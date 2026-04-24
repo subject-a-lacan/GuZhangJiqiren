@@ -48,6 +48,7 @@ void init_sensor(STATUS *status) {
   init_gw_analogue(&status->sensor.gw_analogue);
 }
 
+
 void init_state(STATUS *status, uint8_t T) {
   status->state.T = T;
   status->state.time = 0;
