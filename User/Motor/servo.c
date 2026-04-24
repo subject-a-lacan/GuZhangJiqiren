@@ -12,7 +12,7 @@ void driver_servo(SERVO *servo) {
   } else if (servo->which == 2) {
     __HAL_TIM_SET_COMPARE(&htim15, TIM_CHANNEL_1, (int)((((float)servo->angle / (float)servo->max_angle) * 0.1 + 0.025) * 50000));
   }
-
+//((angle / max) * (最长时间 - 最短时间) + 最短时间) / 总周期时间 * PWM最大值
   return;
 }
 

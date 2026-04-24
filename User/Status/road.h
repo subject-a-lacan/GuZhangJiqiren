@@ -11,23 +11,23 @@
 #define ROAD_RIGHT 20000
 
 typedef enum Road {    // L F R
-  CrossRoad = 0b111,   // 1 1 1
-  TBRoad = 0b101,      // 1 0 1
-  TLRoad = 0b011,      // 1 1 0
-  TRRoad = 0b110,      // 0 1 1
-  LeftRoad = 0b001,    // 1 0 0
-  RightRoad = 0b100,   // 0 0 1
-  Straight = 0b010,    // 0 1 0
-  UnknowRoad = 0b000,  // 0 0 0
+  CrossRoad = 0b111,   // 三方向都有路
+  TBRoad = 0b101,      // 左右有路 前方无路
+  TLRoad = 0b011,      // 左前有路 右侧无路
+  TRRoad = 0b110,      // 前右有路 左侧无路
+  LeftRoad = 0b001,    // 只有左侧有路
+  RightRoad = 0b100,   // 只有右侧有路
+  Straight = 0b010,    // 只有前方有路
+  UnknowRoad = 0b000,  // 没识别到路
 } Road;
 
 typedef struct RoadDetermine {
-  uint8_t data_buf;
-  uint8_t integral;
-  uint8_t maybe;
-  uint8_t cross_cnt;
-  Road cross;
-  uint8_t integral_times;
+  uint8_t data_buf;        // 当前帧巡线数字量数据
+  uint8_t integral;        // 多帧按位累计结果，用于稳定判路
+  uint8_t maybe;           // 候选判定计数器，控制再观察几帧
+  uint8_t cross_cnt;       // 已通过/识别的路口计数
+  Road cross;              // 当前判定出的道路类型
+  uint8_t integral_times;  // 进行一次判定需要累计的帧数
 
 } RoadDetermine;
 

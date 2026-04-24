@@ -21,6 +21,19 @@ uint8_t cross_delay = 0;       // 路口延时计数器
 int32_t keep_angle_time = -1;  // 保持角度时间
 uint8_t speed_show_flag = 0;   // 显示速度标志位
 
+/**
+ * @brief 初始化舵机和轮子
+ * @param 无
+ * @return 无
+ *@note 调用 init_servo(&status.motor.servo[0], 1, 180)
+ *       把 1 号舵机挂到状态树里，180 是这个舵机的最大角度，后续可按实物修改
+ *@note 调用 init_servo(&status.motor.servo[1], 2, 270)
+ *       把 2 号舵机挂到状态树里，270 是这个舵机的最大角度，后续可按实物修改
+ *@note 调用 init_wheel(&status.motor.wheel[0], 1, -1)
+ *       把左轮挂到状态树里，1 是硬件编号，-1 用来修正正反转方向，后续常调
+ *@note 调用 init_wheel(&status.motor.wheel[1], 2, 1)
+ *       把右轮挂到状态树里，2 是硬件编号，1 表示当前方向定义，后续常调
+ */
 void init_motor() {
   init_servo(&status.motor.servo[0], 1, 180);
   init_servo(&status.motor.servo[1], 2, 270);
@@ -31,6 +44,23 @@ void init_motor() {
   return;
 }
 
+/**
+ * @brief 初始化按键、灯和蜂鸣器
+ * @param 无
+ * @return 无
+ *@note 调用 init_button(&status.device.button_D2, 1, 0)
+ *       初始化 D2 按键，1 是按键编号，0 表示低电平按下，后续可按接线改
+ *@note 调用 init_button(&status.device.button_B11, 2, 0)
+ *       初始化 B11 按键，2 是按键编号，0 表示低电平按下，后续可按接线改
+ *@note 调用 init_LED(&status.device.led_on_board, 1, 0)
+ *       初始化板载灯，1 是设备编号，0 表示低电平点亮，后续可按电路改
+ *@note 调用 init_LED(&status.device.led1, 2, 0)
+ *       初始化外接 LED1，2 是设备编号，点亮电平方式后续可调
+ *@note 调用 init_LED(&status.device.led2, 3, 0)
+ *       初始化外接 LED2，3 是设备编号，点亮电平方式后续可调
+ *@note 调用 init_BUZZER(&status.device.buzzer, 1, 1)
+ *       初始化蜂鸣器，1 是设备编号，1 表示高电平响，后续可按电路改
+ */
 void init_device() {
   init_button(&status.device.button_D2, 1, 0);
   init_button(&status.device.button_B11, 2, 0);
@@ -42,6 +72,17 @@ void init_device() {
   return;
 }
 
+/**
+ * @brief 初始化传感器
+ * @param status 状态结构体指针，用来找到各个传感器在状态树中的位置
+ * @return 无
+ *@note 调用 init_gyr(&status->sensor.gy901)
+ *       初始化陀螺仪的缓存区、设备地址和起始寄存器地址，其中地址参数后续可调
+ *@note 调用 init_gw_8bit(&status->sensor.gw_8bit)
+ *       初始化 8 路数字灰度的权重、路口缓存和巡线 PID，其中权重和 PID 参数后续可调
+ *@note 调用 init_gw_analogue(&status->sensor.gw_analogue)
+ *       初始化 8 路模拟灰度的通道值、阈值和校准数据，其中阈值参数后续可调
+ */
 void init_sensor(STATUS *status) {
   init_gyr(&status->sensor.gy901);
   init_gw_8bit(&status->sensor.gw_8bit);
@@ -49,6 +90,17 @@ void init_sensor(STATUS *status) {
 }
 
 
+/**
+ * @brief 初始化小车运行时要用到的基础状态
+ * @param status 状态结构体指针，用来写入整车的初始状态
+ * @param T 系统控制周期，单位 ms，表示状态多久更新一次
+ * @return 无
+ *@note 这里会把时间清零，并把运动模式先设成 STOP，保证上电时车不会直接动
+ *@note 这里会给当前角度、目标角度、基础速度和灰度状态这些运行变量设默认值
+ *@note 这里会把 road_determine 里的路口缓存、计数和判路参数设成初值
+ *       其中 integral_times = 6 是后续可调的一个灵敏度参数
+ *@note 参数 T 会影响后续控制节奏，是后续常调的基础参数
+ */
 void init_state(STATUS *status, uint8_t T) {
   status->state.T = T;
   status->state.time = 0;
@@ -72,11 +124,36 @@ void init_state(STATUS *status, uint8_t T) {
   return;
 }
 
+/**
+ * @brief 初始化状态层控制用的 PID
+ * @param status 状态结构体指针，用来保存巡线和保角 PID
+ * @return 无
+ *@note 调用 init_pid(1.5, 0.1, 500, 20, 20)
+ *       初始化巡线 PID，这几个数字分别控制跟线反应快慢和积分限制，后续都可调
+ *@note 调用 init_pid(1, 0, 1, 20, 20)
+ *       初始化保角 PID，这几个数字决定转向纠偏力度和稳定性，后续都可调
+ */
 void init_status_pid(STATUS *status) {
   status->state.status_pid.follow_line_pid = init_pid(1.5, 0.1, 500, 20, 20);
   status->state.status_pid.keep_angle_pid = init_pid(1, 0, 1, 20, 20);
 }
 
+/**
+ * @brief 初始化整棵 status 状态树
+ * @param status 状态结构体指针，整车所有状态都会挂在这里
+ * @param T 系统控制周期，单位 ms
+ * @return 无
+ *@note 调用 init_state(status, T)
+ *       先把时间、模式、角度、基础速度和路口判断缓存设成起始值，其中 T 和 integral_times 后续可调
+ *@note 调用 init_status_pid(status)
+ *       把巡线 PID 和保角 PID 先准备好，这两组参数后续调车时常改
+ *@note 调用 init_sensor(status)
+ *       把陀螺仪、数字灰度、模拟灰度的默认参数准备好，地址、阈值、权重等后续可调
+ *@note 调用 init_motor()
+ *       把舵机和轮子与实际硬件通道对应起来，舵机最大角度和轮子方向参数后续可调
+ *@note 调用 init_device()
+ *       把按键、LED、蜂鸣器的编号和电平逻辑设好，电平有效方式后续可调
+ */
 void init_status(STATUS *status, uint8_t T) {
   init_state(status, T);
 

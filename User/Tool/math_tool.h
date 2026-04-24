@@ -8,7 +8,7 @@
 #define LIMIT_MIN(x, min) MAX(x, min)
 #define LIMIT(x, min, max) LIMIT_MIN(LIMIT_MAX(x, max), min)
 #define CLAMP(x, range) LIMIT(x, -(range), range)
-#define CONFINE(x, a, b) ((x) < (a) ? (a) : ((x) > (b) ? (b) : (x)))
+#define CONFINE(x, a, b) ((x) < (a) ? (a) : ((x) > (b) ? (b) : (x))) // 宏定义限制函数，将x限制在[a, b]范围内 小于a返回a 大于b返回b 否则返回x
 #define SIGN(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))  // 宏定义符号函数
 
 #define POW(base, exp) ({              \
