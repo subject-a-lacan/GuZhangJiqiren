@@ -22,7 +22,8 @@ uint8_t find_voice[3] = {0xAA, 0x01, 0xBB};
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   status.state.time += status.state.T;  // 更新系统时间
-
+   status.device.led1.on = 1;
+  status.device.led2.on = 1;
   if (htim == &htim5)  // 周期 1ms
   {
     if (status.state.time == 50)

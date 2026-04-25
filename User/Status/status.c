@@ -168,29 +168,34 @@ void init_status(STATUS *status, uint8_t T) {
   return;
 }
 
-Road road_buf = Straight;
+Road road_buf = Straight;  //存储上一次检测到的路口类型
 
+/*
+ * @brief 判断当前路况是直行还是转弯
+ * @param 无
+ * @return 路口类型
+ */
 Road Turn_or_Straight() {
   if (road_buf != status.state.road_determine.cross) {
-    status.motor.wheel[0].tar_speed = 0;
+    status.motor.wheel[0].tar_speed = 0; //路况发生变化就先停车
     status.motor.wheel[1].tar_speed = 0;
     if ((ABS(status.motor.wheel[0].cur_speed) < 5) && (ABS(status.motor.wheel[1].cur_speed) < 5)) {
-      road_buf = status.state.road_determine.cross;
+      road_buf = status.state.road_determine.cross; 
     }
   }
-  if (status.state.road_determine.cross == LeftRoad && left_cnt == 1) {
-    status.state.base_speed = 60;
-    status.state.road_determine.integral = 4;
-  }
+  // if (status.state.road_determine.cross == LeftRoad && left_cnt == 1) {
+  //   status.state.base_speed = 60;
+  //   status.state.road_determine.integral = 4;
+  // }  还没看懂为什么特化左转
   return road_buf;
 }
 
 void follow_line(STATUS *status) {
   if (cross_delay > 0) {
     cross_delay--;
-  }
-  get_gw_analoge_digital_data(&status->sensor.gw_analogue);
-  get_gw_analogue_analogue_diff(&status->sensor.gw_analogue);
+  }//可以视作反应时间 可以理解成“刚识别完关键路口后，先别急着改判定，再观察一小段时间”。
+  get_gw_analoge_digital_data(&status->sensor.gw_analogue);   //获取01001八位数字量
+  get_gw_analogue_analogue_diff(&status->sensor.gw_analogue); //获取归一化量
 
   get_road_type(&status->state.road_determine, status->sensor.gw_analogue.digital_8bit);
 

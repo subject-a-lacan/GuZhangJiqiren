@@ -93,6 +93,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  while (1) {
+  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);    // PC13
+  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);  // PC0
+  HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);  // PC2
+  HAL_Delay(1000);
+}
   MX_DMA_Init();
   MX_ADC3_Init();
   MX_I2C2_Init();
@@ -111,9 +117,7 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+  
   init_status(&status, 1);
 
   after_init_state();
@@ -129,7 +133,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  
+;
   }
   /* USER CODE END 3 */
 }

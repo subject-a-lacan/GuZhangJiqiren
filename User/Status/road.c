@@ -37,7 +37,13 @@ Road road_decision(RoadDetermine *roaddetermine) {
   Road road = road_new_from_bit(left, font, right);
   return road;
 }
-
+/*
+  * @brief 根据判定出的路口类型调整小车状态
+  * @param roaddetermine 路口判定结构体指针，用来获取当前判定的路口类型和计数等信息
+  * @param road 当前判定出的路口类型
+  * @return 无
+  *@note 在get road type里调用
+*/
 void serve_road(RoadDetermine *roaddetermine, Road road) {
   if (status.state.motion == FIND_LINE) {
     if (road == CrossRoad) {

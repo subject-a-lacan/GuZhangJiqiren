@@ -22,12 +22,16 @@ typedef enum Road {    // L F R
 } Road;
 
 typedef struct RoadDetermine {
-  uint8_t data_buf;        // 当前帧巡线数字量数据
-  uint8_t integral;        // 多帧按位累计结果，用于稳定判路
-  uint8_t maybe;           // 候选判定计数器，控制再观察几帧
+  uint8_t data_buf;        // 当前帧巡线数字量
+  uint8_t integral;        // 按位或：只要有一位是1就是1 用来取多帧判定的并集举例（假设窗口 4 帧）：
+                          // 第1帧 data_buf = 00111100
+                          // 第2帧 data_buf = 00111110
+                          // 第3帧 data_buf = 01111100 
+                          // 第4帧 data_buf = 00111100  第4次后 = 01111110
+  uint8_t maybe;           // 计数器
   uint8_t cross_cnt;       // 已通过/识别的路口计数
   Road cross;              // 当前判定出的道路类型
-  uint8_t integral_times;  // 进行一次判定需要累计的帧数
+  uint8_t integral_times;  // 进行一次判定需要累计的帧数  计数器的初始值
 
 } RoadDetermine;
 
