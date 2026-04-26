@@ -26,135 +26,136 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   status.device.led2.on = 1;
   if (htim == &htim5)  // 周期 1ms
   {
-    if (status.state.time == 50)
-      status.device.led_on_board.on = 1;
-    else if (status.state.time == 100)
-      status.device.led_on_board.on = 0;
-    else if (status.state.time == 150)
-      status.device.led_on_board.on = 1;
-    else if (status.state.time == 200)
-      status.device.led_on_board.on = 0;
-    else if (status.state.time == 250)
-      status.device.led_on_board.on = 1;
-    else if (status.state.time == 300)
-      status.device.led_on_board.on = 0;
+    // if (status.state.time == 50)
+    //   status.device.led_on_board.on = 1;
+    // else if (status.state.time == 100)
+    //   status.device.led_on_board.on = 0;
+    // else if (status.state.time == 150)
+    //   status.device.led_on_board.on = 1;
+    // else if (status.state.time == 200)
+    //   status.device.led_on_board.on = 0;
+    // else if (status.state.time == 250)
+    //   status.device.led_on_board.on = 1;
+    // else if (status.state.time == 300)
+    //   status.device.led_on_board.on = 0;
 
-    if (rw_time_cur != -1) {
-      if (is_init == 0) {
-        if (status.state.time == rw_time_cur + 300) {
-          status.state.initial_angle = status.state.cur_angle;
-        }
-        is_init = 1;
-      }
-      if (cross_cnt == 0) {
-        if (status.state.time == rw_time_cur + 50)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_cur + 100)
-          status.device.buzzer.on = 0;
-        else if (status.state.time == rw_time_cur + 150)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_cur + 200)
-          status.device.buzzer.on = 0;
-        else if (status.state.time == rw_time_cur + 250)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_cur + 300)
-          status.device.buzzer.on = 0;
-      } else if (cross_cnt == 1) {
-        if (status.state.time == rw_time_cur + 50)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_cur + 100)
-          status.device.buzzer.on = 0;
-        else if (status.state.time == rw_time_cur + 150)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_cur + 200)
-          status.device.buzzer.on = 0;
-        else if (status.state.time == rw_time_cur + 250)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_cur + 300)
-          status.device.buzzer.on = 0;
-        else if (status.state.time == rw_time_cur + 500) {
-          status.state.base_speed = 40;
-        }
-      } else if (cross_cnt == 2) {
-        if (status.state.time == rw_time_cur + 500) {
-          status.state.base_speed = -40;
-          status.state.road_determine.integral_times = 6;
-        }
-      } else if (cross_cnt == 3) {
-        if (status.state.time == rw_time_cur + 500) {
-          status.state.base_speed = 40;
-        }
-      }
-    }
+    // if (rw_time_cur != -1) {
+    //   if (is_init == 0) {
+    //     if (status.state.time == rw_time_cur + 300) {
+    //       status.state.initial_angle = status.state.cur_angle;
+    //     }
+    //     is_init = 1;
+    //   }
+    //   if (cross_cnt == 0) {
+    //     if (status.state.time == rw_time_cur + 50)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_cur + 100)
+    //       status.device.buzzer.on = 0;
+    //     else if (status.state.time == rw_time_cur + 150)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_cur + 200)
+    //       status.device.buzzer.on = 0;
+    //     else if (status.state.time == rw_time_cur + 250)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_cur + 300)
+    //       status.device.buzzer.on = 0;
+    //   } else if (cross_cnt == 1) {
+    //     if (status.state.time == rw_time_cur + 50)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_cur + 100)
+    //       status.device.buzzer.on = 0;
+    //     else if (status.state.time == rw_time_cur + 150)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_cur + 200)
+    //       status.device.buzzer.on = 0;
+    //     else if (status.state.time == rw_time_cur + 250)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_cur + 300)
+    //       status.device.buzzer.on = 0;
+    //     else if (status.state.time == rw_time_cur + 500) {
+    //       status.state.base_speed = 40;
+    //     }
+    //   } else if (cross_cnt == 2) {
+    //     if (status.state.time == rw_time_cur + 500) {
+    //       status.state.base_speed = -40;
+    //       status.state.road_determine.integral_times = 6;
+    //     }
+    //   } else if (cross_cnt == 3) {
+    //     if (status.state.time == rw_time_cur + 500) {
+    //       status.state.base_speed = 40;
+    //     }
+    //   }
+    // }
 
-    if (rw_time_tar != -1) {
-      if (status.state.motion == KEEP_ANGLE) {
-        if (status.state.time == rw_time_tar + 4500)
-          status.state.base_speed = 0;
-        if (status.state.time == rw_time_tar + 50 + 4500)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_tar + 100 + 4500)
-          status.device.buzzer.on = 0;
-        else if (status.state.time == rw_time_tar + 150 + 4500)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_tar + 200 + 4500)
-          status.device.buzzer.on = 0;
-        else if (status.state.time == rw_time_tar + 250 + 4500)
-          status.device.buzzer.on = 1;
-        else if (status.state.time == rw_time_tar + 300 + 4500)
-          status.device.buzzer.on = 0;
-      }
-    }
-    if (rw_time_tar != -1) {
-      if (status.state.time == rw_time_tar + 500) {
-        status.state.base_speed = 40;
-      } else if (status.state.time == rw_time_tar + 1500) {
-        status.state.base_speed = 0;
-      } else if (status.state.time == rw_time_tar + 1550) {
-        status.device.buzzer.on = 1;
-      } else if (status.state.time == rw_time_tar + 1600) {
-        status.device.buzzer.on = 0;
-      } else if (status.state.time == rw_time_tar + 1650) {
-        status.device.buzzer.on = 1;
-      } else if (status.state.time == rw_time_tar + 1700) {
-        status.device.buzzer.on = 0;
-      } else if (status.state.time == rw_time_tar + 1750) {
-        status.device.buzzer.on = 1;
-      } else if (status.state.time == rw_time_tar + 1800) {
-        status.device.buzzer.on = 0;
-        status.state.motion = STOP;
-      } else if (status.state.time == rw_time_tar + 1850) {
-        status.device.led1.on = 1;
-        HAL_UART_Transmit(&huart2, find_voice, 3, 100);
-      }
-      if (wait_finish_flag == 1) {
-        wait_finish_flag = 0;
-        status.state.tar_angle = -63.5;
-        status.state.motion = KEEP_ANGLE;
-      }
-      if (status.state.time == keep_angle_time + 3500) {
-        status.state.base_speed = 0;
-        status.state.motion = STOP;
-        HAL_UART_Transmit(&huart3, maixcam, 3, 100);
-      } else if (status.state.time == keep_angle_time + 50 + 3500) {
-        status.device.buzzer.on = 1;
-      } else if (status.state.time == keep_angle_time + 100 + 3500) {
-        status.device.buzzer.on = 0;
-      } else if (status.state.time == keep_angle_time + 150 + 3500) {
-        status.device.buzzer.on = 1;
-      } else if (status.state.time == keep_angle_time + 200 + 3500) {
-        status.device.buzzer.on = 0;
-      } else if (status.state.time == keep_angle_time + 250 + 3500) {
-        status.device.buzzer.on = 1;
-      } else if (status.state.time == keep_angle_time + 300 + 3500) {
-        status.device.buzzer.on = 0;
-      }
-    }
-    if (status.state.time % 20 == 0) {  // 周期 25ms
-      update_status(&status);           // 状态更新中断 用于读取传感器原始数据
-    }
-    if (status.state.time % 100 == 0) {  // 周期 100ms
-      log_uprintf(&huart4, "n0.val=%d\xff\xff\xff", (int)(0.83 * ((status.motor.wheel[0].cur_speed + status.motor.wheel[1].cur_speed) / 2)));
-    }
+    // if (rw_time_tar != -1) {
+    //   if (status.state.motion == KEEP_ANGLE) {
+    //     if (status.state.time == rw_time_tar + 4500)
+    //       status.state.base_speed = 0;
+    //     if (status.state.time == rw_time_tar + 50 + 4500)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_tar + 100 + 4500)
+    //       status.device.buzzer.on = 0;
+    //     else if (status.state.time == rw_time_tar + 150 + 4500)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_tar + 200 + 4500)
+    //       status.device.buzzer.on = 0;
+    //     else if (status.state.time == rw_time_tar + 250 + 4500)
+    //       status.device.buzzer.on = 1;
+    //     else if (status.state.time == rw_time_tar + 300 + 4500)
+    //       status.device.buzzer.on = 0;
+    //   }
+    // }
+    // if (rw_time_tar != -1) {
+    //   if (status.state.time == rw_time_tar + 500) {
+    //     status.state.base_speed = 40;
+    //   } else if (status.state.time == rw_time_tar + 1500) {
+    //     status.state.base_speed = 0;
+    //   } else if (status.state.time == rw_time_tar + 1550) {
+    //     status.device.buzzer.on = 1;
+    //   } else if (status.state.time == rw_time_tar + 1600) {
+    //     status.device.buzzer.on = 0;
+    //   } else if (status.state.time == rw_time_tar + 1650) {
+    //     status.device.buzzer.on = 1;
+    //   } else if (status.state.time == rw_time_tar + 1700) {
+    //     status.device.buzzer.on = 0;
+    //   } else if (status.state.time == rw_time_tar + 1750) {
+    //     status.device.buzzer.on = 1;
+    //   } else if (status.state.time == rw_time_tar + 1800) {
+    //     status.device.buzzer.on = 0;
+    //     status.state.motion = STOP;
+    //   } else if (status.state.time == rw_time_tar + 1850) {
+    //     status.device.led1.on = 1;
+    //     HAL_UART_Transmit(&huart2, find_voice, 3, 100);
+    //   }
+    //   if (wait_finish_flag == 1) {
+    //     wait_finish_flag = 0;
+    //     status.state.tar_angle = -63.5;
+    //     status.state.motion = KEEP_ANGLE;
+    //   }
+    //   if (status.state.time == keep_angle_time + 3500) {
+    //     status.state.base_speed = 0;
+    //     status.state.motion = STOP;
+    //     HAL_UART_Transmit(&huart3, maixcam, 3, 100);
+    //   } else if (status.state.time == keep_angle_time + 50 + 3500) {
+    //     status.device.buzzer.on = 1;
+    //   } else if (status.state.time == keep_angle_time + 100 + 3500) {
+    //     status.device.buzzer.on = 0;
+    //   } else if (status.state.time == keep_angle_time + 150 + 3500) {
+    //     status.device.buzzer.on = 1;
+    //   } else if (status.state.time == keep_angle_time + 200 + 3500) {
+    //     status.device.buzzer.on = 0;
+    //   } else if (status.state.time == keep_angle_time + 250 + 3500) {
+    //     status.device.buzzer.on = 1;
+    //   } else if (status.state.time == keep_angle_time + 300 + 3500) {
+    //     status.device.buzzer.on = 0;
+    //   }
+    // }
+    // if (status.state.time % 20 == 0) {  // 周期 25ms
+    //   update_status(&status);           // 状态更新中断 用于读取传感器原始数据
+    // }
+    // if (status.state.time % 100 == 0) {  // 周期 100ms
+    //   log_uprintf(&huart4, "n0.val=%d\xff\xff\xff", (int)(0.83 * ((status.motor.wheel[0].cur_speed + status.motor.wheel[1].cur_speed) / 2)));
+    // }
+    
   }
 }
