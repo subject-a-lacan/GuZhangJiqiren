@@ -189,7 +189,12 @@ Road Turn_or_Straight() {
   // }  还没看懂为什么特化左转
   return road_buf;
 }
-
+/*
+ * @brief 巡线控制
+ * @param status 状态结构体指针
+ * @return 无
+ * @note 每次被调用时，会完成一轮：采集灰度数据 → 判定路型 → 生成左右轮目标速度。
+ */
 void follow_line(STATUS *status) {
   if (cross_delay > 0) {
     cross_delay--;
@@ -224,7 +229,13 @@ void follow_line(STATUS *status) {
 
 uint8_t cnt = 20;
 uint8_t flag = 1;
-
+/*
+ * @brief 保持角度控制
+ * @param status 状态结构体指针
+ * @return 无
+ * @note 每次被调用时，会完成一轮：计算当前与目标角度的差值 → 通过 PID 计算转向修正量 → 生成左右轮目标速度。
+ * @note 当角度误差小于 1 度时，先让车稳定一小段时间（cnt 和 flag 的作用），然后把基础速度提高到 40，开始加速。
+ */
 void keep_angle(STATUS *status) {
   float target = status->state.tar_angle + status->state.initial_angle;  // 目标角度
   float diff_angle = target - status->state.cur_angle;
@@ -243,14 +254,18 @@ void keep_angle(STATUS *status) {
       cnt--;
     } else {
       if (flag == 1) {
-        keep_angle_time = status->state.time;  // 记录保持角度的时间
-        status->state.base_speed = 40;
+        keep_angle_time = status->state.time;  // 记录保持角度的时间 为后续时间提供时间
+        status->state.base_speed = 40;         // 角度稳定后加速
         flag = 0;
       }
     }
   }
 }
-
+/*
+ * @brief 更新按钮状态 调用srver_button函数执行具体按键逻辑
+ * @param status 状态结构体指针
+ * @return 无
+ */
 void update_status(STATUS *status) {
   get_gw_raw_data(&status->sensor.gw_analogue);
 
@@ -258,9 +273,8 @@ void update_status(STATUS *status) {
   status->motor.wheel[1].cur_speed = get_wheel_speed(&status->motor.wheel[1]);
   status->motor.wheel[2].cur_speed = get_wheel_speed(&status->motor.wheel[2]);
   status->motor.wheel[3].cur_speed = get_wheel_speed(&status->motor.wheel[3]);
-
+  //get_gyr_raw_data是获取原始数据 get_gyr_value则是解析映射原始数据
   get_gyr_raw_data(&hi2c1, &status->sensor.gy901);
-
   status->state.cur_angle = get_gyr_value(&status->sensor.gy901, gyr_z_yaw);
 
   if (status->state.motion == FIND_LINE) {
@@ -274,7 +288,7 @@ void update_status(STATUS *status) {
     status->motor.wheel[1].tar_speed = 0;
   }
 
-  log_uprintf(&huart1, "%d %d %d %d\r\n", cross_cnt, cross_delay, Turn_or_Straight(), status->state.road_determine.cross);
+  // log_uprintf(&huart1, "%d %d %d %d\r\n", cross_cnt, cross_delay, Turn_or_Straight(), status->state.road_determine.cross);
 
   driver_button(&status->device.button_D2);
   driver_button(&status->device.button_B11);
@@ -284,7 +298,7 @@ void update_status(STATUS *status) {
   driver_LED(&status->device.led2);
 
   driver_servo(&status->motor.servo[0]);
-  driver_servo(&status->motor.servo[1]);
+  driver_servo(&status->motor.servo[1]); //舵机转动制定角度（结构体元素确定
 
   driver_BUZZER(&status->device.buzzer);
 
@@ -294,9 +308,13 @@ void update_status(STATUS *status) {
   return;
 }
 
-void driver_status(STATUS *status) {  // 鐘舵€佹暟椹卞姩
+void driver_status(STATUS *status) {  // 
 }
-
+/*
+ * @brief 初始化状态后更新初始角度 避免读取旧缓存值
+ * @param 无
+ * @return 无
+ */
 void after_init_state() {
   get_gyr_raw_data(&hi2c1, &status.sensor.gy901);
   HAL_Delay(50);
