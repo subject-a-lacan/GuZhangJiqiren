@@ -93,12 +93,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  while (1) {
-  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);    // PC13
-  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);  // PC0
-  HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);  // PC2
-  HAL_Delay(1000);
-}
   MX_DMA_Init();
   MX_ADC3_Init();
   MX_I2C2_Init();

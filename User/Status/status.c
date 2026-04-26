@@ -298,7 +298,7 @@ void update_status(STATUS *status) {
   driver_LED(&status->device.led2);
 
   driver_servo(&status->motor.servo[0]);
-  driver_servo(&status->motor.servo[1]); //舵机转动制定角度（结构体元素确定
+  driver_servo(&status->motor.servo[1]); //舵机转动定角度（结构体元素确定
 
   driver_BUZZER(&status->device.buzzer);
 
