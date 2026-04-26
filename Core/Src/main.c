@@ -31,6 +31,14 @@
 #include "log.h"
 #include "status.h"
 #include "uart_it.h"
+#include "button.h"
+#include "led.h"
+#include "buzzer.h"
+#include "wheel.h"
+#include "servo.h"
+#include "gw_anagloge.h"
+#include "gy901.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,7 +65,11 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+int fputc(int ch, FILE *f)
+{
+    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1,HAL_MAX_DELAY);
+    return ch;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -104,6 +116,7 @@ int main(void)
   MX_TIM15_Init();
   MX_UART4_Init();
   MX_USART1_UART_Init();
+
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
   MX_TIM5_Init();
@@ -114,7 +127,7 @@ int main(void)
   
   init_status(&status, 1);
 
-  after_init_state();
+  // after_init_state();
 
   HAL_TIM_Base_Start_IT(&htim5);
   
@@ -127,7 +140,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-;
+    // log_uprintf(&huart1, "1,2,3\r\n");
+    printf("1,2,3\r\n");
+    HAL_Delay(1000);
+
   }
   /* USER CODE END 3 */
 }
