@@ -45,4 +45,5 @@ car_control_stm32_project/main.o: ../Core/Src/main.c ../Core/Inc\main.h \
   ../User/Sensor\gw_anagloge.h ../User/Sensor\gw_find_line.h \
   ../User/Tool\pid.h ../User/Status\road.h ../User/Sensor\gy901.h \
   ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h \
-  ../User/It\uart_it.h
+  ../User/It\uart_it.h ../User/Tool\math_tool.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h

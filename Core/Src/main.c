@@ -31,6 +31,15 @@
 #include "log.h"
 #include "status.h"
 #include "uart_it.h"
+#include "pid.h"
+#include "wheel.h"
+#include "servo.h"
+#include "led.h"
+#include "button.h"
+#include "road.h"
+#include "math_tool.h"
+#include "stdio.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,7 +66,11 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+int fputc(int ch, FILE *f)
+{
+    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1,HAL_MAX_DELAY);
+    return ch;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -129,6 +142,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    printf("1,2,3\r\n");
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
