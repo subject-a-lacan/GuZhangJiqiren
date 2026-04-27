@@ -142,6 +142,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
     // log_uprintf(&huart1, "1,2,3\r\n");
     printf("1,2,3\r\n");
+    //log_uprintf(&huart1, "helloworld\r\n");
     HAL_Delay(1000);
 
   }
