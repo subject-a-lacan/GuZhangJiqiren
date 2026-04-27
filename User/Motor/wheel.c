@@ -43,7 +43,7 @@ void set_wheel_dir(WHEEL *wheel, int16_t trust) {
       HAL_GPIO_WritePin(M1D2_GPIO_Port, M1D2_Pin, 1);
     }
   } else if (wheel->which == 2) {
-    if (wheel->trust * wheel->dir > 0) {
+    if (wheel->trust * wheel->dir < 0) {
       HAL_GPIO_WritePin(M2D1_GPIO_Port, M2D1_Pin, 1);
       HAL_GPIO_WritePin(M2D2_GPIO_Port, M2D2_Pin, 0);
     } else {
@@ -114,7 +114,7 @@ void init_wheel(WHEEL *wheel, uint8_t which, int8_t dir) {
   wheel->cur_speed = 0;
   wheel->tar_speed = 0;
   wheel->dir = dir;
-  wheel->wheel_pid = init_pid(0, 0, 0, 1, 10);  // PID已禁用，电机测试直接设trust
+  wheel->wheel_pid = init_pid(1.5, 0.5, 0, 1, 10);  // kd=0，导数项已禁用
   if (wheel->which == 1) {
     HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
   } else if (wheel->which == 2) {
