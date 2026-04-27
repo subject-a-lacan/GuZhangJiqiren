@@ -76,7 +76,7 @@ void set_wheel_dir(WHEEL *wheel, int16_t trust) {
  * @note 通过PID计算得到推力，并设置电机方向和PWM占空比
  */
 void driver_wheel(WHEEL *wheel) {
-  wheel->trust += compute_pid(&wheel->wheel_pid, wheel->tar_speed - wheel->cur_speed);
+  wheel->trust = compute_pid(&wheel->wheel_pid, wheel->tar_speed - wheel->cur_speed);
   wheel->trust = CONFINE(wheel->trust, -TRUST_CONFINE, TRUST_CONFINE); //trust的单位是PWM占空比的值 
 
   if (wheel->tar_speed == 0 && wheel->cur_speed == 0) {

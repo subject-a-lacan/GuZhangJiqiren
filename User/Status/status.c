@@ -39,7 +39,7 @@ void init_motor() {
   init_servo(&status.motor.servo[1], 2, 270);
 
   init_wheel(&status.motor.wheel[0], 1, -1);
-  init_wheel(&status.motor.wheel[1], 2, 1);
+  init_wheel(&status.motor.wheel[1], 2, -1);
 
   return;
 }
@@ -288,8 +288,8 @@ void update_status(STATUS *status) {
     status->motor.wheel[1].tar_speed = 0;
   }
   if (status->state.motion == MOTOR_TEST) {
-    status->motor.wheel[0].tar_speed = 100;
-    status->motor.wheel[1].tar_speed = 100;
+    status->motor.wheel[0].tar_speed = 6000;
+    status->motor.wheel[1].tar_speed = -3000;
   }
 
   log_uprintf(&huart1, "%d %d %d %d\r\n", cross_cnt, cross_delay, Turn_or_Straight(), status->state.road_determine.cross);

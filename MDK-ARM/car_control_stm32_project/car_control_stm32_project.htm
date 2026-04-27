@@ -3,7 +3,7 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Tue Apr 28 00:00:08 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Tue Apr 28 01:34:31 2026
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -2398,7 +2398,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[148]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[190]"></a>driver_wheel</STRONG> (Thumb, 260 bytes, Stack size 8 bytes, wheel.o(.text.driver_wheel))
+<P><STRONG><a name="[190]"></a>driver_wheel</STRONG> (Thumb, 244 bytes, Stack size 8 bytes, wheel.o(.text.driver_wheel))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = driver_wheel &rArr; set_wheel_dir
 </UL>
 <BR>[Calls]<UL><LI><a href="#[191]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
@@ -2528,7 +2528,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
 </UL>
 
-<P><STRONG><a name="[1a6]"></a>init_motor</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, status.o(.text.init_motor))
+<P><STRONG><a name="[1a6]"></a>init_motor</STRONG> (Thumb, 80 bytes, Stack size 8 bytes, status.o(.text.init_motor))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = init_motor &rArr; init_wheel &rArr; HAL_TIM_PWM_Start
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
@@ -2700,7 +2700,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
 </UL>
 
-<P><STRONG><a name="[148]"></a>update_status</STRONG> (Thumb, 292 bytes, Stack size 32 bytes, status.o(.text.update_status))
+<P><STRONG><a name="[148]"></a>update_status</STRONG> (Thumb, 300 bytes, Stack size 32 bytes, status.o(.text.update_status))
 <BR><BR>[Stack]<UL><LI>Max Depth = 272 + Unknown Stack Size
 <LI>Call Chain = update_status &rArr; driver_button &rArr; server_button &rArr; correct_gw_analogue &rArr; log_uprintf &rArr; vsnprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
