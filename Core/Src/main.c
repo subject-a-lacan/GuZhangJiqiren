@@ -142,7 +142,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    printf("1,2,3\r\n");
+    log_uprintf(&huart1, "%d,%d,%d\r\n", status.motor.wheel[0].tar_speed, status.motor.wheel[0].cur_speed, status.motor.wheel[0].trust);
+    // log_uprintf(&huart1, "1,2,3\r\n");
     HAL_Delay(1000);
   }
   /* USER CODE END 3 */
