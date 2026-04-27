@@ -25,6 +25,7 @@ typedef enum MOTION_STATION {
   STOP,
   KEEP_ANGLE,
   FIND_LINE,
+  MOTOR_TEST,
 } MOTION_STATION;
 /*
  * @brief 传感器结构体

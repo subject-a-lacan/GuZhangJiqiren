@@ -133,7 +133,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>CMSIS_AGDI</Key>
-          <Name>-X"Any" -UAny -O206 -S9 -C0 -P00 -N00("") -D00(00000000) -L00(0) -TO65554 -TC10000000 -TP20 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32G47x-8x_128.FLM -FS08000000 -FL020000 -FP0($$Device:STM32G474VBTx$CMSIS\Flash\STM32G47x-8x_128.FLM)</Name>
+          <Name>-X"" -O206 -S8 -C0 -P00 -N00("") -D00(00000000) -L00(0) -TO65554 -TC10000000 -TP20 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32G47x-8x_128.FLM -FS08000000 -FL020000 -FP0($$Device:STM32G474VBTx$CMSIS\Flash\STM32G47x-8x_128.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -148,7 +148,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U37FF71064E573436751F1043 -O2254 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32G47x-8x_128.FLM -FS08000000 -FL020000 -FP0($$Device:STM32G474VBTx$CMSIS\Flash\STM32G47x-8x_128.FLM)</Name>
+          <Name>-U37FF71064E573436329B1843 -O2254 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P2 -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32G47x-8x_128.FLM -FS08000000 -FL020000 -FP0($$Device:STM32G474VBTx$CMSIS\Flash\STM32G47x-8x_128.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint/>
@@ -204,7 +204,7 @@
         <Enable>1</Enable>
         <EnableLog>0</EnableLog>
         <Protocol>2</Protocol>
-        <DbgClock>5000000</DbgClock>
+        <DbgClock>10000000</DbgClock>
       </DebugDescription>
     </TargetOption>
   </Target>

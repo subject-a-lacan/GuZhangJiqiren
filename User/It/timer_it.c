@@ -150,9 +150,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     //     status.device.buzzer.on = 0;
     //   }
     // }
-    // if (status.state.time % 20 == 0) {  // 周期 25ms
-    //   update_status(&status);           // 状态更新中断 用于读取传感器原始数据
-    // }
+    if (status.state.time % 20 == 0) {  // 周期 25ms
+      update_status(&status);           // 状态更新中断 用于读取传感器原始数据
+    }
     // if (status.state.time % 100 == 0) {  // 周期 100ms
     //   log_uprintf(&huart4, "n0.val=%d\xff\xff\xff", (int)(0.83 * ((status.motor.wheel[0].cur_speed + status.motor.wheel[1].cur_speed) / 2)));
     // }

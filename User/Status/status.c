@@ -287,6 +287,12 @@ void update_status(STATUS *status) {
     status->motor.wheel[0].tar_speed = 0;
     status->motor.wheel[1].tar_speed = 0;
   }
+  if (status->state.motion == MOTOR_TEST) {
+    status->motor.wheel[0].trust = -600;
+    status->motor.wheel[0].tar_speed = -600;
+    status->motor.wheel[1].trust = 600;
+    status->motor.wheel[1].tar_speed = 600;
+  }
 
   log_uprintf(&huart1, "%d %d %d %d\r\n", cross_cnt, cross_delay, Turn_or_Straight(), status->state.road_determine.cross);
 

@@ -118,10 +118,7 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim5);
 
-  status.motor.wheel[0].trust = -900;
-  status.motor.wheel[0].tar_speed = -900;
-  status.motor.wheel[1].trust = 900;
-  status.motor.wheel[1].tar_speed = 900;
+  status.state.motion = MOTOR_TEST;
 
   /* USER CODE END 2 */
 
@@ -132,9 +129,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    driver_wheel(&status.motor.wheel[0]);
-    driver_wheel(&status.motor.wheel[1]);
-    HAL_Delay(10);
   }
   /* USER CODE END 3 */
 }
