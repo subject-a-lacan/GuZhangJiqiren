@@ -1,4 +1,4 @@
---cpu=Cortex-M4.fp.sp
+--cpu=Cortex-M4.fp
 "car_control_stm32_project\startup_stm32g474xx.o"
 "car_control_stm32_project\main.o"
 "car_control_stm32_project\gpio.o"
@@ -56,7 +56,7 @@
 "car_control_stm32_project\eeprom.o"
 "car_control_stm32_project\log.o"
 "car_control_stm32_project\pid.o"
---strict --scatter "car_control_stm32_project\car_control_stm32_project.sct"
+--library_type=microlib --strict --scatter "stm32g474xx_flash.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "car_control_stm32_project.map" -o car_control_stm32_project\car_control_stm32_project.axf
