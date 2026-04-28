@@ -27,23 +27,23 @@ void init_gw_analogue(GW_ANALOGUE *gw_analogue) {
     gw_analogue->correction_data_w[i] = 0;  // Initialize correction data to 0
     gw_analogue->correction_data_b[i] = 0;  // Initialize correction data to 0
   }
-  gw_analogue->digital_high_threshold[0] = 81;   // Initialize high threshold to 0
-  gw_analogue->digital_high_threshold[1] = 137;  // Initialize high threshold to 0
-  gw_analogue->digital_high_threshold[2] = 77;   // Initialize high threshold to 0
-  gw_analogue->digital_high_threshold[3] = 82;   // Initialize high threshold to 0
-  gw_analogue->digital_high_threshold[4] = 61;   // Initialize high threshold to 0
-  gw_analogue->digital_high_threshold[5] = 115;  // Initialize high threshold to 0
-  gw_analogue->digital_high_threshold[6] = 129;  // Initialize high threshold to 0
-  gw_analogue->digital_high_threshold[7] = 75;   // Initialize high threshold to 0
+ gw_analogue->digital_high_threshold[0] = 46;
+  gw_analogue->digital_high_threshold[1] = 46;
+  gw_analogue->digital_high_threshold[2] = 47;
+  gw_analogue->digital_high_threshold[3] = 47;
+  gw_analogue->digital_high_threshold[4] = 47;
+  gw_analogue->digital_high_threshold[5] = 47;
+  gw_analogue->digital_high_threshold[6] = 46;
+  gw_analogue->digital_high_threshold[7] = 46;
 
-  gw_analogue->digital_low_threshold[0] = 49;  // Initialize low threshold to 0
-  gw_analogue->digital_low_threshold[1] = 95;  // Initialize low threshold to 0
-  gw_analogue->digital_low_threshold[2] = 49;  // Initialize low threshold to 0
-  gw_analogue->digital_low_threshold[3] = 55;  // Initialize low threshold to 0
-  gw_analogue->digital_low_threshold[4] = 37;  // Initialize low threshold to 0
-  gw_analogue->digital_low_threshold[5] = 77;  // Initialize low threshold to 0
-  gw_analogue->digital_low_threshold[6] = 89;  // Initialize low threshold to 0
-  gw_analogue->digital_low_threshold[7] = 47;  // Initialize low threshold to 0
+  gw_analogue->digital_low_threshold[0] = 24;
+  gw_analogue->digital_low_threshold[1] = 24;
+  gw_analogue->digital_low_threshold[2] = 24;
+  gw_analogue->digital_low_threshold[3] = 25;
+  gw_analogue->digital_low_threshold[4] = 25;
+  gw_analogue->digital_low_threshold[5] = 25;
+  gw_analogue->digital_low_threshold[6] = 25;
+  gw_analogue->digital_low_threshold[7] = 24;
 
   for (int i = 0; i < 8; i++) {
     gw_analogue->correction_data_w[i] = 2 * gw_analogue->digital_high_threshold[i] - gw_analogue->digital_low_threshold[i];  // Initialize high threshold to 0
@@ -94,7 +94,8 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
       select_channel(i);                                             // Select the channel to read from
       HAL_ADC_Start(&hadc3);                                         // Start the ADC conversion
       HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
-      gw_analogue->correction_data_w[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value      HAL_ADC_Stop(&hadc3);                                // Stop the ADC conversion
+      gw_analogue->correction_data_w[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value      
+      HAL_ADC_Stop(&hadc3);                                // Stop the ADC conversion
     }
     status.device.led_on_board.on = 1;
     gw_analogue->sta = 1;  // Set the state to calibration mode 1
