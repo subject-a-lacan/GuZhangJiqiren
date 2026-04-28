@@ -152,49 +152,16 @@ int main(void)
     /* USER CODE BEGIN 3 */
     PERIODIC_START(Task_Vofa_Print, 500)
     printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"
-           "%07.0f\r\n",
-           /* follow_line: actual target output kp ki kd */
-           (double)status.sensor.gw_analogue.diff, 0.0,
-           (double)(status.state.status_pid.follow_line_pid.kp * status.state.status_pid.follow_line_pid.error
-                  + status.state.status_pid.follow_line_pid.integral
-                  + status.state.status_pid.follow_line_pid.derivative),
-           (double)status.state.status_pid.follow_line_pid.kp,
-           (double)status.state.status_pid.follow_line_pid.ki,
-           (double)status.state.status_pid.follow_line_pid.kd,
-           /* keep_angle: actual target output kp ki kd */
-           (double)status.state.cur_angle, (double)(status.state.tar_angle + status.state.initial_angle),
-           (double)(status.state.status_pid.keep_angle_pid.kp * status.state.status_pid.keep_angle_pid.error
-                  + status.state.status_pid.keep_angle_pid.integral
-                  + status.state.status_pid.keep_angle_pid.derivative),
-           (double)status.state.status_pid.keep_angle_pid.kp,
-           (double)status.state.status_pid.keep_angle_pid.ki,
-           (double)status.state.status_pid.keep_angle_pid.kd,
-           /* wheel0: actual target output kp ki kd */
+           "%.3f,%.3f,%.3f\r\n",
            (double)status.motor.wheel[0].cur_speed,
            (double)status.motor.wheel[0].tar_speed,
            (double)status.motor.wheel[0].trust,
            (double)status.motor.wheel[0].wheel_pid.kp,
            (double)status.motor.wheel[0].wheel_pid.ki,
            (double)status.motor.wheel[0].wheel_pid.kd,
-           /* wheel1: actual target output kp ki kd */
            (double)status.motor.wheel[1].cur_speed,
            (double)status.motor.wheel[1].tar_speed,
-           (double)status.motor.wheel[1].trust,
-           (double)status.motor.wheel[1].wheel_pid.kp,
-           (double)status.motor.wheel[1].wheel_pid.ki,
-           (double)status.motor.wheel[1].wheel_pid.kd,
-           /* gray digital 8bits as 8-digit integer (e.g. 10101010) */
-           (double)(((status.sensor.gw_analogue.digital_8bit >> 7) & 1) * 10000000 +
-                    ((status.sensor.gw_analogue.digital_8bit >> 6) & 1) * 1000000 +
-                    ((status.sensor.gw_analogue.digital_8bit >> 5) & 1) * 100000 +
-                    ((status.sensor.gw_analogue.digital_8bit >> 4) & 1) * 10000 +
-                    ((status.sensor.gw_analogue.digital_8bit >> 3) & 1) * 1000 +
-                    ((status.sensor.gw_analogue.digital_8bit >> 2) & 1) * 100 +
-                    ((status.sensor.gw_analogue.digital_8bit >> 1) & 1) * 10 +
-                    (status.sensor.gw_analogue.digital_8bit & 1)));
+           (double)status.motor.wheel[1].trust);
     PERIODIC_END
   }
   /* USER CODE END 3 */
