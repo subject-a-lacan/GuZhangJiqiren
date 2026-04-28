@@ -39,4 +39,5 @@ car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_uart.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
-  ../User/Tool\log.h ../Core/Inc\usart.h
+  ../User/Tool\log.h ../Core/Inc\usart.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h

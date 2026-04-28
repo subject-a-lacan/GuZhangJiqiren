@@ -870,6 +870,11 @@
               <FileType>5</FileType>
               <FilePath>..\User\Tool\pid.h</FilePath>
             </File>
+            <File>
+              <FileName>task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\User\Tool\task.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
