@@ -3,9 +3,9 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Wed Apr 29 01:11:37 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Wed Apr 29 02:53:44 2026
 <BR><P>
-<H3>Maximum Stack Usage =        396 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        348 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 <P>
@@ -540,8 +540,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[156]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_PID_Tune
+<BR><BR>[Called By]<UL><LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_PID_Tune
 <LI><a href="#[17b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
 <LI><a href="#[15b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gyr_value
 <LI><a href="#[164]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_servo
@@ -1436,7 +1435,7 @@ Global Symbols
 <LI><a href="#[17b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
 </UL>
 
-<P><STRONG><a name="[100]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 92 bytes, Stack size 8 bytes, timer_it.o(.text.HAL_TIM_PeriodElapsedCallback))
+<P><STRONG><a name="[100]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, timer_it.o(.text.HAL_TIM_PeriodElapsedCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 216<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; driver_button &rArr; server_button &rArr; correct_gw_analogue &rArr; log_uprintf &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
@@ -1937,7 +1936,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[125]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Init
 </UL>
 
-<P><STRONG><a name="[132]"></a>UART_PID_Tune</STRONG> (Thumb, 644 bytes, Stack size 16 bytes, main.o(.text.UART_PID_Tune))
+<P><STRONG><a name="[132]"></a>UART_PID_Tune</STRONG> (Thumb, 660 bytes, Stack size 16 bytes, main.o(.text.UART_PID_Tune))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = UART_PID_Tune &rArr; puts &rArr; fputc &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[156]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
@@ -2017,7 +2016,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[166]"></a>compute_pid</STRONG> (Thumb, 152 bytes, Stack size 0 bytes, pid.o(.text.compute_pid))
+<P><STRONG><a name="[166]"></a>compute_pid</STRONG> (Thumb, 156 bytes, Stack size 0 bytes, pid.o(.text.compute_pid))
 <BR><BR>[Called By]<UL><LI><a href="#[181]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_angle
 <LI><a href="#[168]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line
 <LI><a href="#[165]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
@@ -2188,8 +2187,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[17e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[176]"></a>init_gw_8bit</STRONG> (Thumb, 152 bytes, Stack size 48 bytes, gw_find_line.o(.text.init_gw_8bit))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = init_gw_8bit
+<P><STRONG><a name="[176]"></a>init_gw_8bit</STRONG> (Thumb, 160 bytes, Stack size 56 bytes, gw_find_line.o(.text.init_gw_8bit))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = init_gw_8bit
 </UL>
 <BR>[Calls]<UL><LI><a href="#[177]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
 </UL>
@@ -2204,8 +2203,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[17d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
 </UL>
 
-<P><STRONG><a name="[179]"></a>init_gyr</STRONG> (Thumb, 104 bytes, Stack size 48 bytes, gy901.o(.text.init_gyr))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = init_gyr
+<P><STRONG><a name="[179]"></a>init_gyr</STRONG> (Thumb, 112 bytes, Stack size 56 bytes, gy901.o(.text.init_gyr))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = init_gyr
 </UL>
 <BR>[Calls]<UL><LI><a href="#[177]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
 </UL>
@@ -2221,7 +2220,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[17e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[177]"></a>init_pid</STRONG> (Thumb, 26 bytes, Stack size 0 bytes, pid.o(.text.init_pid))
+<P><STRONG><a name="[177]"></a>init_pid</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, pid.o(.text.init_pid))
 <BR><BR>[Called By]<UL><LI><a href="#[170]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;serve_road
 <LI><a href="#[17c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
 <LI><a href="#[180]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status_pid
@@ -2230,7 +2229,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[17d]"></a>init_sensor</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, status.o(.text.init_sensor))
-<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = init_sensor &rArr; init_gyr
+<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = init_sensor &rArr; init_gyr
 </UL>
 <BR>[Calls]<UL><LI><a href="#[179]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gyr
 <LI><a href="#[178]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
@@ -2267,16 +2266,16 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[180]"></a>init_status_pid</STRONG> (Thumb, 160 bytes, Stack size 96 bytes, status.o(.text.init_status_pid))
-<BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = init_status_pid
+<P><STRONG><a name="[180]"></a>init_status_pid</STRONG> (Thumb, 176 bytes, Stack size 104 bytes, status.o(.text.init_status_pid))
+<BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = init_status_pid
 </UL>
 <BR>[Calls]<UL><LI><a href="#[177]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
 </UL>
 <BR>[Called By]<UL><LI><a href="#[17e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[17c]"></a>init_wheel</STRONG> (Thumb, 256 bytes, Stack size 48 bytes, wheel.o(.text.init_wheel))
-<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = init_wheel &rArr; HAL_TIM_PWM_Start
+<P><STRONG><a name="[17c]"></a>init_wheel</STRONG> (Thumb, 264 bytes, Stack size 56 bytes, wheel.o(.text.init_wheel))
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = init_wheel &rArr; HAL_TIM_PWM_Start
 </UL>
 <BR>[Calls]<UL><LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
 <LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Encoder_Start
@@ -2304,13 +2303,12 @@ Global Symbols
 <LI><a href="#[15c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
-<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 432 bytes, Stack size 144 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 396<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
+<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 360 bytes, Stack size 96 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 348<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[17e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 <LI><a href="#[159]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;after_init_state
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
-<LI><a href="#[156]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[152]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 <LI><a href="#[150]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_USART3_UART_Init
 <LI><a href="#[14f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_USART2_UART_Init
@@ -2362,8 +2360,8 @@ Global Symbols
 <LI><a href="#[15c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
-<P><STRONG><a name="[170]"></a>serve_road</STRONG> (Thumb, 260 bytes, Stack size 48 bytes, road.o(.text.serve_road))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = serve_road
+<P><STRONG><a name="[170]"></a>serve_road</STRONG> (Thumb, 268 bytes, Stack size 56 bytes, road.o(.text.serve_road))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = serve_road
 </UL>
 <BR>[Calls]<UL><LI><a href="#[177]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
 </UL>

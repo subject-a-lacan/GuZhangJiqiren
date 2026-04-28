@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -i '235,253d' Core/Src/main.c)",
+      "Bash(sed -i '234r /tmp/case_y.txt' Core/Src/main.c)"
+    ]
+  }
+}

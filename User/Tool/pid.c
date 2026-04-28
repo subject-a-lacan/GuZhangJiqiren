@@ -18,6 +18,7 @@ PID init_pid(float kp, float ki, float kd, float T, float integral_max) {
   pid.integral = 0;
   pid.derivative = 0;//微分
   pid.is_first = 1;
+  pid.out = 0;
 
   return pid;
 }
@@ -42,6 +43,7 @@ float compute_pid(PID *pid, float error) {
     pid->derivative = (pid->error - pid->last_error) / pid->T;
   }
   pid->last_error = pid->error;
+  pid->out = pid->kp * pid->error + pid->ki * pid->integral + pid->kd * pid->derivative;
 
-  return pid->kp * pid->error + pid->ki * pid->integral + pid->kd * pid->derivative;
+  return pid->out;
 }

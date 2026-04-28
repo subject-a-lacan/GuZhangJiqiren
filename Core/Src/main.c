@@ -150,15 +150,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Task_Vofa_Print, 500)
-    printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"
+    PERIODIC_START(Task_Vofa_Print, 100)
+    printf("%.3f,%.3f,%.3f,%.3f,"
            "%.3f,%.3f,%.3f\r\n",
            (double)status.motor.wheel[0].cur_speed,
            (double)status.motor.wheel[0].tar_speed,
            (double)status.motor.wheel[0].trust,
-           (double)status.motor.wheel[0].wheel_pid.kp,
-           (double)status.motor.wheel[0].wheel_pid.ki,
-           (double)status.motor.wheel[0].wheel_pid.kd,
            (double)status.motor.wheel[1].cur_speed,
            (double)status.motor.wheel[1].tar_speed,
            (double)status.motor.wheel[1].trust);
@@ -238,15 +235,19 @@ void UART_PID_Tune(uint8_t cmd, float val) {
       status.state.status_pid.follow_line_pid.integral = 0;
       status.state.status_pid.follow_line_pid.last_error = 0;
       status.state.status_pid.follow_line_pid.error = 0;
+      status.state.status_pid.follow_line_pid.out = 0;
       status.state.status_pid.keep_angle_pid.integral = 0;
       status.state.status_pid.keep_angle_pid.last_error = 0;
       status.state.status_pid.keep_angle_pid.error = 0;
+      status.state.status_pid.keep_angle_pid.out = 0;
       status.motor.wheel[0].wheel_pid.integral = 0;
       status.motor.wheel[0].wheel_pid.last_error = 0;
       status.motor.wheel[0].wheel_pid.error = 0;
+      status.motor.wheel[0].wheel_pid.out = 0;
       status.motor.wheel[1].wheel_pid.integral = 0;
       status.motor.wheel[1].wheel_pid.last_error = 0;
       status.motor.wheel[1].wheel_pid.error = 0;
+      status.motor.wheel[1].wheel_pid.out = 0;
       status.state.motion = MOTOR_TEST;
       break;
     default: break;

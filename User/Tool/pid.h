@@ -16,6 +16,7 @@ typedef struct PID {
   float derivative;
   float integral_max;
   uint8_t is_first;
+  float out;
 } PID;
 
 // PID 初始化函数 参数 T: pid周期 单位ms integral_max: 积分限幅
