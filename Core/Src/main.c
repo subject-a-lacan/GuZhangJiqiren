@@ -39,6 +39,7 @@
 #include "road.h"
 #include "math_tool.h"
 #include "stdio.h"
+#include <stdlib.h>
 
 /* USER CODE END Includes */
 
@@ -60,7 +61,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t rx_byte = 0;
+uint8_t rx_cmd = 0;
+uint8_t rx_state = 0;
+char rx_buf[20];
+uint8_t rx_index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -133,6 +138,8 @@ int main(void)
 
   status.state.motion = MOTOR_TEST;
 
+  HAL_UART_Receive_IT(&huart1, &rx_byte, 1); // 开启 USART2 的接收中断，准备接收调参命令
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -201,6 +208,45 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void UART_PID_Tune(uint8_t cmd, float val) {
+  switch (cmd) {
+    case 'a': status.state.status_pid.follow_line_pid.kp = val; printf("follow_line kp=%.3f\r\n", val); break;
+    case 'c': status.state.status_pid.follow_line_pid.ki = val; printf("follow_line ki=%.3f\r\n", val); break;
+    case 'e': status.state.status_pid.follow_line_pid.kd = val; printf("follow_line kd=%.3f\r\n", val); break;
+
+    case 'g': status.state.status_pid.keep_angle_pid.kp = val; printf("keep_angle kp=%.3f\r\n", val); break;
+    case 'i': status.state.status_pid.keep_angle_pid.ki = val; printf("keep_angle ki=%.3f\r\n", val); break;
+    case 'k': status.state.status_pid.keep_angle_pid.kd = val; printf("keep_angle kd=%.3f\r\n", val); break;
+
+    case 'm': status.motor.wheel[0].wheel_pid.kp = val; printf("wheel0 kp=%.3f\r\n", val); break;
+    case 'o': status.motor.wheel[0].wheel_pid.ki = val; printf("wheel0 ki=%.3f\r\n", val); break;
+    case 'q': status.motor.wheel[0].wheel_pid.kd = val; printf("wheel0 kd=%.3f\r\n", val); break;
+
+    case 's': status.motor.wheel[1].wheel_pid.kp = val; printf("wheel1 kp=%.3f\r\n", val); break;
+    case 'u': status.motor.wheel[1].wheel_pid.ki = val; printf("wheel1 ki=%.3f\r\n", val); break;
+    case 'w': status.motor.wheel[1].wheel_pid.kd = val; printf("wheel1 kd=%.3f\r\n", val); break;
+
+    case 'z': status.state.motion = STOP; printf("motion=STOP\r\n"); break;
+    case 'y':
+      status.state.status_pid.follow_line_pid.integral = 0;
+      status.state.status_pid.follow_line_pid.last_error = 0;
+      status.state.status_pid.follow_line_pid.error = 0;
+      status.state.status_pid.keep_angle_pid.integral = 0;
+      status.state.status_pid.keep_angle_pid.last_error = 0;
+      status.state.status_pid.keep_angle_pid.error = 0;
+      status.motor.wheel[0].wheel_pid.integral = 0;
+      status.motor.wheel[0].wheel_pid.last_error = 0;
+      status.motor.wheel[0].wheel_pid.error = 0;
+      status.motor.wheel[1].wheel_pid.integral = 0;
+      status.motor.wheel[1].wheel_pid.last_error = 0;
+      status.motor.wheel[1].wheel_pid.error = 0;
+      status.state.motion = MOTOR_TEST;
+      printf("motion=MOTOR_TEST, all PID reset\r\n");
+      break;
+    default: break;
+  }
+}
 
 /* USER CODE END 4 */
 
