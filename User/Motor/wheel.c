@@ -114,7 +114,7 @@ void init_wheel(WHEEL *wheel, uint8_t which, int8_t dir) {
   wheel->cur_speed = 0;
   wheel->tar_speed = 0;
   wheel->dir = dir;
-  wheel->wheel_pid = init_pid(1.5, 0.5, 0, 1, 10);  // kd=0，导数项已禁用
+  wheel->wheel_pid = init_pid(5, 0, 0, 1, 10);  // kd=0，导数项已禁用  P I D T integral_max
   if (wheel->which == 1) {
     HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
   } else if (wheel->which == 2) {
