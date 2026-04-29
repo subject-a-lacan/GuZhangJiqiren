@@ -128,14 +128,14 @@ void init_state(STATUS *status, uint8_t T) {
  * @brief 初始化状态层控制用的 PID
  * @param status 状态结构体指针，用来保存巡线和保角 PID
  * @return 无
- *@note 调用 init_pid(1.5, 0.1, 500, 20, 20)
+ *@note 调用 init_pid(1.5, 0, 0, 20, 20)
  *       初始化巡线 PID，这几个数字分别控制跟线反应快慢和积分限制，后续都可调
  *@note 调用 init_pid(1, 0, 1, 20, 20)
  *       初始化保角 PID，这几个数字决定转向纠偏力度和稳定性，后续都可调
  */
 void init_status_pid(STATUS *status) {
-  status->state.status_pid.follow_line_pid = init_pid(1.5, 0.1, 500, 20, 20);
-  status->state.status_pid.keep_angle_pid = init_pid(1, 0, 1, 20, 20);
+  status->state.status_pid.follow_line_pid = init_pid(1.5, 0, 0, 20, 20);
+  status->state.status_pid.keep_angle_pid = init_pid(1, 0, 0, 20, 20);
 }
 
 /**
