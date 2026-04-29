@@ -4997,8 +4997,8 @@ Image Symbol Table
     [Anonymous Symbol]                       0x080081d4   Section        0  gw_analogue.o(.text.init_gw_analogue)
     [Anonymous Symbol]                       0x0800824c   Section        0  gy901.o(.text.init_gyr)
     [Anonymous Symbol]                       0x080082bc   Section        0  status.o(.text.init_motor)
-    [Anonymous Symbol]                       0x0800830c   Section        0  pid.o(.text.init_pid)
-    [Anonymous Symbol]                       0x08008328   Section        0  status.o(.text.init_sensor)
+    [Anonymous Symbol]                       0x08008308   Section        0  pid.o(.text.init_pid)
+    [Anonymous Symbol]                       0x08008324   Section        0  status.o(.text.init_sensor)
     [Anonymous Symbol]                       0x08008348   Section        0  servo.o(.text.init_servo)
     [Anonymous Symbol]                       0x08008428   Section        0  status.o(.text.init_state)
     [Anonymous Symbol]                       0x08008454   Section        0  status.o(.text.init_status)
@@ -5422,9 +5422,9 @@ Image Symbol Table
     init_gw_8bit                             0x08008135   Thumb Code   160  gw_find_line.o(.text.init_gw_8bit)
     init_gw_analogue                         0x080081d5   Thumb Code   118  gw_analogue.o(.text.init_gw_analogue)
     init_gyr                                 0x0800824d   Thumb Code   112  gy901.o(.text.init_gyr)
-    init_motor                               0x080082bd   Thumb Code    80  status.o(.text.init_motor)
-    init_pid                                 0x0800830d   Thumb Code    28  pid.o(.text.init_pid)
-    init_sensor                              0x08008329   Thumb Code    32  status.o(.text.init_sensor)
+    init_motor                               0x080082bd   Thumb Code    76  status.o(.text.init_motor)
+    init_pid                                 0x08008309   Thumb Code    28  pid.o(.text.init_pid)
+    init_sensor                              0x08008325   Thumb Code    32  status.o(.text.init_sensor)
     init_servo                               0x08008349   Thumb Code   224  servo.o(.text.init_servo)
     init_state                               0x08008429   Thumb Code    44  status.o(.text.init_state)
     init_status                              0x08008455   Thumb Code    32  status.o(.text.init_status)
@@ -5939,9 +5939,10 @@ Memory Map of the image
     0x080081d4   0x080081d4   0x00000076   Code   RO         2447    .text.init_gw_analogue  gw_analogue.o
     0x0800824a   0x0800824a   0x00000002   PAD
     0x0800824c   0x0800824c   0x00000070   Code   RO         2377    .text.init_gyr      gy901.o
-    0x080082bc   0x080082bc   0x00000050   Code   RO         2227    .text.init_motor    status.o
-    0x0800830c   0x0800830c   0x0000001c   Code   RO         2596    .text.init_pid      pid.o
-    0x08008328   0x08008328   0x00000020   Code   RO         2231    .text.init_sensor   status.o
+    0x080082bc   0x080082bc   0x0000004c   Code   RO         2227    .text.init_motor    status.o
+    0x08008308   0x08008308   0x0000001c   Code   RO         2596    .text.init_pid      pid.o
+    0x08008324   0x08008324   0x00000020   Code   RO         2231    .text.init_sensor   status.o
+    0x08008344   0x08008344   0x00000004   PAD
     0x08008348   0x08008348   0x000000e0   Code   RO         2498    .text.init_servo    servo.o
     0x08008428   0x08008428   0x0000002c   Code   RO         2233    .text.init_state    status.o
     0x08008454   0x08008454   0x00000020   Code   RO         2237    .text.init_status   status.o
@@ -6092,7 +6093,7 @@ Image component sizes
        416         48          0          0          0       1172   servo.o
        190          0          0          0        100       6113   spi.o
         36          8        472          0       1024        828   startup_stm32g474xx.o
-      1232         28          0         15        610       6836   status.o
+      1228         28          0         15        610       6836   status.o
        198          0          0          8          4      10083   stm32g4xx_hal.o
       3142          0          0          0          0      24082   stm32g4xx_hal_adc.o
        332          0          0          0          0      21720   stm32g4xx_hal_adc_ex.o
@@ -6121,7 +6122,7 @@ Image component sizes
     ----------------------------------------------------------------------
      33272        606        676         68       5752     414634   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-       248          0          2          9         12          0   (incl. Padding)
+       252          0          2          9         12          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 

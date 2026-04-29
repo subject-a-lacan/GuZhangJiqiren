@@ -38,7 +38,7 @@ void init_motor() {
   init_servo(&status.motor.servo[0], 1, 180);
   init_servo(&status.motor.servo[1], 2, 270);
 
-  init_wheel(&status.motor.wheel[0], 1, -1);
+  init_wheel(&status.motor.wheel[0], 1, 1);
   init_wheel(&status.motor.wheel[1], 2, -1);
 
   return;
@@ -202,7 +202,7 @@ void follow_line(STATUS *status) {
   get_gw_analoge_digital_data(&status->sensor.gw_analogue);   //获取01001八位数字量
   get_gw_analogue_analogue_diff(&status->sensor.gw_analogue); //获取归一化量
 
-  get_road_type(&status->state.road_determine, status->sensor.gw_analogue.digital_8bit);
+  // get_road_type(&status->state.road_determine, status->sensor.gw_analogue.digital_8bit);
 
   if (Turn_or_Straight() == Straight) {
     float diff = compute_pid(&status->state.status_pid.follow_line_pid, status->sensor.gw_analogue.diff);
