@@ -41,6 +41,7 @@
 #include "stdio.h"
 #include <stdlib.h>
 #include "task.h"
+#include "lora.h"
 
 /* USER CODE END Includes */
 
@@ -74,7 +75,8 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 int fputc(int ch, FILE *f)
 {
-    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1,HAL_MAX_DELAY);
+    while (!(USART1->ISR & USART_ISR_TXE));
+    USART1->TDR = (uint8_t)ch;
     return ch;
 }
 /* USER CODE END PFP */
@@ -135,12 +137,14 @@ int main(void)
 
   after_init_state();
 
-  HAL_TIM_Base_Start_IT(&htim5);
+  
 
   status.state.motion = MOTOR_TEST;
 
   HAL_UART_Receive_IT(&huart1, &rx_byte, 1); // 开启 USART1 的接收中断，准备接收调参命令
 
+  // ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
 
   /* Infinite loop */

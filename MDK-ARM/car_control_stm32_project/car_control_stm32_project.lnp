@@ -10,6 +10,7 @@
 "car_control_stm32_project\usart.o"
 "car_control_stm32_project\stm32g4xx_it.o"
 "car_control_stm32_project\stm32g4xx_hal_msp.o"
+"car_control_stm32_project\lora.o"
 "car_control_stm32_project\stm32g4xx_hal_adc.o"
 "car_control_stm32_project\stm32g4xx_hal_adc_ex.o"
 "car_control_stm32_project\stm32g4xx_ll_adc.o"
