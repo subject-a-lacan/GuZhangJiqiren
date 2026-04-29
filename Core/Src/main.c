@@ -150,15 +150,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Task_Vofa_Print, 300)
+    PERIODIC_START(Task_Vofa_Print, 800)
     log_uprintf(&huart1,"%.3f,%.3f,%.3f,%.3f,"
-           "%.3f,%.3f,%.3f\r\n",
+           "%.3f,%.3f,%.3f,%.3f,%.3f\r\n",
            (double)status.motor.wheel[0].cur_speed,
            (double)status.motor.wheel[0].tar_speed,
            (double)status.motor.wheel[0].trust,
            (double)status.motor.wheel[1].cur_speed,
            (double)status.motor.wheel[1].tar_speed,
-           (double)status.motor.wheel[1].trust);
+           (double)status.motor.wheel[1].trust,
+          (double)status.motor.wheel[0].wheel_pid.kp,
+          (double)status.motor.wheel[0].wheel_pid.ki,
+          (double)status.motor.wheel[0].wheel_pid.kd);
+
     PERIODIC_END
   }
   /* USER CODE END 3 */

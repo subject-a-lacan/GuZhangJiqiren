@@ -3,9 +3,9 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Wed Apr 29 03:01:11 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Wed Apr 29 11:15:02 2026
 <BR><P>
-<H3>Maximum Stack Usage =        348 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        396 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 <P>
@@ -539,7 +539,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[161]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[178]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
+<BR><BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[178]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
 <LI><a href="#[157]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gyr_value
 <LI><a href="#[160]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_servo
 </UL>
@@ -2057,9 +2058,9 @@ Global Symbols
 <P><STRONG><a name="[160]"></a>driver_servo</STRONG> (Thumb, 192 bytes, Stack size 8 bytes, servo.o(.text.driver_servo))
 <BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = driver_servo &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
+<BR>[Calls]<UL><LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2iz
-<LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 </UL>
 <BR>[Called By]<UL><LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
@@ -2125,8 +2126,8 @@ Global Symbols
 <P><STRONG><a name="[157]"></a>get_gyr_value</STRONG> (Thumb, 164 bytes, Stack size 8 bytes, gy901.o(.text.get_gyr_value))
 <BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = get_gyr_value &rArr; __aeabi_dmul &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
-<LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<BR>[Calls]<UL><LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
 <LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 </UL>
 <BR>[Called By]<UL><LI><a href="#[155]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;after_init_state
@@ -2223,10 +2224,10 @@ Global Symbols
 <P><STRONG><a name="[178]"></a>init_servo</STRONG> (Thumb, 224 bytes, Stack size 24 bytes, servo.o(.text.init_servo))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = init_servo &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
+<BR>[Calls]<UL><LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
 <LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2iz
-<LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 </UL>
 <BR>[Called By]<UL><LI><a href="#[177]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_motor
@@ -2286,13 +2287,14 @@ Global Symbols
 <LI><a href="#[158]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
-<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 364 bytes, Stack size 96 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 348<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
+<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 440 bytes, Stack size 144 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 396<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[12e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;log_uprintf
 <LI><a href="#[17b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 <LI><a href="#[155]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;after_init_state
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
+<LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[151]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 <LI><a href="#[14f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_USART3_UART_Init
 <LI><a href="#[14e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_USART2_UART_Init
