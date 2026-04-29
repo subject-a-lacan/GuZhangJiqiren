@@ -292,7 +292,7 @@ void UART_PID_Tune(uint8_t cmd, float val) {
       status.motor.wheel[1].wheel_pid.last_error = 0;
       status.motor.wheel[1].wheel_pid.error = 0;
       status.motor.wheel[1].wheel_pid.out = 0;
-      status.state.motion = FIND_LINE;
+      status.state.motion = MOTOR_TEST;
       status.state.base_speed = 40;
       break;
     default: break;
