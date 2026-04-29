@@ -27,11 +27,16 @@ Project File Date:  04/29/2026
 <h2>Output:</h2>
 *** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'car_control_stm32_project'
-compiling main.c...
+../Core/Src/lora.c(30): warning: implicitly declaring library function 'strlen' with type 'unsigned int (const char *)' [-Wimplicit-function-declaration]
+    uart1_tx((uint8_t*)buf, strlen(buf));
+                            ^
+../Core/Src/lora.c(30): note: include the header <string.h> or explicitly provide a declaration for 'strlen'
+1 warning generated.
+compiling lora.c...
 linking...
-Program Size: Code=37912 RO-data=688 RW-data=72 ZI-data=5752  
+Program Size: Code=38362 RO-data=686 RW-data=72 ZI-data=5752  
 FromELF: creating hex file...
-"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 0 Warning(s).
+"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 

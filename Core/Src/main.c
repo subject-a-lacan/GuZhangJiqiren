@@ -139,11 +139,11 @@ int main(void)
 
   
 
-  status.state.motion = MOTOR_TEST;
+  status.state.motion = STOP;
 
   HAL_UART_Receive_IT(&huart1, &rx_byte, 1); // 开启 USART1 的接收中断，准备接收调参命令
 
-  // ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
 
@@ -292,7 +292,8 @@ void UART_PID_Tune(uint8_t cmd, float val) {
       status.motor.wheel[1].wheel_pid.last_error = 0;
       status.motor.wheel[1].wheel_pid.error = 0;
       status.motor.wheel[1].wheel_pid.out = 0;
-      status.state.motion = MOTOR_TEST;
+      status.state.motion = FIND_LINE;
+      status.state.base_speed = 40;
       break;
     default: break;
   }
