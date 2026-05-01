@@ -109,7 +109,6 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
       gw_analogue->correction_data_b[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
       HAL_ADC_Stop(&hadc3);                                          // Stop the ADC conversion
     }
-    status.device.led_on_board.on = 0;
     gw_analogue->sta = 0;  // Set the state to calibration mode 2
     for (int i = 0; i < 8; i++) {
       gw_analogue->digital_low_threshold[i] = gw_analogue->correction_data_b[i] +

@@ -47,7 +47,6 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
         }
       } else if (button_2_cnt == 1) {
         wait_finish_flag = 1;
-        status.device.led1.on = 0;
       }
       button_2_cnt++;
     }
