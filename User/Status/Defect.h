@@ -58,5 +58,6 @@ void task_finish(STATUS *status);
 void task_stop(STATUS *status);
 void task_select(STATUS *status, uint8_t id);
 void update_task(STATUS *status);
+void update_task_led(STATUS *status);
 
 #endif

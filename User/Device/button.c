@@ -41,7 +41,7 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
   // PD2 (which == 1)
   if (button->which == 1) {
     if (station == BUTTON_UP) {
-      if (status.task.armed == 1 && status.task.task_running == 0) {
+      if (status.task.armed == 0 && status.task.task_running == 0) {
         status.task.start_request = 1;
         status.device.buzzer.on = 1;
         status.device.buzzer.off_time = status.state.time + 200;

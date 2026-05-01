@@ -39,10 +39,8 @@ car_control_stm32_project/button.o: ../User/Device/button.c \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_uart.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
-  ../Core/Inc\gpio.h ../User/Sensor\gw_anagloge.h ../User/Device/led.h \
-  ../User/Tool\log.h ../Core/Inc\usart.h ../User/Motor\lq_step.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h ../User/Tool\math_tool.h \
+  ../Core/Inc\gpio.h ../User/Sensor\gw_anagloge.h \
   ../User/Status\status.h ../User/Device\buzzer.h \
   ../User/Status/Defect.h ../User/Sensor\gw_find_line.h \
   ../User/Tool\pid.h ../User/Status\road.h ../User/Sensor\gy901.h \
-  ../User/Motor\servo.h ../User/Motor\wheel.h
+  ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h

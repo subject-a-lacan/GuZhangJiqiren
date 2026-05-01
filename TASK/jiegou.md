@@ -57,12 +57,12 @@ status.task.task_running = 0
 status.state.motion = STOP
 ```
 
-### 2. 短按 PD2 请求发车
+### 2. 短按 PD2 请求进入任务入口
 
-发车前提：
+PD2 短按不是直接启动任务，也不直接修改 `task_running`。它只提出“我要进入当前选中任务”的请求：
 
 ```text
-status.task.armed == 1
+status.task.armed == 0
 status.task.task_running == 0
 ```
 
@@ -72,7 +72,7 @@ PD2 短按后：
 PD2 按下并释放
   -> driver_button() 识别 BUTTON_UP
   -> server_button() 判断本次没有触发长按
-  -> 如果 armed == 1 且 task_running == 0
+  -> 如果 armed == 0 且 task_running == 0
        status.task.start_request = 1
        蜂鸣器短响一次
 ```
@@ -85,16 +85,16 @@ update_status()
     -> 先处理 stop_request
     -> 再处理空闲状态下的 task_select_request / pose_switch_request
     -> 发现 start_request == 1
-    -> 如果 armed == 1 且 task_running == 0
+    -> 如果 armed == 0 且 task_running == 0
+         status.task.armed = 1
          task_start(status)
     -> start_request = 0
 ```
 
-`task_start(status)` 负责把任务真正启动起来：
+`task_start(status)` 负责进入当前任务前的统一初始化，但不要把 `task_running` 置 1：
 
 ```text
 task_start(status):
-  status.task.task_running = 1
   清 start_request / stop_request
   清 cross_cnt / road_buf / road_determine
   清 PID 积分和历史误差
@@ -108,15 +108,15 @@ task_start(status):
   base_speed = 0
 ```
 
-注意：`task_start()` 只负责“启动前初始化”和“设置第一个 race_phase”，不建议在这里直接让车猛冲。真正让车怎么动，放到对应题目的 update 函数里。
+注意：`task_start()` 只负责“进入任务前初始化”和“设置第一个 race_phase”。它不能代表任务已经真的跑起来，所以不要在这里置 `task_running = 1`。真正让车怎么动、什么时候确认任务开始运行，放到对应题目的 update 函数里。
 
 ### 3. 任务开始运行
 
-`task_start()` 执行完后，下一次或同一次 `update_task()` 会进入题目分发：
+`task_start()` 执行完后，`armed == 1` 表示当前任务入口已经放行。随后 `update_task()` 进入题目分发：
 
 ```text
 update_task(status):
-  if task_running == 1:
+  if armed == 1:
     switch (task_id):
       TASK_BASIC_1 -> task_basic_1_update(status)
       TASK_BASIC_2 -> task_basic_2_update(status)
@@ -130,6 +130,7 @@ update_task(status):
 task_basic_1_update(status):
   switch (race_phase):
     Q1_START_A_TURN:
+      确认任务流程真正开始后 task_running = 1
       设置 motion / base_speed / tar_angle
       满足完成条件后 task_set_phase(Q1_SIDE_AD)
 
@@ -153,10 +154,12 @@ update_status()
 PB11/蓝牙选中 TASK_X
   -> update_task() 消费 task_select_request，真正修改 task_id
   -> PD2 短按置 start_request
-  -> update_task() 调 task_start()
-  -> task_running = 1
+  -> update_task() 将 armed 置 1，并调用 task_start() 做入口初始化
+  -> task_xxx_update() 进入题内流程
+  -> 题内状态机确认任务真的开始后，才置 task_running = 1
   -> task_xxx_update() 根据 race_phase 设置 motion
   -> 底层 motion 控制电机运行
+  -> task_finish()/task_stop() 清 task_running 和 armed，退出任务入口
 ```
 
 ## 一、三层职责
@@ -198,14 +201,14 @@ typedef struct TASK {
     uint8_t race_phase;     // 当前题目内部阶段
     uint8_t cross_cnt;      // 当前任务内已确认的路口/角点计数
 
-    uint8_t armed;          // 是否允许启动任务，原先讨论里的 cmd
-    uint8_t task_running;   // 当前是否正在执行任务
+    uint8_t armed;          // 是否已进入当前任务入口，原先讨论里的 cmd
+    uint8_t task_running;   // 题目内部确认任务正在运行
 
     uint8_t task_select_request;  // 请求切换任务
     uint8_t requested_task_id;    // 任务切换的目标任务
     uint8_t pose_switch_request;  // 请求切换 AB/AD 发车模式
 
-    uint8_t start_request;  // 按键或蓝牙提出启动请求
+    uint8_t start_request;  // 按键或蓝牙提出进入任务入口请求
     uint8_t stop_request;   // 蓝牙或紧急输入提出停止请求
 
     uint32_t phase_start_time; // 当前阶段开始时间，推荐预留
@@ -219,12 +222,12 @@ typedef struct TASK {
 - `start_pose`：发车方向，第二问和第三问需要 AB/AD 二选一。
 - `race_phase`：每道题自己的内部阶段。
 - `cross_cnt`：当前任务内部使用的路口/角点计数。它属于任务流程，不应该长期依赖 `road.c` 里的全局计数。
-- `armed`：武装标志。只有 `armed == 1` 时，启动请求才有效。
-- `task_running`：任务是否正在运行。任务调度应该看这个字段，不应该看 `motion != STOP`。
+- `armed`：任务入口许可标志。`start_request` 被 `update_task()` 消费后置 1，表示已经进入当前选中任务的流程入口。
+- `task_running`：任务内部确认“任务真的开始运行”的标志，必须由具体 `task_xxx_update()` 在合适阶段置 1，不能由按钮直接置 1，也不建议由 `task_start()` 直接置 1。
 - `task_select_request`：请求切换任务。PB11 短按和蓝牙选题都走这个接口。
 - `requested_task_id`：任务切换的目标值。PB11 短按时由按钮逻辑先算出“下一个任务”，再填到这里。
 - `pose_switch_request`：请求切换 AB/AD 发车模式。只在第二问和第三问空闲状态下有效。
-- `start_request`：启动请求。按钮或蓝牙只置 1，由 `update_task()` 消费。
+- `start_request`：进入任务入口请求。按钮或蓝牙只置 1，由 `update_task()` 消费，消费后置 `armed = 1` 并执行任务入口初始化。
 - `stop_request`：停止请求。急停优先级最高，由 `update_task()` 消费。
 - `phase_start_time`：进入当前阶段时的系统时间，用于超时保护、蜂鸣器节奏等。
 - `phase_mileage`：当前阶段里程，用于第一问停车、第三问测距等。
@@ -308,11 +311,29 @@ typedef enum START_POSE {
 
 ## 六、armed 武装标志
 
-`armed` 对应之前讨论里的 `cmd`，但名字更清楚。
+`armed` 对应之前讨论里的 `cmd`，但名字更清楚。它不是按钮直接改出的“任务已经运行”，而是 `update_task()` 消费 `start_request` 后确认“当前选中任务允许进入流程入口”。
 
 ```text
-armed = 0  未武装，不能启动任务
-armed = 1  已武装，允许启动任务
+armed = 0  未进入任务入口
+armed = 1  已进入当前选中任务的流程入口
+```
+
+`start_request`、`armed`、`task_running` 的关系必须分清：
+
+```text
+start_request:
+  外部输入提出“进入任务入口”的一次性请求
+  按钮/蓝牙只置这个请求，不直接改 task_running
+
+armed:
+  update_task() 消费 start_request 后置 1
+  用来说明当前任务入口已经放行
+  可以用来判断“有没有真正进入任务流程”
+
+task_running:
+  只能由具体 task_xxx_update() 在确认任务真的开始执行后置 1
+  不能由按钮直接置 1
+  不建议由 task_start() 直接置 1，避免假启动
 ```
 
 推荐生命周期：
@@ -327,17 +348,23 @@ armed = 1  已武装，允许启动任务
   stop_request = 1
   update_task() 消费后按远程停车语义停车
 
-蓝牙武装命令:
+PD2 短按或蓝牙启动命令:
+  start_request = 1
+
+update_task() 消费 start_request:
   armed = 1
+  task_start(status) 做入口初始化
+
+题内状态机确认任务开始:
+  task_running = 1
 
 任务正常完成:
   task_running = 0
+  armed = 0
   motion = STOP
-  armed 保持 1，方便重跑
 ```
 
-上电默认 `armed = 0`，避免误触发启动。必须通过蓝牙武装命令，或后续设计的硬件武装方式，将 `armed` 置 1 后，PD2 短按或蓝牙启动命令才能真正启动任务。
-事实上我就打算默认改成arm=0 傻逼gpt
+上电默认 `armed = 0`，避免误触发启动。PD2 短按或蓝牙启动命令只置 `start_request = 1`，真正把 `armed` 置 1 的动作必须放在 `update_task()` 里统一完成。
 
 ## 七、按钮分配
 
@@ -347,7 +374,7 @@ armed = 1  已武装，允许启动任务
 |---|---|---|---|
 | PB11 短按 | `BUTTON_UP` 且本次没有触发长按 | `task_running == 0` | 计算下一个任务，写入 `requested_task_id`，再置 `task_select_request = 1` |
 | PB11 长按 | `BUTTON_LONG` | `task_running == 0` | `pose_switch_request = 1` |
-| PD2 短按 | `BUTTON_UP` 且本次没有触发长按 | `task_running == 0` 且 `armed == 1` | `start_request = 1` |
+| PD2 短按 | `BUTTON_UP` 且本次没有触发长按 | `armed == 0` 且 `task_running == 0` | `start_request = 1` |
 | PD2 长按 | `BUTTON_LONG` | 任意安全时刻 | 灰度校准 `correct_gw_analogue()` |
 
 任务运行中，普通按键操作锁死。运行中只保留蓝牙急停或专门的硬件急停入口。
@@ -424,8 +451,7 @@ C... \n
 | 选择指定任务 | `requested_task_id = 目标任务; task_select_request = 1` |
 | 切换到下一个任务 | 先算出下一个任务，写入 `requested_task_id`，再置 `task_select_request = 1` |
 | 切换发车模式 | `pose_switch_request = 1` |
-| 武装任务 | `armed = 1` |
-| 启动任务 | 如果 `armed == 1`，置 `start_request = 1` |
+| 请求进入/启动当前任务 | `start_request = 1` |
 | 停车 | 置 `stop_request = 1` |
 
 这样后续即使蓝牙协议改几次，任务调度层也不用跟着改，只需要改蓝牙解析层。
@@ -457,7 +483,7 @@ C... \n
 
 | 事件 | 蜂鸣器反馈 |
 |---|---|
-| PD2 短按启动当前任务 | 短响一次 |
+| PD2 短按请求进入当前任务入口 | 短响一次 |
 | PB11 长按切换 TASK2/TASK3 发车姿态 | 常响一段时间 |
 
 蜂鸣器不要用阻塞延时。推荐用系统时间做非阻塞关闭：
@@ -509,7 +535,7 @@ update_task(status):
   }
 
   // 2. 未运行任务时，先处理任务选择/发车模式请求
-  if (!status.task.task_running) {
+  if (!status.task.task_running && !status.task.armed) {
       if (status.task.task_select_request) {
           task_select(status, status.task.requested_task_id);
           status.task.task_select_request = 0;
@@ -521,16 +547,17 @@ update_task(status):
       }
   }
 
-  // 3. 处理启动请求
+  // 3. 处理进入任务入口请求
   if (status.task.start_request) {
-      if (!status.task.task_running && status.task.armed) {
+      if (!status.task.task_running && !status.task.armed) {
+          status.task.armed = 1;
           task_start(status);
       }
       status.task.start_request = 0;
   }
 
-  // 4. 没有运行任务则不推进题目状态机
-  if (!status.task.task_running) {
+  // 4. 没有进入任务入口则不推进题目状态机
+  if (!status.task.armed) {
       return;
   }
 
@@ -553,7 +580,7 @@ update_task(status):
 
 这里的 `task_basic_1_update()` 等函数只负责本题自己的 `race_phase` 推进，并设置底层运动参数。
 
-任务选择请求只建议在 `task_running == 0` 时生效。任务运行过程中，普通 PB11/PD2 操作和蓝牙选题命令都应忽略，只有 `stop_request` 始终有效。
+任务选择请求只建议在 `task_running == 0` 且 `armed == 0` 时生效。任务已经进入入口或正在运行时，普通 PB11/PD2 操作和蓝牙选题命令都应忽略，只有 `stop_request` 始终有效。
 
 推荐把具体切换逻辑封成几个小函数：
 
@@ -574,13 +601,13 @@ task_switch_start_pose(status):
 
 ## 十二、任务启动 task_start()
 
-每次启动任务都必须统一初始化，避免上一轮状态污染下一轮。
+每次进入任务入口都必须统一初始化，避免上一轮状态污染下一轮。
 
 ```text
 task_start(status):
-  task_running = 1
   start_request = 0
   stop_request = 0
+  不设置 task_running
 
   清任务级路口计数 status.task.cross_cnt
   清 legacy/global cross_cnt，避免旧逻辑污染
@@ -621,14 +648,16 @@ TASK_ADV_2:
 ```text
 task_finish(status):
   task_running = 0
+  armed = 0
   state.motion = STOP
   state.base_speed = 0
   左右轮 tar_speed = 0
-  armed 保持 1
   完成声光提示
 ```
 
-`armed` 保持 1 是为了方便重跑。如果需要更安全，可以完成后也置 0。
+`task_start()` 只做入口初始化，不代表任务已经真正运行。`task_running = 1` 应该由对应的 `task_xxx_update()` 在确认任务真的开始执行时设置。
+
+`armed` 表示“已经进入任务入口”，所以任务正常完成后建议清 0。这样下一次必须重新按 PD2 或发送蓝牙启动命令，避免旧入口状态残留。
 
 ## 十四、远程停车 task_stop()
 
@@ -637,6 +666,7 @@ task_finish(status):
 ```text
 task_stop(status):
   task_running = 0
+  armed = 0
   start_request = 0
   stop_request = 0
   state.motion = STOP
@@ -648,6 +678,7 @@ task_stop(status):
 
 ```c
 status.task.task_running = 0;
+status.task.armed = 0;
 status.task.start_request = 0;
 status.task.stop_request = 0;
 status.state.motion = STOP;
@@ -656,7 +687,7 @@ status.motor.wheel[0].tar_speed = 0;
 status.motor.wheel[1].tar_speed = 0;
 ```
 
-`task_stop()` 不清 `task_id`，不清 `start_pose`，不清 `race_phase`，不清 `armed`，不重置 PID，也不清路口计数。它只是让车停下，并让当前任务不再继续自动推进。
+`task_stop()` 不清 `task_id`，不清 `start_pose`，不清 `race_phase`，不重置 PID，也不清路口计数。它会清 `armed`，因为远程停车意味着退出当前任务入口，避免下一周期继续分发题内状态机。
 
 因此不再需要单独的 `task_abort()` 概念。如果后续确实需要“异常中止并完全清状态”的重逻辑，可以另起名字，例如 `task_reset_all()`，不要和蓝牙停车混在一起。
 
@@ -708,6 +739,8 @@ task_basic_1_update(status):
   switch (status.task.race_phase):
     case Q1_START_A_TURN:
       执行起点 A 特化逻辑
+      如果确认任务已经真正开始执行:
+        status.task.task_running = 1
       如果完成:
         task_set_phase(status, Q1_SIDE_AD)
       break
@@ -768,5 +801,5 @@ Q1_START_A_TURN:
 4. `task_running` 决定任务是否推进，不能用 `motion != STOP` 代替。
 5. `race_phase` 必须独立存在，不能只靠 `cross_cnt` 推导。
 6. `motion` 只表示底层运动方式，不表示第几问。
-7. 每次启动任务必须统一清理路口计数、PID、里程、阶段时间等状态。
+7. 每次进入任务入口必须统一清理路口计数、PID、里程、阶段时间等状态。
 8. 蓝牙和按钮共用同一套状态字段，避免双系统冲突。
