@@ -64,9 +64,9 @@ void init_motor() {
 void init_device() {
   init_button(&status.device.button_D2, 1, 0);
   init_button(&status.device.button_B11, 2, 0);
-  init_LED(&status.device.led_on_board, 1, 0);
-  init_LED(&status.device.led1, 2, 0);
-  init_LED(&status.device.led2, 3, 0);
+  init_LED(&status.device.led_on_board, 1, 1);
+  init_LED(&status.device.led1, 2, 1);
+  init_LED(&status.device.led2, 3, 1);
   init_BUZZER(&status.device.buzzer, 1, 1);
 
   return;

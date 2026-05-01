@@ -144,7 +144,7 @@ int main(void)
 
   HAL_UART_Receive_IT(&huart1, &rx_byte, 1); // 开启 USART1 的接收中断，准备接收调参命令
 
-  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  // ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
 
