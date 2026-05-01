@@ -126,18 +126,22 @@ void task_select(STATUS *status, uint8_t id) {
 
 static void task_basic_1_update(STATUS *status) {
   (void)status;
+  status->task.task_running=0;
 }
 
 static void task_basic_2_update(STATUS *status) {
   (void)status;
+    status->task.task_running=0;
 }
 
 static void task_adv_1_update(STATUS *status) {
   (void)status;
+    status->task.task_running=0;
 }
 
 static void task_adv_2_update(STATUS *status) {
   (void)status;
+    status->task.task_running=0;
 }
 
 void update_task(STATUS *status) {

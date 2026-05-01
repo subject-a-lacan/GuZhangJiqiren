@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define LONG_PRESS_CNT 20  // 长按判断时间 单位 ms
+#define LONG_PRESS_CNT 50  // 长按判断时间 指的是调用次数 如果20ms调一次 那就是1000ms之后算长按
 
 // 按键结构体
 // 挂载于 status device
@@ -14,6 +14,7 @@ typedef struct BUTTON {
   uint8_t Press_is_high_level;  // 按下电平为高还是低
   uint8_t which;                // 按键编号
   int16_t long_press_cnt;       // 长按计数
+  uint8_t long_triggered;       // 本次按下是否已触发过长按
 } BUTTON;
 
 // 按键事件枚举

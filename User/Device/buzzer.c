@@ -15,6 +15,7 @@ void init_BUZZER(BUZZER *buzzer, uint8_t which, uint8_t High_level_is_on) {
   buzzer->High_level_is_on = High_level_is_on;
   buzzer->on = 0;
   buzzer->which = which;
+  buzzer->off_time = 0;
 
   return;
 }

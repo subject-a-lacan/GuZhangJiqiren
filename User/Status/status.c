@@ -308,6 +308,9 @@ void update_status(STATUS *status) {
   driver_servo(&status->motor.servo[0]);
   driver_servo(&status->motor.servo[1]); //舵机转动定角度（结构体元素确定
 
+  if (status->device.buzzer.on && status->state.time >= status->device.buzzer.off_time) {
+    status->device.buzzer.on = 0;
+  }
   driver_BUZZER(&status->device.buzzer);
 
   driver_wheel(&status->motor.wheel[0]);

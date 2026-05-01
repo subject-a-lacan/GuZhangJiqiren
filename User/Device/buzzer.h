@@ -10,6 +10,7 @@ typedef struct BUZZER {
   uint8_t which;             // LED编号
   uint8_t High_level_is_on;  // 用于设置该led是高电平亮还是低电平亮
   uint8_t on;                // 设置LED亮灭
+  uint32_t off_time;         // 蜂鸣器自动关闭时间
 } BUZZER;
 
 // 设置蜂鸣器响 status.device.buzzer.on = 1;
