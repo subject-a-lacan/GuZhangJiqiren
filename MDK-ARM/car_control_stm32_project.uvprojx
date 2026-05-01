@@ -715,6 +715,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\Status\road.c</FilePath>
             </File>
+            <File>
+              <FileName>Defect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Status\Defect.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -881,6 +886,9 @@
               <FilePath>..\User\Tool\task.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>New Group</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>

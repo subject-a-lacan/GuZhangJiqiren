@@ -42,6 +42,6 @@ car_control_stm32_project/gw_find_line.o: ../User/Sensor/gw_find_line.c \
   ../User/Tool\pid.h ../User/Status\road.h ../Core/Inc\i2c.h \
   ../User/Tool\log.h ../Core/Inc\usart.h ../User/Status\status.h \
   ../User/Device\button.h ../User/Device\buzzer.h \
-  ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h \
-  ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h
+  ../User/Status/Defect.h ../User/Sensor\gw_anagloge.h \
+  ../User/Sensor\gy901.h ../User/Device\led.h ../User/Motor\servo.h \
+  ../User/Motor\wheel.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h

@@ -5,6 +5,7 @@
 
 #include "button.h"
 #include "buzzer.h"
+#include "Defect.h"
 #include "gw_anagloge.h"
 #include "gw_find_line.h"
 #include "gy901.h"
@@ -113,6 +114,7 @@ typedef struct STATUS {
   SENSOR sensor;  // 传感器数据
   MOTOR motor;    // 电机数据
   DEVICE device;
+  TASK task;
 } STATUS;
 
 extern STATUS status;

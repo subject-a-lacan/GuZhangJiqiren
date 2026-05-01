@@ -2,6 +2,12 @@
 
 本文档描述校赛四道题在现有 STM32 工程中的推荐嵌入方式。核心思想是：把“比赛任务状态”封装成独立的 `TASK` 结构体，挂到全局 `STATUS` 状态树中；按钮和蓝牙只负责改任务状态或置请求位；真正的任务启动、停止、题内状态机推进，统一放到 20ms 控制周期中的 `update_task()` 里完成。
 
+简要来说：
+TASK：任务层
+MOTION：运动执行层
+
+
+
 ## 一、三层职责
 
 工程中建议明确区分三层：
@@ -161,7 +167,7 @@ armed = 1  已武装，允许启动任务
 
 蓝牙 'S' 急停:
   stop_request = 1
-  update_task() 消费后 armed = 0
+  update_task() 消费后按远程停车语义停车
 
 蓝牙 'M':
   armed = 1
@@ -294,10 +300,9 @@ update_status():
 ```text
 update_task(status):
 
-  // 1. 急停请求优先级最高
+  // 1. 远程停车请求优先级最高
   if (status.task.stop_request) {
-      task_abort(status);
-      status.task.stop_request = 0;
+      task_stop(status);
       return;
   }
 
@@ -391,21 +396,35 @@ task_finish(status):
 
 `armed` 保持 1 是为了方便重跑。如果需要更安全，可以完成后也置 0。
 
-## 十四、急停 task_abort()
+## 十四、远程停车 task_stop()
 
-急停用于蓝牙 `'S'` 或其他紧急停止入口。
+远程停车用于蓝牙 `'S'`，语义应尽量接近现有 `main.c` 里 `Cz` 指令的停车效果，但要额外阻止任务状态机在下一周期继续推进。
 
 ```text
-task_abort(status):
+task_stop(status):
   task_running = 0
+  start_request = 0
+  stop_request = 0
   state.motion = STOP
   state.base_speed = 0
   左右轮 tar_speed = 0
-  armed = 0
-  急停声光提示
 ```
 
-急停后必须重新发送 `'M'` 武装，或通过指定硬件方式重新武装，才能再次启动。
+也就是：
+
+```c
+status.task.task_running = 0;
+status.task.start_request = 0;
+status.task.stop_request = 0;
+status.state.motion = STOP;
+status.state.base_speed = 0;
+status.motor.wheel[0].tar_speed = 0;
+status.motor.wheel[1].tar_speed = 0;
+```
+
+`task_stop()` 不清 `task_id`，不清 `start_pose`，不清 `race_phase`，不清 `armed`，不重置 PID，也不清路口计数。它只是让车停下，并让当前任务不再继续自动推进。
+
+因此不再需要单独的 `task_abort()` 概念。如果后续确实需要“异常中止并完全清状态”的重逻辑，可以另起名字，例如 `task_reset_all()`，不要和蓝牙停车混在一起。
 
 ## 十五、题目状态机示例
 

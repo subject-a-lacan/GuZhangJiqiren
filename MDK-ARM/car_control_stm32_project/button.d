@@ -43,5 +43,6 @@ car_control_stm32_project/button.o: ../User/Device/button.c \
   ../User/Tool\log.h ../Core/Inc\usart.h ../User/Motor\lq_step.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h ../User/Tool\math_tool.h \
   ../User/Status\status.h ../User/Device\buzzer.h \
-  ../User/Sensor\gw_find_line.h ../User/Tool\pid.h ../User/Status\road.h \
-  ../User/Sensor\gy901.h ../User/Motor\servo.h ../User/Motor\wheel.h
+  ../User/Status/Defect.h ../User/Sensor\gw_find_line.h \
+  ../User/Tool\pid.h ../User/Status\road.h ../User/Sensor\gy901.h \
+  ../User/Motor\servo.h ../User/Motor\wheel.h

@@ -165,6 +165,8 @@ void init_status(STATUS *status, uint8_t T) {
 
   init_device();
 
+  init_task(&status->task);
+
   return;
 }
 
