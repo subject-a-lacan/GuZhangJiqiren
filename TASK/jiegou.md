@@ -243,6 +243,7 @@ typedef struct STATUS {
     MOTOR motor;
     DEVICE device;
     TASK task;
+    
 } STATUS;
 ```
 
