@@ -1,888 +1,788 @@
-# 小车控制工程架构
+# 小车工程结构说明
 
-本文档描述当前工程的推荐架构。核心思想是：整车状态统一挂在全局 `STATUS status` 树上；比赛题目流程统一由 `TASK` 结构体管理；底层 `motion` 只负责执行运动方式，不负责理解“现在是第几问、第几个路口、该不该停车”。
+这份文档写给刚接触本工程的队友。目标不是讲设计思想，而是让你能快速回答三个问题：
 
-一句话版本：
+1. 程序从哪里开始跑？
+2. 整车状态都存在哪里？
+3. 一次 20ms 控制周期里，代码怎么从“读传感器”走到“电机真正转起来”？
+
+先记住一句话：
 
 ```text
-输入事件/传感器
-  -> status 状态树
-  -> update_task() 推进比赛任务状态机
-  -> status.state.motion 选择底层运动模式
-  -> driver_xxx() 驱动硬件
+所有数据挂在全局 status 树上；
+update_status() 每 20ms 跑一次；
+update_task() 决定当前任务要干什么；
+motion 层算出轮子目标速度；
+driver_xxx() 把目标值真正写进硬件。
 ```
 
 ---
 
-## 一、工程分层
+## 1. 先看工程目录
 
 ```text
 Core/
-  CubeMX 生成的 HAL 初始化代码，例如 MX_GPIO_Init()、MX_TIMx_Init()
+  CubeMX 生成的初始化代码。
+  例如 GPIO、TIM、USART、ADC、I2C 的 MX_xxx_Init() 都在这里。
 
 Drivers/
-  STM32G4 HAL/CMSIS 标准库
+  STM32 HAL 库和 CMSIS。
+  平时基本不用改。
 
 User/
   Status/
-    整车状态树、TASK 调度、运动控制入口
+    整车控制核心。
+    status.h/status.c 定义全局状态树和 update_status()。
+    Defect.h/Defect.c 定义比赛 TASK 状态机。
+    road.h/road.c 做路口识别相关逻辑。
+
   Sensor/
-    灰度、陀螺仪等传感器驱动与数据解析
+    传感器。
+    例如 GY901 陀螺仪、灰度传感器。
+
   Motor/
-    电机、舵机等执行器驱动
+    执行器。
+    例如 wheel.c 控制 TB6612 + 电机，servo.c 控制舵机。
+
   Device/
-    按键、LED、蜂鸣器等板载外设
+    板载外设。
+    例如 button.c、led.c、buzzer.c。
+
   It/
-    定时器、串口等中断服务
+    中断服务。
+    timer_it.c 负责定时调用 update_status()。
+
   Tool/
-    PID、数学宏、日志、数组工具等通用组件
-  Middle/
-    跨平台兼容层
+    通用工具。
+    例如 PID、数学宏、串口日志。
 ```
 
-硬件平台：STM32G474，系统主频约 150 MHz。
+新队友最应该先看这几个文件：
+
+```text
+User/Status/status.h      看 status 这棵状态树长什么样
+User/Status/status.c      看 init_status() 和 update_status()
+User/Status/Defect.h      看 TASK 结构体
+User/Status/Defect.c      看 update_task() 怎么调度任务
+User/Device/button.c      看按键怎么给 TASK 发请求
+User/Motor/wheel.c        看轮子目标速度怎么变成 PWM
+User/It/timer_it.c        看 20ms 控制周期怎么触发
+```
 
 ---
 
-## 二、状态树 STATUS
+## 2. 程序是怎么跑起来的
 
-工程里只有一个全局状态树实例：
+主入口在 `Core/Src/main.c`。大致流程是：
+
+```text
+main()
+  -> HAL_Init()
+  -> SystemClock_Config()
+  -> MX_GPIO_Init()
+  -> MX_TIMx_Init()
+  -> MX_USARTx_UART_Init()
+  -> init_status(&status, 20)
+  -> after_init_state()
+  -> 启动定时器 / PWM / 编码器 / 串口接收等
+  -> while (1)
+```
+
+真正的控制逻辑不主要写在 `while (1)` 里，而是靠 TIM5 定时器周期性触发。
+
+当前控制节拍：
+
+```text
+TIM5 每 1ms 进一次中断
+  -> status.state.time += 1
+
+每累计到 20ms
+  -> update_status(&status)
+```
+
+所以调车时要有一个概念：大部分控制代码每 20ms 执行一次，不是一直连续执行。
+
+---
+
+## 3. 全局状态树 STATUS
+
+工程里最重要的变量是：
 
 ```c
 STATUS status;
 ```
 
-它声明在 `User/Status/status.h`，定义在 `User/Status/status.c`。所有模块都应该通过 `status.xxx.xxx` 读写状态，避免再散落新的全局变量。
+它定义在 `User/Status/status.c`，声明在 `User/Status/status.h`。
 
-当前顶层结构：
+整车几乎所有状态都挂在这棵树上。不要随便新建全局变量保存运行状态，优先考虑挂进 `status`。
+
+当前结构：
 
 ```text
 status
-  ├── state     车辆运行状态、底层运动控制参数、路口观测缓存、状态层 PID
-  ├── sensor    陀螺仪、数字灰度、模拟灰度等传感器数据
-  ├── motor     轮子、舵机等执行器状态
-  ├── device    LED、按键、蜂鸣器等外设状态
-  └── task      比赛任务状态机
+  ├── state     小车当前运行状态和控制参数
+  ├── sensor    传感器数据
+  ├── motor     电机、舵机等执行器数据
+  ├── device    LED、按键、蜂鸣器等外设数据
+  └── task      比赛任务状态机数据
 ```
 
-### 2.1 state：底层运动状态
-
-`state` 描述“车现在怎么动”，不描述“现在跑第几问”。
-
-关键字段：
+可以把它理解成整车的“内存面板”：
 
 ```text
-state.T                 控制周期，当前 update_status() 每 20ms 调用一次
-state.time              系统运行时间，由 TIM5 1ms 中断递增
-state.motion            STOP / FIND_LINE / KEEP_ANGLE / MOTOR_TEST
-state.initial_angle     进入任务或初始化时记录的参考 yaw
-state.cur_angle         当前 yaw
-state.tar_angle         目标相对角度
-state.base_speed        底层运动基础速度
-state.road_determine    路口观测缓存
-state.status_pid        follow_line_pid / keep_angle_pid
-```
-
-`motion` 是执行层枚举：
-
-```c
-typedef enum MOTION_STATION {
-  STOP,
-  KEEP_ANGLE,
-  FIND_LINE,
-  MOTOR_TEST,
-} MOTION_STATION;
-```
-
-注意：`motion` 不能代替 `task_id` 或 `race_phase`。例如第一问和第二问都可能处于 `FIND_LINE`，但它们的任务含义完全不同。
-
-### 2.2 sensor：传感器状态
-
-```text
-sensor.gy901        GY901 陀螺仪
-sensor.gw_8bit      8 路数字灰度
-sensor.gw_analogue  8 路模拟灰度
-```
-
-模拟灰度当前承担主要循迹任务：
-
-```text
-gw_analogue.channel[8]              原始 ADC 值
-gw_analogue.correction_data_w[8]    白底校准数据
-gw_analogue.correction_data_b[8]    黑底校准数据
-gw_analogue.digital_8bit            二值化后的 8 位灰度
-gw_analogue.diff                    归一化线偏差
-```
-
-### 2.3 motor：执行器状态
-
-```text
-motor.wheel[4]   直流电机
-motor.servo[2]   舵机
-```
-
-当前主运动控制只使用左右两个轮子：
-
-```text
-wheel[0].cur_speed   左轮当前编码器速度
-wheel[0].tar_speed   左轮目标速度
-wheel[0].trust       左轮 PWM 推力
-wheel[0].dir         左轮方向校准
-
-wheel[1].cur_speed   右轮当前编码器速度
-wheel[1].tar_speed   右轮目标速度
-wheel[1].trust       右轮 PWM 推力
-wheel[1].dir         右轮方向校准
-```
-
-`driver_wheel()` 内部根据 `tar_speed - cur_speed` 做速度环 PID，最后输出 TB6612 的方向 GPIO 和 PWM。
-
-### 2.4 device：板载外设
-
-```text
-device.led_on_board
-device.led1
-device.led2
-device.button_D2
-device.button_B11
-device.buzzer
-```
-
-按键事件由 `driver_button()` 识别，再交给 `server_button()` 写入 `status.task` 的请求位。
-
-蜂鸣器采用非阻塞自动关闭：
-
-```text
-触发蜂鸣器:
-  buzzer.on = 1
-  buzzer.off_time = status.state.time + 持续时间
-
-周期检查:
-  if (buzzer.on && status.state.time >= buzzer.off_time)
-      buzzer.on = 0
+传感器读到什么          -> 写进 status.sensor
+任务当前跑到哪一步       -> 写进 status.task
+底层现在应该怎么运动     -> 写进 status.state
+轮子目标速度是多少       -> 写进 status.motor
+LED / 蜂鸣器 / 按键状态  -> 写进 status.device
 ```
 
 ---
 
-## 三、TASK 任务层
+## 4. STATUS 树的详细结构
 
-`TASK` 是现在比赛架构的核心。它描述“当前选择第几问、是否进入任务入口、题内跑到哪一步”。
+下面这棵树不是每个字段都要立刻背下来，但你要知道去哪里找。
 
-```c
-typedef struct TASK {
-  uint8_t task_id;
-  uint8_t start_pose;
-  uint8_t race_phase;
-  uint8_t cross_cnt;
+### 4.1 status.state
 
-  uint8_t armed;
-  uint8_t task_running;
-
-  uint8_t task_select_request;
-  uint8_t requested_task_id;
-  uint8_t pose_switch_request;
-
-  uint8_t start_request;
-  uint8_t stop_request;
-
-  uint32_t phase_start_time;
-  float phase_mileage;
-} TASK;
-```
-
-### 3.1 task_id
-
-```c
-typedef enum TASK_ID {
-  TASK_BASIC_1 = 1,
-  TASK_BASIC_2 = 2,
-  TASK_ADV_1   = 3,
-  TASK_ADV_2   = 4,
-} TASK_ID;
-```
-
-含义：
+`state` 表示小车底层运行状态。
 
 ```text
-TASK_BASIC_1  基础部分第一问
-TASK_BASIC_2  基础部分第二问
-TASK_ADV_1    发挥部分第一问
-TASK_ADV_2    发挥部分第二问
+status.state
+  ├── T                 控制周期，当前是 20ms
+  ├── time              系统运行时间，TIM5 每 1ms 加 1
+  ├── motion            当前底层运动模式
+  ├── initial_angle     参考 yaw 角
+  ├── cur_angle         当前 yaw 角
+  ├── tar_angle         目标相对角度
+  ├── base_speed        底层基础速度
+  ├── road_determine    路口识别缓存
+  ├── gw_8bit           预留灰度状态
+  └── status_pid
+      ├── follow_line_pid
+      └── keep_angle_pid
 ```
 
-### 3.2 start_pose
+`motion` 的取值：
+
+```text
+STOP        停车，左右轮目标速度清零
+FIND_LINE   循迹，调用 follow_line()
+KEEP_ANGLE  保角，调用 keep_angle()
+MOTOR_TEST  电机测试模式
+```
+
+重点：`motion` 只表示“车怎么动”，不表示“现在是第几问”。
+
+### 4.2 status.sensor
+
+`sensor` 保存传感器读数。
+
+```text
+status.sensor
+  ├── gy901
+  │   ├── data_buf[24]          陀螺仪原始数据
+  │   ├── device_addr           I2C 地址
+  │   └── data_start_addr       数据寄存器起始地址
+  │
+  ├── gw_8bit
+  │   ├── data_buf              8 位数字灰度原始位图
+  │   ├── gw_bit_weight[8]      权重
+  │   ├── cross                 当前识别道路类型
+  │   └── gw_diff               数字灰度偏差
+  │
+  └── gw_analogue
+      ├── channel[8]            8 路 ADC 原始值
+      ├── correction_data_w[8]  白底校准数据
+      ├── correction_data_b[8]  黑底校准数据
+      ├── digital_8bit          二值化后的 8 位灰度
+      └── diff                  模拟灰度循迹偏差
+```
+
+目前循迹主要看 `gw_analogue.digital_8bit` 和 `gw_analogue.diff`。
+
+### 4.3 status.motor
+
+`motor` 保存电机和舵机状态。
+
+```text
+status.motor
+  ├── wheel[4]
+  │   ├── which       轮子编号
+  │   ├── trust       当前 PWM 推力
+  │   ├── cur_speed   编码器测得的当前速度
+  │   ├── tar_speed   控制层给出的目标速度
+  │   ├── dir         电机方向校准
+  │   └── wheel_pid   单轮速度 PID
+  │
+  └── servo[2]
+      ├── which
+      ├── angle
+      └── max_angle
+```
+
+当前主要使用：
+
+```text
+wheel[0]  左轮
+wheel[1]  右轮
+```
+
+控制层只需要设置：
 
 ```c
-typedef enum START_POSE {
-  START_AB = 0,
-  START_AD = 1,
-} START_POSE;
+status.motor.wheel[0].tar_speed = 左轮目标速度;
+status.motor.wheel[1].tar_speed = 右轮目标速度;
 ```
 
-规则：
+真正的 PWM 输出由 `driver_wheel()` 完成。
+
+### 4.4 status.device
+
+`device` 保存板载外设状态。
 
 ```text
-TASK_BASIC_1  固定 START_AB
-TASK_BASIC_2  支持 START_AB / START_AD
-TASK_ADV_1    支持 START_AB / START_AD
-TASK_ADV_2    固定 START_AB
+status.device
+  ├── led_on_board
+  ├── led1
+  ├── led2
+  ├── button_D2
+  ├── button_B11
+  └── buzzer
 ```
 
-`task_select()` 中，选择第一问或第四问时会强制回到 `START_AB`。第二问和第三问保留当前 `start_pose`，允许通过长按 PB11 切换。
+LED 和蜂鸣器的使用方式很简单：
 
-### 3.3 armed、start_request、task_running
+```c
+status.device.led1.on = 1;       // LED1 亮
+status.device.buzzer.on = 1;     // 蜂鸣器响
+```
 
-这三个字段必须分清楚：
+但这只是改状态，真正写 GPIO 要等后面的：
+
+```c
+driver_LED(&status->device.led1);
+driver_BUZZER(&status->device.buzzer);
+```
+
+### 4.5 status.task
+
+`task` 是比赛任务状态机。
 
 ```text
+status.task
+  ├── task_id                当前选择第几问
+  ├── start_pose             AB / AD 发车姿态
+  ├── race_phase             当前题目内部跑到哪一阶段
+  ├── cross_cnt              当前任务确认过的有效路口数
+  │
+  ├── armed                  是否已经进入任务入口
+  ├── task_running           任务是否真的开始运行
+  │
+  ├── task_select_request    请求切换任务
+  ├── requested_task_id      想切到哪个任务
+  ├── pose_switch_request    请求切换 AB/AD
+  ├── start_request          请求进入当前任务
+  ├── stop_request           请求停车
+  │
+  ├── phase_start_time       当前阶段开始时间
+  └── phase_mileage          当前阶段累计里程，预留
+```
+
+`task_id`：
+
+```text
+1  TASK_BASIC_1
+2  TASK_BASIC_2
+3  TASK_ADV_1
+4  TASK_ADV_2
+```
+
+`start_pose`：
+
+```text
+START_AB = 0
+START_AD = 1
+```
+
+---
+
+## 5. 最核心调用链：update_status()
+
+新人最需要看懂 `User/Status/status.c` 里的 `update_status()`。
+
+它每 20ms 执行一次，顺序大概是：
+
+```text
+update_status(status)
+
+  1. 读取传感器
+     get_gw_raw_data()
+     get_wheel_speed()
+     get_gyr_raw_data()
+     get_gyr_value()
+
+  2. 扫描按键
+     driver_button(button_D2)
+     driver_button(button_B11)
+
+  3. 更新比赛任务状态机
+     update_task(status)
+
+  4. 根据 motion 计算左右轮目标速度
+     FIND_LINE   -> follow_line(status)
+     KEEP_ANGLE  -> keep_angle(status)
+     STOP        -> 左右轮 tar_speed = 0
+     MOTOR_TEST  -> 左右轮 tar_speed = 40
+
+  5. 把状态真正写到硬件
+     driver_LED()
+     driver_servo()
+     蜂鸣器超时自动关闭
+     driver_BUZZER()
+     driver_wheel()
+```
+
+这就是整个工程最重要的数据流。
+
+更直观一点：
+
+```text
+传感器硬件
+  -> get_xxx_raw_data()
+  -> status.sensor
+
+按键硬件
+  -> driver_button()
+  -> server_button()
+  -> status.task 的 request 字段
+
+比赛任务
+  -> update_task()
+  -> status.task.race_phase
+  -> status.state.motion / base_speed / tar_angle
+
+底层运动
+  -> follow_line() / keep_angle()
+  -> status.motor.wheel[x].tar_speed
+
+硬件输出
+  -> driver_wheel()
+  -> TB6612 + 电机
+```
+
+---
+
+## 6. update 层和 driver 层的区别
+
+这是新队友最容易混的地方。
+
+### 6.1 update 层：算“应该是什么”
+
+update 层主要负责读数据、判断状态、计算目标值。
+
+典型函数：
+
+```text
+update_status()
+update_task()
+follow_line()
+keep_angle()
+get_gw_raw_data()
+get_gyr_raw_data()
+get_wheel_speed()
+```
+
+例子：
+
+```text
+follow_line() 不直接输出 PWM。
+它只是根据灰度偏差算出左右轮目标速度 tar_speed。
+```
+
+### 6.2 driver 层：把目标值写进硬件
+
+driver 层主要负责把 status 里的目标状态变成 GPIO/PWM。
+
+典型函数：
+
+```text
+driver_wheel()
+driver_LED()
+driver_BUZZER()
+driver_servo()
+driver_button()
+```
+
+例子：
+
+```text
+driver_wheel() 读取 wheel.tar_speed 和 wheel.cur_speed，
+做速度 PID，
+算出 wheel.trust，
+最后写 TB6612 方向 GPIO 和 TIM8 PWM。
+```
+
+所以代码里经常是两步：
+
+```c
+status.motor.wheel[0].tar_speed = 100;  // 先改目标值
+driver_wheel(&status.motor.wheel[0]);   // 后写硬件
+```
+
+---
+
+## 7. 一条完整的电机控制链
+
+以循迹为例：
+
+```text
+update_status()
+  -> get_gw_raw_data()
+     读取模拟灰度 ADC
+
+  -> update_task()
+     任务状态机决定当前应该 FIND_LINE
+     status.state.motion = FIND_LINE
+     status.state.base_speed = 某个速度
+
+  -> follow_line()
+     get_gw_analoge_digital_data()
+     get_gw_analogue_analogue_diff()
+     compute_pid(follow_line_pid, 灰度偏差)
+     status.motor.wheel[0].tar_speed = base_speed - diff
+     status.motor.wheel[1].tar_speed = base_speed + diff
+
+  -> driver_wheel(wheel[0])
+     根据 tar_speed - cur_speed 做速度 PID
+     输出左轮 PWM 和方向
+
+  -> driver_wheel(wheel[1])
+     根据 tar_speed - cur_speed 做速度 PID
+     输出右轮 PWM 和方向
+```
+
+所以电机最终为什么这么转，要沿着这条链往上查：
+
+```text
+PWM 不对
+  看 driver_wheel()
+
+tar_speed 不对
+  看 follow_line() / keep_angle() / STOP 分支
+
+motion 不对
+  看 update_task() 和当前 race_phase
+
+任务没启动
+  看 button.c 有没有置 start_request，update_task() 有没有置 armed
+```
+
+---
+
+## 8. TASK 层是干什么的
+
+旧代码里很多逻辑直接写在 `follow_line()` 或 `road.c` 里，例如看到 `LeftRoad` 就立刻原地转弯。
+
+现在的新架构不这样干。
+
+新架构分三层：
+
+```text
+TASK 层
+  决定“当前第几问、跑到哪一阶段、下一步该干什么”
+
+motion 层
+  决定“用循迹、保角、停车还是电机测试”
+
+driver 层
+  决定“怎么把目标速度/LED 状态/PWM 写到硬件”
+```
+
+比如同样看到 `LeftRoad`：
+
+```text
+第一问 AD 边看到 LeftRoad
+  可能表示到 D 点，要准备左转
+
+第一问 BA 最后看到 LeftRoad
+  可能表示回到 A 点附近，要停车
+
+刚发车时看到 LeftRoad
+  可能是起点旁边的 AD，需要忽略
+```
+
+所以路口的意义不能由 `road.c` 自己决定，必须由 `task_xxx_update()` 根据 `race_phase` 判断。
+
+---
+
+## 9. TASK 的启动链路
+
+当前按键逻辑在 `User/Device/button.c`。
+
+### 9.1 PB11 短按：切换任务
+
+```text
+PB11 释放
+  -> driver_button() 识别 BUTTON_UP
+  -> server_button()
+  -> 计算下一个 task_id
+  -> status.task.requested_task_id = next
+  -> status.task.task_select_request = 1
+```
+
+然后下一个 20ms：
+
+```text
+update_status()
+  -> update_task()
+  -> 发现 task_select_request == 1
+  -> task_select(status, requested_task_id)
+  -> status.task.task_id 改变
+  -> update_task_led(status)
+```
+
+### 9.2 PB11 长按：切换 AB/AD 发车
+
+只对第二问和第三问有效：
+
+```text
+PB11 长按
+  -> pose_switch_request = 1
+  -> 蜂鸣器长响约 1000ms
+
+update_task()
+  -> 如果当前是 TASK_BASIC_2 或 TASK_ADV_1
+  -> start_pose 在 START_AB / START_AD 之间切换
+  -> update_task_led(status)
+```
+
+### 9.3 PD2 短按：请求进入当前任务
+
+```text
+PD2 短按
+  -> start_request = 1
+  -> 蜂鸣器短响约 200ms
+
+update_task()
+  -> 如果当前没有 armed，也没有 task_running
+  -> armed = 1
+  -> task_start(status)
+  -> 根据 task_id 设置 race_phase
+```
+
+注意：
+
+```text
+PD2 短按不会直接把 task_running 置 1。
+task_start() 也不会直接把 task_running 置 1。
+
+task_running 必须由具体 task_xxx_update() 在确认任务真的开始后置 1。
+```
+
+这可以防止“按了启动键，但任务内部没跑通，却显示任务已经在跑”的假启动。
+
+---
+
+## 10. TASK 几个关键字段怎么理解
+
+```text
+task_id
+  当前选的是第几问。
+
+start_pose
+  当前发车姿态，AB 或 AD。
+
+race_phase
+  当前题目内部的小阶段。
+  例如第一问可以分成起点转弯、AD 边、D 点转弯、DC 边等。
+
+cross_cnt
+  当前任务确认过的有效路口数。
+  它应该由任务状态机更新，不应该由 road.c 自动决定。
+
 start_request
-  外部输入提出“我要进入当前任务入口”的一次性请求。
-  按键和蓝牙只能置这个请求，不能直接启动任务。
+  外部输入提出“我要启动当前任务”的请求。
 
 armed
-  update_task() 消费 start_request 后置 1。
-  表示当前任务入口已经放行，允许进入对应 task_xxx_update()。
+  update_task() 已经接受启动请求，任务入口已经放行。
 
 task_running
-  只有具体 task_xxx_update() 在确认任务真的开始运行后才能置 1。
-  它不能由按键直接置 1，也不应该由 task_start() 直接置 1。
+  任务内部确认“真的开始跑了”。
+
+stop_request
+  蓝牙或其他紧急输入请求停车。
 ```
 
-推荐生命周期：
+三者关系最容易混：
 
 ```text
-上电:
-  armed = 0
-  task_running = 0
-  motion = STOP
-
-PD2 短按或蓝牙启动命令:
-  start_request = 1
-
-update_task() 消费 start_request:
-  armed = 1
-  task_start(status)
-
-题内状态机确认任务真正开始:
-  task_running = 1
-
-任务完成:
-  task_finish(status)
-  armed = 0
-  task_running = 0
-  motion = STOP
-```
-
-这个设计的好处是：按下启动键不等于假启动。只有任务入口真正跑通，并且题内状态机确认开始执行后，`task_running` 才代表“任务真的在跑”。
-
-### 3.4 race_phase
-
-`race_phase` 是每道题内部的小状态机。
-
-第一问当前已经有阶段枚举：
-
-```c
-typedef enum Q1_RACE_PHASE {
-  Q1_START_A_TURN,
-  Q1_SIDE_AD,
-  Q1_TURN_D,
-  Q1_SIDE_DC,
-  Q1_TURN_C,
-  Q1_SIDE_CB,
-  Q1_TURN_B,
-  Q1_BA_FINAL,
-} Q1_RACE_PHASE;
-```
-
-推荐理解：
-
-```text
-task_id      表示现在选的是第几问
-race_phase   表示这道题内部走到哪一步
-motion       表示这一小步让底层怎么运动
-```
-
-例如：
-
-```text
-task_id = TASK_BASIC_1
-race_phase = Q1_SIDE_AD
-motion = FIND_LINE
-```
-
-含义是：当前跑第一问，题内处于 AD 边，底层正在循迹。
-
-### 3.5 cross_cnt
-
-`status.task.cross_cnt` 表示“当前任务状态机已经确认并消费过几个有效路口/角点”。
-
-它不是传感器原始量，也不应该由 `road.c` 自己随便加。路口检测模块只能说“我好像看到了某种路口事件”，是否有效、是否计数、是否触发阶段切换，必须由具体任务状态机决定。
-
-短期为了兼容旧代码，`road.c` 里仍有 legacy/global `cross_cnt`。长期目标是把任务流程计数统一迁移到 `status.task.cross_cnt`。
-
----
-
-## 四、update_status() 控制周期
-
-`update_status()` 每 20ms 调用一次，是整车控制主循环。当前推荐顺序如下：
-
-```text
-1. 读取传感器和轮速
-   get_gw_raw_data()
-   get_wheel_speed()
-   get_gyr_raw_data()
-   get_gyr_value()
-
-2. 处理按键事件
-   driver_button(button_D2)
-   driver_button(button_B11)
-   按键事件只写 status.task 的请求位
-
-3. 推进任务层
-   update_task(status)
-   消费 start/stop/select/pose 请求
-   根据 task_id 分发到 task_xxx_update()
-   由题内状态机设置 motion/base_speed/tar_angle 等
-
-4. 执行底层 motion
-   FIND_LINE   -> follow_line(status)
-   KEEP_ANGLE  -> keep_angle(status)
-   STOP        -> wheel tar_speed = 0
-   MOTOR_TEST  -> 固定测试速度
-
-5. 驱动硬件
-   driver_LED()
-   driver_servo()
-   蜂鸣器超时自动关闭
-   driver_BUZZER()
-   driver_wheel()
-```
-
-这条顺序很关键：按钮先产生请求，`update_task()` 再消费请求，最后底层 `motion` 才根据任务层给出的状态真正算轮速。
-
----
-
-## 五、update_task() 调度逻辑
-
-`update_task()` 是任务层唯一入口。它不扫描按键，只消费已经被按键或蓝牙置好的请求位。
-
-推荐逻辑：
-
-```text
-update_task(status):
-
-  1. stop_request 优先级最高
-     if stop_request:
-       task_stop(status)
-       return
-
-  2. 空闲状态下处理任务选择和发车姿态切换
-     条件: !task_running && !armed
-
-     if task_select_request:
-       task_select(status, requested_task_id)
-       task_select_request = 0
-
-     if pose_switch_request:
-       如果当前是 TASK_BASIC_2 或 TASK_ADV_1:
-         START_AB <-> START_AD
-         update_task_led(status)
-       pose_switch_request = 0
-
-  3. 处理进入任务入口请求
-     if start_request:
-       if !task_running && !armed:
-         armed = 1
-         task_start(status)
-       start_request = 0
-
-  4. 没有 armed 就不推进题内状态机
-     if !armed:
-       return
-
-  5. 根据 task_id 分发
-     TASK_BASIC_1 -> task_basic_1_update(status)
-     TASK_BASIC_2 -> task_basic_2_update(status)
-     TASK_ADV_1   -> task_adv_1_update(status)
-     TASK_ADV_2   -> task_adv_2_update(status)
-```
-
-当前 `task_xxx_update()` 仍是占位骨架，后续每道题的真正流程都应该写在对应函数里。
-
----
-
-## 六、任务入口与退出
-
-### 6.1 init_task()
-
-上电默认状态：
-
-```text
-task_id = TASK_BASIC_1
-start_pose = START_AB
-race_phase = 0
-cross_cnt = 0
-
-armed = 0
-task_running = 0
-
-所有 request = 0
-phase_start_time = 0
-phase_mileage = 0
-```
-
-上电必须 `armed = 0`，否则车可能直接进入任务。
-
-### 6.2 task_start()
-
-`task_start()` 只做“进入任务入口前的统一初始化”，不代表任务已经真的运行。
-
-它负责清理：
-
-```text
-start_request / stop_request
-status.task.cross_cnt
-legacy cross_cnt / left_cnt / cross_delay
-road_buf / road_determine
-phase_mileage
-follow_line_pid / keep_angle_pid 的历史误差和积分
-initial_angle
-左右轮 tar_speed
-motion / base_speed
-```
-
-然后根据当前 `task_id` 和 `start_pose` 设置初始 `race_phase`，并记录：
-
-```text
-phase_start_time = status.state.time
-```
-
-注意：`task_start()` 不设置 `task_running = 1`。
-
-### 6.3 task_finish()
-
-正常完成任务时调用：
-
-```text
-task_running = 0
-armed = 0
-start_request = 0
-stop_request = 0
-task_select_request = 0
-pose_switch_request = 0
-motion = STOP
-base_speed = 0
-左右轮 tar_speed = 0
-蜂鸣器短响
-```
-
-完成后必须重新按 PD2 或发蓝牙启动命令，才能再次进入任务入口。
-
-### 6.4 task_stop()
-
-远程停车/急停语义，效果接近旧 `Cz` 停车命令：
-
-```text
-task_running = 0
-armed = 0
-start_request = 0
-stop_request = 0
-motion = STOP
-base_speed = 0
-左右轮 tar_speed = 0
-```
-
-`task_stop()` 不清 `task_id`，不清 `start_pose`。这样停车后仍然保留当前选题和发车模式。
-
----
-
-## 七、按键与蓝牙输入
-
-按键和蓝牙都只写请求位，不直接修改任务核心状态。这样以后蓝牙命令改格式，也不会影响任务调度层。
-
-### 7.1 PB11
-
-```text
-PB11 短按:
-  条件: task_running == 0
-  动作:
-    next = task_id + 1
-    如果 next > 4，则 next = 1
-    requested_task_id = next
-    task_select_request = 1
-
-PB11 长按:
-  条件:
-    task_running == 0
-    当前 task_id 是 TASK_BASIC_2 或 TASK_ADV_1
-  动作:
-    pose_switch_request = 1
-    蜂鸣器长响约 1000ms
-```
-
-### 7.2 PD2
-
-```text
-PD2 短按:
-  条件:
-    armed == 0
-    task_running == 0
-  动作:
-    start_request = 1
-    蜂鸣器短响约 200ms
-
-PD2 长按:
-  动作:
-    correct_gw_analogue()
-    进入灰度校准
-```
-
-### 7.3 短按和长按互斥
-
-`BUTTON` 结构体中使用 `long_triggered` 标志位：
-
-```text
-BUTTON_DOWN:
-  long_triggered = 0
-
-BUTTON_LONG:
-  long_triggered = 1
-  执行长按动作
-
-BUTTON_UP:
-  if long_triggered == 0:
-    执行短按动作
-```
-
-这样长按释放时不会再误触发短按。
-
-### 7.4 蓝牙接口原则
-
-具体蓝牙命令格式仍可后续确定，但最终建议沿用 `main.c` 里 `pid_tune()` 的风格：
-
-```text
-C... \r\n
-```
-
-解析后统一落到这些请求接口：
-
-```text
-选择任务:
-  requested_task_id = 目标任务
-  task_select_request = 1
-
-切换 AB/AD:
-  pose_switch_request = 1
-
-请求进入当前任务:
-  start_request = 1
-
-远程停车:
-  stop_request = 1
+start_request 是请求
+armed 是入口放行
+task_running 是任务真的运行
 ```
 
 ---
 
-## 八、LED 与蜂鸣器反馈
+## 11. LED 和蜂鸣器怎么看状态
 
-三个 LED 的常亮编码表示当前选题和发车姿态。
-
-顺序为：
+三个 LED 的顺序：
 
 ```text
 板载 LED, LED1, LED2
 ```
 
-编码表：
+当前编码：
 
-| 状态 | LED 编码 |
+| 状态 | LED |
 |---|---|
 | TASK1 | `1 0 1` |
-| TASK2 AB 发车 | `1 1 1` |
-| TASK2 AD 发车 | `0 1 1` |
-| TASK3 AB 发车 | `1 0 0` |
-| TASK3 AD 发车 | `0 0 0` |
+| TASK2 AB | `1 1 1` |
+| TASK2 AD | `0 1 1` |
+| TASK3 AB | `1 0 0` |
+| TASK3 AD | `0 0 0` |
 | TASK4 | `1 1 0` |
 
-LED 由 `update_task_led(status)` 统一刷新。切换任务或切换发车姿态后都应该调用它。
-
-蜂鸣器规则：
+LED 不是在按键函数里直接最终决定的，而是：
 
 ```text
-PD2 短按请求进入任务入口:
-  短响约 200ms
-
-PB11 长按切换 TASK2/TASK3 发车姿态:
-  长响约 1000ms
-
-task_finish():
-  短响约 200ms
+按键置 request
+  -> update_task() 消费 request
+  -> update_task_led()
+  -> driver_LED()
 ```
 
-蜂鸣器不能使用 `HAL_Delay()` 阻塞控制周期。
+蜂鸣器：
+
+```text
+PD2 短按启动请求      短响约 200ms
+PB11 长按切换 AB/AD   长响约 1000ms
+task_finish()         短响约 200ms
+```
+
+蜂鸣器通过 `off_time` 自动关闭，不用 `HAL_Delay()` 阻塞。
 
 ---
 
-## 九、运动控制层
+## 12. road.c 现在应该怎么看
 
-### 9.1 FIND_LINE
+`road.c` 目前还有旧架构残留。新队友看它时要特别小心。
 
-`follow_line(status)` 当前负责：
+它里面有一些旧逻辑：
 
 ```text
-读取模拟灰度二值化结果
-计算模拟灰度 diff
-调用 get_road_type() 更新路口观测
-根据 diff 计算左右轮差速
+全局 cross_cnt
+全局 left_cnt
+全局 cross_delay
+serve_road() 里直接改 base_speed
+follow_line() 里看到 LeftRoad/RightRoad 直接转弯
+cross_cnt == 4 的特殊右转
 ```
 
-需要特别注意：旧代码里 `follow_line()` 仍混有路口转向逻辑，例如 `LeftRoad` 直接原地转、`cross_cnt == 4` 特化右转等。这些属于旧赛题残留，长期应该迁移到 `task_xxx_update()`。
+这些以后应该逐步清理。
 
-目标架构中：
+新架构希望 `road.c` 只做一件事：
 
 ```text
-road.c / get_road_type()
-  只负责告诉任务层“我观察到了什么路口事件”
-
-task_xxx_update()
-  决定这个事件在当前 race_phase 是否有效
-  决定是否计数、转弯、停车、进入下一阶段
-
-follow_line()
-  只负责在需要循迹时输出左右轮目标速度
+根据灰度数据判断当前像不像某种路口：
+Straight / LeftRoad / RightRoad / CrossRoad
 ```
 
-### 9.2 KEEP_ANGLE
-
-`keep_angle(status)` 根据陀螺仪 yaw 做闭环保角：
+至于这个路口是否有效、要不要计数、要不要转弯、要不要停车，应该交给：
 
 ```text
-target = initial_angle + tar_angle
-diff_angle = target - cur_angle
-角度误差处理 360° 环绕
-keep_angle_pid 计算修正量
-左轮 = base_speed + diff
-右轮 = base_speed - diff
+task_basic_1_update()
+task_basic_2_update()
+task_adv_1_update()
+task_adv_2_update()
 ```
 
-后续直角转弯建议由任务状态机设置 `tar_angle`，再用 `KEEP_ANGLE` 或专门的转弯阶段完成，而不是在路口检测函数里开环写死轮速。
-
-### 9.3 STOP
-
-`STOP` 是底层停车模式：
+也就是说：
 
 ```text
-wheel[0].tar_speed = 0
-wheel[1].tar_speed = 0
-```
-
-但“为什么停车”不由 `STOP` 判断。是完成任务、远程停车、阶段等待，还是保护逻辑，都应该由任务状态机决定。
-
----
-
-## 十、路口识别层的边界
-
-当前 `road.c` 里仍有旧架构残留：
-
-```text
-global cross_cnt
-global left_cnt
-global cross_delay
-serve_road() 里直接改 base_speed / PID / 计数
-follow_line() 里直接根据路型转弯
-```
-
-这些逻辑和新 `TASK` 架构不兼容。新边界应该是：
-
-```text
-灰度数据
-  -> road.c 判断当前像 Straight / LeftRoad / RightRoad / CrossRoad
-  -> 只产生“观测结果”
-  -> task_xxx_update() 结合 race_phase、里程、时间、start_pose 判断是否采用
-```
-
-同一个 `LeftRoad` 在不同阶段含义不同：
-
-```text
-Q1_SIDE_AD:
-  可能表示到达 D 点，准备左转
-
-Q1_BA_FINAL:
-  可能表示回到 A 点附近，应该停车
-
-Q1_START_A_TURN:
-  起点本来就靠近 AD，普通 LeftRoad 可能需要忽略
-```
-
-所以路口计数、阶段切换、转弯动作都必须放到任务状态机里。
-
----
-
-## 十一、题内状态机写法
-
-每道题都应该有自己的 `task_xxx_update()`。
-
-一个阶段只做三件事：
-
-```text
-1. 阶段动作
-   当前阶段让车怎么动，例如 FIND_LINE、KEEP_ANGLE、STOP。
-
-2. 阶段判据
-   什么条件说明本阶段完成，例如检测到有效路口、角度到位、里程达到、超时保护。
-
-3. 阶段切换
-   完成后进入哪个 race_phase。
-```
-
-推荐统一封装阶段切换：
-
-```text
-task_set_phase(status, next_phase):
-  race_phase = next_phase
-  phase_start_time = status.state.time
-  phase_mileage = 0
-  清理本阶段临时计数
-```
-
-第一问示意：
-
-```text
-Q1_START_A_TURN
-  起点 A 特化处理，避免刚上电就把 AD 误当普通左路口
-  完成后 -> Q1_SIDE_AD
-
-Q1_SIDE_AD
-  FIND_LINE
-  检测到 D 点有效路口 -> Q1_TURN_D
-
-Q1_TURN_D
-  陀螺仪闭环左转 + 低速找线
-  完成后 -> Q1_SIDE_DC
-
-Q1_SIDE_DC
-  FIND_LINE
-  检测到 C 点有效路口 -> Q1_TURN_C
-
-Q1_TURN_C
-  完成后 -> Q1_SIDE_CB
-
-Q1_SIDE_CB
-  FIND_LINE
-  检测到 B 点有效路口 -> Q1_TURN_B
-
-Q1_TURN_B
-  完成后 -> Q1_BA_FINAL
-
-Q1_BA_FINAL
-  BA 边循迹
-  编码器里程为主，A 点灰度路口为辅
-  到停车条件 -> task_finish()
-```
-
-第二问示意：
-
-```text
-根据 start_pose 决定方向:
-  START_AB: 从 AB 出发，跑 3/4 圈到 B，掉头返回
-  START_AD: 从 AD 出发，跑 3/4 圈到 D，掉头返回
-
-BC 干扰 A4 区域:
-  灰度横线可能制造假路口
-  需要由 race_phase + 里程门限判断是否采用路口事件
-  不能让 road.c 的全局 cross_cnt 自动决定任务进度
+road.c 负责“看见了什么”
+TASK 负责“这件事在当前题目里代表什么”
 ```
 
 ---
 
-## 十二、中断与时间
-
-`User/It/timer_it.c` 中 TIM5 是系统心跳：
+## 13. 常见修改应该去哪改
 
 ```text
-TIM5 每 1ms 中断:
-  status.state.time += 1
+想改任务切换、启动、停止逻辑
+  -> User/Status/Defect.c
+  -> update_task() / task_start() / task_finish()
 
-每 20ms:
-  update_status(&status)
+想改某一道题怎么跑
+  -> User/Status/Defect.c
+  -> task_basic_1_update() 等 task_xxx_update()
+
+想改按键功能
+  -> User/Device/button.c
+  -> server_button()
+
+想改循迹
+  -> User/Status/status.c
+  -> follow_line()
+  -> User/Sensor/gw_analogue.c
+
+想改直角转弯/保角
+  -> User/Status/status.c
+  -> keep_angle()
+  -> 以及具体 task_xxx_update() 里如何设置 tar_angle
+
+想改电机 PID 或方向
+  -> User/Motor/wheel.c
+  -> init_motor() 里的 init_wheel() 参数
+
+想改 LED/蜂鸣器状态提示
+  -> User/Status/Defect.c
+  -> update_task_led()
+  -> User/Device/buzzer.c / led.c
+
+想看控制周期怎么触发
+  -> User/It/timer_it.c
 ```
 
-因此：
+---
+
+## 14. 新队友调试时的读代码顺序
+
+建议按这个顺序，不要一上来钻进某个细节函数里迷路。
 
 ```text
-LONG_PRESS_CNT = 50
-真实长按时间约为 50 * 20ms = 1000ms
+1. User/Status/status.h
+   先看 STATUS 树有哪些分支。
+
+2. User/Status/status.c
+   看 init_status() 初始化了哪些东西。
+   再看 update_status() 每 20ms 做了什么。
+
+3. User/Status/Defect.h
+   看 TASK 结构体有哪些字段。
+
+4. User/Status/Defect.c
+   看 update_task() 怎么消费请求。
+
+5. User/Device/button.c
+   看 PB11 / PD2 怎么把按键动作变成 TASK 请求。
+
+6. User/Motor/wheel.c
+   看 tar_speed 最后怎么变成 PWM。
+
+7. User/Status/road.c
+   最后再看路口识别，并注意里面有旧逻辑残留。
 ```
 
-需要非阻塞定时的地方优先使用 `status.state.time`，不要在控制周期里使用阻塞延时。
-
 ---
 
-## 十三、串口资源
+## 15. 最后记住这几条
 
-| 串口 | 当前用途 |
-|---|---|
-| USART1 | WiFi/蓝牙透传、PID 调参、日志打印 |
-| USART2 | K230/视觉模块、步进电机、绝对编码器预留 |
-| USART3 | 步进电机/MaixCam 预留 |
-| UART4 | VOFA 预留 |
-
-蓝牙命令最终应该和按键走同一套 `status.task` 请求接口。
-
----
-
-## 十四、定时器资源
-
-| 定时器 | 用途 |
-|---|---|
-| TIM1 | 编码器模式 |
-| TIM2 | 编码器模式 |
-| TIM3 | 编码器模式 |
-| TIM4 | 编码器模式 |
-| TIM5 | 系统心跳，驱动 20ms 控制周期 |
-| TIM6 | CCD 驱动预留 |
-| TIM8 | 电机 PWM，TB6612 驱动 |
-| TIM15 | 舵机 PWM |
-
----
-
-## 十五、添加新模块的原则
-
-新增模块时按这个节奏接入：
-
-```text
-1. 在对应 User/Sensor、User/Motor 或 User/Device 下定义结构体
-2. 写 init_xxx()
-3. 写 get_xxx_raw_data() 或 driver_xxx()
-4. 把结构体挂到 STATUS 对应分支
-5. 在 init_status() / update_status() 中接入
-```
-
-控制参数和运行状态优先挂到 `status` 树，不要随手新增孤立全局变量。
-
----
-
-## 十六、当前最重要的架构原则
-
-1. `TASK` 管比赛流程，`motion` 管底层动作。
-2. 按键和蓝牙只置请求位，不直接改 `task_id`、`armed`、`task_running`。
-3. `update_task()` 是任务请求的唯一消费者。
-4. `task_start()` 只做入口初始化，不设置 `task_running`。
-5. `task_running` 只能由具体题目的 `task_xxx_update()` 在确认真正运行后置 1。
-6. `road.c` 只能作为路口观测层，不能接管转弯、停车、任务计数。
-7. `status.task.cross_cnt` 才是任务有效路口计数，旧全局 `cross_cnt` 只能作为过渡兼容。
-8. LED 常亮编码由 `task_id + start_pose` 决定，蜂鸣器必须非阻塞。
-9. 第一问、第二问这种比赛逻辑必须写成 `race_phase` 小状态机。
-10. 上电默认 `armed = 0`、`task_running = 0`、`motion = STOP`，保证车不会自己跑。
-
----
-
-## 十七、推荐阅读顺序
-
-1. `User/ARCHITECTURE.md`：先理解本文档。
-2. `User/Status/status.h`：看完整 `STATUS` 类型。
-3. `User/Status/Defect.h`：看 `TASK` 字段和任务枚举。
-4. `User/Status/Defect.c`：看 `init_task()`、`update_task()`、`task_start()`、`task_finish()`。
-5. `User/Device/button.c`：看按键如何写任务请求位。
-6. `User/Status/status.c`：看 `update_status()` 的 20ms 调用链。
-7. `User/Status/road.c`：看当前旧路口识别残留，后续逐步清理。
+1. `status` 是整车唯一核心状态树。
+2. `update_status()` 是 20ms 控制主循环。
+3. 按键和蓝牙不直接改任务状态，只置 request。
+4. `update_task()` 消费 request，并推进比赛状态机。
+5. `TASK` 管第几问和题内阶段，`motion` 管底层运动方式。
+6. `follow_line()` / `keep_angle()` 算 `tar_speed`。
+7. `driver_wheel()` 才真正输出 PWM。
+8. `road.c` 未来只应该做路口观测，不应该接管转弯和停车。
