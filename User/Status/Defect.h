@@ -41,6 +41,10 @@ typedef struct TASK {
   uint8_t armed;       //出发允许
   uint8_t task_running;  //表示任务进行的标志位
 
+  uint8_t task_select_request;  // 请求切换任务标志位
+  uint8_t requested_task_id;    // 任务切换的目标任务
+  uint8_t pose_switch_request;  // 请求切换 AB/AD 发车模式标志位
+
   uint8_t start_request;  //出发请求 按钮和蓝牙只改动start_request 中断里判断后再给armed置1
   uint8_t stop_request;   //停止请求  不过感觉有点多余 Cz命令之后根本不会进task running标志位都置1了
 
@@ -49,8 +53,10 @@ typedef struct TASK {
 } TASK;
 
 void init_task(TASK *task);
-// void update_task(STATUS *status);
-void task_start(STATUS *status);  //每次进任务都初始化 避免上一次任务污染这一次
-// void task_finish(STATUS *status);
+void task_start(STATUS *status);
+void task_finish(STATUS *status);
+void task_stop(STATUS *status);
+void task_select(STATUS *status, uint8_t id);
+void update_task(STATUS *status);
 
 #endif

@@ -279,7 +279,15 @@ void update_status(STATUS *status) {
   get_gyr_raw_data(&hi2c1, &status->sensor.gy901);
   status->state.cur_angle = get_gyr_value(&status->sensor.gy901, gyr_z_yaw);
 
-  if (status->state.motion == FIND_LINE) {
+  
+
+  // log_uprintf(&huart1, "%d %d %d %d\r\n", cross_cnt, cross_delay, Turn_or_Straight(), status->state.road_determine.cross);
+
+  driver_button(&status->device.button_D2);
+  driver_button(&status->device.button_B11);
+
+  update_task(status);
+ if (status->state.motion == FIND_LINE) {
     follow_line(status);
   }
   if (status->state.motion == KEEP_ANGLE) {
@@ -293,12 +301,6 @@ void update_status(STATUS *status) {
     status->motor.wheel[0].tar_speed = 40;
     status->motor.wheel[1].tar_speed = 40;
   }
-
-  // log_uprintf(&huart1, "%d %d %d %d\r\n", cross_cnt, cross_delay, Turn_or_Straight(), status->state.road_determine.cross);
-
-  driver_button(&status->device.button_D2);
-  driver_button(&status->device.button_B11);
-
   driver_LED(&status->device.led_on_board);
   driver_LED(&status->device.led1);
   driver_LED(&status->device.led2);

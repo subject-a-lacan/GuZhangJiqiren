@@ -8,6 +8,157 @@ MOTION：运动执行层
 
 
 
+## 零、从切换任务到发车运行的完整调用链
+
+这里先把最重要的一条链路写清楚：外部输入只负责“提出请求”，真正改 `task_id`、启动任务、推进题内状态机，都在 `update_task()` 里完成。
+
+### 1. 切换到 TASK_X
+
+以 PB11 短按切换任务为例：
+
+```text
+PB11 按下并释放
+  -> driver_button() 识别 BUTTON_UP
+  -> server_button() 判断本次没有触发长按
+  -> 计算 next_task_id
+  -> status.task.requested_task_id = next_task_id
+  -> status.task.task_select_request = 1
+```
+
+如果是蓝牙选题，链路也一样，只是 `requested_task_id` 来自蓝牙命令解析：
+
+```text
+蓝牙收到选题命令
+  -> 解析出目标 TASK_X
+  -> status.task.requested_task_id = TASK_X
+  -> status.task.task_select_request = 1
+```
+
+随后在 20ms 控制周期中：
+
+```text
+update_status()
+  -> update_task(&status)
+    -> 发现 task_running == 0
+    -> 发现 task_select_request == 1
+    -> task_select(status, requested_task_id)
+      -> status.task.task_id = TASK_X
+      -> 如果 TASK_X 是 TASK1/TASK4，start_pose 强制 START_AB
+      -> 如果 TASK_X 是 TASK2/TASK3，保留当前 start_pose
+      -> 刷新 LED 编码
+    -> task_select_request = 0
+```
+
+到这里为止，只是“选中了第 X 问”，车还没有动：
+
+```text
+status.task.task_id = TASK_X
+status.task.task_running = 0
+status.state.motion = STOP
+```
+
+### 2. 短按 PD2 请求发车
+
+发车前提：
+
+```text
+status.task.armed == 1
+status.task.task_running == 0
+```
+
+PD2 短按后：
+
+```text
+PD2 按下并释放
+  -> driver_button() 识别 BUTTON_UP
+  -> server_button() 判断本次没有触发长按
+  -> 如果 armed == 1 且 task_running == 0
+       status.task.start_request = 1
+       蜂鸣器短响一次
+```
+
+随后在 20ms 控制周期中：
+
+```text
+update_status()
+  -> update_task(&status)
+    -> 先处理 stop_request
+    -> 再处理空闲状态下的 task_select_request / pose_switch_request
+    -> 发现 start_request == 1
+    -> 如果 armed == 1 且 task_running == 0
+         task_start(status)
+    -> start_request = 0
+```
+
+`task_start(status)` 负责把任务真正启动起来：
+
+```text
+task_start(status):
+  status.task.task_running = 1
+  清 start_request / stop_request
+  清 cross_cnt / road_buf / road_determine
+  清 PID 积分和历史误差
+  清 phase_mileage
+  刷新 initial_angle
+  左右轮目标速度清零
+
+  根据 task_id 和 start_pose 设置 race_phase
+  phase_start_time = 当前系统时间
+  motion = STOP
+  base_speed = 0
+```
+
+注意：`task_start()` 只负责“启动前初始化”和“设置第一个 race_phase”，不建议在这里直接让车猛冲。真正让车怎么动，放到对应题目的 update 函数里。
+
+### 3. 任务开始运行
+
+`task_start()` 执行完后，下一次或同一次 `update_task()` 会进入题目分发：
+
+```text
+update_task(status):
+  if task_running == 1:
+    switch (task_id):
+      TASK_BASIC_1 -> task_basic_1_update(status)
+      TASK_BASIC_2 -> task_basic_2_update(status)
+      TASK_ADV_1   -> task_adv_1_update(status)
+      TASK_ADV_2   -> task_adv_2_update(status)
+```
+
+对应的 `task_xxx_update()` 根据 `race_phase` 设置底层运动：
+
+```text
+task_basic_1_update(status):
+  switch (race_phase):
+    Q1_START_A_TURN:
+      设置 motion / base_speed / tar_angle
+      满足完成条件后 task_set_phase(Q1_SIDE_AD)
+
+    Q1_SIDE_AD:
+      设置 motion = FIND_LINE
+      检测到有效路口后 task_set_phase(Q1_TURN_D)
+```
+
+最后由底层运动控制执行：
+
+```text
+update_status()
+  -> 根据 status.state.motion 执行 follow_line() / keep_angle() / stop
+  -> driver_wheel()
+  -> 电机实际动作
+```
+
+所以完整链路可以压缩成一句话：
+
+```text
+PB11/蓝牙选中 TASK_X
+  -> update_task() 消费 task_select_request，真正修改 task_id
+  -> PD2 短按置 start_request
+  -> update_task() 调 task_start()
+  -> task_running = 1
+  -> task_xxx_update() 根据 race_phase 设置 motion
+  -> 底层 motion 控制电机运行
+```
+
 ## 一、三层职责
 
 工程中建议明确区分三层：
@@ -50,6 +201,10 @@ typedef struct TASK {
     uint8_t armed;          // 是否允许启动任务，原先讨论里的 cmd
     uint8_t task_running;   // 当前是否正在执行任务
 
+    uint8_t task_select_request;  // 请求切换任务
+    uint8_t requested_task_id;    // 任务切换的目标任务
+    uint8_t pose_switch_request;  // 请求切换 AB/AD 发车模式
+
     uint8_t start_request;  // 按键或蓝牙提出启动请求
     uint8_t stop_request;   // 蓝牙或紧急输入提出停止请求
 
@@ -66,6 +221,9 @@ typedef struct TASK {
 - `cross_cnt`：当前任务内部使用的路口/角点计数。它属于任务流程，不应该长期依赖 `road.c` 里的全局计数。
 - `armed`：武装标志。只有 `armed == 1` 时，启动请求才有效。
 - `task_running`：任务是否正在运行。任务调度应该看这个字段，不应该看 `motion != STOP`。
+- `task_select_request`：请求切换任务。PB11 短按和蓝牙选题都走这个接口。
+- `requested_task_id`：任务切换的目标值。PB11 短按时由按钮逻辑先算出“下一个任务”，再填到这里。
+- `pose_switch_request`：请求切换 AB/AD 发车模式。只在第二问和第三问空闲状态下有效。
 - `start_request`：启动请求。按钮或蓝牙只置 1，由 `update_task()` 消费。
 - `stop_request`：停止请求。急停优先级最高，由 `update_task()` 消费。
 - `phase_start_time`：进入当前阶段时的系统时间，用于超时保护、蜂鸣器节奏等。
@@ -130,7 +288,7 @@ typedef enum TASK_ID {
 } TASK_ID;
 ```
 
-建议从 1 开始，方便蓝牙命令 `'1'`、`'2'`、`'3'`、`'4'` 直接对应题号。
+建议从 1 开始，方便后续蓝牙命令参数直接对应题号。具体蓝牙命令还待定，不在这里写死。
 
 ## 五、start_pose 枚举
 
@@ -165,11 +323,11 @@ armed = 1  已武装，允许启动任务
   task_running = 0
   motion = STOP
 
-蓝牙 'S' 急停:
+蓝牙停车命令:
   stop_request = 1
   update_task() 消费后按远程停车语义停车
 
-蓝牙 'M':
+蓝牙武装命令:
   armed = 1
 
 任务正常完成:
@@ -178,19 +336,19 @@ armed = 1  已武装，允许启动任务
   armed 保持 1，方便重跑
 ```
 
-上电默认 `armed = 0`，避免误触发启动。必须通过蓝牙 `'M'`，或后续设计的硬件武装方式，将 `armed` 置 1 后，PD2 长按或蓝牙 `'G'` 才能真正启动任务。
+上电默认 `armed = 0`，避免误触发启动。必须通过蓝牙武装命令，或后续设计的硬件武装方式，将 `armed` 置 1 后，PD2 短按或蓝牙启动命令才能真正启动任务。
 事实上我就打算默认改成arm=0 傻逼gpt
 
 ## 七、按钮分配
 
-按钮事件发生后，直接修改 `status.task` 或置 request，
+按钮事件发生后只置 `status.task` 里的请求位，不直接切换任务。按钮和蓝牙必须共用同一套请求接口，后续统一由 `update_task()` 消费请求并真正修改 `task_id` / `start_pose`。
 
 | 按键 | 事件 | 条件 | 动作 |
 |---|---|---|---|
-| PB11 短按 | `BUTTON_UP` 且本次没有触发长按 | `task_running == 0` | `task_id` 在 1/2/3/4 之间轮换 |
-| PB11 长按 | `BUTTON_LONG` | `task_running == 0` 且 `task_id` 为 2 或 3 | 切换 `start_pose`：AB/AD |
-| PD2 短按 | `BUTTON_UP` 且本次没有触发长按 | 任意安全时刻 | 灰度校准 `correct_gw_analogue()` |
-| PD2 长按 | `BUTTON_LONG` | `task_running == 0` 且 `armed == 1` | `start_request = 1` |
+| PB11 短按 | `BUTTON_UP` 且本次没有触发长按 | `task_running == 0` | 计算下一个任务，写入 `requested_task_id`，再置 `task_select_request = 1` |
+| PB11 长按 | `BUTTON_LONG` | `task_running == 0` | `pose_switch_request = 1` |
+| PD2 短按 | `BUTTON_UP` 且本次没有触发长按 | `task_running == 0` 且 `armed == 1` | `start_request = 1` |
+| PD2 长按 | `BUTTON_LONG` | 任意安全时刻 | 灰度校准 `correct_gw_analogue()` |
 
 任务运行中，普通按键操作锁死。运行中只保留蓝牙急停或专门的硬件急停入口。
 
@@ -240,37 +398,81 @@ LONG_PRESS_CNT = 20
 
 ## 八、蓝牙命令
 
-蓝牙命令和按键操作同一组 `status.task` 字段，避免两套逻辑冲突。
+蓝牙命令的具体字符和参数暂时待定，不在本文档中写死。但是架构原则已经确定：
 
-| 命令 | 效果 |
+1. 蓝牙和按键共用同一组 `status.task` 请求字段，避免两套逻辑冲突。
+2. 蓝牙不直接修改 `task_id` / `start_pose` / `task_running`，只置请求位。
+3. 具体请求仍由 `update_task()` 在 20ms 控制周期中统一消费。
+4. 最终命令格式沿用 `main.c` 里 `pid_tune()` 的风格：以 `C` 开头，以换行结尾。
+
+也就是说，最终形式应该类似：
+
+```text
+C... \r\n
+```
+
+或：
+
+```text
+C... \n
+```
+
+这里的 `...` 是后续再定的命令体。命令体可以表示“选第几问”“切换 AB/AD 发车点”“武装”“启动”“停车”等语义，但无论命令体怎么设计，解析后都应该落到下面这些统一请求接口上：
+
+| 语义 | 解析后的动作 |
 |---|---|
-| `'1'` | `task_id = TASK_BASIC_1` |
-| `'2'` | `task_id = TASK_BASIC_2` |
-| `'3'` | `task_id = TASK_ADV_1` |
-| `'4'` | `task_id = TASK_ADV_2` |
-| `'A'` | `start_pose = START_AB` |
-| `'D'` | `start_pose = START_AD` |
-| `'M'` | `armed = 1` |
-| `'G'` | 如果 `armed == 1`，置 `start_request = 1` |
-| `'S'` | 置 `stop_request = 1` |
+| 选择指定任务 | `requested_task_id = 目标任务; task_select_request = 1` |
+| 切换到下一个任务 | 先算出下一个任务，写入 `requested_task_id`，再置 `task_select_request = 1` |
+| 切换发车模式 | `pose_switch_request = 1` |
+| 武装任务 | `armed = 1` |
+| 启动任务 | 如果 `armed == 1`，置 `start_request = 1` |
+| 停车 | 置 `stop_request = 1` |
 
-不用多字符命令 `ARM`，因为它会和单字符 `'A'` 冲突，并且需要额外字符串解析。
+这样后续即使蓝牙协议改几次，任务调度层也不用跟着改，只需要改蓝牙解析层。
 
 ## 九、LED 与蜂鸣器反馈
 
-推荐反馈方式：
+声光提示以 3 个 LED 的常亮编码为主，蜂鸣器只做少数关键动作确认。
 
-| 状态 | 反馈 |
+三个 0/1 从左到右分别表示：
+
+```text
+板载 LED, LED1, LED2
+```
+
+任务状态显示规则：
+
+| 状态 | LED 编码 |
 |---|---|
-| `task_id = N` | 板载 LED 闪 N 次，停顿 1 秒，循环 |
-| `start_pose = START_AB` | `led1` 亮，`led2` 灭 |
-| `start_pose = START_AD` | `led1` 灭，`led2` 亮 |
-| `armed == 1` | 任务选择闪烁结束后额外常亮 200ms |
-| 切换 task_id/start_pose | 蜂鸣器短响 50ms |
-| 启动任务 | 蜂鸣器长响 200ms |
-| 急停 | 蜂鸣器快速响 3 次 |
+| TASK1 | `1 0 1` |
+| TASK2，AB 发车 | `1 1 1` |
+| TASK2，AD 发车 | `0 1 1` |
+| TASK3，AB 发车 | `1 0 0` |
+| TASK3，AD 发车 | `0 0 0` |
+| TASK4 | `1 1 0` |
 
-反馈逻辑最好也由 20ms 周期状态机驱动，不要在中断里写长时间阻塞延时。
+也就是说，LED 常亮状态由 `task_id + start_pose` 决定。每次切换任务或切换发车姿态后，都应该刷新一次 LED 显示。
+
+蜂鸣器规则：
+
+| 事件 | 蜂鸣器反馈 |
+|---|---|
+| PD2 短按启动当前任务 | 短响一次 |
+| PB11 长按切换 TASK2/TASK3 发车姿态 | 常响一段时间 |
+
+蜂鸣器不要用阻塞延时。推荐用系统时间做非阻塞关闭：
+
+```text
+触发蜂鸣器:
+  status.device.buzzer.on = 1
+  buzzer_off_time = status.T + 持续时间
+
+周期检查:
+  if (status.device.buzzer.on && status.T >= buzzer_off_time)
+      status.device.buzzer.on = 0
+```
+
+这里的 `status.T` 指工程里已有的系统时间字段；如果实际字段名是 `status.state.time`，就用实际字段名。核心原则是：蜂鸣器只是被置为“响到某个截止时间”，控制周期继续正常跑，不使用 `HAL_Delay()`，也不需要 `PERIODIC` 宏。
 
 ## 十、update_task() 任务调度入口
 
@@ -281,8 +483,8 @@ LONG_PRESS_CNT = 20
 ```text
 update_status():
   1. 读取灰度、轮速、陀螺仪等传感器
-  2. driver_button() 处理按钮事件，按钮事件直接修改 status.task
-  3. 解析蓝牙/串口命令，直接修改 status.task
+  2. driver_button() 处理按钮事件，按钮事件只置 status.task 请求位
+  3. 解析蓝牙/串口命令，蓝牙命令只置 status.task 请求位
   4. update_task(&status)
   5. 根据 status.state.motion 执行底层控制
        FIND_LINE  -> follow_line()
@@ -291,7 +493,7 @@ update_status():
   6. driver_LED / driver_BUZZER / driver_wheel
 ```
 
-`update_task()` 不负责实时扫描按键。按钮和蓝牙事件发生时已经直接置好了 request。
+`update_task()` 不负责实时扫描按键。按钮和蓝牙事件发生时已经直接置好了 request，`update_task()` 只负责消费这些 request。
 
 ## 十一、update_task() 内部逻辑
 
@@ -306,7 +508,20 @@ update_task(status):
       return;
   }
 
-  // 2. 处理启动请求
+  // 2. 未运行任务时，先处理任务选择/发车模式请求
+  if (!status.task.task_running) {
+      if (status.task.task_select_request) {
+          task_select(status, status.task.requested_task_id);
+          status.task.task_select_request = 0;
+      }
+
+      if (status.task.pose_switch_request) {
+          task_switch_start_pose(status);
+          status.task.pose_switch_request = 0;
+      }
+  }
+
+  // 3. 处理启动请求
   if (status.task.start_request) {
       if (!status.task.task_running && status.task.armed) {
           task_start(status);
@@ -314,12 +529,12 @@ update_task(status):
       status.task.start_request = 0;
   }
 
-  // 3. 没有运行任务则不推进题目状态机
+  // 4. 没有运行任务则不推进题目状态机
   if (!status.task.task_running) {
       return;
   }
 
-  // 4. 根据 task_id 分发
+  // 5. 根据 task_id 分发
   switch (status.task.task_id) {
       case TASK_BASIC_1:
           task_basic_1_update(status);
@@ -337,6 +552,25 @@ update_task(status):
 ```
 
 这里的 `task_basic_1_update()` 等函数只负责本题自己的 `race_phase` 推进，并设置底层运动参数。
+
+任务选择请求只建议在 `task_running == 0` 时生效。任务运行过程中，普通 PB11/PD2 操作和蓝牙选题命令都应忽略，只有 `stop_request` 始终有效。
+
+推荐把具体切换逻辑封成几个小函数：
+
+```text
+task_select(status, id):
+  如果 id 合法，则 task_id = id
+  如果 id 是 Q1/Q4，start_pose 强制 START_AB
+
+button_pb11_short(status):
+  先计算 next_id，让 task_id 在 1 -> 2 -> 3 -> 4 -> 1 之间轮换
+  requested_task_id = next_id
+  task_select_request = 1
+
+task_switch_start_pose(status):
+  只有 task_id 是 Q2 或 Q3 时，切换 START_AB/START_AD
+  Q1/Q4 下收到该请求，可以忽略或蜂鸣器提示无效
+```
 
 ## 十二、任务启动 task_start()
 
@@ -398,7 +632,7 @@ task_finish(status):
 
 ## 十四、远程停车 task_stop()
 
-远程停车用于蓝牙 `'S'`，语义应尽量接近现有 `main.c` 里 `Cz` 指令的停车效果，但要额外阻止任务状态机在下一周期继续推进。
+远程停车用于蓝牙停车命令，具体命令字符串待定。语义应尽量接近现有 `main.c` 里 `Cz` 指令的停车效果，但要额外阻止任务状态机在下一周期继续推进。
 
 ```text
 task_stop(status):
@@ -465,9 +699,70 @@ Q1_BA_FINAL
 
 这说明：`race_phase` 是题目内部流程核心，`motion` 只是每个阶段选择的底层运动方式。
 
-## 十六、落地原则
+## 十六、题内小状态机约定
 
-1. 按钮和蓝牙事件发生时，直接修改 `status.task` 或置 request。
+每一道题都应该有自己的 `race_phase` 小状态机。`update_task()` 只负责根据 `task_id` 分发，真正的阶段判定和阶段切换放在对应的 `task_xxx_update()` 里。
+
+```text
+task_basic_1_update(status):
+  switch (status.task.race_phase):
+    case Q1_START_A_TURN:
+      执行起点 A 特化逻辑
+      如果完成:
+        task_set_phase(status, Q1_SIDE_AD)
+      break
+
+    case Q1_SIDE_AD:
+      设置 motion = FIND_LINE
+      如果检测到 D 点有效路口:
+        task_set_phase(status, Q1_TURN_D)
+      break
+
+    case Q1_TURN_D:
+      执行陀螺仪转弯 + 低速找线
+      如果转弯完成且重新找到线:
+        task_set_phase(status, Q1_SIDE_DC)
+      break
+```
+
+每个 `race_phase` 里面只关心三件事：
+
+```text
+阶段动作：当前阶段让车怎么动
+阶段判据：什么条件说明本阶段完成
+阶段切换：完成后进入哪个阶段
+```
+
+推荐所有阶段切换都通过一个统一入口：
+
+```text
+task_set_phase(status, next_phase):
+  status.task.race_phase = next_phase
+  status.task.phase_start_time = status.state.time
+  status.task.phase_mileage = 0
+  清本阶段专用临时计数/连续帧计数
+```
+
+这样可以避免阶段切换时忘记清时间、里程或连续帧计数。
+
+路口检测模块只负责产生事件，不能自己决定任务含义。同样一个 `LeftRoad`，在不同阶段含义完全不同：
+
+```text
+Q1_SIDE_AD:
+  LeftRoad 可能表示到达 D 点，需要准备转弯
+
+Q1_BA_FINAL:
+  LeftRoad 可能表示回到 A 点附近，需要停车兜底
+
+Q1_START_A_TURN:
+  起点 A 本来就在左侧，普通 LeftRoad 应该被特化逻辑忽略
+```
+
+这也是 `cross_cnt` 应该放进 `TASK` 的原因：路口计数不是底层传感器看到黑线就加，而是题内状态机确认“这个路口在当前阶段有效”之后才加。
+
+## 十七、落地原则
+
+1. 按钮和蓝牙事件发生时，统一置 `status.task` 中的请求位。
 2. 不需要 `task_input()` 实时扫描按钮。
 3. `update_task()` 每 20ms 消费 request，启动、停止、推进题目状态机。
 4. `task_running` 决定任务是否推进，不能用 `motion != STOP` 代替。
