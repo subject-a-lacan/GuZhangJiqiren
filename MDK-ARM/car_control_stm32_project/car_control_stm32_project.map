@@ -4987,10 +4987,10 @@ Image Symbol Table
     [Anonymous Symbol]                       0x08008024   Section        0  gw_analogue.o(.text.init_gw_analogue)
     [Anonymous Symbol]                       0x080080a8   Section        0  gy901.o(.text.init_gyr)
     [Anonymous Symbol]                       0x08008118   Section        0  status.o(.text.init_motor)
-    [Anonymous Symbol]                       0x08008168   Section        0  pid.o(.text.init_pid)
-    [Anonymous Symbol]                       0x08008184   Section        0  gw_analogue.o(.text.init_road_cnt)
-    [Anonymous Symbol]                       0x08008190   Section        0  gw_analogue.o(.text.init_road_determine)
-    [Anonymous Symbol]                       0x080081a0   Section        0  status.o(.text.init_sensor)
+    [Anonymous Symbol]                       0x08008164   Section        0  pid.o(.text.init_pid)
+    [Anonymous Symbol]                       0x08008180   Section        0  gw_analogue.o(.text.init_road_cnt)
+    [Anonymous Symbol]                       0x0800818c   Section        0  gw_analogue.o(.text.init_road_determine)
+    [Anonymous Symbol]                       0x0800819c   Section        0  status.o(.text.init_sensor)
     [Anonymous Symbol]                       0x080081b8   Section        0  servo.o(.text.init_servo)
     [Anonymous Symbol]                       0x08008298   Section        0  status.o(.text.init_state)
     [Anonymous Symbol]                       0x080082b4   Section        0  status.o(.text.init_status)
@@ -5428,11 +5428,11 @@ Image Symbol Table
     init_device                              0x08007fcd   Thumb Code    86  status.o(.text.init_device)
     init_gw_analogue                         0x08008025   Thumb Code   132  gw_analogue.o(.text.init_gw_analogue)
     init_gyr                                 0x080080a9   Thumb Code   112  gy901.o(.text.init_gyr)
-    init_motor                               0x08008119   Thumb Code    80  status.o(.text.init_motor)
-    init_pid                                 0x08008169   Thumb Code    28  pid.o(.text.init_pid)
-    init_road_cnt                            0x08008185   Thumb Code    12  gw_analogue.o(.text.init_road_cnt)
-    init_road_determine                      0x08008191   Thumb Code    14  gw_analogue.o(.text.init_road_determine)
-    init_sensor                              0x080081a1   Thumb Code    24  status.o(.text.init_sensor)
+    init_motor                               0x08008119   Thumb Code    76  status.o(.text.init_motor)
+    init_pid                                 0x08008165   Thumb Code    28  pid.o(.text.init_pid)
+    init_road_cnt                            0x08008181   Thumb Code    12  gw_analogue.o(.text.init_road_cnt)
+    init_road_determine                      0x0800818d   Thumb Code    14  gw_analogue.o(.text.init_road_determine)
+    init_sensor                              0x0800819d   Thumb Code    24  status.o(.text.init_sensor)
     init_servo                               0x080081b9   Thumb Code   224  servo.o(.text.init_servo)
     init_state                               0x08008299   Thumb Code    28  status.o(.text.init_state)
     init_status                              0x080082b5   Thumb Code    40  status.o(.text.init_status)
@@ -5948,12 +5948,13 @@ Memory Map of the image
     0x08008022   0x08008022   0x00000002   PAD
     0x08008024   0x08008024   0x00000084   Code   RO         2431    .text.init_gw_analogue  gw_analogue.o
     0x080080a8   0x080080a8   0x00000070   Code   RO         2357    .text.init_gyr      gy901.o
-    0x08008118   0x08008118   0x00000050   Code   RO         2226    .text.init_motor    status.o
-    0x08008168   0x08008168   0x0000001c   Code   RO         2592    .text.init_pid      pid.o
-    0x08008184   0x08008184   0x0000000c   Code   RO         2429    .text.init_road_cnt  gw_analogue.o
-    0x08008190   0x08008190   0x0000000e   Code   RO         2427    .text.init_road_determine  gw_analogue.o
-    0x0800819e   0x0800819e   0x00000002   PAD
-    0x080081a0   0x080081a0   0x00000018   Code   RO         2230    .text.init_sensor   status.o
+    0x08008118   0x08008118   0x0000004c   Code   RO         2226    .text.init_motor    status.o
+    0x08008164   0x08008164   0x0000001c   Code   RO         2592    .text.init_pid      pid.o
+    0x08008180   0x08008180   0x0000000c   Code   RO         2429    .text.init_road_cnt  gw_analogue.o
+    0x0800818c   0x0800818c   0x0000000e   Code   RO         2427    .text.init_road_determine  gw_analogue.o
+    0x0800819a   0x0800819a   0x00000002   PAD
+    0x0800819c   0x0800819c   0x00000018   Code   RO         2230    .text.init_sensor   status.o
+    0x080081b4   0x080081b4   0x00000004   PAD
     0x080081b8   0x080081b8   0x000000e0   Code   RO         2494    .text.init_servo    servo.o
     0x08008298   0x08008298   0x0000001c   Code   RO         2232    .text.init_state    status.o
     0x080082b4   0x080082b4   0x00000028   Code   RO         2236    .text.init_status   status.o
@@ -6120,7 +6121,7 @@ Image component sizes
        416         48          0          0          0       1172   servo.o
        190          0          0          0        100       6113   spi.o
         36          8        472          0       1024        828   startup_stm32g474xx.o
-      1046         28          0          7        569       7191   status.o
+      1042         28          0          7        569       7191   status.o
        198          0          0          8          4      10083   stm32g4xx_hal.o
       3142          0          0          0          0      24082   stm32g4xx_hal_adc.o
        332          0          0          0          0      21720   stm32g4xx_hal_adc_ex.o
@@ -6149,7 +6150,7 @@ Image component sizes
     ----------------------------------------------------------------------
      33492        506        684         60       5712     413796   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-       272          4          0          9         15          0   (incl. Padding)
+       276          4          0          9         15          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 

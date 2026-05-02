@@ -151,7 +151,7 @@ int main(void)
     log_uprintf(&huart1,"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line_pid
            "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // keep_angle_pid
            "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // wheel[0].wheel_pid
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n", // wheel[1].wheel_pid
+           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n", // wheel[1].wheel_pid
            // follow_line_pid: target, actual, out, kp, ki, kd
            (double)0.0,
            (double)status.sensor.gw_analogue.diff,

@@ -36,7 +36,7 @@ void init_motor() {
   init_servo(&status.motor.servo[0], 1, 180);
   init_servo(&status.motor.servo[1], 2, 270);
 
-  init_wheel(&status.motor.wheel[0], 1, -1);
+  init_wheel(&status.motor.wheel[0], 1, 1);
   init_wheel(&status.motor.wheel[1], 2, -1);
 
   return;
