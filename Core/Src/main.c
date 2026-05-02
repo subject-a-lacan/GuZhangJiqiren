@@ -135,6 +135,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
   init_status(&status, 1);
   after_init_state();
+  status.motor.wheel[0].wheel_pid.kp=15;
+  status.motor.wheel[0].wheel_pid.ki=31;
+  status.motor.wheel[0].wheel_pid.kd=450;
+  status.motor.wheel[1].wheel_pid.kp=15;
+  status.motor.wheel[1].wheel_pid.ki=30;
+  status.motor.wheel[1].wheel_pid.kd=400;
   status.state.motion = STOP;
   HAL_UART_Receive_IT(&huart1, &rx_byte, 1); // 开启 USART1 的接收中断，准备接收调参命令
   ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
@@ -148,25 +154,25 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Task_Vofa_Print, 200)
-    printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line_pid
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // keep_angle_pid
+    PERIODIC_START(Task_Vofa_Print, 800)
+    printf(//"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line_pid
+          //  "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // keep_angle_pid
            "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // wheel[0].wheel_pid
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n", // wheel[1].wheel_pid
+           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n", // wheel[1].wheel_pid
            // follow_line_pid: target, actual, out, kp, ki, kd
-           (double)0.0,
-           (double)status.sensor.gw_analogue.diff,
-           (double)status.state.status_pid.follow_line_pid.out,
-           (double)status.state.status_pid.follow_line_pid.kp,
-           (double)status.state.status_pid.follow_line_pid.ki,
-           (double)status.state.status_pid.follow_line_pid.kd,
+          //  (double)0.0,
+          //  (double)status.sensor.gw_analogue.diff,
+          //  (double)status.state.status_pid.follow_line_pid.out,
+          //  (double)status.state.status_pid.follow_line_pid.kp,
+          //  (double)status.state.status_pid.follow_line_pid.ki,
+          //  (double)status.state.status_pid.follow_line_pid.kd,
            // keep_angle_pid: target, actual, out, kp, ki, kd
-           (double)(status.state.tar_angle + status.state.initial_angle),
-           (double)status.state.cur_angle,
-           (double)status.state.status_pid.keep_angle_pid.out,
-           (double)status.state.status_pid.keep_angle_pid.kp,
-           (double)status.state.status_pid.keep_angle_pid.ki,
-           (double)status.state.status_pid.keep_angle_pid.kd,
+          //  (double)(status.state.tar_angle + status.state.initial_angle),
+          //  (double)status.state.cur_angle,
+          //  (double)status.state.status_pid.keep_angle_pid.out,
+          //  (double)status.state.status_pid.keep_angle_pid.kp,
+          //  (double)status.state.status_pid.keep_angle_pid.ki,
+          //  (double)status.state.status_pid.keep_angle_pid.kd,
            // wheel[0].wheel_pid: target, actual, out, kp, ki, kd
            (double)status.motor.wheel[0].tar_speed,
            (double)status.motor.wheel[0].cur_speed,
@@ -184,9 +190,9 @@ int main(void)
            (double)status.task.task_id,
            (double)cmd_speed,
            (double)status.motor.wheel[0].wheel_pid.integral,
-            (double)status.motor.wheel[0].wheel_pid.derivative,
-            (double)status.motor.wheel[1].wheel_pid.integral,
-            (double)status.motor.wheel[1].wheel_pid.derivative
+           (double)status.motor.wheel[0].wheel_pid.derivative,
+           (double)status.motor.wheel[1].wheel_pid.integral,
+           (double)status.motor.wheel[1].wheel_pid.derivative
           );
 
     PERIODIC_END
