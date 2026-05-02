@@ -130,24 +130,24 @@ void task_select(STATUS *status, uint8_t id) {
 
 //待定
 
-static void task_basic_1_update(STATUS *status) {
-  status->task.task_running = 1;
+static void driver_task1(STATUS *status) {
+  
   status->state.base_speed = 40;
-  status->state.motion = FIND_LINE;
+  
   // task_finish(status);
 }
 
-static void task_basic_2_update(STATUS *status) {
+static void driver_task2(STATUS *status) {
   status->task.task_running = 1;
   task_finish(status);
 }
 
-static void task_adv_1_update(STATUS *status) {
+static void driver_task3(STATUS *status) {
   status->task.task_running = 1;
   task_finish(status);
 }
 
-static void task_adv_2_update(STATUS *status) {
+static void driver_task4(STATUS *status) {
   status->task.task_running = 1;
   task_finish(status);
 }
@@ -222,18 +222,24 @@ void update_task(STATUS *status) {
     return;
   }
 
+  int32_t wheel0_pulse = status->motor.wheel[0].cur_speed;
+  int32_t wheel1_pulse = status->motor.wheel[1].cur_speed;
+  // if (wheel0_pulse < 0) wheel0_pulse = -wheel0_pulse;
+  // if (wheel1_pulse < 0) wheel1_pulse = -wheel1_pulse;
+  status->task.phase_mileage += ((float)wheel0_pulse + (float)wheel1_pulse) / 2.0f;
+
   switch (status->task.task_id) {
     case TASK_BASIC_1:
-      task_basic_1_update(status);
+      driver_task1(status);
       break;
     case TASK_BASIC_2:
-      task_basic_2_update(status);
+      driver_task2(status);
       break;
     case TASK_ADV_1:
-      task_adv_1_update(status);
+      driver_task3(status);
       break;
     case TASK_ADV_2:
-      task_adv_2_update(status);
+      driver_task4(status);
       break;
   }
 }

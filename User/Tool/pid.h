@@ -24,6 +24,16 @@ PID init_pid(float kp, float ki, float kd, float T, float integral_max);
 // PID 计算函数 参数 error: 误差
 float compute_pid(PID *pid, float error);
 
+/* 编码器脉冲 → 距离(cm) 转换参数 */
+#define ENCODER_PPR 13                    // 编码器线数
+#define GEAR_RATIO 28.0f                  // 减速比 1:28（电机:车轮）
+#define WHEEL_DIAMETER_CM 6.723f          // 轮子直径(cm) 67.23mm
+#define WHEEL_CIRCUMFERENCE_CM (3.1415926f * WHEEL_DIAMETER_CM)
+#define PULSES_PER_WHEEL_REV (ENCODER_PPR * 4.0f * GEAR_RATIO)  // TI12 四倍频
+#define CM_PER_PULSE (WHEEL_CIRCUMFERENCE_CM / PULSES_PER_WHEEL_REV)
+
+float encoder_pulse_to_cm(int32_t pulse);
+
 /*
 使用示例：
 PID pid = init_pid(1, 0.1, 0.1, 0.1, 100);

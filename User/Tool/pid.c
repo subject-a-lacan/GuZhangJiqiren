@@ -47,3 +47,12 @@ float compute_pid(PID *pid, float error) {
 
   return pid->out;
 }
+
+/*
+ * 将编码器累计脉冲数转换为实际行驶距离(cm)。
+ * 调用方需自行维护脉冲累加器（如 phase_mileage），
+ * 每 20ms 将 get_wheel_speed() 的绝对值累加后传入。
+ */
+float encoder_pulse_to_cm(int32_t pulse) {
+  return (float)pulse * CM_PER_PULSE;
+}
