@@ -1,6 +1,7 @@
 #include "Defect.h"
 #include "status.h"
 
+#include "log.h"
 #include "pid.h"
 
 extern uint8_t cross_cnt;
@@ -144,12 +145,29 @@ static void driver_task2(STATUS *status) {
 
 static void driver_task3(STATUS *status) {
   status->task.task_running = 1;
-  task_finish(status);
+  status->state.base_speed = 40;
+  status->state.motion = FIND_LINE;
 }
 
 static void driver_task4(STATUS *status) {
-  status->task.task_running = 1;
-  task_finish(status);
+  Road road = status->sensor.gw_analogue.cross.cross;
+  if (road == TLRoad) road = LeftRoad;
+  if (road == TRRoad) road = RightRoad;
+
+  if (status->task.race_phase == 0) {
+    status->task.task_running = 1;
+    status->state.base_speed = 30;
+    status->state.motion = FIND_LINE;
+    status->task.race_phase = 1;
+    return;
+  }
+
+  if (status->task.race_phase == 1 && road == LeftRoad) {
+    status->state.motion = STOP;
+    float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+    log_uprintf(&huart1, "pulse=%.0f  cm=%.2f\r\n", status->task.phase_mileage, cm);
+    status->task.race_phase = 1;
+  }
 }
 
 void update_task_led(STATUS *status) {

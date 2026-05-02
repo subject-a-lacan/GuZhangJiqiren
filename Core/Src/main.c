@@ -147,43 +147,43 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Task_Vofa_Print, 200)
-    log_uprintf(&huart1,"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line_pid
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // keep_angle_pid
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // wheel[0].wheel_pid
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n", // wheel[1].wheel_pid
-           // follow_line_pid: target, actual, out, kp, ki, kd
-           (double)0.0,
-           (double)status.sensor.gw_analogue.diff,
-           (double)status.state.status_pid.follow_line_pid.out,
-           (double)status.state.status_pid.follow_line_pid.kp,
-           (double)status.state.status_pid.follow_line_pid.ki,
-           (double)status.state.status_pid.follow_line_pid.kd,
-           // keep_angle_pid: target, actual, out, kp, ki, kd
-           (double)(status.state.tar_angle + status.state.initial_angle),
-           (double)status.state.cur_angle,
-           (double)status.state.status_pid.keep_angle_pid.out,
-           (double)status.state.status_pid.keep_angle_pid.kp,
-           (double)status.state.status_pid.keep_angle_pid.ki,
-           (double)status.state.status_pid.keep_angle_pid.kd,
-           // wheel[0].wheel_pid: target, actual, out, kp, ki, kd
-           (double)status.motor.wheel[0].tar_speed,
-           (double)status.motor.wheel[0].cur_speed,
-           (double)status.motor.wheel[0].wheel_pid.out,
-           (double)status.motor.wheel[0].wheel_pid.kp,
-           (double)status.motor.wheel[0].wheel_pid.ki,
-           (double)status.motor.wheel[0].wheel_pid.kd,
-           // wheel[1].wheel_pid: target, actual, out, kp, ki, kd
-           (double)status.motor.wheel[1].tar_speed,
-           (double)status.motor.wheel[1].cur_speed,
-           (double)status.motor.wheel[1].wheel_pid.out,
-           (double)status.motor.wheel[1].wheel_pid.kp,
-           (double)status.motor.wheel[1].wheel_pid.ki,
-           (double)status.motor.wheel[1].wheel_pid.kd,
-           (double)status.task.task_id
-          );
+    // PERIODIC_START(Task_Vofa_Print, 200)
+    // log_uprintf(&huart1,"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line_pid
+    //        "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // keep_angle_pid
+    //        "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // wheel[0].wheel_pid
+    //        "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n", // wheel[1].wheel_pid
+    //        // follow_line_pid: target, actual, out, kp, ki, kd
+    //        (double)0.0,
+    //        (double)status.sensor.gw_analogue.diff,
+    //        (double)status.state.status_pid.follow_line_pid.out,
+    //        (double)status.state.status_pid.follow_line_pid.kp,
+    //        (double)status.state.status_pid.follow_line_pid.ki,
+    //        (double)status.state.status_pid.follow_line_pid.kd,
+    //        // keep_angle_pid: target, actual, out, kp, ki, kd
+    //        (double)(status.state.tar_angle + status.state.initial_angle),
+    //        (double)status.state.cur_angle,
+    //        (double)status.state.status_pid.keep_angle_pid.out,
+    //        (double)status.state.status_pid.keep_angle_pid.kp,
+    //        (double)status.state.status_pid.keep_angle_pid.ki,
+    //        (double)status.state.status_pid.keep_angle_pid.kd,
+    //        // wheel[0].wheel_pid: target, actual, out, kp, ki, kd
+    //        (double)status.motor.wheel[0].tar_speed,
+    //        (double)status.motor.wheel[0].cur_speed,
+    //        (double)status.motor.wheel[0].wheel_pid.out,
+    //        (double)status.motor.wheel[0].wheel_pid.kp,
+    //        (double)status.motor.wheel[0].wheel_pid.ki,
+    //        (double)status.motor.wheel[0].wheel_pid.kd,
+    //        // wheel[1].wheel_pid: target, actual, out, kp, ki, kd
+    //        (double)status.motor.wheel[1].tar_speed,
+    //        (double)status.motor.wheel[1].cur_speed,
+    //        (double)status.motor.wheel[1].wheel_pid.out,
+    //        (double)status.motor.wheel[1].wheel_pid.kp,
+    //        (double)status.motor.wheel[1].wheel_pid.ki,
+    //        (double)status.motor.wheel[1].wheel_pid.kd,
+    //        (double)status.task.task_id
+    //       );
 
-    PERIODIC_END
+    // PERIODIC_END
   }
   /* USER CODE END 3 */
 }
