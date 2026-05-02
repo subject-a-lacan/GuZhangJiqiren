@@ -19,14 +19,15 @@ typedef enum START_POSE {
 
 /* Q1 race phases */
 typedef enum Q1_RACE_PHASE {
-  Q1_START_A_TURN,
-  Q1_SIDE_AD,
-  Q1_TURN_D,
-  Q1_SIDE_DC,
-  Q1_TURN_C,
-  Q1_SIDE_CB,
-  Q1_TURN_B,
-  Q1_BA_FINAL,
+  Q1_START_TO_A,  /* 从发车点走到 A 点附近 */
+  Q1_TURN_A,      /* A 点左转 90° */
+  Q1_SIDE_AD,     /* AD 边巡线等 D 点 */
+  Q1_TURN_D,      /* D 点左转 90° */
+  Q1_SIDE_DC,     /* DC 边巡线等 C 点 */
+  Q1_TURN_C,      /* C 点左转 90° */
+  Q1_SIDE_CB,     /* CB 边巡线等 B 点 */
+  Q1_TURN_B,      /* B 点左转 90° */
+  Q1_BA_FINAL,    /* BA 最后一段回到停车点 */
 } Q1_RACE_PHASE;
 
 /* Q2/Q3/Q4 race phases — to be defined per-task */
@@ -37,6 +38,7 @@ typedef struct TASK {
   uint8_t race_phase;  //每一阶段的控制
 
   uint8_t cross_cnt;   //已通过的路口计数
+  uint8_t cnt_seen;    //防止同一路口重复消费: 0=未消费 1=已消费 Straight时清零
 
   uint8_t armed;       //出发允许
   uint8_t task_running;  //表示任务进行的标志位
