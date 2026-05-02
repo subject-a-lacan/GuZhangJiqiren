@@ -290,7 +290,19 @@ void UART_PID_Tune(uint8_t cmd, float val) {
     case 'u': status.motor.wheel[1].wheel_pid.ki = val;  break;
     case 'w': status.motor.wheel[1].wheel_pid.kd = val;  break;
 
-    case 'z': status.state.motion = STOP;  break;
+    case 'z': status.task.task_running = 0;
+              status.task.armed = 0;
+              status.task.start_request = 0;
+              status.task.stop_request = 0;
+              status.task.stop_cmd = 1;
+
+              status.state.motion = STOP;
+              status.state.base_speed = 0;
+
+              status.motor.wheel[0].tar_speed = 0;
+              status.motor.wheel[1].tar_speed = 0;
+    
+              break;
     case 'y':
       status.state.status_pid.follow_line_pid.integral = 0;
       status.state.status_pid.follow_line_pid.last_error = 0;

@@ -132,7 +132,9 @@ void task_select(STATUS *status, uint8_t id) {
 
 static void task_basic_1_update(STATUS *status) {
   status->task.task_running = 1;
-  task_finish(status);
+  status->state.base_speed = 40;
+  status->state.motion = FIND_LINE;
+  // task_finish(status);
 }
 
 static void task_basic_2_update(STATUS *status) {

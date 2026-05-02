@@ -3,7 +3,7 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sat May  2 16:54:51 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sat May  2 17:17:28 2026
 <BR><P>
 <H3>Maximum Stack Usage =        676 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1949,7 +1949,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[129]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Init
 </UL>
 
-<P><STRONG><a name="[136]"></a>UART_PID_Tune</STRONG> (Thumb, 280 bytes, Stack size 0 bytes, main.o(.text.UART_PID_Tune))
+<P><STRONG><a name="[136]"></a>UART_PID_Tune</STRONG> (Thumb, 312 bytes, Stack size 0 bytes, main.o(.text.UART_PID_Tune))
 <BR><BR>[Called By]<UL><LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_RxCpltCallback
 </UL>
 
@@ -2165,7 +2165,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[165]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
 </UL>
 
-<P><STRONG><a name="[18f]"></a>get_wheel_speed</STRONG> (Thumb, 78 bytes, Stack size 0 bytes, wheel.o(.text.get_wheel_speed))
+<P><STRONG><a name="[18e]"></a>get_wheel_speed</STRONG> (Thumb, 78 bytes, Stack size 0 bytes, wheel.o(.text.get_wheel_speed))
 <BR><BR>[Called By]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
@@ -2400,32 +2400,31 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[189]"></a>task_finish</STRONG> (Thumb, 58 bytes, Stack size 0 bytes, defect.o(.text.task_finish))
-<BR><BR>[Called By]<UL><LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_basic_2_update
-<LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_basic_1_update
+<BR><BR>[Called By]<UL><LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_basic_2_update
 <LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_adv_2_update
 <LI><a href="#[188]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_adv_1_update
 </UL>
 
-<P><STRONG><a name="[18d]"></a>task_select</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, defect.o(.text.task_select))
-<BR><BR>[Calls]<UL><LI><a href="#[18e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task_led
+<P><STRONG><a name="[18c]"></a>task_select</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, defect.o(.text.task_select))
+<BR><BR>[Calls]<UL><LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task_led
 </UL>
-<BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
-</UL>
-
-<P><STRONG><a name="[192]"></a>task_start</STRONG> (Thumb, 154 bytes, Stack size 0 bytes, defect.o(.text.task_start))
-<BR><BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[191]"></a>task_stop</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, defect.o(.text.task_stop))
-<BR><BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<P><STRONG><a name="[191]"></a>task_start</STRONG> (Thumb, 154 bytes, Stack size 0 bytes, defect.o(.text.task_start))
+<BR><BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+</UL>
+
+<P><STRONG><a name="[190]"></a>task_stop</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, defect.o(.text.task_stop))
+<BR><BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
 <P><STRONG><a name="[118]"></a>update_status</STRONG> (Thumb, 278 bytes, Stack size 24 bytes, status.o(.text.update_status))
 <BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = update_status &rArr; driver_button &rArr; server_button &rArr; correct_gw_analogue &rArr; log_uprintf &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Calls]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 <LI><a href="#[185]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_angle
-<LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_wheel_speed
+<LI><a href="#[18e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_wheel_speed
 <LI><a href="#[15c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gyr_value
 <LI><a href="#[15b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gyr_raw_data
 <LI><a href="#[16f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line
@@ -2439,24 +2438,24 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 </UL>
 
-<P><STRONG><a name="[190]"></a>update_task</STRONG> (Thumb, 202 bytes, Stack size 8 bytes, defect.o(.text.update_task))
+<P><STRONG><a name="[18f]"></a>update_task</STRONG> (Thumb, 202 bytes, Stack size 8 bytes, defect.o(.text.update_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = update_task
 </UL>
-<BR>[Calls]<UL><LI><a href="#[18e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task_led
-<LI><a href="#[191]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
-<LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
-<LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_select
-<LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_basic_2_update
-<LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_basic_1_update
+<BR>[Calls]<UL><LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task_led
+<LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
+<LI><a href="#[191]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
+<LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_select
+<LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_basic_2_update
+<LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_basic_1_update
 <LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_adv_2_update
 <LI><a href="#[188]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_adv_1_update
 </UL>
 <BR>[Called By]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[18e]"></a>update_task_led</STRONG> (Thumb, 96 bytes, Stack size 0 bytes, defect.o(.text.update_task_led))
-<BR><BR>[Called By]<UL><LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_select
-<LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<P><STRONG><a name="[18d]"></a>update_task_led</STRONG> (Thumb, 96 bytes, Stack size 0 bytes, defect.o(.text.update_task_led))
+<BR><BR>[Called By]<UL><LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_select
+<LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
 <P><STRONG><a name="[193]"></a>__0sprintf</STRONG> (Thumb, 34 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
@@ -2909,25 +2908,23 @@ Local Symbols
 <P><STRONG><a name="[188]"></a>task_adv_1_update</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, defect.o(.text.task_adv_1_update))
 <BR><BR>[Calls]<UL><LI><a href="#[189]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
 </UL>
-<BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
 <P><STRONG><a name="[18a]"></a>task_adv_2_update</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, defect.o(.text.task_adv_2_update))
 <BR><BR>[Calls]<UL><LI><a href="#[189]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
 </UL>
-<BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[18b]"></a>task_basic_1_update</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, defect.o(.text.task_basic_1_update))
-<BR><BR>[Calls]<UL><LI><a href="#[189]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
-</UL>
-<BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<P><STRONG><a name="[192]"></a>task_basic_1_update</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, defect.o(.text.task_basic_1_update))
+<BR><BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[18c]"></a>task_basic_2_update</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, defect.o(.text.task_basic_2_update))
+<P><STRONG><a name="[18b]"></a>task_basic_2_update</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, defect.o(.text.task_basic_2_update))
 <BR><BR>[Calls]<UL><LI><a href="#[189]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
 </UL>
-<BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
 <P><STRONG><a name="[198]"></a>_fp_digits</STRONG> (Thumb, 366 bytes, Stack size 64 bytes, printfa.o(i._fp_digits), UNUSED)
