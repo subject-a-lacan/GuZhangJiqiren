@@ -112,9 +112,9 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   
-  init_status(&status, 1);
-
-  after_init_state();
+  // init_status(&status, 1);
+  ESP8266_Init("your_ssid", "your_password", "server_ip", "server_port"); 
+  // after_init_state();
 
   HAL_TIM_Base_Start_IT(&htim5);
   
