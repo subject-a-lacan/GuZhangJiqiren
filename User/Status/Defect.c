@@ -140,7 +140,8 @@ static void driver_task1(STATUS *status) {
 
 static void driver_task2(STATUS *status) {
   status->task.task_running = 1;
-  task_finish(status);
+  status->state.base_speed = 40;
+  status->state.motion = MOTOR_TEST;
 }
 
 static void driver_task3(STATUS *status) {
