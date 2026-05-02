@@ -16,9 +16,39 @@ A -> D -> C -> B -> A
 
 1. 第一问所有有效拐角都是左转。
 2. 发车点不一定严格就在 A 点转弯处，所以不能一进入 TASK1 就直接原地左转。必须增加“从发车点走到第一个转弯处 A”的阶段。
-3. 起步时车可能已经压着/靠近一个路口，暂时先不写特殊屏蔽逻辑。如果实车出现一启动就误判路口，再单独加起步时间或起步里程屏蔽。
+3. 起步时车可能已经压着/靠近一个路口，暂时先不写特殊屏蔽逻辑。如果实车出现一启动就误判路口，再单独加起步里程屏蔽或路口稳定策略。
 4. Q1 只需要把 T 型路口合并成普通左右路口使用，不改 `get_road_type()`，不改 `serve_road()`，不改 `road_new_from_bit()`。
 5. BA 最后一段停车可以考虑用里程数判定，但里程精度还没实测好，所以先把它作为一个方案保留，不要把整个状态机强绑定到唯一的里程停车方案。
+6. TASK1 阶段推进不要使用时间阈值判断。不要写 `status->state.time - status->task.phase_start_time >= xxx_TIME` 这种逻辑。
+
+# 禁止时间阈值推进阶段
+
+TASK1 的阶段切换不要依赖运行时间阈值。
+
+禁止写类似代码：
+
+```c
+if (status->state.time - status->task.phase_start_time >= Q1_START_TO_A_TIME) {
+  // 切阶段
+}
+```
+
+原因：
+
+```text
+电池电压、地面摩擦、PID 参数、负载都会让同样时间内走过的距离变化很大。
+用时间阈值推进阶段，实车表现会非常漂。
+```
+
+TASK1 阶段推进优先使用：
+
+```text
+1. phase_mileage，也就是编码器脉冲累计
+2. 映射后的 road 路口事件
+3. 陀螺仪角度误差
+```
+
+`phase_start_time` 可以保留作调试或日志用途，但 TASK1 第一版不要用它作为阶段切换条件。
 
 # T 型路口合并规则
 
@@ -72,7 +102,6 @@ if (road == TRRoad) {
 status->task.race_phase;
 status->task.cross_cnt;
 status->task.phase_mileage;
-status->task.phase_start_time;
 status->state.motion;
 status->state.base_speed;
 ```
@@ -137,10 +166,17 @@ Q1_BA_FINAL,    // BA 边回到 A，最后停车
 
 ```c
 status->task.race_phase = next_phase;
-status->task.phase_start_time = status->state.time;
 status->task.phase_mileage = 0;
 status->task.cnt_seen = 0;
 ```
+
+如果确实想记录阶段开始时刻，可以顺手更新：
+
+```c
+status->task.phase_start_time = status->state.time;
+```
+
+但是注意：`phase_start_time` 只允许用于调试、打印、观察，不允许用于 TASK1 阶段推进。
 
 `phase_mileage` 当前单位是编码器脉冲，不是 cm。需要真实距离判断时，再调用：
 
@@ -197,19 +233,13 @@ base_speed = 低速或中速
 phase_mileage 达到一个标定脉冲阈值
 ```
 
-或者：
-
-```text
-运行时间达到一个短时间阈值
-```
-
 进入下一阶段：
 
 ```text
 Q1_TURN_A
 ```
 
-注意：这一阶段暂时不要因为检测到路口就立刻转弯。起步处可能已经压着边线或路口，先用距离/时间把车带离起步不稳定区域。
+注意：这一阶段暂时不要因为检测到路口就立刻转弯。起步处可能已经压着边线或路口，先用阶段里程 `phase_mileage` 把车带离起步不稳定区域。
 
 ## 2. Q1_TURN_A
 
@@ -227,7 +257,6 @@ base_speed = 低速
 
 ```text
 角度误差进入允许范围
-并且保持一小段时间
 ```
 
 进入下一阶段：
@@ -375,4 +404,30 @@ if (q1_final_stop_condition(status, road)) {
 4. 不要让传感器层直接推进 `race_phase`。
 5. `status.task.cross_cnt` 只由 TASK1 内部确认有效路口后增加。
 6. `phase_mileage` 保持脉冲单位，只有需要和 cm 阈值比较时再换算。
-7. 第一版先追求状态机清楚可调，不要把起步屏蔽、停车策略、A4 干扰处理全部揉进一个大判断。
+7. 不要使用时间阈值推进 TASK1 阶段，不要引入 `Q1_START_TO_A_TIME` 这类宏。
+8. 第一版先追求状态机清楚可调，不要把起步屏蔽、停车策略、A4 干扰处理全部揉进一个大判断。
+
+# 代码结构和注释要求
+
+AI agent 实现时必须把代码写清楚，不要把所有逻辑塞进一个巨大 `switch` 里。
+
+建议拆出小工具函数：
+
+```c
+static Road task1_map_road(Road raw);
+static void task1_enter_phase(STATUS *status, uint8_t next_phase);
+static uint8_t task1_accept_left_road(STATUS *status, Road road);
+static uint8_t task1_turn_finished(STATUS *status);
+static uint8_t task1_final_stop_condition(STATUS *status, Road road);
+```
+
+要求：
+
+1. `task1_map_road()` 只做 `TLRoad/TRRoad` 到 `LeftRoad/RightRoad` 的合并。
+2. `task1_enter_phase()` 统一负责切换 `race_phase`、清零 `phase_mileage`、清零 `cnt_seen`。
+3. `task1_accept_left_road()` 统一负责 `road == LeftRoad && cnt_seen == 0` 的有效路口消费和 `task.cross_cnt++`。
+4. 每个 `case Q1_xxx:` 前都要写注释，说明当前阶段的物理含义，例如“沿 AD 边巡线，等待 D 点左路口”。
+5. 每个阶段切换处都要写注释，说明为什么切到下一阶段。
+6. 不要写魔法数字。速度、角度容差、起步脉冲阈值、最终停车脉冲阈值都用清晰的宏名。
+7. 宏名必须体现单位，比如 `_PULSE` 表示脉冲，`_DEG` 表示角度。不要写 `_TIME` 阈值。
+8. 注释要解释“为什么这样判断”，不要只复述代码。

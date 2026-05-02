@@ -30,7 +30,7 @@ PID init_pid(float kp, float ki, float kd, float T, float integral_max) {
  */
 float compute_pid(PID *pid, float error) {
   if (pid == NULL) {
-    WARN("pid is not initialized");
+    // WARN("pid is not initialized");
     return 0;
   }
   pid->error = error;

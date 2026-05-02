@@ -149,10 +149,10 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     PERIODIC_START(Task_Vofa_Print, 200)
-    log_uprintf(&huart1,"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line_pid
+    printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line_pid
            "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // keep_angle_pid
            "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // wheel[0].wheel_pid
-           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n", // wheel[1].wheel_pid
+           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\r\n", // wheel[1].wheel_pid
            // follow_line_pid: target, actual, out, kp, ki, kd
            (double)0.0,
            (double)status.sensor.gw_analogue.diff,
@@ -182,7 +182,11 @@ int main(void)
            (double)status.motor.wheel[1].wheel_pid.ki,
            (double)status.motor.wheel[1].wheel_pid.kd,
            (double)status.task.task_id,
-           (double)cmd_speed
+           (double)cmd_speed,
+           (double)status.motor.wheel[0].wheel_pid.integral,
+            (double)status.motor.wheel[0].wheel_pid.derivative,
+            (double)status.motor.wheel[1].wheel_pid.integral,
+            (double)status.motor.wheel[1].wheel_pid.derivative
           );
 
     PERIODIC_END
@@ -322,8 +326,9 @@ void UART_PID_Tune(uint8_t cmd, float val) {
       status.motor.wheel[1].wheel_pid.last_error = 0;
       status.motor.wheel[1].wheel_pid.error = 0;
       status.motor.wheel[1].wheel_pid.out = 0;
-      status.state.motion = MOTOR_TEST;
-      status.state.base_speed = cmd_speed;
+      status.motor.wheel[0].trust = 0;
+      status.motor.wheel[1].trust = 0;
+      status.task.start_request=1;
       break;
     case 'h': cmd_speed = (int16_t)val;  break;
     default: break;
