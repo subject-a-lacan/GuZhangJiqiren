@@ -41,6 +41,5 @@ car_control_stm32_project/defect.o: ../User/Status/Defect.c \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_uart.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
   ../User/Device\buzzer.h ../User/Sensor\gw_anagloge.h \
-  ../User/Sensor\gw_find_line.h ../User/Tool\pid.h ../User/Status\road.h \
-  ../User/Sensor\gy901.h ../User/Device\led.h ../User/Motor\servo.h \
-  ../User/Motor\wheel.h
+  ../User/Sensor\gy901.h ../User/Tool\pid.h ../User/Device\led.h \
+  ../User/Motor\servo.h ../User/Motor\wheel.h

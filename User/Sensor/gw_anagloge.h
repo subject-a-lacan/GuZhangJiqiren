@@ -9,6 +9,37 @@
 #ifndef __GW_ANALOGUE_H
 #define __GW_ANALOGUE_H
 
+#include "main.h"
+
+typedef enum Road {
+  CrossRoad = 0b111,   // 三方向都有路
+  TBRoad = 0b101,      // 左右有路 前方无路
+  TLRoad = 0b011,      // 左前有路 右侧无路
+  TRRoad = 0b110,      // 前右有路 左侧无路
+  LeftRoad = 0b001,    // 只有左侧有路
+  RightRoad = 0b100,   // 只有右侧有路
+  Straight = 0b010,    // 只有前方有路
+  UnknowRoad = 0b000,  // 没识别到路
+} Road;
+
+typedef struct Cross {
+  uint8_t data_buf;        // 当前帧巡线数字量
+  uint8_t integral;        // 多帧按位或累积
+  uint8_t maybe;           // 计数器
+  uint8_t cross_cnt;       // 已通过/识别的路口计数
+  Road cross;              // 当前判定出的道路类型
+  uint8_t integral_times;  // 进行一次判定需要累计的帧数
+
+  uint8_t CrossRoad_cnt;
+  uint8_t TBRoad_cnt;
+  uint8_t TLRoad_cnt;
+  uint8_t TRRoad_cnt;
+  uint8_t LeftRoad_cnt;
+  uint8_t RightRoad_cnt;
+  uint8_t Straight_cnt;
+  uint8_t UnknowRoad_cnt;
+} Cross;
+
 typedef struct GW_ANALOGUE {
   uint8_t channel[8];                 // 0-7
   uint8_t sta;                        // 0工作模式 1校准模式
@@ -19,37 +50,20 @@ typedef struct GW_ANALOGUE {
   uint8_t digital_low_threshold[8];   // 8bit低阈值
   float diff;
 
+  Cross cross;  // 路口观测状态
 } GW_ANALOGUE;
 
-// 初始化传感器
-void init_gw_analogue(GW_ANALOGUE *aw_analogue);
-
-// 获取传感器的原始数据
-// 数据: uint8_t channel[8] 0-7
-void get_gw_raw_data(GW_ANALOGUE *aw_analogue);
-
-// 校准传感器
-// 使用方法:
-// 调用两次correct_gw_analogue()函数进行校准
-// 首次将传感器放在白色的地方，调用correct_gw_analogue()函数进行校准
-// 再次将传感器放在黑色的地方，调用correct_gw_analogue()函数进行校准
-// 校准后自动生成迟滞比较器数据与归一化数据
+void init_gw_analogue(GW_ANALOGUE *gw_analogue);
+void get_gw_raw_data(GW_ANALOGUE *gw_analogue);
 void correct_gw_analogue(GW_ANALOGUE *gw_analogue);
-
-// 选择传感器的通道
-// 内部调用不用管
 void select_channel(uint8_t channel);
-
-// 将raw数据解析为数字量数据
-// 数据: uint8_t digital_8bit 0-7
 void get_gw_analoge_digital_data(GW_ANALOGUE *gw_analogue);
-
-// 将数字量数据打印至串口出来 1打印"#" 0打印". "
-// 调试时使用
 void gw_analogue_gray_show(GW_ANALOGUE *gw_analogue);
-
-// 将raw数据解析为模拟量数据
-// 数据: float -42 ~ 42
 void get_gw_analogue_analogue_diff(GW_ANALOGUE *gw_analogue);
+
+void init_road_determine(Cross *cross);
+void init_road_cnt(Cross *cross);
+void get_road_type(Cross *cross, uint8_t road_data);
+void driver_gw_analogue(GW_ANALOGUE *gw_analogue);
 
 #endif

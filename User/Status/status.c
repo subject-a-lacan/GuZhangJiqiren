@@ -1,13 +1,12 @@
 #include "status.h"
-
+#include "gw_anagloge.h"
 #include "button.h"
 #include "buzzer.h"
-#include "gw_find_line.h"
+#include "Defect.h"
 #include "i2c.h"
 #include "led.h"
 #include "log.h"
 #include "math_tool.h"
-#include "road.h"
 #include "servo.h"
 #include "wheel.h"
 
@@ -15,7 +14,6 @@ STATUS status;
 
 int32_t rw_time_cur = -1;
 int32_t rw_time_tar = -1;
-extern uint8_t left_cnt;
 extern uint8_t cross_cnt;      // 路口计数器
 uint8_t cross_delay = 0;       // 路口延时计数器
 int32_t keep_angle_time = -1;  // 保持角度时间
@@ -85,7 +83,6 @@ void init_device() {
  */
 void init_sensor(STATUS *status) {
   init_gyr(&status->sensor.gy901);
-  init_gw_8bit(&status->sensor.gw_8bit);
   init_gw_analogue(&status->sensor.gw_analogue);
 }
 
@@ -109,13 +106,6 @@ void init_state(STATUS *status, uint8_t T) {
   status->state.tar_angle = 90;
 
   status->state.gw_8bit = 0x00;
-
-  status->state.road_determine.cross = Straight;
-  status->state.road_determine.cross_cnt = 0;
-  status->state.road_determine.maybe = 0;
-  status->state.road_determine.integral = 0;
-  status->state.road_determine.data_buf = 0;
-  status->state.road_determine.integral_times = 6;
 
   status->state.base_speed = 0;
 
@@ -178,11 +168,11 @@ Road road_buf = Straight;  //存储上一次检测到的路口类型
  * @return 路口类型
  */
 Road Turn_or_Straight() {
-  if (road_buf != status.state.road_determine.cross) {
+  if (road_buf != status.sensor.gw_analogue.cross.cross) {
     status.motor.wheel[0].tar_speed = 0; //路况发生变化就先停车
     status.motor.wheel[1].tar_speed = 0;
     if ((ABS(status.motor.wheel[0].cur_speed) < 5) && (ABS(status.motor.wheel[1].cur_speed) < 5)) {
-      road_buf = status.state.road_determine.cross; 
+      road_buf = status.sensor.gw_analogue.cross.cross;
     }
   }
   // if (status.state.road_determine.cross == LeftRoad && left_cnt == 1) {
@@ -192,41 +182,17 @@ Road Turn_or_Straight() {
   return road_buf;
 }
 /*
- * @brief 巡线控制
+ * @brief 巡线控制（纯 PID + 差速）。
+ *        只根据当前传感器偏差计算左右轮目标速度，不判断路口，不执行转弯。
+ *        路口观测结果由 driver_gw_analogue 写入 status.sensor.gw_analogue.cross.cross，
+ *        转弯/停车/计数由 update_task 内的小状态机根据 race_phase 决定。
  * @param status 状态结构体指针
  * @return 无
- * @note 每次被调用时，会完成一轮：采集灰度数据 → 判定路型 → 生成左右轮目标速度。
  */
 void follow_line(STATUS *status) {
-  if (cross_delay > 0) {
-    cross_delay--;
-  }//可以视作反应时间 可以理解成“刚识别完关键路口后，先别急着改判定，再观察一小段时间”。
-  get_gw_analoge_digital_data(&status->sensor.gw_analogue);   //获取01001八位数字量
-  get_gw_analogue_analogue_diff(&status->sensor.gw_analogue); //获取归一化量
-
-  get_road_type(&status->state.road_determine, status->sensor.gw_analogue.digital_8bit);
-
-  if (Turn_or_Straight() == Straight) {
-    float diff = compute_pid(&status->state.status_pid.follow_line_pid, status->sensor.gw_analogue.diff);
-    status->motor.wheel[0].tar_speed = status->state.base_speed - (int16_t)diff;
-    status->motor.wheel[1].tar_speed = status->state.base_speed + (int16_t)diff;
-  }
-  if (Turn_or_Straight() == LeftRoad) {
-    status->motor.wheel[0].tar_speed = 20;
-    status->motor.wheel[1].tar_speed = -20;
-  }
-  if (Turn_or_Straight() == RightRoad) {
-    status->motor.wheel[0].tar_speed = -20;
-    status->motor.wheel[1].tar_speed = 20;
-  }
-  if (Turn_or_Straight() == CrossRoad && cross_cnt == 4) {
-    status->motor.wheel[0].tar_speed = -20;
-    status->motor.wheel[1].tar_speed = 20;
-  }
-  if (road_buf != status->state.road_determine.cross) {
-    status->motor.wheel[0].tar_speed = 0;
-    status->motor.wheel[1].tar_speed = 0;
-  }
+  float diff = compute_pid(&status->state.status_pid.follow_line_pid, status->sensor.gw_analogue.diff);
+  status->motor.wheel[0].tar_speed = status->state.base_speed - (int16_t)diff;
+  status->motor.wheel[1].tar_speed = status->state.base_speed + (int16_t)diff;
 }
 
 uint8_t cnt = 20;
@@ -269,7 +235,7 @@ void keep_angle(STATUS *status) {
  * @return 无
  */
 void update_status(STATUS *status) {
-  get_gw_raw_data(&status->sensor.gw_analogue);
+  driver_gw_analogue(&status->sensor.gw_analogue);
 
   status->motor.wheel[0].cur_speed = get_wheel_speed(&status->motor.wheel[0]);
   status->motor.wheel[1].cur_speed = get_wheel_speed(&status->motor.wheel[1]);

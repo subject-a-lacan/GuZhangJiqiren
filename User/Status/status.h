@@ -7,7 +7,6 @@
 #include "buzzer.h"
 #include "Defect.h"
 #include "gw_anagloge.h"
-#include "gw_find_line.h"
 #include "gy901.h"
 #include "led.h"
 #include "main.h"
@@ -65,7 +64,6 @@ typedef struct GW_8BIT {
  */
 typedef struct SENSOR {
   GYR gy901;
-  GW_8BIT gw_8bit;
   GW_ANALOGUE gw_analogue;
 } SENSOR;
 /*
@@ -101,8 +99,6 @@ typedef struct STATE {
   float tar_angle;
 
   int16_t base_speed;  // 基础速度
-
-  RoadDetermine road_determine;  // 道路判断结构体
 
   uint8_t gw_8bit;
 

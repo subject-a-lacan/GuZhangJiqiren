@@ -41,6 +41,5 @@ car_control_stm32_project/pid.o: ../User/Tool/pid.c ../User/Tool/pid.h \
   ../User/Tool/log.h ../Core/Inc\usart.h ../User/Tool/math_tool.h \
   ../User/Status\status.h ../User/Device\button.h \
   ../User/Device\buzzer.h ../User/Status/Defect.h \
-  ../User/Sensor\gw_anagloge.h ../User/Sensor\gw_find_line.h \
-  ../User/Status\road.h ../User/Sensor\gy901.h ../User/Device\led.h \
-  ../User/Motor\servo.h ../User/Motor\wheel.h
+  ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h \
+  ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h

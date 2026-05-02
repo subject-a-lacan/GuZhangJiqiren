@@ -6,7 +6,6 @@
 
 #include "array.h"
 #include "math_tool.h"
-#include "road.h"
 
 uint16_t BUFF_DATA_1[128] = {0};
 uint16_t BUFF_DATA_2[128] = {0};

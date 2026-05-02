@@ -42,7 +42,6 @@ car_control_stm32_project/led.o: ../User/Device/led.c \
   ../Core/Inc\gpio.h ../User/Tool\log.h ../Core/Inc\usart.h \
   ../User/Status\status.h ../User/Device\button.h \
   ../User/Device\buzzer.h ../User/Status/Defect.h \
-  ../User/Sensor\gw_anagloge.h ../User/Sensor\gw_find_line.h \
-  ../User/Tool\pid.h ../User/Status\road.h ../User/Sensor\gy901.h \
+  ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h ../User/Tool\pid.h \
   ../User/Motor\servo.h ../User/Motor\wheel.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h

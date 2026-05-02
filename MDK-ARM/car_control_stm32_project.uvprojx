@@ -691,16 +691,6 @@
           <GroupName>Status</GroupName>
           <Files>
             <File>
-              <FileName>motion.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\User\Status\motion.h</FilePath>
-            </File>
-            <File>
-              <FileName>road.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\User\Status\road.h</FilePath>
-            </File>
-            <File>
               <FileName>status.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Status\status.c</FilePath>
@@ -709,11 +699,6 @@
               <FileName>status.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\User\Status\status.h</FilePath>
-            </File>
-            <File>
-              <FileName>road.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Status\road.c</FilePath>
             </File>
             <File>
               <FileName>Defect.c</FileName>
@@ -744,16 +729,6 @@
               <FileName>ccd.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\User\Sensor\ccd.h</FilePath>
-            </File>
-            <File>
-              <FileName>gw_find_line.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Sensor\gw_find_line.c</FilePath>
-            </File>
-            <File>
-              <FileName>gw_find_line.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\User\Sensor\gw_find_line.h</FilePath>
             </File>
             <File>
               <FileName>gy901.c</FileName>

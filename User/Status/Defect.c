@@ -2,7 +2,6 @@
 #include "status.h"
 
 #include "pid.h"
-#include "road.h"
 
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
@@ -40,11 +39,11 @@ void task_start(STATUS *status) {
   cross_delay = 0;
 
   road_buf = Straight;
-  status->state.road_determine.integral = 0;
-  status->state.road_determine.data_buf = 0;
-  status->state.road_determine.maybe = 0;
-  status->state.road_determine.cross = Straight;
-  status->state.road_determine.cross_cnt = 0;
+  status->sensor.gw_analogue.cross.integral = 0;
+  status->sensor.gw_analogue.cross.data_buf = 0;
+  status->sensor.gw_analogue.cross.maybe = 0;
+  status->sensor.gw_analogue.cross.cross = Straight;
+  status->sensor.gw_analogue.cross.cross_cnt = 0;
 
   status->task.phase_mileage = 0;
 

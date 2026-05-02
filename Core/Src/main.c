@@ -36,7 +36,6 @@
 #include "servo.h"
 #include "led.h"
 #include "button.h"
-#include "road.h"
 #include "math_tool.h"
 #include "stdio.h"
 #include <stdlib.h>
@@ -133,17 +132,10 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  
   init_status(&status, 1);
-
   after_init_state();
-
-  
-
   status.state.motion = STOP;
-
   HAL_UART_Receive_IT(&huart1, &rx_byte, 1); // 开启 USART1 的接收中断，准备接收调参命令
-
   ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
