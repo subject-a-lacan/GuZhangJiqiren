@@ -16,6 +16,9 @@ typedef struct WHEEL {
   int16_t tar_speed;  // 电机目标速度
   int8_t dir;         // 电机方向
   PID wheel_pid;
+  int16_t feedforward;  // 当前周期前馈 PWM（VOFA 观测用）
+  float dead_pwm;       // 克服静摩擦/死区的基础 PWM，串口可调
+  float kff;            // tar_speed→PWM 线性系数，串口可调
 } WHEEL;
 
 // 更新轮子当前速度至状态树： status.motor.wheel[0].cur_speed = get_wheel_speed(&status->motor.wheel[0]);
