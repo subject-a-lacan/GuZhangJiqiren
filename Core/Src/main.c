@@ -135,12 +135,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   init_status(&status, 1);
   after_init_state();
-  status.motor.wheel[0].wheel_pid.kp=15;
-  status.motor.wheel[0].wheel_pid.ki=31;
-  status.motor.wheel[0].wheel_pid.kd=450;
-  status.motor.wheel[1].wheel_pid.kp=15;
-  status.motor.wheel[1].wheel_pid.ki=30;
-  status.motor.wheel[1].wheel_pid.kd=400;
   status.state.motion = STOP;
   HAL_UART_Receive_IT(&huart1, &rx_byte, 1); // 开启 USART1 的接收中断，准备接收调参命令
   ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
@@ -154,7 +148,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Task_Vofa_Print, 800)
+    PERIODIC_START(Task_Vofa_Print, 80)
     printf(//"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line_pid
           //  "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // keep_angle_pid
            "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // wheel[0].wheel_pid

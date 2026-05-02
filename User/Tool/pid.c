@@ -6,13 +6,14 @@
 #include "math_tool.h"
 #include "status.h"
 
-PID init_pid(float kp, float ki, float kd, float T, float integral_max) {
+PID init_pid(float kp, float ki, float kd, float T, float integral_max, float InteralCoef) {
   PID pid;
   pid.kp = kp;
   pid.ki = ki;
   pid.kd = kd;
   pid.T = T;
   pid.integral_max = integral_max;
+  pid.InteralCoef = InteralCoef;
   pid.error = 0;
   pid.last_error = 0;
   pid.integral = 0;
@@ -34,8 +35,15 @@ float compute_pid(PID *pid, float error) {
     return 0;
   }
   pid->error = error;
-  pid->integral += pid->error * pid->T;
-  pid->integral = CONFINE(pid->integral, -pid->integral_max, pid->integral_max);
+  float ki_abs = pid->ki >= 0 ? pid->ki : -pid->ki;
+  if (ki_abs > 0.000001f) {
+    float error_abs = pid->error >= 0 ? pid->error : -pid->error;
+    float k = 1.0f / (1.0f + pid->InteralCoef * error_abs);
+    pid->integral += pid->error * pid->T * k;
+    pid->integral = CONFINE(pid->integral, -pid->integral_max, pid->integral_max);
+  } else {
+    pid->integral = 0;
+  }
   if (pid->is_first) {
     pid->derivative = 0; //微分项初始为0 避免第一次计算时出现较大输出
     pid->is_first = 0;

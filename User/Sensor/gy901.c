@@ -15,7 +15,7 @@ void init_gyr(GYR *gyr) {
   for (int i = 0; i < 24; i++) {
     gyr->data_buf[i] = 0;
   }
-  gyr->gy901_keep_angle_pid = init_pid(50, 0, 0, 50, 500);
+  gyr->gy901_keep_angle_pid = init_pid(50, 0, 0, 50, 500, 0.0f);
   return;
 }
   /**

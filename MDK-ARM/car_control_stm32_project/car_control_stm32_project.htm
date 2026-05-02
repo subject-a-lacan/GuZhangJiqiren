@@ -3,7 +3,7 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sun May  3 03:10:07 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sun May  3 05:43:49 2026
 <BR><P>
 <H3>Maximum Stack Usage =        548 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1951,7 +1951,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Init
 </UL>
 
-<P><STRONG><a name="[137]"></a>UART_PID_Tune</STRONG> (Thumb, 338 bytes, Stack size 0 bytes, main.o(.text.UART_PID_Tune))
+<P><STRONG><a name="[137]"></a>UART_PID_Tune</STRONG> (Thumb, 340 bytes, Stack size 0 bytes, main.o(.text.UART_PID_Tune))
 <BR><BR>[Called By]<UL><LI><a href="#[133]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_RxCpltCallback
 </UL>
 
@@ -2025,7 +2025,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[177]"></a>compute_pid</STRONG> (Thumb, 156 bytes, Stack size 0 bytes, pid.o(.text.compute_pid))
+<P><STRONG><a name="[177]"></a>compute_pid</STRONG> (Thumb, 224 bytes, Stack size 0 bytes, pid.o(.text.compute_pid))
 <BR><BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_angle
 <LI><a href="#[179]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line
 <LI><a href="#[176]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
@@ -2210,7 +2210,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
 </UL>
 
-<P><STRONG><a name="[185]"></a>init_gyr</STRONG> (Thumb, 112 bytes, Stack size 56 bytes, gy901.o(.text.init_gyr))
+<P><STRONG><a name="[185]"></a>init_gyr</STRONG> (Thumb, 120 bytes, Stack size 56 bytes, gy901.o(.text.init_gyr))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = init_gyr
 </UL>
 <BR>[Calls]<UL><LI><a href="#[186]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
@@ -2227,7 +2227,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[186]"></a>init_pid</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, pid.o(.text.init_pid))
+<P><STRONG><a name="[186]"></a>init_pid</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, pid.o(.text.init_pid))
 <BR><BR>[Called By]<UL><LI><a href="#[189]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
 <LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status_pid
 <LI><a href="#[185]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gyr
@@ -2267,7 +2267,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[18b]"></a>init_status</STRONG> (Thumb, 40 bytes, Stack size 8 bytes, status.o(.text.init_status))
-<BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = init_status &rArr; init_status_pid
+<BR><BR>[Stack]<UL><LI>Max Depth = 136<LI>Call Chain = init_status &rArr; init_status_pid
 </UL>
 <BR>[Calls]<UL><LI><a href="#[18e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_task
 <LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status_pid
@@ -2279,8 +2279,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[18d]"></a>init_status_pid</STRONG> (Thumb, 180 bytes, Stack size 120 bytes, status.o(.text.init_status_pid))
-<BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = init_status_pid
+<P><STRONG><a name="[18d]"></a>init_status_pid</STRONG> (Thumb, 196 bytes, Stack size 128 bytes, status.o(.text.init_status_pid))
+<BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = init_status_pid
 </UL>
 <BR>[Calls]<UL><LI><a href="#[186]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
 </UL>
@@ -2291,7 +2291,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[189]"></a>init_wheel</STRONG> (Thumb, 264 bytes, Stack size 56 bytes, wheel.o(.text.init_wheel))
+<P><STRONG><a name="[189]"></a>init_wheel</STRONG> (Thumb, 284 bytes, Stack size 56 bytes, wheel.o(.text.init_wheel))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = init_wheel &rArr; HAL_TIM_PWM_Start
 </UL>
 <BR>[Calls]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
@@ -2418,7 +2418,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[196]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[198]"></a>task_start</STRONG> (Thumb, 194 bytes, Stack size 0 bytes, defect.o(.text.task_start))
+<P><STRONG><a name="[198]"></a>task_start</STRONG> (Thumb, 196 bytes, Stack size 0 bytes, defect.o(.text.task_start))
 <BR><BR>[Called By]<UL><LI><a href="#[196]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
@@ -2953,8 +2953,8 @@ Local Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 136<LI>Call Chain = driver_task4 &rArr; log_uprintf &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[16c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
-<LI><a href="#[175]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;encoder_pulse_to_cm
 <LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;log_uprintf
+<LI><a href="#[175]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;encoder_pulse_to_cm
 </UL>
 <BR>[Called By]<UL><LI><a href="#[196]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
