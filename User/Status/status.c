@@ -12,6 +12,7 @@
 
 STATUS status;
 
+extern int16_t cmd_speed;
 int32_t rw_time_cur = -1;
 int32_t rw_time_tar = -1;
 extern uint8_t cross_cnt;      // 路口计数器
@@ -255,6 +256,7 @@ void update_status(STATUS *status) {
   update_task(status);
  if (status->state.motion == FIND_LINE) {
     status->task.stop_cmd = 0;
+    status->state.base_speed = cmd_speed;
     follow_line(status);
   }
   if (status->state.motion == KEEP_ANGLE) {
@@ -268,8 +270,9 @@ void update_status(STATUS *status) {
   }
   if (status->state.motion == MOTOR_TEST) {
     status->task.stop_cmd = 0;
-    status->motor.wheel[0].tar_speed = 40;
-    status->motor.wheel[1].tar_speed = 40;
+    status->state.base_speed = cmd_speed;
+    status->motor.wheel[0].tar_speed = cmd_speed;
+    status->motor.wheel[1].tar_speed = cmd_speed;
   }
   driver_LED(&status->device.led_on_board);
   driver_LED(&status->device.led1);
