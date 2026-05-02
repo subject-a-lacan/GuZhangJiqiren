@@ -818,13 +818,13 @@ ARM Macro Assembler    Page 13
               00000400 
               00000200 
               00000000 
-Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
-interwork --depend=car_control_stm32_project\startup_stm32g474xx.d -ocar_contro
-l_stm32_project\startup_stm32g474xx.o -I.\RTE\_car_control_stm32_project -ID:\p
-rogram\keil_5\pack\ARM\CMSIS\6.1.0\CMSIS\Core\Include -ID:\program\keil_5\pack\
-Keil\STM32G4xx_DFP\1.6.0\Drivers\CMSIS\Device\ST\STM32G4xx\Include --predefine=
-"__UVISION_VERSION SETA 540" --predefine="STM32G474xx SETA 1" --predefine="_RTE
-_ SETA 1" --list=startup_stm32g474xx.lst startup_stm32g474xx.s
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --depend=c
+ar_control_stm32_project\startup_stm32g474xx.d -ocar_control_stm32_project\star
+tup_stm32g474xx.o -I.\RTE\_car_control_stm32_project -IC:\Keil_v5\ARM\PACK\ARM\
+CMSIS\5.0.1\CMSIS\Include -IC:\Keil_v5\ARM\PACK\Keil\STM32G4xx_DFP\1.4.0\Driver
+s\CMSIS\Device\ST\STM32G4xx\Include --predefine="__UVISION_VERSION SETA 524" --
+predefine="_RTE_ SETA 1" --predefine="STM32G474xx SETA 1" --list=startup_stm32g
+474xx.lst startup_stm32g474xx.s
 
 
 

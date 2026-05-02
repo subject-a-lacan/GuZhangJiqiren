@@ -31,6 +31,9 @@
 #include "log.h"
 #include "status.h"
 #include "uart_it.h"
+#include "lora.h"
+#include "wheel.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,6 +54,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+volatile int16_t cmd_speed = 0;
+volatile int16_t actual_speed0 = 0;
+volatile int16_t actual_speed1 = 0;
+volatile uint32_t rx_count = 0;
+volatile uint8_t last_rx = 0;
 
 /* USER CODE END PV */
 
@@ -62,6 +70,112 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static int16_t clamp_pwm(int16_t pwm) {
+  if (pwm > TRUST_CONFINE) {
+    return TRUST_CONFINE;
+  }
+  if (pwm < -TRUST_CONFINE) {
+    return -TRUST_CONFINE;
+  }
+  return pwm;
+}
+
+static uint16_t abs_pwm(int16_t pwm) {
+  return (pwm < 0) ? (uint16_t)(-pwm) : (uint16_t)pwm;
+}
+
+static char feedforward_cmd_buf[16];
+static uint8_t feedforward_cmd_len = 0;
+
+static void set_feedforward_pwm(void) {
+  int16_t pwm = clamp_pwm(cmd_speed);
+
+  status.motor.wheel[0].trust = pwm;
+  status.motor.wheel[1].trust = pwm;
+
+  set_wheel_dir(&status.motor.wheel[0], pwm);
+  set_wheel_dir(&status.motor.wheel[1], pwm);
+
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, abs_pwm(pwm));
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, abs_pwm(pwm));
+}
+
+static void handle_feedforward_cmd(const char *cmd) {
+  int value = 0;
+
+  if (cmd[0] != 'C') {
+    return;
+  }
+  if (cmd[1] == 'z' || cmd[1] == 'Z') {
+    cmd_speed = 0;
+    return;
+  }
+  if (sscanf(&cmd[1], "%d", &value) == 1) {
+    if (value > TRUST_CONFINE) {
+      value = TRUST_CONFINE;
+    } else if (value < -TRUST_CONFINE) {
+      value = -TRUST_CONFINE;
+    }
+    cmd_speed = (int16_t)value;
+  }
+}
+
+static void feedforward_cmd_apply(void) {
+  if (feedforward_cmd_len > 1) {
+    feedforward_cmd_buf[feedforward_cmd_len] = '\0';
+    handle_feedforward_cmd(feedforward_cmd_buf);
+    set_feedforward_pwm();
+  }
+  feedforward_cmd_len = 0;
+}
+
+static void feedforward_cmd_put_char(char ch) {
+  if (ch == 'C' || ch == 'c') {
+    feedforward_cmd_buf[0] = 'C';
+    feedforward_cmd_len = 1;
+    return;
+  }
+
+  if (feedforward_cmd_len == 0) {
+    return;
+  }
+
+  if (ch == '\r' || ch == '\n') {
+    feedforward_cmd_apply();
+    return;
+  }
+
+  if ((ch == 'z' || ch == 'Z') && feedforward_cmd_len == 1) {
+    feedforward_cmd_buf[feedforward_cmd_len++] = ch;
+    feedforward_cmd_apply();
+    return;
+  }
+
+  if ((ch >= '0' && ch <= '9') || ch == '-' || ch == '+') {
+    if (feedforward_cmd_len < sizeof(feedforward_cmd_buf) - 1) {
+      feedforward_cmd_buf[feedforward_cmd_len++] = ch;
+    } else {
+      feedforward_cmd_len = 0;
+    }
+  }
+}
+
+static void poll_feedforward_cmd(uint32_t duration_ms) {
+  uint32_t start = HAL_GetTick();
+
+  while (HAL_GetTick() - start < duration_ms) {
+    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE)) {
+      __HAL_UART_CLEAR_OREFLAG(&huart1);
+    }
+    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE)) {
+      last_rx = (uint8_t)(huart1.Instance->RDR & 0xff);
+      rx_count++;
+      feedforward_cmd_put_char((char)last_rx);
+    }
+  }
+
+  feedforward_cmd_apply();
+}
 
 /* USER CODE END 0 */
 
@@ -112,8 +226,15 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   
-  // init_status(&status, 1);
-  ESP8266_Init("your_ssid", "your_password", "server_ip", "server_port"); 
+  status.state.T = 1;
+  status.state.time = 0;
+  init_wheel(&status.motor.wheel[0], 1, -1);
+  init_wheel(&status.motor.wheel[1], 2, 1);
+
+  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  __HAL_UART_DISABLE_IT(&huart1, UART_IT_RXNE);
+  __HAL_UART_DISABLE_IT(&huart1, UART_IT_IDLE);
+  HAL_NVIC_DisableIRQ(USART1_IRQn);
   // after_init_state();
 
   HAL_TIM_Base_Start_IT(&htim5);
@@ -127,7 +248,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-;
+    poll_feedforward_cmd(100);
+    set_feedforward_pwm();
+    log_uprintf(&huart1, "%d,%d,%d,%lu,%u\r\n", cmd_speed, actual_speed0, actual_speed1, (unsigned long)rx_count, last_rx);
   }
   /* USER CODE END 3 */
 }

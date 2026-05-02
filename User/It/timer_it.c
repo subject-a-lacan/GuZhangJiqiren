@@ -15,12 +15,17 @@ extern uint8_t cross_cnt;        // 路口计数器
 uint8_t wait_finish_flag = 0;    // 等待完成标志位
 extern int32_t keep_angle_time;  // 保持角度时间
 extern uint8_t speed_show_flag;  // 显示速度标志位
+extern volatile int16_t actual_speed0;
+extern volatile int16_t actual_speed1;
 uint8_t is_init = 0;
 
 uint8_t maixcam[3] = {0xAA, 0x02, 0xBB};
 uint8_t find_voice[3] = {0xAA, 0x01, 0xBB};
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+  if (htim == &htim5) {
+    status.state.time += status.state.T;
+  }
   // status.state.time += status.state.T;  // 更新系统时间
   //  status.device.led1.on = 1;
   // status.device.led2.on = 1;
@@ -150,9 +155,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   //       status.device.buzzer.on = 0;
   //     }
   //   }
-  //   if (status.state.time % 20 == 0) {  // 周期 25ms
-  //     update_status(&status);           // 状态更新中断 用于读取传感器原始数据
-  //   }
+    if (htim == &htim5 && status.state.time % 20 == 0) {
+      actual_speed0 = get_wheel_speed(&status.motor.wheel[0]);
+      actual_speed1 = get_wheel_speed(&status.motor.wheel[1]);
+    }
   //   if (status.state.time % 100 == 0) {  // 周期 100ms
   //     log_uprintf(&huart4, "n0.val=%d\xff\xff\xff", (int)(0.83 * ((status.motor.wheel[0].cur_speed + status.motor.wheel[1].cur_speed) / 2)));
   //   }

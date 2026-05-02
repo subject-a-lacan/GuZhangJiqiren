@@ -23,6 +23,7 @@ typedef struct WHEEL {
 
 // 获取当前轮子速度 放在status_update()中 只能定期调用 返回编码器定时器的当前CNT值于上次CNT值的插值
 int16_t get_wheel_speed(WHEEL *wheel);
+void set_wheel_dir(WHEEL *wheel, int16_t trust);
 // 驱动轮子 用于设置轮子的pwm占空比与方向设置引脚 放在status_driver()中
 void driver_wheel(WHEEL *wheel);
 // 初始化轮子 which传入轮子的编号 默认1-4 用于识别电机调用对应的硬件 dir传入 1或-1 用于设置轮子正转时的方向 放在init_motor()中
