@@ -254,16 +254,20 @@ void update_status(STATUS *status) {
 
   update_task(status);
  if (status->state.motion == FIND_LINE) {
+    status->task.stop_cmd = 0;
     follow_line(status);
   }
   if (status->state.motion == KEEP_ANGLE) {
+    status->task.stop_cmd = 0;
     keep_angle(status);
   }
   if (status->state.motion == STOP) {
+    status->task.stop_cmd = 1;
     status->motor.wheel[0].tar_speed = 0;
     status->motor.wheel[1].tar_speed = 0;
   }
   if (status->state.motion == MOTOR_TEST) {
+    status->task.stop_cmd = 0;
     status->motor.wheel[0].tar_speed = 40;
     status->motor.wheel[1].tar_speed = 40;
   }

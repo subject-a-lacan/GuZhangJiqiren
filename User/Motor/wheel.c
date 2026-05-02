@@ -76,6 +76,20 @@ void set_wheel_dir(WHEEL *wheel, int16_t trust) {
  * @note 通过PID计算得到推力，并设置电机方向和PWM占空比
  */
 void driver_wheel(WHEEL *wheel) {
+  if (status.task.stop_cmd) {
+    wheel->trust = 0;
+    if (wheel->which == 1) {
+      __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, 0);
+    } else if (wheel->which == 2) {
+      __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, 0);
+    } else if (wheel->which == 3) {
+      __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, 0);
+    } else if (wheel->which == 4) {
+      __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_4, 0);
+    }
+    return;
+  }
+
   wheel->trust = compute_pid(&wheel->wheel_pid, wheel->tar_speed - wheel->cur_speed);
   wheel->trust = CONFINE(wheel->trust, -TRUST_CONFINE, TRUST_CONFINE); //trust的单位是PWM占空比的值 
 

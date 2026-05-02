@@ -47,6 +47,7 @@ typedef struct TASK {
 
   uint8_t start_request;  //出发请求 按钮和蓝牙只改动start_request 中断里判断后再给armed置1
   uint8_t stop_request;   //停止请求  不过感觉有点多余 Cz命令之后根本不会进task running标志位都置1了
+  uint8_t stop_cmd;       //硬停止命令 1=禁止PWM输出 0=允许PWM输出
 
   uint32_t phase_start_time;
   float phase_mileage;

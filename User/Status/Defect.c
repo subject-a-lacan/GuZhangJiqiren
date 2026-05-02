@@ -24,6 +24,7 @@ void init_task(TASK *task) {
 
   task->start_request = 0;
   task->stop_request = 0;
+  task->stop_cmd = 1;
 
   task->phase_start_time = 0;
   task->phase_mileage = 0;
@@ -32,6 +33,7 @@ void init_task(TASK *task) {
 void task_start(STATUS *status) {
   status->task.start_request = 0;
   status->task.stop_request = 0;
+  status->task.stop_cmd = 0;
 
   status->task.cross_cnt = 0;
   cross_cnt = 0;
@@ -92,6 +94,7 @@ void task_finish(STATUS *status) {
   status->task.armed = 0;
   status->task.start_request = 0;
   status->task.stop_request = 0;
+  status->task.stop_cmd = 1;
   status->task.task_select_request = 0;
   status->task.pose_switch_request = 0;
   status->state.motion = STOP;
@@ -107,6 +110,7 @@ void task_stop(STATUS *status) {
   status->task.armed = 0;
   status->task.start_request = 0;
   status->task.stop_request = 0;
+  status->task.stop_cmd = 1;
   status->state.motion = STOP;
   status->state.base_speed = 0;
   status->motor.wheel[0].tar_speed = 0;
