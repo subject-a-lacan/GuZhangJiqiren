@@ -174,10 +174,14 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
       select_channel(i);                                             // Select the channel to read from
       HAL_ADC_Start(&hadc3);                                         // Start the ADC conversion
       HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
-      gw_analogue->correction_data_w[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value      
+      gw_analogue->correction_data_w[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
       HAL_ADC_Stop(&hadc3);                                // Stop the ADC conversion
+      status.device.buzzer.on = 1;
+      status.device.buzzer.off_time = status.state.time + 500;
     }
-    status.device.led_on_board.on = 1;
+    status.device.led_on_board.on = 0;
+    status.device.led1.on = 0;
+    status.device.led2.on = 1;
     gw_analogue->sta = 1;  // Set the state to calibration mode 1
     return;
   }
@@ -188,8 +192,12 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
       HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
       gw_analogue->correction_data_b[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
       HAL_ADC_Stop(&hadc3);                                          // Stop the ADC conversion
+      status.device.buzzer.on = 1;
+      status.device.buzzer.off_time = status.state.time + 500;
     }
     status.device.led_on_board.on = 0;
+    status.device.led1.on = 1;
+    status.device.led2.on = 0;
     gw_analogue->sta = 0;  // Set the state to calibration mode 2
     for (int i = 0; i < 8; i++) {
       gw_analogue->digital_low_threshold[i] = gw_analogue->correction_data_b[i] +
