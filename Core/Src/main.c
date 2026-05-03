@@ -149,24 +149,27 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Task_Vofa_Print, 80)
-    printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line: target, actual, out, kp, ki, kd
-           "%.3f,%.3f,"  // wheel[0]: actual, target
-           "%.3f,%.3f,%.3f\r\n", // wheel[1]: actual, target
-           // follow_line_pid
-           (double)0.0,
-           (double)status.sensor.gw_analogue.diff,
-           (double)status.state.status_pid.follow_line_pid.out,
-           (double)status.state.status_pid.follow_line_pid.kp,
-           (double)status.state.status_pid.follow_line_pid.ki,
-           (double)status.state.status_pid.follow_line_pid.kd,
-           // wheel[0]: actual, target
-           (double)status.motor.wheel[0].cur_speed,
+    PERIODIC_START(Task_Vofa_Print, 160)
+    printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // w0: tar, cur, out, kp, ki, kd, integral
+           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // w1: tar, cur, out, kp, ki, kd, integral
+           "%d\r\n",                                // task_id
+           // wheel[0]
            (double)status.motor.wheel[0].tar_speed,
-           // wheel[1]: actual, target
-           (double)status.motor.wheel[1].cur_speed,
+           (double)status.motor.wheel[0].cur_speed,
+           (double)status.motor.wheel[0].wheel_pid.out,
+           (double)status.motor.wheel[0].wheel_pid.kp,
+           (double)status.motor.wheel[0].wheel_pid.ki,
+           (double)status.motor.wheel[0].wheel_pid.kd,
+           (double)status.motor.wheel[0].wheel_pid.integral,
+           // wheel[1]
            (double)status.motor.wheel[1].tar_speed,
-           (double)status.task.task_id
+           (double)status.motor.wheel[1].cur_speed,
+           (double)status.motor.wheel[1].wheel_pid.out,
+           (double)status.motor.wheel[1].wheel_pid.kp,
+           (double)status.motor.wheel[1].wheel_pid.ki,
+           (double)status.motor.wheel[1].wheel_pid.kd,
+           (double)status.motor.wheel[1].wheel_pid.integral,
+           status.task.task_id
           );
 
     PERIODIC_END

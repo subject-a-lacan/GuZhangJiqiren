@@ -27,24 +27,6 @@ Project File Date:  05/03/2026
 <h2>Output:</h2>
 *** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'car_control_stm32_project'
-../User/Motor/servo.c(6): warning: In file included from...
-../User/Status\status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling servo.c...
-../User/Tool/pid.c(7): warning: In file included from...
-../User/Status\status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling pid.c...
 ../Core/Src/main.c(32): warning: In file included from...
 ../User/Status\status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
@@ -54,81 +36,10 @@ typedef struct STATUS STATUS;
                       ^
 1 warning generated.
 compiling main.c...
-../User/Motor/wheel.c(6): warning: In file included from...
-../User/Status\status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling wheel.c...
-compiling buzzer.c...
-../User/Device/button.c(5): warning: In file included from...
-../User/Status\status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling button.c...
-../User/Status/Defect.c(2): warning: In file included from...
-../User/Status/status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling Defect.c...
-compiling gy901.c...
-../Core/Src/lora.c(30): warning: implicitly declaring library function 'strlen' with type 'unsigned int (const char *)' [-Wimplicit-function-declaration]
-    uart1_tx((uint8_t*)buf, strlen(buf));
-                            ^
-../Core/Src/lora.c(30): note: include the header <string.h> or explicitly provide a declaration for 'strlen'
-1 warning generated.
-compiling lora.c...
-../User/Device/led.c(5): warning: In file included from...
-../User/Status\status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling led.c...
-../User/It/timer_it.c(7): warning: In file included from...
-../User/Status\status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling timer_it.c...
-../User/Status/status.c(1): warning: In file included from...
-../User/Status/status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling status.c...
-../User/Sensor/gw_analogue.c(6): warning: In file included from...
-../User/Status\status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling gw_analogue.c...
 linking...
-Program Size: Code=39786 RO-data=686 RW-data=68 ZI-data=5748  
+Program Size: Code=39738 RO-data=762 RW-data=68 ZI-data=5748  
 FromELF: creating hex file...
-"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 11 Warning(s).
+"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -151,7 +62,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.0.1
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>
