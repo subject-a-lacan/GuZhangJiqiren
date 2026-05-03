@@ -3,14 +3,24 @@
 #include "math_tool.h"
 #include "log.h"
 #include "pid.h"
+#include <stdio.h>
 
 /* Q1 tunable parameters */
-#define Q1_START_PULSE         200      /* 起步脉冲阈值, 待标定 */
-#define Q1_TURN_TARGET_ANGLE   90.0f    /* 左转目标角度 */
-#define Q1_TURN_TOLERANCE_DEG  3.0f     /* 转弯完成的角度容差 */
-#define Q1_CRUISE_SPEED        55       /* 巡线直走速度 */
-#define Q1_TURN_SPEED          35       /* 转弯时的基础速度 */
-#define Q1_BA_PULSE            3500     /* BA 边停车脉冲阈值, 待标定 */
+#define Q1_START_PULSE                 200   /* 起步脉冲阈值, 待标定 */
+#define Q1_TURN_TARGET_ANGLE           90.0f /* 左转目标角度 */
+#define Q1_TURN_TOLERANCE_DEG          6.0f  /* 转弯完成的角度容差 */
+#define Q1_TURN_TO_FIND_TOLERANCE_DEG  10.0f /* 转弯→找线接管角度阈值 */
+#define Q1_TURN_LINE_MASK_6            0x7E  /* bit1~bit6, 中间6路 */
+#define Q1_TURN_LINE_MASK_4            0x3C  /* bit2~bit5, 中间4路 */
+#define Q1_LINE_STABLE_CNT             3     /* 中间4路稳定帧数 */
+#define Q1_FLASH_SPEED                 65    /* 直线冲刺速度 */
+#define Q1_CRUISE_SPEED                50    /* 巡线直走速度 */
+#define Q1_TURN_SPEED                  35    /* 转弯时的基础速度 */
+#define Q1_FINAL_SLOW_SPEED            20    /* 终点前降速 / 找线低速 */
+#define Q1_STRAIGHT_FLASH_CM           65.0f /* 直线冲刺距离(cm) */
+#define Q1_FINAL_SLOW_CM               90.0f /* 终点降速距离(cm) */
+#define Q1_BA_PULSE                    3500  /* BA 边停车脉冲阈值, 待标定 */
+#define Q1_BA_STOP_CM                  93.0f /* BA 边停车里程阈值(cm) */
 
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
@@ -157,6 +167,8 @@ void task_select(STATUS *status, uint8_t id) {
 
 /* ---- TASK1 小工具函数 ---- */
 
+static uint8_t q1_mid4_stable_cnt = 0;
+
 static Road task1_map_road(Road raw) {
   if (raw == TLRoad) return LeftRoad;
   if (raw == TRRoad) return RightRoad;
@@ -167,6 +179,7 @@ static void task1_enter_phase(STATUS *status, uint8_t next_phase) {
   status->task.race_phase = next_phase;
   status->task.phase_mileage = 0;
   status->task.phase_start_time = status->state.time;
+  q1_mid4_stable_cnt = 0;
 }
 
 static uint8_t task1_accept_left_road(STATUS *status, Road road) {
@@ -178,33 +191,63 @@ static uint8_t task1_accept_left_road(STATUS *status, Road road) {
   return 0;
 }
 
-static uint8_t task1_turn_finished(STATUS *status) {
-  float target = status->state.tar_angle + status->state.initial_angle;
-  float diff_angle = target - status->state.cur_angle;
-  if (diff_angle > 180.0f)      diff_angle -= 360.0f;
-  else if (diff_angle < -180.0f) diff_angle += 360.0f;
-  return (ABS(diff_angle) < Q1_TURN_TOLERANCE_DEG);
-}
-
 static uint8_t task1_final_stop_condition(STATUS *status, Road road) {
-  /* 方案 A: 里程停车 (待标定) */
-  if (status->task.phase_mileage > Q1_BA_PULSE) {
+  if (road == LeftRoad
+      && status->task.cnt_seen == 0
+      && encoder_pulse_to_cm((int32_t)status->task.phase_mileage) > Q1_BA_STOP_CM) {
     return 1;
   }
-  /* 方案 B: 最终路口辅助停车 (预留)
-  if (road == LeftRoad && status->task.cnt_seen == 0) {
-    return 1;
-  }
-  */
   return 0;
 }
 
-//待定
+static float task1_angle_error(STATUS *status) {
+  float target = status->state.tar_angle + status->state.initial_angle;
+  float diff = target - status->state.cur_angle;
+  if (diff > 180.0f)        diff -= 360.0f;
+  else if (diff < -180.0f)  diff += 360.0f;
+  return diff;
+}
+
+static uint8_t task1_turn_angle_ready(STATUS *status) {
+  return (ABS(task1_angle_error(status)) < Q1_TURN_TO_FIND_TOLERANCE_DEG);
+}
+
+static uint8_t task1_middle6_seen(STATUS *status) {
+  return (status->sensor.gw_analogue.digital_8bit & Q1_TURN_LINE_MASK_6) != 0;
+}
+
+static uint8_t task1_middle4_seen(STATUS *status) {
+  return (status->sensor.gw_analogue.digital_8bit & Q1_TURN_LINE_MASK_4) != 0;
+}
+
+static void task1_apply_side_speed(STATUS *status) {
+  float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+  if (q1_mid4_stable_cnt < Q1_LINE_STABLE_CNT) {
+    status->state.base_speed = Q1_FINAL_SLOW_SPEED;
+  } else if (cm <= Q1_STRAIGHT_FLASH_CM) {
+    status->state.base_speed = Q1_FLASH_SPEED;
+  } else {
+    status->state.base_speed = Q1_CRUISE_SPEED;
+  }
+}
+
+static void task1_apply_final_speed(STATUS *status) {
+  float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+  if (cm <= Q1_FINAL_SLOW_CM) {
+    status->state.base_speed = Q1_CRUISE_SPEED;
+  } else {
+    status->state.base_speed = Q1_FINAL_SLOW_SPEED;
+  }
+}
 
 static void driver_task1(STATUS *status) {
   Road road = task1_map_road(status->sensor.gw_analogue.cross.cross);
 
-  if (road == Straight) {
+  if (road == Straight && status->state.motion == FIND_LINE
+      && status->task.race_phase != Q1_FIND_AD
+      && status->task.race_phase != Q1_FIND_DC
+      && status->task.race_phase != Q1_FIND_CB
+      && status->task.race_phase != Q1_FIND_BA) {
     status->task.cnt_seen = 0;
   }
 
@@ -224,43 +267,62 @@ static void driver_task1(STATUS *status) {
       }
       break;
 
-    /* A 点左转 90°, 进入 AD 边 */
+    /* ---- 转弯: 角度环 KEEP_ANGLE ---- */
     case Q1_TURN_A:
-    /* D 点左转 90°, 进入 DC 边 */
     case Q1_TURN_D:
-    /* C 点左转 90°, 进入 CB 边 */
     case Q1_TURN_C:
-    /* B 点左转 90°, 进入 BA 边 */
     case Q1_TURN_B:
       status->task.task_running = 1;
       status->state.motion = KEEP_ANGLE;
 
-      if (task1_turn_finished(status)) {
-        /* 角度到位, 进入下一条直边巡线 */
+      if (task1_turn_angle_ready(status)) {
         uint8_t next;
-        if (status->task.race_phase == Q1_TURN_A)      next = Q1_SIDE_AD;
-        else if (status->task.race_phase == Q1_TURN_D) next = Q1_SIDE_DC;
-        else if (status->task.race_phase == Q1_TURN_C) next = Q1_SIDE_CB;
-        else                                           next = Q1_BA_FINAL;
+        if (status->task.race_phase == Q1_TURN_A)      next = Q1_FIND_AD;
+        else if (status->task.race_phase == Q1_TURN_D) next = Q1_FIND_DC;
+        else if (status->task.race_phase == Q1_TURN_C) next = Q1_FIND_CB;
+        else                                           next = Q1_FIND_BA;
 
         task1_enter_phase(status, next);
         status->state.motion = FIND_LINE;
-        status->state.base_speed = Q1_CRUISE_SPEED;
+        status->state.base_speed = Q1_FINAL_SLOW_SPEED;
       }
       break;
 
-    /* 沿 AD 边巡线, 等待 D 点有效左路口 */
+    /* ---- 转弯后低速找线 ---- */
+    case Q1_FIND_AD:
+    case Q1_FIND_DC:
+    case Q1_FIND_CB:
+    case Q1_FIND_BA:
+      status->task.task_running = 1;
+      status->state.motion = FIND_LINE;
+      status->state.base_speed = Q1_FINAL_SLOW_SPEED;
+
+      if (task1_middle6_seen(status)) {
+        uint8_t next;
+        if (status->task.race_phase == Q1_FIND_AD)      next = Q1_SIDE_AD;
+        else if (status->task.race_phase == Q1_FIND_DC) next = Q1_SIDE_DC;
+        else if (status->task.race_phase == Q1_FIND_CB) next = Q1_SIDE_CB;
+        else                                            next = Q1_BA_FINAL;
+
+        task1_enter_phase(status, next);
+      }
+      break;
+
+    /* ---- 直线巡线 ---- */
     case Q1_SIDE_AD:
-    /* 沿 DC 边巡线, 等待 C 点有效左路口 */
     case Q1_SIDE_DC:
-    /* 沿 CB 边巡线, 等待 B 点有效左路口 */
     case Q1_SIDE_CB:
       status->task.task_running = 1;
       status->state.motion = FIND_LINE;
-      status->state.base_speed = Q1_CRUISE_SPEED;
+
+      if (task1_middle4_seen(status)) {
+        q1_mid4_stable_cnt++;
+      } else {
+        q1_mid4_stable_cnt = 0;
+      }
+      task1_apply_side_speed(status);
 
       if (task1_accept_left_road(status, road)) {
-        /* 确认有效左路口, 进入对应转弯 */
         uint8_t next;
         if (status->task.race_phase == Q1_SIDE_AD)      next = Q1_TURN_D;
         else if (status->task.race_phase == Q1_SIDE_DC) next = Q1_TURN_C;
@@ -274,11 +336,11 @@ static void driver_task1(STATUS *status) {
       }
       break;
 
-    /* BA 最后一段, 巡线回到发车点停车 */
+    /* ---- BA 最后一段, 巡线回到发车点停车 ---- */
     case Q1_BA_FINAL:
       status->task.task_running = 1;
       status->state.motion = FIND_LINE;
-      status->state.base_speed = Q1_CRUISE_SPEED;
+      task1_apply_final_speed(status);
 
       if (task1_final_stop_condition(status, road)) {
         task_finish(status);

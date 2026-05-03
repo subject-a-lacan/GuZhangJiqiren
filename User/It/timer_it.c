@@ -147,7 +147,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     //     status.device.buzzer.on = 0;
     //   }
     // }
-    if (status.state.time % 20 == 0) {  // 周期 
+    if (status.state.time % 10 == 0) {  // 周期 
       update_status(&status);           // 状态更新中断 用于读取传感器原始数据
     }
     // if (status.state.time % 100 == 0) {  // 周期 100ms

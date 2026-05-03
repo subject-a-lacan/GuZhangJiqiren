@@ -31,7 +31,7 @@ void gw_analogue_gray_show(GW_ANALOGUE *gw_analogue) {
 /*
  * 初始化路口判定缓存（status.sensor.gw_analogue.cross 中的判定字段）。
  * 将 integral / data_buf / maybe / cross / cross_cnt 置为安全初值，
- * integral_times 设为 5（需连续 4 帧确认路口，详见 get_road_type）。
+ * integral_times 设为 70（需连续 70 帧确认路口，详见 get_road_type）。
  * 调用时机：init_gw_analogue() 上电初始化；task_start() 发车复位（Defect.c）。
  */
 void init_road_determine(Cross *cross) {
@@ -40,7 +40,7 @@ void init_road_determine(Cross *cross) {
   cross->maybe = 0;
   cross->cross = Straight;
   cross->cross_cnt = 0;
-  cross->integral_times = 5;
+  cross->integral_times = 7;
 
   return;
 }

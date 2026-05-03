@@ -1,433 +1,254 @@
-# TASK1 第一问注意点
+# AI 提示词：优化 TASK1 转弯找线与直线速度策略
 
-本文是给 AI agent 的 TASK1 小状态机实现提示词。实现时要适配现有 TASK 架构，不要去重写传感器层。
+你是一个嵌入式 STM32 小车工程代码 agent。请阅读本项目的 `TASK/jiegou.md`、`TASK/route.md`，再重点修改 `User/Status/Defect.c` 里的 `driver_task1()` 相关逻辑。目标是优化第一问 TASK1：转弯后不容易丢线，并加入基于编码器里程的直线分段速度策略。
 
-第一问路线：
+请遵守以下原则：
+
+1. 保持现有 TASK 架构，不重写整个工程。
+2. 优先小改、局部改，避免把无关任务 Q2/Q3/Q4 搅乱。
+3. 不要把 8 路灰度永久加入普通循迹 `diff`。正常巡线仍以当前 `gw_analogue.c` 的中间 4 路 `diff` 为主。
+4. 转弯后允许使用 `digital_8bit` 的中间 6 路做“找线/接管”判断，但不要改坏传感器层路口识别。
+5. 不使用时间阈值推进 TASK1 阶段，阶段距离优先用 `phase_mileage` 和 `encoder_pulse_to_cm()`。
+
+## 当前问题
+
+TASK1 现在的转弯结束条件主要是角度误差：
+
+```c
+ABS(diff_angle) < Q1_TURN_TOLERANCE_DEG
+```
+
+实车上可能出现：角度已经转到位，但灰度传感器没有压住下一条线，马上切回 `FIND_LINE` 后因为 `diff` 不可靠导致循不上线。
+
+另一个已验证事实：编码器里程比较准，实测一段约 `102cm` 的路程换算为 `101.63cm`，可以用于 TASK1 直线阶段速度切换和最后停车前降速。
+
+## 需要实现的总体方案
+
+把 TASK1 的转弯流程拆成：
 
 ```text
-AB 发车点出发
-车头朝 A
-逆时针跑一圈
-A -> D -> C -> B -> A
-最后停回 AB 发车点附近
+TURN_x：角度环转弯
+REACQUIRE_x：转弯后低速找线/接管
+SIDE_x：正常直线巡线
 ```
 
-关键注意点：
-
-1. 第一问所有有效拐角都是左转。
-2. 发车点不一定严格就在 A 点转弯处，所以不能一进入 TASK1 就直接原地左转。必须增加“从发车点走到第一个转弯处 A”的阶段。
-3. 起步时车可能已经压着/靠近一个路口，暂时先不写特殊屏蔽逻辑。如果实车出现一启动就误判路口，再单独加起步里程屏蔽或路口稳定策略。
-4. Q1 只需要把 T 型路口合并成普通左右路口使用，不改 `get_road_type()`，不改 `serve_road()`，不改 `road_new_from_bit()`。
-5. BA 最后一段停车可以考虑用里程数判定，但里程精度还没实测好，所以先把它作为一个方案保留，不要把整个状态机强绑定到唯一的里程停车方案。
-6. TASK1 阶段推进不要使用时间阈值判断。不要写 `status->state.time - status->task.phase_start_time >= xxx_TIME` 这种逻辑。
-
-# 禁止时间阈值推进阶段
-
-TASK1 的阶段切换不要依赖运行时间阈值。
-
-禁止写类似代码：
-
-```c
-if (status->state.time - status->task.phase_start_time >= Q1_START_TO_A_TIME) {
-  // 切阶段
-}
-```
-
-原因：
+不要用“角度误差 < 10 度 OR 最外侧传感器黑”直接结束转弯。正确语义是：
 
 ```text
-电池电压、地面摩擦、PID 参数、负载都会让同样时间内走过的距离变化很大。
-用时间阈值推进阶段，实车表现会非常漂。
+角度误差 < 10°：只表示允许进入找线接管阶段
+中间 6 路看到线：允许从找线阶段切回巡线阶段
+中间 4 路稳定看到线：恢复正常直线速度策略
 ```
 
-TASK1 阶段推进优先使用：
+## 建议新增宏
+
+放在 `User/Status/Defect.c` TASK1 参数区附近：
+
+```c
+#define Q1_TURN_TO_FIND_TOLERANCE_DEG  10.0f
+#define Q1_TURN_LINE_MASK_6            0x7E  /* bit1~bit6 */
+#define Q1_TURN_LINE_MASK_4            0x3C  /* bit2~bit5 */
+#define Q1_LINE_STABLE_CNT             3
+
+#define Q1_FLASH_SPEED                 80
+#define Q1_CRUISE_SPEED                50
+#define Q1_FINAL_SLOW_SPEED            20
+#define Q1_STRAIGHT_FLASH_CM           80.0f
+#define Q1_FINAL_SLOW_CM               90.0f
+```
+
+如果已有同名宏，按含义合并，不要重复定义。
+
+## 需要新增的 TASK1 阶段
+
+在 `Q1_RACE_PHASE` 中加入转弯后的找线阶段。建议使用明确名字：
+
+```c
+Q1_FIND_AD,  /* A 转完后找 AD 线 */
+Q1_FIND_DC,  /* D 转完后找 DC 线 */
+Q1_FIND_CB,  /* C 转完后找 CB 线 */
+Q1_FIND_BA,  /* B 转完后找 BA 线 */
+```
+
+对应流程：
 
 ```text
-1. phase_mileage，也就是编码器脉冲累计
-2. 映射后的 road 路口事件
-3. 陀螺仪角度误差
+Q1_TURN_A -> Q1_FIND_AD -> Q1_SIDE_AD
+Q1_TURN_D -> Q1_FIND_DC -> Q1_SIDE_DC
+Q1_TURN_C -> Q1_FIND_CB -> Q1_SIDE_CB
+Q1_TURN_B -> Q1_FIND_BA -> Q1_BA_FINAL
 ```
 
-`phase_start_time` 可以保留作调试或日志用途，但 TASK1 第一版不要用它作为阶段切换条件。
-
-# T 型路口合并规则
-
-Q1 只有左转/右转语义，传感器层检测出的 `TLRoad / TRRoad` 在 `driver_task1` 或 `task_basic_1_update()` 内部合并即可。
-
-不要改动传感器层：
-
-```text
-User/Sensor/gw_analogue.c
-get_road_type()
-serve_road()
-road_new_from_bit()
-Road 枚举左右映射
-```
-
-TASK1 内部读取原始路口后做一层映射：
-
-```c
-Road road = status->sensor.gw_analogue.cross.cross;
-
-if (road == TLRoad) {
-  road = LeftRoad;
-}
-if (road == TRRoad) {
-  road = RightRoad;
-}
-```
-
-映射表：
-
-| 传感器报 | TASK1 状态机当成 |
-|----------|------------------|
-| `LeftRoad` | `LeftRoad` |
-| `RightRoad` | `RightRoad` |
-| `TLRoad` | `LeftRoad` |
-| `TRRoad` | `RightRoad` |
-| `TBRoad` | Q1 暂时忽略 |
-| `CrossRoad` | Q1 暂时忽略 |
-| `UnknowRoad` | 忽略 |
-| `Straight` | 正常直线 |
-
-# driver_task1 整体架构
-
-实现位置建议仍然放在 `User/Status/Defect.c` 的 TASK1 内部函数里，也就是当前的 `task_basic_1_update()`。如果想改名成 `driver_task1()` 也可以，但不要破坏 `update_task()` 分发链路。
-
-## 需要的状态字段
-
-现有字段：
-
-```c
-status->task.race_phase;
-status->task.cross_cnt;
-status->task.phase_mileage;
-status->state.motion;
-status->state.base_speed;
-```
-
-建议新增一个 TASK 层字段：
-
-```c
-uint8_t cnt_seen;
-```
-
-`cnt_seen` 用来防止同一个物理路口在连续多帧里被重复消费。
-
-语义：
-
-```text
-cnt_seen = 0:
-  当前传感器路口事件还没有被 TASK 消费。
-
-cnt_seen = 1:
-  当前路口事件已经被 TASK 消费，直到恢复 Straight 前都不能重复计数。
-
-road == Straight:
-  cnt_seen 清零，允许下一个路口被消费。
-```
-
-注意：建议只在接受到“有效路口”时把 `cnt_seen` 置 1。不要看到任意非 Straight 就置 1，否则如果路口前几帧误报成 `CrossRoad / TBRoad`，后面稳定成 `LeftRoad` 时反而会被挡掉。
-
-## 建议重新整理 Q1_RACE_PHASE
-
-当前枚举里只有：
-
-```c
-Q1_START_A_TURN,
-Q1_SIDE_AD,
-Q1_TURN_D,
-Q1_SIDE_DC,
-Q1_TURN_C,
-Q1_SIDE_CB,
-Q1_TURN_B,
-Q1_BA_FINAL,
-```
-
-建议拆成更清楚的阶段：
-
-```c
-Q1_START_TO_A,  // 从发车点先沿 AB/起步方向走到 A 点附近
-Q1_TURN_A,      // A 点左转，进入 AD
-Q1_SIDE_AD,     // AD 边巡线，等待 D 点
-Q1_TURN_D,      // D 点左转，进入 DC
-Q1_SIDE_DC,     // DC 边巡线，等待 C 点
-Q1_TURN_C,      // C 点左转，进入 CB
-Q1_SIDE_CB,     // CB 边巡线，等待 B 点
-Q1_TURN_B,      // B 点左转，进入 BA
-Q1_BA_FINAL,    // BA 边回到 A，最后停车
-```
-
-如果不想大改命名，也至少要保证第一阶段不是直接原地转弯，而是“先向前走到 A 点附近”。
-
-## 阶段切换通用动作
-
-每次切换 `race_phase` 时，统一做这些事：
+`task1_enter_phase()` 继续负责：
 
 ```c
 status->task.race_phase = next_phase;
 status->task.phase_mileage = 0;
-status->task.cnt_seen = 0;
-```
-
-如果确实想记录阶段开始时刻，可以顺手更新：
-
-```c
 status->task.phase_start_time = status->state.time;
 ```
 
-但是注意：`phase_start_time` 只允许用于调试、打印、观察，不允许用于 TASK1 阶段推进。
+注意：不要在 `task1_enter_phase()` 里清 `cnt_seen`。`cnt_seen` 必须只在真实检测到 `Straight` 且处于巡线语义时清零，避免同一个路口被消费两次。
 
-`phase_mileage` 当前单位是编码器脉冲，不是 cm。需要真实距离判断时，再调用：
+## 转弯结束与找线接管
 
-```c
-encoder_pulse_to_cm(status->task.phase_mileage)
-```
-
-## 路口消费通用逻辑
-
-每次进入 TASK1 内部，先获取映射后的路口：
+建议拆两个 helper：
 
 ```c
-Road road = status->sensor.gw_analogue.cross.cross;
-if (road == TLRoad) road = LeftRoad;
-if (road == TRRoad) road = RightRoad;
+static float task1_angle_error(STATUS *status);
+static uint8_t task1_turn_angle_ready(STATUS *status);
+static uint8_t task1_middle6_seen(STATUS *status);
+static uint8_t task1_middle4_seen(STATUS *status);
 ```
 
-然后做 `cnt_seen` 维护：
+语义：
 
 ```c
-if (road == Straight) {
-  status->task.cnt_seen = 0;
-}
+task1_turn_angle_ready:
+  ABS(angle_error) < Q1_TURN_TO_FIND_TOLERANCE_DEG
+
+task1_middle6_seen:
+  (status->sensor.gw_analogue.digital_8bit & Q1_TURN_LINE_MASK_6) != 0
+
+task1_middle4_seen:
+  (status->sensor.gw_analogue.digital_8bit & Q1_TURN_LINE_MASK_4) != 0
 ```
 
-在等待有效左路口的阶段中：
-
-```c
-if (road == LeftRoad && status->task.cnt_seen == 0) {
-  status->task.cnt_seen = 1;
-  status->task.cross_cnt++;
-  // 切换到对应转弯阶段
-}
-```
-
-不要让传感器层的全局 `cross_cnt` 直接替代 `status.task.cross_cnt`。TASK 自己的 `cross_cnt` 只在小状态机确认“这是本题有效路口”后增加。
-
-# TASK1 阶段设计
-
-## 1. Q1_START_TO_A
-
-目标：从发车点先向 A 点附近走一小段，而不是上来就原地左转。
-
-动作建议：
-
-```text
-motion = FIND_LINE
-base_speed = 低速或中速
-```
-
-完成条件先用简单方案：
-
-```text
-phase_mileage 达到一个标定脉冲阈值
-```
-
-进入下一阶段：
-
-```text
-Q1_TURN_A
-```
-
-注意：这一阶段暂时不要因为检测到路口就立刻转弯。起步处可能已经压着边线或路口，先用阶段里程 `phase_mileage` 把车带离起步不稳定区域。
-
-## 2. Q1_TURN_A
-
-目标：A 点左转 90 度，进入 AD 边。
-
-动作建议：
+在 `Q1_TURN_A/D/C/B` 中：
 
 ```text
 motion = KEEP_ANGLE
-base_speed = 低速
-目标角度 = 当前起始角度基础上左转 90 度
+base_speed = Q1_TURN_SPEED
+如果角度误差 < 10°，进入对应 Q1_FIND_x
 ```
 
-完成条件：
+在 `Q1_FIND_x` 中：
 
 ```text
-角度误差进入允许范围
+motion = FIND_LINE
+base_speed = Q1_FINAL_SLOW_SPEED 或 Q1_TURN_SPEED 中较稳的值
+如果中间 6 路看到线，进入对应正常直线阶段
 ```
 
-进入下一阶段：
+`Q1_FIND_x` 是转弯后的低速接管阶段，不要直接高速冲。它的目的只是让灰度重新压住下一条边。
+
+## 中间 4 路稳定后恢复速度
+
+在每个正常直线阶段内，建议维护一个 TASK1 内部静态计数或 TASK 字段：
+
+```c
+static uint8_t q1_mid4_stable_cnt;
+```
+
+每次进入新 phase 时清零。运行时：
+
+```text
+如果中间 4 路看到线，stable_cnt++
+否则 stable_cnt = 0
+```
+
+当 `stable_cnt >= Q1_LINE_STABLE_CNT` 后，认为巡线已经稳定接管，可以执行正常直线速度策略。
+
+如果不想新增静态变量，也可以新增 `TASK` 字段，但要保证初始化和切阶段时清零。
+
+## 直线阶段速度策略
+
+所有普通直线阶段，包括：
 
 ```text
 Q1_SIDE_AD
-```
-
-## 3. Q1_SIDE_AD
-
-目标：沿 AD 边巡线，等待 D 点有效左路口。
-
-动作：
-
-```text
-motion = FIND_LINE
-base_speed = 巡线速度
-```
-
-有效路口判断：
-
-```text
-road == LeftRoad
-并且 cnt_seen == 0
-```
-
-确认后：
-
-```text
-task.cross_cnt++
-进入 Q1_TURN_D
-```
-
-## 4. Q1_TURN_D
-
-目标：D 点左转 90 度，进入 DC 边。
-
-动作和完成条件同 `Q1_TURN_A`。
-
-进入下一阶段：
-
-```text
 Q1_SIDE_DC
-```
-
-## 5. Q1_SIDE_DC
-
-目标：沿 DC 边巡线，等待 C 点有效左路口。
-
-动作同 `Q1_SIDE_AD`。
-
-有效左路口确认后：
-
-```text
-task.cross_cnt++
-进入 Q1_TURN_C
-```
-
-## 6. Q1_TURN_C
-
-目标：C 点左转 90 度，进入 CB 边。
-
-动作和完成条件同前面的转弯阶段。
-
-进入下一阶段：
-
-```text
 Q1_SIDE_CB
 ```
 
-## 7. Q1_SIDE_CB
-
-目标：沿 CB 边巡线，等待 B 点有效左路口。
-
-动作同 `Q1_SIDE_AD`。
-
-有效左路口确认后：
+速度按当前阶段里程切换：
 
 ```text
-task.cross_cnt++
-进入 Q1_TURN_B
+phase_mileage 换算距离 <= 80cm:
+  base_speed = Q1_FLASH_SPEED    // 80
+
+phase_mileage 换算距离 > 80cm:
+  base_speed = Q1_CRUISE_SPEED   // 50
 ```
 
-## 8. Q1_TURN_B
-
-目标：B 点左转 90 度，进入 BA 最后一段。
-
-动作和完成条件同前面的转弯阶段。
-
-进入下一阶段：
-
-```text
-Q1_BA_FINAL
-```
-
-进入 `Q1_BA_FINAL` 时一定要清零 `phase_mileage`，因为最后停车可能要用从 B 转完之后开始算的阶段里程。
-
-## 9. Q1_BA_FINAL
-
-目标：沿 BA 回到 A 附近，停回发车点。
-
-动作：
-
-```text
-motion = FIND_LINE
-base_speed = 可先高速，接近终点前降速
-```
-
-停车策略暂时保留两种，不要一开始写死：
-
-方案 A：里程停车
-
-```text
-从 B 转弯完成进入 BA 开始累计 phase_mileage
-达到标定脉冲数后 task_finish()
-```
-
-优点：不依赖最后 A 点路口的极限检测。
-缺点：编码器里程精度还没验证，轮子打滑会影响停车点。
-
-方案 B：最终路口辅助停车
-
-```text
-BA 段巡线时检测到最终 A 点对应路口后停车或急停
-```
-
-优点：直接利用终点特征。
-缺点：灰度探头检测到 AD 线时，车头距离限制可能已经非常紧，容易刹不住。
-
-建议实现时先把 BA 停车封装成清晰判断，不要散落在多个地方：
+用：
 
 ```c
-if (q1_final_stop_condition(status, road)) {
-  task_finish(status);
-}
+float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
 ```
 
-具体最终采用里程、路口，还是二者结合，等实测 `phase_mileage` 精度后再定。
+注意：只有在中间 4 路稳定看到线后再允许冲刺速度。如果刚从 `Q1_FIND_x` 切进普通直线，前几帧还没有稳定压线，先用低速，避免刚接管就冲出去。
 
-# 实现边界
-
-1. 不要修改 `gw_analogue.c` 的路口判断。
-2. 不要修改 `Road` 枚举左右映射。
-3. 不要删除全局 `cross_cnt`。
-4. 不要让传感器层直接推进 `race_phase`。
-5. `status.task.cross_cnt` 只由 TASK1 内部确认有效路口后增加。
-6. `phase_mileage` 保持脉冲单位，只有需要和 cm 阈值比较时再换算。
-7. 不要使用时间阈值推进 TASK1 阶段，不要引入 `Q1_START_TO_A_TIME` 这类宏。
-8. 第一版先追求状态机清楚可调，不要把起步屏蔽、停车策略、A4 干扰处理全部揉进一个大判断。
-
-# 代码结构和注释要求
-
-AI agent 实现时必须把代码写清楚，不要把所有逻辑塞进一个巨大 `switch` 里。
-
-建议拆出小工具函数：
+建议封装：
 
 ```c
-static Road task1_map_road(Road raw);
-static void task1_enter_phase(STATUS *status, uint8_t next_phase);
-static uint8_t task1_accept_left_road(STATUS *status, Road road);
-static uint8_t task1_turn_finished(STATUS *status);
-static uint8_t task1_final_stop_condition(STATUS *status, Road road);
+static void task1_apply_side_speed(STATUS *status);
 ```
 
-要求：
+语义：
 
-1. `task1_map_road()` 只做 `TLRoad/TRRoad` 到 `LeftRoad/RightRoad` 的合并。
-2. `task1_enter_phase()` 统一负责切换 `race_phase`、清零 `phase_mileage`、清零 `cnt_seen`。
-3. `task1_accept_left_road()` 统一负责 `road == LeftRoad && cnt_seen == 0` 的有效路口消费和 `task.cross_cnt++`。
-4. 每个 `case Q1_xxx:` 前都要写注释，说明当前阶段的物理含义，例如“沿 AD 边巡线，等待 D 点左路口”。
-5. 每个阶段切换处都要写注释，说明为什么切到下一阶段。
-6. 不要写魔法数字。速度、角度容差、起步脉冲阈值、最终停车脉冲阈值都用清晰的宏名。
-7. 宏名必须体现单位，比如 `_PULSE` 表示脉冲，`_DEG` 表示角度。不要写 `_TIME` 阈值。
-8. 注释要解释“为什么这样判断”，不要只复述代码。
+```text
+未稳定压线：低速，例如 Q1_FINAL_SLOW_SPEED 或 Q1_TURN_SPEED
+稳定压线且 cm <= 80：Q1_FLASH_SPEED
+稳定压线且 cm > 80：Q1_CRUISE_SPEED
+```
+
+## 最后停车阶段速度策略
+
+`Q1_BA_FINAL` 阶段：
+
+```text
+如果当前阶段里程 <= 90cm:
+  base_speed = Q1_CRUISE_SPEED
+
+如果当前阶段里程 > 90cm:
+  base_speed = Q1_FINAL_SLOW_SPEED   // 20
+```
+
+然后停车条件继续由 `task1_final_stop_condition()` 管理。可以优先使用编码器里程停车，因为编码器精度已经验证不错。若保留灰度终点兜底，需要写成辅助条件，不要散落在 `switch` 里。
+
+建议封装：
+
+```c
+static void task1_apply_final_speed(STATUS *status);
+```
+
+## 重要：status.c 速度覆盖问题
+
+当前 `User/Status/status.c` 的 `update_status()` 在 `FIND_LINE` 分支里有：
+
+```c
+status->state.base_speed = cmd_speed;
+follow_line(status);
+```
+
+这会覆盖 `driver_task1()` 设置的 `Q1_FLASH_SPEED / Q1_CRUISE_SPEED / Q1_FINAL_SLOW_SPEED`。实现本任务时必须解决这个问题，否则 TASK1 速度策略不会生效。
+
+做法：
+
+```text
+当 status.task.armed && status.task.task_running 时，FIND_LINE 不要用 cmd_speed 覆盖 base_speed。
+空闲手动调试或 MOTOR_TEST 时再使用 cmd_speed。
+```
+
+保持改动小，不要大范围重写 `update_status()`。
+
+## 不要做的事
+
+1. 不要把普通循迹 `diff` 改成永久 8 路参与。
+2. 不要用最左/最右传感器黑作为直接切回巡线的唯一条件。
+3. 不要使用时间阈值推进阶段。
+4. 不要在 `task1_enter_phase()` 里清 `cnt_seen`。
+5. 不要把 `Q1_FLASH_SPEED=80` 用在转弯刚结束、尚未稳定压线的阶段。
+6. 不要让传感器层直接修改 `race_phase`。
+
+## 验收标准
+
+1. TASK1 转弯阶段不会因为刚到角度阈值就直接高速巡线。
+2. 每次转弯后必须经过 `Q1_FIND_x` 找线阶段。
+3. 中间 6 路看到线后，才允许进入下一条边的巡线阶段。
+4. 中间 4 路连续稳定看到线后，才允许直线阶段按 80cm 内冲刺。
+5. 普通直线阶段 80cm 内速度为 `Q1_FLASH_SPEED=80`，80cm 后为 `Q1_CRUISE_SPEED=50`。
+6. BA 最后停车阶段 90cm 后速度降为 `Q1_FINAL_SLOW_SPEED=20`。
+7. `status.c` 不再无条件用 `cmd_speed` 覆盖 TASK1 的 `base_speed`。
+8. 工程能通过当前可用的编译检查；如果全工程因已有 `ccd.c` 引脚问题失败，需要在最终说明里明确这不是本次改动引入的。
+

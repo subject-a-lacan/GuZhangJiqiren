@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define LONG_PRESS_CNT 50  // 长按判断时间 指的是调用次数 如果20ms调一次 那就是1000ms之后算长按
+#define LONG_PRESS_CNT 100  // 长按判断时间 指的是调用次数 如果20ms调一次 那就是1000ms之后算长按
 
 // 按键结构体
 // 挂载于 status device

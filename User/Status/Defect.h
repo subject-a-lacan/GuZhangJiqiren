@@ -21,12 +21,16 @@ typedef enum START_POSE {
 typedef enum Q1_RACE_PHASE {
   Q1_START_TO_A,  /* 从发车点走到 A 点附近 */
   Q1_TURN_A,      /* A 点左转 90° */
+  Q1_FIND_AD,     /* A 转完后找 AD 线 */
   Q1_SIDE_AD,     /* AD 边巡线等 D 点 */
   Q1_TURN_D,      /* D 点左转 90° */
+  Q1_FIND_DC,     /* D 转完后找 DC 线 */
   Q1_SIDE_DC,     /* DC 边巡线等 C 点 */
   Q1_TURN_C,      /* C 点左转 90° */
+  Q1_FIND_CB,     /* C 转完后找 CB 线 */
   Q1_SIDE_CB,     /* CB 边巡线等 B 点 */
   Q1_TURN_B,      /* B 点左转 90° */
+  Q1_FIND_BA,     /* B 转完后找 BA 线 */
   Q1_BA_FINAL,    /* BA 最后一段回到停车点 */
 } Q1_RACE_PHASE;
 
