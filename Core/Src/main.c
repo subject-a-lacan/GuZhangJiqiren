@@ -151,12 +151,24 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     PERIODIC_START(Task_Vofa_Print, 160)
-    printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // fw: target, actual, out, kp, ki, kd
+    uint8_t d = status.sensor.gw_analogue.digital_8bit;
+    float gw_val = 0.0f;
+    if (d & 0x80) gw_val += 1.0f;
+    if (d & 0x40) gw_val += 0.1f;
+    if (d & 0x20) gw_val += 0.01f;
+    if (d & 0x10) gw_val += 0.001f;
+    if (d & 0x08) gw_val += 0.0001f;
+    if (d & 0x04) gw_val += 0.00001f;
+    if (d & 0x02) gw_val += 0.000001f;
+    if (d & 0x01) gw_val += 0.0000001f;
+    printf("%.7f,"                            // gw 8-bit as float
+           "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // fw: target, actual, out, kp, ki, kd
            "%.3f,%.3f,"                        // w0: tar, cur
            "%.3f,%.3f,"                        // w1: tar, cur
            "%d,%d,"                            // task_id, base_speed
            "%d,%d\r\n"                       // cross_cnt(global), task.cross_cnt
            ,
+           (double)gw_val,
            // follow_line
            (double)0.0,
            (double)status.sensor.gw_analogue.diff,

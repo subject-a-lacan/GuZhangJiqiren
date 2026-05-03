@@ -255,13 +255,13 @@ float normalize_gray_data(uint8_t max, uint8_t min, uint8_t now) {
  */
 void normalize_gray_weight(float *raw_data) {
   float total = 0;
-  for (int i = 0; i < 8; i++) {
+  for (int i = 2; i < 6; i++) {
     total += raw_data[i];
   }
   if (total == 0) {
     return;
   }
-  for (int i = 0; i < 8; i++) {
+  for (int i = 2; i < 6; i++) {
     raw_data[i] = (raw_data[i] / total);
   }
 
@@ -280,12 +280,12 @@ void normalize_gray_weight(float *raw_data) {
 void get_gw_analogue_analogue_diff(GW_ANALOGUE *gw_analogue) {
   float buff[8] = {0};
   float diff = 0;
-  for (int i = 0; i < 8; i++) {
+  for (int i = 2; i < 6; i++) {
     if (gw_analogue->channel[i] < gw_analogue->digital_high_threshold[i])
       buff[i] = 100 - normalize_gray_data(gw_analogue->correction_data_w[i], gw_analogue->correction_data_b[i], gw_analogue->channel[i]);
   }
   normalize_gray_weight(buff);
-  for (int i = 0; i < 8; i++) {
+  for (int i = 2; i < 6; i++) {
     diff += buff[i] * distance[i];
   }
 

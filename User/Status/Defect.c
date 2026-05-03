@@ -289,8 +289,15 @@ static void driver_task1(STATUS *status) {
 
 static void driver_task2(STATUS *status) {
   status->task.task_running = 1;
+
+  if (status->task.race_phase == 0) {
+    status->state.initial_angle = status->state.cur_angle;
+    status->state.tar_angle = 0;
+    status->task.race_phase = 1;
+  }
+
   status->state.base_speed = 40;
-  status->state.motion = MOTOR_TEST;
+  status->state.motion = KEEP_ANGLE;
 }
 
 static void driver_task3(STATUS *status) {
