@@ -152,7 +152,7 @@ int main(void)
     PERIODIC_START(Task_Vofa_Print, 80)
     printf("%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,"  // follow_line: target, actual, out, kp, ki, kd
            "%.3f,%.3f,"  // wheel[0]: actual, target
-           "%.3f,%.3f\r\n", // wheel[1]: actual, target
+           "%.3f,%.3f,%.3f\r\n", // wheel[1]: actual, target
            // follow_line_pid
            (double)0.0,
            (double)status.sensor.gw_analogue.diff,
@@ -165,7 +165,8 @@ int main(void)
            (double)status.motor.wheel[0].tar_speed,
            // wheel[1]: actual, target
            (double)status.motor.wheel[1].cur_speed,
-           (double)status.motor.wheel[1].tar_speed
+           (double)status.motor.wheel[1].tar_speed,
+           (double)status.task.task_id
           );
 
     PERIODIC_END
@@ -274,6 +275,9 @@ void UART_PID_Tune(uint8_t cmd, float val) {
     case 's': status.motor.wheel[1].wheel_pid.kp = val;  break;
     case 'u': status.motor.wheel[1].wheel_pid.ki = val;  break;
     case 'w': status.motor.wheel[1].wheel_pid.kd = val;  break;
+
+    case 'b': status.motor.wheel[0].wheel_pid.integral_max = val;  break;
+    case 'n': status.motor.wheel[1].wheel_pid.integral_max = val;  break;
 
     case 'z': status.task.task_running = 0;
               status.task.armed = 0;

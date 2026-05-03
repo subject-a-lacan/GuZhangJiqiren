@@ -3,9 +3,9 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sun May  3 05:54:56 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sun May  3 09:11:06 2026
 <BR><P>
-<H3>Maximum Stack Usage =        420 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        444 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 <P>
@@ -531,7 +531,8 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[15e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[15e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
 <P><STRONG><a name="[92]"></a>__aeabi_d2iz</STRONG> (Thumb, 62 bytes, Stack size 16 bytes, dfixi.o(.text))
@@ -623,8 +624,8 @@ Global Symbols
 <LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
 <LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
 </UL>
-<BR>[Called By]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
-<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
+<BR>[Called By]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
+<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ul2d
@@ -1950,7 +1951,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Init
 </UL>
 
-<P><STRONG><a name="[137]"></a>UART_PID_Tune</STRONG> (Thumb, 340 bytes, Stack size 0 bytes, main.o(.text.UART_PID_Tune))
+<P><STRONG><a name="[137]"></a>UART_PID_Tune</STRONG> (Thumb, 368 bytes, Stack size 0 bytes, main.o(.text.UART_PID_Tune))
 <BR><BR>[Called By]<UL><LI><a href="#[133]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_RxCpltCallback
 </UL>
 
@@ -2033,14 +2034,14 @@ Global Symbols
 <P><STRONG><a name="[15e]"></a>correct_gw_analogue</STRONG> (Thumb, 456 bytes, Stack size 56 bytes, gw_analogue.o(.text.correct_gw_analogue))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = correct_gw_analogue &rArr; log_uprintf &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
+<BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
+<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
 <LI><a href="#[d2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_Stop
 <LI><a href="#[d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_Start
 <LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_PollForConversion
 <LI><a href="#[160]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_GetValue
 <LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;log_uprintf
 <LI><a href="#[15f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
-<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2iz
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
@@ -2093,8 +2094,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[119]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[176]"></a>driver_wheel</STRONG> (Thumb, 344 bytes, Stack size 8 bytes, wheel.o(.text.driver_wheel))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = driver_wheel &rArr; set_wheel_dir
+<P><STRONG><a name="[176]"></a>driver_wheel</STRONG> (Thumb, 456 bytes, Stack size 24 bytes, wheel.o(.text.driver_wheel))
+<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = driver_wheel &rArr; set_wheel_dir
 </UL>
 <BR>[Calls]<UL><LI><a href="#[177]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
 <LI><a href="#[178]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_wheel_dir
@@ -2290,7 +2291,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[189]"></a>init_wheel</STRONG> (Thumb, 288 bytes, Stack size 56 bytes, wheel.o(.text.init_wheel))
+<P><STRONG><a name="[189]"></a>init_wheel</STRONG> (Thumb, 276 bytes, Stack size 56 bytes, wheel.o(.text.init_wheel))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = init_wheel &rArr; HAL_TIM_PWM_Start
 </UL>
 <BR>[Calls]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
@@ -2319,11 +2320,12 @@ Global Symbols
 <LI><a href="#[15e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
-<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 532 bytes, Stack size 168 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 420<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
+<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 564 bytes, Stack size 192 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 444<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 <LI><a href="#[15b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;after_init_state
+<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
 <LI><a href="#[16c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[157]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
@@ -2926,7 +2928,7 @@ Local Symbols
 <LI><a href="#[11a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UARTEx_SetRxFifoThreshold
 </UL>
 
-<P><STRONG><a name="[16d]"></a>driver_task1</STRONG> (Thumb, 280 bytes, Stack size 16 bytes, defect.o(.text.driver_task1))
+<P><STRONG><a name="[16d]"></a>driver_task1</STRONG> (Thumb, 264 bytes, Stack size 16 bytes, defect.o(.text.driver_task1))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = driver_task1
 </UL>
 <BR>[Calls]<UL><LI><a href="#[16f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task1_turn_finished
