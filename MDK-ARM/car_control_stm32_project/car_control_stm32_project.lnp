@@ -1,5 +1,6 @@
 --cpu=Cortex-M4.fp
 "car_control_stm32_project\startup_stm32g474xx.o"
+"car_control_stm32_project\lora.o"
 "car_control_stm32_project\main.o"
 "car_control_stm32_project\gpio.o"
 "car_control_stm32_project\adc.o"
@@ -10,7 +11,6 @@
 "car_control_stm32_project\usart.o"
 "car_control_stm32_project\stm32g4xx_it.o"
 "car_control_stm32_project\stm32g4xx_hal_msp.o"
-"car_control_stm32_project\lora.o"
 "car_control_stm32_project\stm32g4xx_hal_adc.o"
 "car_control_stm32_project\stm32g4xx_hal_adc_ex.o"
 "car_control_stm32_project\stm32g4xx_ll_adc.o"
@@ -44,7 +44,6 @@
 "car_control_stm32_project\status.o"
 "car_control_stm32_project\defect.o"
 "car_control_stm32_project\abslute_angle_sensor.o"
-"car_control_stm32_project\ccd.o"
 "car_control_stm32_project\gy901.o"
 "car_control_stm32_project\ms_find_line.o"
 "car_control_stm32_project\radar.o"

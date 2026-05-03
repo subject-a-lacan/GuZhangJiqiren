@@ -124,21 +124,20 @@ void init_gw_analogue(GW_ANALOGUE *gw_analogue) {
  * 调用时机：get_gw_raw_data() 和 correct_gw_analogue() 遍历 8 通道时。
  */
 void select_channel(uint8_t channel) {
-  // Select the ADC channel to read from
   if (channel & 0x01) {
-    HAL_GPIO_WritePin(IO2_GPIO_Port, IO2_Pin, GPIO_PIN_SET);  // Set PA0 high
+    HAL_GPIO_WritePin(AD0_GPIO_Port, AD0_Pin, GPIO_PIN_SET);
   } else {
-    HAL_GPIO_WritePin(IO2_GPIO_Port, IO2_Pin, GPIO_PIN_RESET);  // Set PA0 low
+    HAL_GPIO_WritePin(AD0_GPIO_Port, AD0_Pin, GPIO_PIN_RESET);
   }
   if (channel & 0x02) {
-    HAL_GPIO_WritePin(IO3_GPIO_Port, IO3_Pin, GPIO_PIN_SET);  // Set PA1 high
+    HAL_GPIO_WritePin(AD1_GPIO_Port, AD1_Pin, GPIO_PIN_SET);
   } else {
-    HAL_GPIO_WritePin(IO3_GPIO_Port, IO3_Pin, GPIO_PIN_RESET);  // Set PA1 low
+    HAL_GPIO_WritePin(AD1_GPIO_Port, AD1_Pin, GPIO_PIN_RESET);
   }
   if (channel & 0x04) {
-    HAL_GPIO_WritePin(IO4_GPIO_Port, IO4_Pin, GPIO_PIN_SET);  // Set PA2 high
+    HAL_GPIO_WritePin(AD2_GPIO_Port, AD2_Pin, GPIO_PIN_SET);
   } else {
-    HAL_GPIO_WritePin(IO4_GPIO_Port, IO4_Pin, GPIO_PIN_RESET);  // Set PA2 low
+    HAL_GPIO_WritePin(AD2_GPIO_Port, AD2_Pin, GPIO_PIN_RESET);
   }
 }
 
@@ -151,6 +150,7 @@ void get_gw_raw_data(GW_ANALOGUE *gw_analogue) {
   // Read the ADC value for the selected channel
   for (int i = 0; i < 8; i++) {
     select_channel(i);                                   // Select the channel to read from
+    for (volatile uint32_t _d = 0; _d < 300; _d++);     // ~3μs delay for mux settling
     HAL_ADC_Start(&hadc3);                               // Start the ADC conversion
     HAL_ADC_PollForConversion(&hadc3, 1);                // Wait for conversion to complete
     gw_analogue->channel[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
@@ -172,6 +172,7 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
   if (gw_analogue->sta == 0) {
     for (int i = 0; i < 8; i++) {
       select_channel(i);                                             // Select the channel to read from
+      for (volatile uint32_t _d = 0; _d < 300; _d++);               // ~3μs delay for mux settling
       HAL_ADC_Start(&hadc3);                                         // Start the ADC conversion
       HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
       gw_analogue->correction_data_w[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
@@ -188,6 +189,7 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
   if (gw_analogue->sta == 1) {
     for (int i = 0; i < 8; i++) {
       select_channel(i);                                             // Select the channel to read from
+      for (volatile uint32_t _d = 0; _d < 300; _d++);               // ~3μs delay for mux settling
       HAL_ADC_Start(&hadc3);                                         // Start the ADC conversion
       HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
       gw_analogue->correction_data_b[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
@@ -427,7 +429,7 @@ void get_road_type(Cross *cross, uint8_t road_data) {
       cross->maybe = 0;
       cross->integral = 0;
     }
-  } else if ((road_data == 0x18) || (road_data == 0x10) || (road_data == 0x08)) {
+  } else if (((road_data & 0x81) == 0) && ((road_data & 0x3C) != 0)) {
     serve_road(cross, Straight);
   }
 }

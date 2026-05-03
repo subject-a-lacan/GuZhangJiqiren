@@ -1,5 +1,4 @@
 #include "buzzer.h"
-#include "ccd.h"
 #include "led.h"
 #include "log.h"
 #include "lq_step.h"

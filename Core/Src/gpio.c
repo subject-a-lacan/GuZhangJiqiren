@@ -51,15 +51,15 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, CCD_SI_Pin|IO7_Pin|IO6_Pin|IO5_Pin
+  HAL_GPIO_WritePin(GPIOE, AD1_Pin|IO7_Pin|IO6_Pin|IO5_Pin
                           |IO3_Pin|IO2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, LED_Pin|LED1_Pin|BUZZ_Pin|LED2_Pin
-                          |CCD_CLK_Pin|M1D1_Pin, GPIO_PIN_RESET);
+                          |AD2_Pin|M1D1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(IO1_GPIO_Port, IO1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(AD0_GPIO_Port, AD0_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, TEST_Pin|IO4_Pin|M1D2_Pin|M2D1_Pin
@@ -81,7 +81,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin PEPin */
-  GPIO_InitStruct.Pin = CCD_SI_Pin|IO7_Pin|IO6_Pin|IO5_Pin
+  GPIO_InitStruct.Pin = AD1_Pin|IO7_Pin|IO6_Pin|IO5_Pin
                           |IO3_Pin|IO2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -91,18 +91,18 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PCPin PCPin PCPin PCPin
                            PCPin PCPin */
   GPIO_InitStruct.Pin = LED_Pin|LED1_Pin|BUZZ_Pin|LED2_Pin
-                          |CCD_CLK_Pin|M1D1_Pin;
+                          |AD2_Pin|M1D1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = IO1_Pin;
+  GPIO_InitStruct.Pin = AD0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(IO1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(AD0_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PAPin PAPin PAPin PAPin
                            PAPin */

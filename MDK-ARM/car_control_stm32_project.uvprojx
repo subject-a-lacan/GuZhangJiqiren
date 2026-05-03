@@ -391,6 +391,11 @@
           <GroupName>Application/User/Core</GroupName>
           <Files>
             <File>
+              <FileName>lora.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\lora.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>
@@ -489,11 +494,6 @@
               <FileName>stm32g4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32g4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>lora.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\lora.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -719,16 +719,6 @@
               <FileName>abslute_angle_sensor.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\User\Sensor\abslute_angle_sensor.h</FilePath>
-            </File>
-            <File>
-              <FileName>ccd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\Sensor\ccd.c</FilePath>
-            </File>
-            <File>
-              <FileName>ccd.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\User\Sensor\ccd.h</FilePath>
             </File>
             <File>
               <FileName>gy901.c</FileName>

@@ -302,8 +302,26 @@ static void driver_task2(STATUS *status) {
 
 static void driver_task3(STATUS *status) {
   status->task.task_running = 1;
-  status->state.base_speed = 40;
-  status->state.motion = FIND_LINE;
+
+  if (status->task.race_phase == 0) {
+    status->state.initial_angle = status->state.cur_angle;
+    status->state.tar_angle = -90.0f;
+    status->state.motion = KEEP_ANGLE;
+    status->state.base_speed = 35;
+    status->task.race_phase = 1;
+    return;
+  }
+
+  if (status->task.race_phase == 1) {
+    float target = status->state.tar_angle + status->state.initial_angle;
+    float diff_angle = target - status->state.cur_angle;
+    if (diff_angle > 180.0f)  diff_angle -= 360.0f;
+    else if (diff_angle < -180.0f) diff_angle += 360.0f;
+
+    if (ABS(diff_angle) < 3.0f) {
+      task_finish(status);
+    }
+  }
 }
 
 static void driver_task4(STATUS *status) {
