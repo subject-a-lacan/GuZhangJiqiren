@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 fit_feedforward.py)",
+      "Bash(where.exe python *)",
+      "Bash(python \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\校赛小车\\\\校赛\\\\GuZhangJiqiren\\\\fit_feedforward.py\")"
+    ]
+  }
+}

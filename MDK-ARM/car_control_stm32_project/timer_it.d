@@ -7,15 +7,15 @@ car_control_stm32_project/timer_it.o: ../User/It/timer_it.c \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include\stm32g4xx.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g474xx.h \
   ../Drivers/CMSIS/Include\core_cm4.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\stdint.h \
   ../Drivers/CMSIS/Include/cmsis_version.h \
   ../Drivers/CMSIS/Include/cmsis_compiler.h \
   ../Drivers/CMSIS/Include/cmsis_armclang_ltm.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
   ../Drivers/CMSIS/Include/mpu_armv7.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include/system_stm32g4xx.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stddef.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\stddef.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_gpio.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_gpio_ex.h \
@@ -41,7 +41,7 @@ car_control_stm32_project/timer_it.o: ../User/It/timer_it.c \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
   ../User/Sensor\ccd.h ../Core/Inc\adc.h ../Core/Inc\tim.h \
   ../User/Device\led.h ../User/Tool\log.h ../Core/Inc\usart.h \
-  ../User/Motor\lq_step.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h \
+  ../User/Motor\lq_step.h D:\keil5\ARM\ARMCLANG\Bin\..\include\math.h \
   ../User/Motor\servo.h ../User/Status\status.h ../User/Device\button.h \
   ../User/Sensor\gw_anagloge.h ../User/Sensor\gw_find_line.h \
   ../User/Tool\pid.h ../User/Status\road.h ../User/Sensor\gy901.h \

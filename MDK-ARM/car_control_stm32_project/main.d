@@ -6,15 +6,15 @@ car_control_stm32_project/main.o: ../Core/Src/main.c ../Core/Inc\main.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include\stm32g4xx.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g474xx.h \
   ../Drivers/CMSIS/Include\core_cm4.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\stdint.h \
   ../Drivers/CMSIS/Include/cmsis_version.h \
   ../Drivers/CMSIS/Include/cmsis_compiler.h \
   ../Drivers/CMSIS/Include/cmsis_armclang_ltm.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
   ../Drivers/CMSIS/Include/mpu_armv7.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include/system_stm32g4xx.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stddef.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\stddef.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_gpio.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_gpio_ex.h \
@@ -46,4 +46,4 @@ car_control_stm32_project/main.o: ../Core/Src/main.c ../Core/Inc\main.h \
   ../User/Tool\pid.h ../User/Status\road.h ../User/Sensor\gy901.h \
   ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h \
   ../User/It\uart_it.h ../Core/Inc\lora.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\stdio.h

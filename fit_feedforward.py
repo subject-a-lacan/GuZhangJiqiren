@@ -1,8 +1,82 @@
-说明：CCR给3000是满PWM100
-下面数据前三个数据是 设置的PWM（纯开环设置） speed0 speed1（20ms内测得）
-后面两列数据没有任何用 不需要管
-当PWM设置为253时 轮子恰好不动
+#!/usr/bin/env python3
+"""
+前馈拟合: 根据实验数据拟合 PWM vs 轮子脉冲数的关系
+数据格式: PWM, left_pulses, right_pulses, unused1, unused2
+自动剔除暂态(启动段)和异常数据
+"""
 
+import numpy as np
+import re
+
+# ============================================================
+# 原始数据 - 来自 qiankui.md
+# ============================================================
+# 数据集1: 空载 (无额外负载)
+# 数据集2: 带maixcam
+# 数据集3: 带330ml水
+
+def parse_csv_data(text):
+    """解析CSV格式数据,按PWM分组"""
+    datasets = {}
+    current_pwm = None
+
+    for line in text.strip().split('\n'):
+        line = line.strip()
+        if not line:
+            continue
+        # 检测C开头的新PWM段
+        if re.match(r'^C\d+$', line):
+            current_pwm = int(line[1:])
+            if current_pwm not in datasets:
+                datasets[current_pwm] = []
+        elif ',' in line:
+            parts = line.split(',')
+            if len(parts) >= 4:
+                pwm = int(parts[0])
+                left = int(parts[1])
+                right = int(parts[2])
+                datasets[current_pwm].append((pwm, left, right))
+    return datasets
+
+
+def clean_steady_state(data_points, min_skip=2):
+    """
+    自动清洗数据:
+    1. 去掉前min_skip个采样点(暂态)
+    2. 自动检测并去掉明显偏离稳态的异常点(>2倍标准差)
+    3. 返回左轮和右轮的稳态均值
+    """
+    if len(data_points) <= min_skip + 2:
+        return 0, 0
+
+    left_vals = [d[1] for d in data_points[min_skip:]]
+    right_vals = [d[2] for d in data_points[min_skip:]]
+
+    if len(left_vals) < 3:
+        return np.mean(left_vals), np.mean(right_vals)
+
+    def remove_outliers(vals, sigma=2.0):
+        """迭代去除离群点"""
+        arr = np.array(vals, dtype=float)
+        for _ in range(2):
+            mean = np.mean(arr)
+            std = np.std(arr)
+            if std < 0.5:
+                break
+            mask = np.abs(arr - mean) < sigma * std
+            arr = arr[mask]
+        return np.mean(arr)
+
+    left_avg = remove_outliers(left_vals)
+    right_avg = remove_outliers(right_vals)
+
+    return left_avg, right_avg
+
+
+# ============================================================
+# 数据集1: 无负载 (原始基准数据)
+# ============================================================
+data1_raw = """
 C1160
 1160,55,56,24,10
 1160,53,55,24,10
@@ -43,10 +117,7 @@ C1160
 1160,52,54,24,10
 1160,56,56,24,10
 
-
-
 C800
-0,0,0,187,10
 800,12,13,192,10
 800,27,28,192,10
 800,32,32,192,10
@@ -92,8 +163,6 @@ C800
 800,34,35,192,10
 
 C1000
-0,0,0,195,10
-1000,0,0,200,48
 1000,29,28,200,48
 1000,40,39,200,48
 1000,42,44,200,48
@@ -128,8 +197,6 @@ C1000
 1000,46,46,200,48
 
 C900
-0,0,0,202,122
-900,0,0,206,48
 900,24,26,206,48
 900,35,38,206,48
 900,37,43,206,48
@@ -176,10 +243,7 @@ C900
 900,42,43,206,48
 900,42,44,206,48
 
-
 C700
-0,0,0,209,10
-700,0,0,213,48
 700,16,18,213,48
 700,23,25,213,48
 700,27,26,213,48
@@ -216,48 +280,6 @@ C700
 700,30,30,213,48
 
 C600
-0,0,0,216,10
-600,0,0,221,10
-600,18,15,221,10
-600,22,22,221,10
-600,26,24,221,10
-600,27,27,221,10
-600,27,25,221,10
-600,24,24,221,10
-600,24,24,221,10
-600,24,21,221,10
-600,26,22,221,10
-600,26,22,221,10
-600,25,25,221,10
-600,25,25,221,10
-600,25,26,221,10
-600,26,24,221,10
-600,25,25,221,10
-600,25,26,221,10
-600,23,25,221,10
-600,21,24,221,10
-600,22,22,221,10
-600,23,23,221,10
-600,25,21,221,10
-600,25,22,221,10
-600,25,25,221,10
-600,25,26,221,10
-600,24,27,221,10
-600,26,25,221,10
-600,26,25,221,10
-600,26,26,221,10
-600,25,27,221,10
-600,23,25,221,10
-600,23,22,221,10
-600,24,21,221,10
-600,25,21,221,10
-600,24,22,221,10
-600,24,24,221,10
-600,25,25,221,10
-
-C600
-0,0,0,216,10
-600,0,0,221,10
 600,18,15,221,10
 600,22,22,221,10
 600,26,24,221,10
@@ -296,9 +318,6 @@ C600
 600,25,25,221,10
 
 C500
-0,0,0,232,10
-0,0,0,232,10
-500,0,0,236,48
 500,7,13,236,48
 500,9,16,236,48
 500,13,17,236,48
@@ -325,9 +344,13 @@ C500
 500,19,18,236,48
 500,18,20,236,48
 500,18,19,236,48
-/*******************************************************************************/
-下面是加上maixcam的数据
-C11600
+"""
+
+# ============================================================
+# 数据集2: 带maixcam
+# ============================================================
+data2_raw = """
+C1160
 1160,52,52,6,48
 1160,52,55,6,48
 1160,53,55,6,48
@@ -670,14 +693,13 @@ C225
 225,0,4,73,53
 225,0,5,73,53
 225,0,4,73,53
+"""
 
-最小210
-
-
-/*******************************************************************************/
-下面是加上330ml毫升水的数据
+# ============================================================
+# 数据集3: 带330ml水
+# ============================================================
+data3_raw = """
 C1600
-1600,0,0,184,48
 1600,47,49,184,48
 1600,58,64,184,48
 1600,69,71,184,48
@@ -704,7 +726,6 @@ C1600
 1600,80,85,184,48
 
 C1300
-1300,0,0,205,48
 1300,35,39,205,48
 1300,48,53,205,48
 1300,56,61,205,48
@@ -729,7 +750,6 @@ C1300
 1300,62,69,205,48
 
 C1200
-1200,0,0,212,48
 1200,31,38,212,48
 1200,43,48,212,48
 1200,44,55,212,48
@@ -785,7 +805,6 @@ C1160
 1160,57,61,233,48
 1160,56,61,233,48
 1160,55,60,233,48
-
 
 C1000
 1000,31,33,240,48
@@ -988,7 +1007,6 @@ C500
 500,21,23,270,48
 
 C400
-400,0,0,276,48
 400,7,11,276,48
 400,8,13,276,48
 400,8,14,276,48
@@ -1019,7 +1037,6 @@ C400
 400,13,16,276,48
 
 C300
-300,0,0,282,48
 300,5,4,282,48
 300,8,9,282,48
 300,10,10,282,48
@@ -1058,7 +1075,6 @@ C300
 300,9,12,282,48
 
 C250
-250,0,0,295,48
 250,4,1,295,48
 250,5,5,295,48
 250,6,6,295,48
@@ -1102,8 +1118,144 @@ C250
 250,7,9,295,48
 250,7,8,295,48
 250,7,8,295,48
+"""
 
-245最小
+
+def process_dataset(name, raw_data):
+    """处理一个数据集并返回结果"""
+    datasets = parse_csv_data(raw_data)
+
+    print(f'\n{"="*60}')
+    print(f'=== {name} ===')
+    print(f'{"PWM":>6} {"Left_avg":>10} {"Right_avg":>10} {"L+R_avg":>10} {"Samples":>8} {"Raw_pts":>8}')
+    print(f'{"-"*55}')
+
+    results = []
+    for pwm in sorted(datasets.keys()):
+        points = datasets[pwm]
+        # 过滤掉第0条全是0的数据行
+        valid_points = [(p, l, r) for (p, l, r) in points if not (l == 0 and r == 0)]
+
+        left_avg, right_avg = clean_steady_state(valid_points, min_skip=2)
+        avg = (left_avg + right_avg) / 2.0
+
+        results.append((pwm, left_avg, right_avg, avg, len(valid_points), len(points)))
+        print(f'{pwm:6d} {left_avg:10.2f} {right_avg:10.2f} {avg:10.2f} '
+              f'{len(valid_points):8d} {len(points):8d}')
+
+    return results
 
 
-PWM = 18.31 × target_pulse + 114.4
+def fit_and_report(results, name, deadzone_pwm=253):
+    """拟合前馈并打印结果"""
+    # 只取有有效脉冲数据的点
+    valid = [(p, a) for (p, _, _, a, _, _) in results if a > 1.0]
+
+    if len(valid) < 3:
+        print(f'  Not enough data points for {name}')
+        return None, None
+
+    pwms = np.array([v[0] for v in valid])
+    avgs = np.array([v[1] for v in valid])
+
+    # 线性拟合: PWM = k * avg_pulses + deadzone
+    # 使用线性回归
+    coeffs = np.polyfit(avgs, pwms, 1)
+    k, b = coeffs
+
+    # 计算R²
+    predicted = k * avgs + b
+    ss_res = np.sum((pwms - predicted) ** 2)
+    ss_tot = np.sum((pwms - np.mean(pwms)) ** 2)
+    r2 = 1 - ss_res / ss_tot
+
+    print(f'\n--- {name} 前馈拟合 ---')
+    print(f'  公式: PWM = {k:.4f} * speed + {b:.4f}')
+    print(f'  R2 = {r2:.6f}')
+    print(f'  有效死区PWM ≈ {b:.0f}')
+
+    # 前馈表
+    print(f'\n  前馈查找表 (目标脉冲 -> 所需PWM):')
+    print(f'  {"目标脉冲":>10} {"PWM":>8}')
+    max_pulse = int(np.max(avgs))
+    for speed in range(0, max_pulse + 5, 2):
+        pwm = k * speed + b
+        if pwm < 0:
+            pwm = 0
+        if pwm > 3000:
+            pwm = 3000
+        print(f'  {speed:10d} {pwm:8.1f}')
+
+    return k, b
+
+
+# ============================================================
+# 主程序
+# ============================================================
+
+# 处理三个数据集
+results1 = process_dataset("数据集1: 空载(无额外负载)", data1_raw)
+results2 = process_dataset("数据集2: 带maixcam", data2_raw)
+results3 = process_dataset("数据集3: 带330ml水", data3_raw)
+
+# 拟合
+k1, b1 = fit_and_report(results1, "数据集1(空载)")
+k2, b2 = fit_and_report(results2, "数据集2(带maixcam)")
+k3, b3 = fit_and_report(results3, "数据集3(带330ml水)")
+
+# ============================================================
+# 合并所有数据做一个通用拟合
+# ============================================================
+print(f'\n{"="*60}')
+print('=== 合并所有数据点 ===')
+
+all_pwms = []
+all_avgs = []
+for results in [results1, results2, results3]:
+    for pwm, left, right, avg, n, _ in results:
+        if avg > 1.0:
+            all_pwms.append(pwm)
+            all_avgs.append(avg)
+
+all_pwms = np.array(all_pwms)
+all_avgs = np.array(all_avgs)
+
+coeffs_all = np.polyfit(all_avgs, all_pwms, 1)
+k_all, b_all = coeffs_all
+pred_all = k_all * all_avgs + b_all
+ss_res = np.sum((all_pwms - pred_all) ** 2)
+ss_tot = np.sum((all_pwms - np.mean(all_pwms)) ** 2)
+r2_all = 1 - ss_res / ss_tot
+
+print(f'通用公式: PWM = {k_all:.4f} * speed + {b_all:.4f}')
+print(f'R2 = {r2_all:.6f}')
+
+print(f'\n=== C代码前馈表 (基于通用拟合) ===')
+print(f'// 前馈: PWM = {k_all:.4f} * target_speed + {b_all:.4f}')
+print(f'// CCR最大3000 = 100% PWM')
+print(f'// 死区PWM约{b_all:.0f}')
+print(f'#define FEEDFORWARD_K {k_all:.4f}f')
+print(f'#define FEEDFORWARD_B {b_all:.4f}f')
+print(f'')
+print(f'// 前馈计算: 给定目标脉冲数,返回所需PWM')
+print(f'static int16_t feedforward_pwm(float target_speed) {{')
+print(f'    float pwm = FEEDFORWARD_K * target_speed + FEEDFORWARD_B;')
+print(f'    if (pwm < 0) pwm = 0;')
+print(f'    if (pwm > 3000) pwm = 3000;')
+print(f'    return (int16_t)pwm;')
+print(f'}}')
+
+print(f'\n=== 前馈查找表数组 (每2脉冲一个档位) ===')
+print(f'static const uint16_t feedforward_table[] = {{')
+table_vals = []
+for speed in range(0, 86, 2):
+    pwm = int(k_all * speed + b_all)
+    if pwm < 0:
+        pwm = 0
+    if pwm > 3000:
+        pwm = 3000
+    table_vals.append(pwm)
+print(f'    {", ".join(str(v) for v in table_vals)}')
+print(f'}};')
+print(f'// 表格索引 = target_speed / 2, 共{len(table_vals)}个元素, 覆盖0-{84}脉冲')
+print(f'#define FEEDFORWARD_TABLE_SIZE {len(table_vals)}')
