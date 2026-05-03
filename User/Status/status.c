@@ -125,7 +125,7 @@ void init_state(STATUS *status, uint8_t T) {
  *       初始化保角 PID，这几个数字决定转向纠偏力度和稳定性，后续都可调
  */
 void init_status_pid(STATUS *status) {
-  status->state.status_pid.follow_line_pid = init_pid(0.8, 0, 0, 20, 1, 0.0f);
+  status->state.status_pid.follow_line_pid = init_pid(100, 0, 0, 20, 1, 0.0f);
   status->state.status_pid.keep_angle_pid = init_pid(1, 0, 0, 20, 1, 0.0f);
 }
 
