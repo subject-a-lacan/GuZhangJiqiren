@@ -71,33 +71,12 @@ void task_start(STATUS *status) {
 
   status->task.phase_mileage = 0;
 
-  status->state.status_pid.follow_line_pid.error = 0;
-  status->state.status_pid.follow_line_pid.last_error = 0;
-  status->state.status_pid.follow_line_pid.integral = 0;
-  status->state.status_pid.follow_line_pid.derivative = 0;
-  status->state.status_pid.follow_line_pid.out = 0;
-  status->state.status_pid.follow_line_pid.is_first = 1;
+  if (status->task.task_id == TASK_BASIC_1 || status->task.task_id == TASK_BASIC_2) {
+    apply_basic_control_param(status);
+  } else {
+    apply_adv_control_param(status);
+  }
 
-  status->state.status_pid.keep_angle_pid.error = 0;
-  status->state.status_pid.keep_angle_pid.last_error = 0;
-  status->state.status_pid.keep_angle_pid.integral = 0;
-  status->state.status_pid.keep_angle_pid.derivative = 0;
-  status->state.status_pid.keep_angle_pid.out = 0;
-  status->state.status_pid.keep_angle_pid.is_first = 1;
-
-  status->motor.wheel[0].wheel_pid.error = 0;
-  status->motor.wheel[0].wheel_pid.last_error = 0;
-  status->motor.wheel[0].wheel_pid.integral = 0;
-  status->motor.wheel[0].wheel_pid.derivative = 0;
-  status->motor.wheel[0].wheel_pid.out = 0;
-  status->motor.wheel[0].wheel_pid.is_first = 1;
-
-  status->motor.wheel[1].wheel_pid.error = 0;
-  status->motor.wheel[1].wheel_pid.last_error = 0;
-  status->motor.wheel[1].wheel_pid.integral = 0;
-  status->motor.wheel[1].wheel_pid.derivative = 0;
-  status->motor.wheel[1].wheel_pid.out = 0;
-  status->motor.wheel[1].wheel_pid.is_first = 1;
   status->motor.wheel[0].trust = 0;
   status->motor.wheel[1].trust = 0;
 
@@ -196,7 +175,9 @@ static uint8_t task1_final_stop_condition(STATUS *status, Road road) {
   if (road == LeftRoad
       && status->task.cnt_seen == 0
       && encoder_pulse_to_cm((int32_t)status->task.phase_mileage) > Q1_BA_STOP_CM) {
+        status->state.motion = STOP;
         status->task.stop_cmd = 1;
+        status->task.task_running = 0;
     return 1;
   }
   return 0;

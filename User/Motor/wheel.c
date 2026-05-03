@@ -6,6 +6,16 @@
 #include "status.h"
 #include "tim.h"
 
+static float wheel_ff_offset = 157.0f;
+static float wheel_ff_k = 18.3f;
+static float wheel_ff_min = 254.0f;
+
+void set_wheel_ff_param(float offset, float k, float min_pwm) {
+  wheel_ff_offset = offset;
+  wheel_ff_k = k;
+  wheel_ff_min = min_pwm;
+}
+
 int16_t get_wheel_speed(WHEEL *wheel) {
   int16_t speed = 0;
   if (wheel->which == 1) {
@@ -91,8 +101,8 @@ void driver_wheel(WHEEL *wheel) {
   }
 
   // 前馈 (from qiankui.md): steady_offset=157, kff=18.3, start_min=254
-  float ff_abs = 157.0f + 18.3f * ABS(wheel->tar_speed);
-  if (ff_abs < 254.0f) ff_abs = 254.0f;
+  float ff_abs = wheel_ff_offset + wheel_ff_k * ABS(wheel->tar_speed);
+  if (ff_abs < wheel_ff_min) ff_abs = wheel_ff_min;
   float ff;
   if (wheel->tar_speed > 0)      ff = ff_abs;
   else if (wheel->tar_speed < 0) ff = -ff_abs;

@@ -21,6 +21,16 @@ typedef struct STATUS_PID {
   PID keep_angle_pid;  // PID结构体
 } STATUS_PID;
 
+typedef struct CONTROL_PARAM {
+  PID follow_line_pid;
+  PID keep_angle_pid;
+  PID wheel_left_pid;
+  PID wheel_right_pid;
+  float ff_offset;
+  float ff_k;
+  float ff_min;
+} CONTROL_PARAM;
+
 typedef enum MOTION_STATION {
   STOP,
   KEEP_ANGLE,
@@ -119,5 +129,7 @@ void after_init_state();
 void init_status(STATUS *status, uint8_t T);
 void update_status(STATUS *status);
 void driver_status(STATUS *status);
+void apply_basic_control_param(STATUS *status);
+void apply_adv_control_param(STATUS *status);
 
 #endif

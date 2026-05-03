@@ -1,15 +1,171 @@
-AB发车：小车全程左转 形同第一问  可以仿照第一问
-    然后小车先转身（没想好怎么实现）
-  回程时小车全程右转
+# TASK2 AB 发车状态机移植提示词
 
-  第一问的经验：陀螺仪每次转弯的角度 最后一段开始减速的里程数等都可以封装成宏  方便手动改
-              不要多个状态机共用一个case 代码 省事但是维护麻烦
-              转弯回线时仿照第一问用6传感器检测+4传感器咬线的机制
-              仿照第一问 直线阶段采取前65cm加速55+后面44+转弯35+终点前和掉头点前降速机制
-              然后：关键！停止时不要像第一问一样走一堆状态机 而是发现最终路口+cnt_seen=0时直接status->task.stop_cmd = 1; 这样响应快
-              然后切记到掉头点时 不需要速度降0 只需要降低速度即可
-  
-  然后是能不能写的比第一问美观简洁一点
-  第一问driver_task1封装一堆小函数还不写注释 内部状态机写的也不是很美观整洁 不易于维护
+只讨论第二问 `TASK_BASIC_2` 的 **AB 发车** 情况。AD 发车之后再单独写，不要这次一起实现。
 
-  
+## 目标路线
+
+AB 发车时先按第一问类似逻辑行驶：
+
+```text
+A -> D -> C -> B
+```
+
+到 B 点附近后不再普通左转，而是执行 180 度掉头，然后原路返回：
+
+```text
+B -> C -> D -> A
+```
+
+去程全是左转，回程全是右转。
+
+## 状态机原则
+
+可以仿照 TASK1 的结构，但不要直接复制 TASK1：
+
+```text
+TURN_x   角度环转弯
+FIND_x   转完后低速找线
+SIDE_x   正常巡线
+UTURN_x  掉头
+FINAL_x  最后一段回发车点停车
+```
+
+转弯后仍然采用 TASK1 的经验：
+
+```text
+角度误差进入阈值 -> 只允许进入 FIND
+中间 6 路看到线 -> 允许从 FIND 切回 SIDE
+中间 4 路稳定看到线 -> 才恢复正常速度
+```
+
+## 停车逻辑
+
+最终停车时不要只写：
+
+```c
+status->task.stop_cmd = 1;
+```
+
+因为 `status.c` 里 `FIND_LINE` 分支会重新把 `stop_cmd` 置 0。
+
+最终停车必须至少做到：
+
+```c
+status->state.motion = STOP;
+status->task.stop_cmd = 1;
+status->task.task_running = 0;
+status->task.armed = 0;
+status->motor.wheel[0].tar_speed = 0;
+status->motor.wheel[1].tar_speed = 0;
+```
+
+更推荐直接调用：
+
+```c
+task_finish(status);
+```
+
+但如果为了响应更快，也必须同步切 `motion = STOP` 和清 `task_running`。
+
+## BC 干扰段
+
+BC 边有干扰 A4 纸，横向黑线会制造假路口。
+
+AB 发车路线中，BC 边会经过两次：
+
+```text
+去程：C -> B
+回程：B -> C
+```
+
+这两段都必须加“里程窗口屏蔽假路口”：
+
+```text
+在 BC 边中段一定距离范围内：
+  忽略 LeftRoad / RightRoad / CrossRoad / TBRoad 等路口事件
+  不推进 race_phase
+  不清 cnt_seen
+
+超过接近边尾的距离阈值后：
+  才允许消费真实角点
+```
+
+建议先写成宏，方便实车调：
+
+```c
+#define Q2_BC_IGNORE_START_CM
+#define Q2_BC_IGNORE_END_CM
+#define Q2_CORNER_ENABLE_CM
+```
+
+## 掉头逻辑
+
+到 B 点后执行 180 度掉头，不要普通 90 度转弯。
+
+掉头建议：
+
+```text
+进入 UTURN_B:
+  initial_angle = cur_angle
+  tar_angle = Q2_UTURN_ANGLE
+  motion = KEEP_ANGLE
+  base_speed = 30
+
+角度误差 < 12~15 度:
+  进入 FIND_BC_RETURN
+
+FIND_BC_RETURN:
+  motion = FIND_LINE
+  base_speed = 低速
+  中间 6 路看到线后进入 SIDE_BC_RETURN
+```
+
+掉头时不需要完全停车，但必须提前降速，`base_speed` 先用 `30`。
+
+## 角度宏
+
+第二问不要复用 TASK1 的转角宏。
+
+去程每个左转角度、回程每个右转角度、掉头角度都写成独立宏，方便实车逐点调：
+
+```c
+#define Q2_TURN_A_LEFT_ANGLE
+#define Q2_TURN_D_LEFT_ANGLE
+#define Q2_TURN_C_LEFT_ANGLE
+
+#define Q2_UTURN_B_ANGLE
+
+#define Q2_TURN_C_RIGHT_ANGLE
+#define Q2_TURN_D_RIGHT_ANGLE
+
+#define Q2_TURN_TO_FIND_TOLERANCE_DEG
+```
+
+右转角度的正负号按实车陀螺仪方向确认，不要想当然。
+
+## 速度策略
+
+先保守跑通，不追求极限速度。
+
+建议宏：
+
+```c
+#define Q2_FLASH_SPEED
+#define Q2_CRUISE_SPEED
+#define Q2_TURN_SPEED
+#define Q2_FIND_SPEED
+#define Q2_UTURN_SPEED 30
+#define Q2_FINAL_SLOW_SPEED
+```
+
+普通边可以用前段冲刺、后段巡航；BC 干扰段建议整体更慢或至少干扰窗口内更慢。
+
+## 不要做
+
+1. 不要这次实现 AD 发车。
+2. 不要只靠时间推进阶段。
+3. 不要在 BC 干扰窗口内消费路口。
+4. 不要只设置 `stop_cmd=1` 就认为停车完成。
+5. 不要让 TASK2 复用 TASK1 的左转角度宏。
+6. 不要把去程左转和回程右转写成同一个 case 糊在一起。
+

@@ -1,3 +1,62 @@
+# PID 参数配置指南
+
+## 如果想给不同任务用不同 PID / 前馈参数，应该在哪里改？
+
+### 全部在 `User/Status/status.c` 里改，只改一个地方：
+
+```
+apply_basic_control_param()  →  TASK1, TASK2 使用
+apply_adv_control_param()    →  TASK3, TASK4 使用
+```
+
+每个函数里包含 6 组参数：
+
+| 参数 | 含义 | 当前值 (BASIC) |
+|---|---|---|
+| `follow_line_pid` | 循迹环 PID | kp=1, ki=0.03, kd=0, T=20 |
+| `keep_angle_pid` | 角度环 PID | kp=1, ki=0, kd=0, T=20 |
+| `wheel_left_pid` | 左轮内环 PID | kp=8, ki=0, kd=0, T=20 |
+| `wheel_right_pid` | 右轮内环 PID | kp=8, ki=0, kd=0, T=20 |
+| `ff_offset` | 前馈稳态偏移 | 157.0 |
+| `ff_k` | 前馈速度系数 | 18.3 |
+| `ff_min` | 前馈最小绝对值 | 254.0 |
+
+### 如果要新增第三套参数（比如 TASK5）
+
+1. 在 `status.c` 新增 `apply_xxx_control_param(STATUS *status)` 函数
+2. 在 `status.h` 声明该函数
+3. 在 `Defect.c` 的 `task_start()` 的 if-else 里加一个新分支
+
+### 调用链（理解用，不需要改）
+
+```
+task_start() [Defect.c]
+  ├─ apply_basic_control_param() 或 apply_adv_control_param() [status.c]
+  │     └─ apply_control_param() [status.c, static]
+  │           ├─ 覆盖 status.state.status_pid.follow_line_pid
+  │           ├─ 覆盖 status.state.status_pid.keep_angle_pid
+  │           ├─ 覆盖 status.motor.wheel[0].wheel_pid
+  │           ├─ 覆盖 status.motor.wheel[1].wheel_pid
+  │           └─ set_wheel_ff_param() [wheel.c]
+  │                 └─ 更新 3 个静态变量 wheel_ff_offset / wheel_ff_k / wheel_ff_min
+  │
+  └─ (下游自动生效)
+       follow_line()  → compute_pid(&status_pid.follow_line_pid, ...)
+       keep_angle()   → compute_pid(&status_pid.keep_angle_pid, ...)
+       driver_wheel() → compute_pid(&wheel->wheel_pid, ...)
+                      → wheel_ff_offset + wheel_ff_k * abs(tar_speed)
+```
+
+### 实车标定流程
+
+1. UART 调参改当前运行时 PID 的值（和以前一样）
+2. 找到合适参数后，把数值手动写回 `apply_basic_control_param()` 或 `apply_adv_control_param()`
+3. 重新编译烧录
+
+注意：下次 `task_start()` 会用模板覆盖运行时 PID，UART 临时改的值会丢失。
+
+---
+
 # AI 提示词：用最小工程改动实现一二问 / 三四问两套 PID 和前馈
 
 你是一个嵌入式 STM32 小车工程代码 agent。请阅读当前工程的 `User/Status/status.c`、`User/Status/status.h`、`User/Status/Defect.c`、`User/Motor/wheel.c`、`User/Tool/pid.c`、`User/Tool/pid.h`。
@@ -246,7 +305,7 @@ status.state.status_pid.follow_line_pid.kp = val;
 status.motor.wheel[0].wheel_pid.kp = val;
 ```
 
-在这个最小方案下，UART 调参仍然能用，但它只会改“当前正在运行的那一套运行时 PID”。
+在这个最小方案下，UART 调参仍然能用，但它只会改"当前正在运行的那一套运行时 PID"。
 
 注意：
 
@@ -262,7 +321,7 @@ status.motor.wheel[0].wheel_pid.kp = val;
 3. 再重新编译烧录。
 ```
 
-不要为了 UART 调参去引入复杂的“在线修改模板”系统，第一版不需要。
+不要为了 UART 调参去引入复杂的"在线修改模板"系统，第一版不需要。
 
 ## 不要做的事
 

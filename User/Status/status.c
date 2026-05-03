@@ -129,6 +129,38 @@ void init_status_pid(STATUS *status) {
   status->state.status_pid.keep_angle_pid = init_pid(1, 0, 0, 20, 1, 0.0f);
 }
 
+static void apply_control_param(STATUS *status, CONTROL_PARAM p) {
+  status->state.status_pid.follow_line_pid = p.follow_line_pid;
+  status->state.status_pid.keep_angle_pid = p.keep_angle_pid;
+  status->motor.wheel[0].wheel_pid = p.wheel_left_pid;
+  status->motor.wheel[1].wheel_pid = p.wheel_right_pid;
+  set_wheel_ff_param(p.ff_offset, p.ff_k, p.ff_min);
+}
+
+void apply_basic_control_param(STATUS *status) {
+  CONTROL_PARAM p;
+  p.follow_line_pid = init_pid(1, 0.03, 0, 20, 1, 0.0f);
+  p.keep_angle_pid  = init_pid(1, 0, 0, 20, 1, 0.0f);
+  p.wheel_left_pid  = init_pid(8, 0, 0, 20, 100, 0.50f);
+  p.wheel_right_pid = init_pid(8, 0, 0, 20, 100, 0.50f);
+  p.ff_offset = 157.0f;
+  p.ff_k = 18.3f;
+  p.ff_min = 254.0f;
+  apply_control_param(status, p);
+}
+
+void apply_adv_control_param(STATUS *status) {
+  CONTROL_PARAM p;
+  p.follow_line_pid = init_pid(1, 0.03, 0, 20, 1, 0.0f);   // TODO: 负重后实车标定
+  p.keep_angle_pid  = init_pid(1, 0, 0, 20, 1, 0.0f);       // TODO: 负重后实车标定
+  p.wheel_left_pid  = init_pid(8, 0, 0, 20, 100, 0.50f);    // TODO: 负重后实车标定
+  p.wheel_right_pid = init_pid(8, 0, 0, 20, 100, 0.50f);    // TODO: 负重后实车标定
+  p.ff_offset = 157.0f;   // TODO: 负重后实车标定
+  p.ff_k = 18.3f;         // TODO: 负重后实车标定
+  p.ff_min = 254.0f;      // TODO: 负重后实车标定
+  apply_control_param(status, p);
+}
+
 /**
  * @brief 初始化整棵 status 状态树
  * @param status 状态结构体指针，整车所有状态都会挂在这里
