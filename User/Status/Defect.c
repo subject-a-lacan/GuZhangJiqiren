@@ -8,8 +8,8 @@
 #define Q1_START_PULSE         200      /* 起步脉冲阈值, 待标定 */
 #define Q1_TURN_TARGET_ANGLE   90.0f    /* 左转目标角度 */
 #define Q1_TURN_TOLERANCE_DEG  3.0f     /* 转弯完成的角度容差 */
-#define Q1_CRUISE_SPEED        40       /* 巡线直走速度 */
-#define Q1_TURN_SPEED          30       /* 转弯时的基础速度 */
+#define Q1_CRUISE_SPEED        55       /* 巡线直走速度 */
+#define Q1_TURN_SPEED          35       /* 转弯时的基础速度 */
 #define Q1_BA_PULSE            3500     /* BA 边停车脉冲阈值, 待标定 */
 
 extern uint8_t cross_cnt;
@@ -210,16 +210,12 @@ static void driver_task1(STATUS *status) {
 
   switch (status->task.race_phase) {
 
-    /* 从发车点向 A 点走一小段。
-       不在此阶段响应路口, 因为起步处可能压着边线。
-       用阶段脉冲数把车带离起步不稳定区域。 */
     case Q1_START_TO_A:
       status->task.task_running = 1;
       status->state.motion = FIND_LINE;
       status->state.base_speed = Q1_TURN_SPEED;
 
-      if (status->task.phase_mileage > Q1_START_PULSE) {
-        /* 已走出起步段, 开始 A 点左转 */
+      if (task1_accept_left_road(status, road)) {
         task1_enter_phase(status, Q1_TURN_A);
         status->state.initial_angle = status->state.cur_angle;
         status->state.tar_angle = Q1_TURN_TARGET_ANGLE;
