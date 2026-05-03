@@ -150,44 +150,44 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-     uint8_t d = status.sensor.gw_analogue.digital_8bit;
-    float gw_val = 0.0f;
-    if (d & 0x80) gw_val += 1.0f;
-    if (d & 0x40) gw_val += 0.1f;
-    if (d & 0x20) gw_val += 0.01f;
-    if (d & 0x10) gw_val += 0.001f;
-    if (d & 0x08) gw_val += 0.0001f;
-    if (d & 0x04) gw_val += 0.00001f;
-    if (d & 0x02) gw_val += 0.000001f;
-    if (d & 0x01) gw_val += 0.0000001f;
-    PERIODIC_START(Task_Vofa_Print,200)
-    printf("%.7f,"                            // gw 8-bit as float
-           "%.7f,%.7f,%.7f,%.7f,%.7f,%.7f,"  // fw: target, actual, out, kp, ki, kd
-           "%.7f,%.7f,%.7f,%.7f,%.7f,%.7f,"  // ka: actual, target, out, kp, ki, kd
-           "%.7f,%.7f\r\n"                            // task_id, base_speed
-           ,
-           (double)gw_val,
-           // follow_line
-           (double)0.0,
-           (double)status.sensor.gw_analogue.diff,
-           (double)status.state.status_pid.follow_line_pid.out,
-           (double)status.state.status_pid.follow_line_pid.kp,
-           (double)status.state.status_pid.follow_line_pid.ki,
-           (double)status.state.status_pid.follow_line_pid.kd,
-           // keep_angle
-           (double)status.state.cur_angle,
-           (double)(status.state.tar_angle + status.state.initial_angle),
-           (double)status.state.status_pid.keep_angle_pid.out,
-           (double)status.state.status_pid.keep_angle_pid.kp,
-           (double)status.state.status_pid.keep_angle_pid.ki,
-           (double)status.state.status_pid.keep_angle_pid.kd,
-           // task_id, base_speed
-           (double)status.task.task_id,
-           (double)status.state.base_speed
-           // cross counts
-          );
+    //  uint8_t d = status.sensor.gw_analogue.digital_8bit;
+    // float gw_val = 0.0f;
+    // if (d & 0x80) gw_val += 1.0f;
+    // if (d & 0x40) gw_val += 0.1f;
+    // if (d & 0x20) gw_val += 0.01f;
+    // if (d & 0x10) gw_val += 0.001f;
+    // if (d & 0x08) gw_val += 0.0001f;
+    // if (d & 0x04) gw_val += 0.00001f;
+    // if (d & 0x02) gw_val += 0.000001f;
+    // if (d & 0x01) gw_val += 0.0000001f;
+    // PERIODIC_START(Task_Vofa_Print,200)
+    // printf("%.7f,"                            // gw 8-bit as float
+    //        "%.7f,%.7f,%.7f,%.7f,%.7f,%.7f,"  // fw: target, actual, out, kp, ki, kd
+    //        "%.7f,%.7f,%.7f,%.7f,%.7f,%.7f,"  // ka: actual, target, out, kp, ki, kd
+    //        "%.7f,%.7f\r\n"                            // task_id, base_speed
+    //        ,
+    //        (double)gw_val,
+    //        // follow_line
+    //        (double)0.0,
+    //        (double)status.sensor.gw_analogue.diff,
+    //        (double)status.state.status_pid.follow_line_pid.out,
+    //        (double)status.state.status_pid.follow_line_pid.kp,
+    //        (double)status.state.status_pid.follow_line_pid.ki,
+    //        (double)status.state.status_pid.follow_line_pid.kd,
+    //        // keep_angle
+    //        (double)status.state.cur_angle,
+    //        (double)(status.state.tar_angle + status.state.initial_angle),
+    //        (double)status.state.status_pid.keep_angle_pid.out,
+    //        (double)status.state.status_pid.keep_angle_pid.kp,
+    //        (double)status.state.status_pid.keep_angle_pid.ki,
+    //        (double)status.state.status_pid.keep_angle_pid.kd,
+    //        // task_id, base_speed
+    //        (double)status.task.task_id,
+    //        (double)status.state.base_speed
+    //        // cross counts
+    //       );
 
-    PERIODIC_END
+    // PERIODIC_END
   }
   /* USER CODE END 3 */
 }

@@ -46,6 +46,7 @@ void task_start(STATUS *status) {
   status->task.stop_cmd = 0;
 
   status->task.cross_cnt = 0;
+  status->task.cnt_seen = 0;
   cross_cnt = 0;
   left_cnt = 0;
   cross_delay = 0;
@@ -165,7 +166,6 @@ static Road task1_map_road(Road raw) {
 static void task1_enter_phase(STATUS *status, uint8_t next_phase) {
   status->task.race_phase = next_phase;
   status->task.phase_mileage = 0;
-  status->task.cnt_seen = 0;
   status->task.phase_start_time = status->state.time;
 }
 
@@ -417,8 +417,8 @@ void update_task(STATUS *status) {
 
   int32_t wheel0_pulse = status->motor.wheel[0].cur_speed;
   int32_t wheel1_pulse = status->motor.wheel[1].cur_speed;
-  // if (wheel0_pulse < 0) wheel0_pulse = -wheel0_pulse;
-  // if (wheel1_pulse < 0) wheel1_pulse = -wheel1_pulse;
+  if (wheel0_pulse < 0) wheel0_pulse = -wheel0_pulse;
+  if (wheel1_pulse < 0) wheel1_pulse = -wheel1_pulse;
   status->task.phase_mileage += ((float)wheel0_pulse + (float)wheel1_pulse) / 2.0f;
 
   switch (status->task.task_id) {
