@@ -27,15 +27,6 @@ Project File Date:  05/03/2026
 <h2>Output:</h2>
 *** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'car_control_stm32_project'
-../User/Status/status.c(1): warning: In file included from...
-../User/Status/status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling status.c...
 ../User/Status/Defect.c(2): warning: In file included from...
 ../User/Status/status.h(114): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
@@ -43,10 +34,14 @@ compiling status.c...
 ../User/Status/Defect.h(6): note: previous definition is here
 typedef struct STATUS STATUS;
                       ^
-1 warning generated.
+../User/Status/Defect.c(348): warning: implicitly declaring library function 'printf' with type 'int (const char *, ...)' [-Wimplicit-function-declaration]
+    printf("%.2f\r\n", cm);
+    ^
+../User/Status/Defect.c(348): note: include the header <stdio.h> or explicitly provide a declaration for 'printf'
+2 warnings generated.
 compiling Defect.c...
 linking...
-Program Size: Code=40226 RO-data=766 RW-data=68 ZI-data=5748  
+Program Size: Code=39642 RO-data=686 RW-data=68 ZI-data=5740  
 FromELF: creating hex file...
 "car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 2 Warning(s).
 

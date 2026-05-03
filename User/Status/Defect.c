@@ -339,9 +339,13 @@ static void driver_task4(STATUS *status) {
 
   if (status->task.race_phase == 1 && road == LeftRoad) {
     status->state.motion = STOP;
+    status->task.race_phase = 2;
+    return;
+  }
+
+  if (status->task.race_phase == 2) {
     float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
-    log_uprintf(&huart1, "pulse=%.0f  cm=%.2f\r\n", status->task.phase_mileage, cm);
-    status->task.race_phase = 1;
+    printf("%.2f\r\n", cm);
   }
 }
 
