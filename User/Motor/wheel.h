@@ -4,18 +4,28 @@
 #include "main.h"
 #include "pid.h"
 
-#define TRUST_CONFINE 3000
+#define TRUST_CONFINE 2999
+
+/* ── 编码器 / 轮胎参数（来自 xiaosaishenche 工程实测）── */
+#define ENC_PPR              13     // 编码器线数 (电机轴)
+#define ENC_GEAR_RATIO       28     // 减速比 1:28
+#define ENC_COUNTS_PER_WHEEL (ENC_PPR * 4 * ENC_GEAR_RATIO)  // 1456
+#define WHEEL_DIAM_MM        65.0f
+#define ENC_CAL              1.0f   // 标定系数: 跑1m实测后微调 = 1000mm / 实测mm
+#define ENC_MM_PER_COUNT     (3.14159265359f * WHEEL_DIAM_MM / ENC_COUNTS_PER_WHEEL * ENC_CAL)
 
 // WHEEL 结构体
 // 挂载于 status motor
 // 用于驱动直流电机 默认挂载四个
 typedef struct WHEEL {
-  uint8_t which;      // 电机编号 1-4
-  int16_t trust;      // 电机推力
-  int16_t cur_speed;  // 电机当前速度
-  int16_t tar_speed;  // 电机目标速度
-  int8_t dir;         // 电机方向
-  PID wheel_pid;
+  uint8_t which;        // 电机编号 1-4
+  int16_t trust;        // 电机推力
+  int16_t cur_speed;    // 电机当前速度
+  int16_t tar_speed;    // 电机目标速度
+  int8_t  dir;          // 电机方向
+  PID     wheel_pid;
+  int32_t total_counts; // 累计编码器计数（带符号，倒车会减小）
+  float   distance_mm;  // 累计里程 (mm)
 } WHEEL;
 
 // 更新轮子当前速度至状态树： status.motor.wheel[0].cur_speed = get_wheel_speed(&status->motor.wheel[0]);

@@ -47,7 +47,7 @@ void driver_ccd() {
     cnt++;
     return;
   } else if ((cnt > 9) && ((cnt - 10) % 3 == 0) && (cnt < 521)) {
-    HAL_ADC_Start_DMA(&hadc3, &BUFF_DATA_1[(cnt - 10) / 3], 1);
+    HAL_ADC_Start_DMA(&hadc3, (uint32_t *)&BUFF_DATA_1[(cnt - 10) / 3], 1);
     cnt++;
     return;
   } else if ((cnt > 9) && ((cnt - 10) % 3 == 1) && (cnt < 521)) {

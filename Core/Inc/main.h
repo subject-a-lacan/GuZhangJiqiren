@@ -57,20 +57,20 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CCD_SI_Pin GPIO_PIN_6
-#define CCD_SI_GPIO_Port GPIOE
+#define AD1_Pin GPIO_PIN_6
+#define AD1_GPIO_Port GPIOE
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
-#define IO1_Pin GPIO_PIN_9
-#define IO1_GPIO_Port GPIOF
+#define AD0_Pin GPIO_PIN_9
+#define AD0_GPIO_Port GPIOF
 #define LED1_Pin GPIO_PIN_0
 #define LED1_GPIO_Port GPIOC
 #define BUZZ_Pin GPIO_PIN_1
 #define BUZZ_GPIO_Port GPIOC
 #define LED2_Pin GPIO_PIN_2
 #define LED2_GPIO_Port GPIOC
-#define CCD_CLK_Pin GPIO_PIN_3
-#define CCD_CLK_GPIO_Port GPIOC
+#define AD2_Pin GPIO_PIN_3
+#define AD2_GPIO_Port GPIOC
 #define TEST_Pin GPIO_PIN_0
 #define TEST_GPIO_Port GPIOA
 #define IO4_Pin GPIO_PIN_4
@@ -112,6 +112,10 @@ void Error_Handler(void);
 #define IO2_Pin GPIO_PIN_1
 #define IO2_GPIO_Port GPIOE
 
+#define CCD_CLK_Pin GPIO_PIN_2
+#define CCD_CLK_GPIO_Port GPIOB
+#define CCD_SI_Pin GPIO_PIN_1
+#define CCD_SI_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

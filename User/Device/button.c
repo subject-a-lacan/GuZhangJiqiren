@@ -30,10 +30,14 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
       }
     }
     if (station == BUTTON_LONG) {
-      if (status.task.task_running == 0 && (status.task.task_id == TASK_BASIC_2 || status.task.task_id == TASK_ADV_1)) {
-        status.task.pose_switch_request = 1;
-        status.device.buzzer.on = 1;
-        status.device.buzzer.off_time = status.state.time + 1000;
+      if (status.task.task_running == 0) {
+        // TASK2/TASK3: 切换发车点 AB/AD
+        if (status.task.task_id == TASK_BASIC_2 || status.task.task_id == TASK_ADV_1) {
+          status.task.pose_switch_request = 1;
+          status.device.buzzer.on = 1;
+          status.device.buzzer.off_time = status.state.time + 1000;
+        }
+        // TASK1/TASK4: 长按无操作
       }
     }
   }
@@ -48,7 +52,13 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
       }
     }
     if (station == BUTTON_LONG) {
-      correct_gw_analogue(&status.sensor.gw_analogue);
+      if (status.task.armed) {
+        // 任意任务 armed 后,长按 PD2 释放启动门控
+        status.task.startup_release = 1;
+      } else {
+        // 未 armed 时,长按 PD2 = 灰度校准
+        correct_gw_analogue(&status.sensor.gw_analogue);
+      }
     }
   }
 

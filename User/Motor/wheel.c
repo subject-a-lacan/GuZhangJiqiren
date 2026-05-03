@@ -22,7 +22,10 @@ int16_t get_wheel_speed(WHEEL *wheel) {
     TIM4->CNT = 30000;
   }
 
-  return speed * wheel->dir;
+  speed *= wheel->dir;
+  wheel->total_counts += speed;
+  wheel->distance_mm = wheel->total_counts * ENC_MM_PER_COUNT;
+  return speed;
 }
 //隔20ms进一次中断 读取cnt 并清零 减去30000的作用是为了避免计数器溢出和处理负数情况 
 
@@ -83,7 +86,7 @@ void driver_wheel(WHEEL *wheel) {
     wheel->trust = 0;
   }
 
-  if (ABS(wheel->cur_speed) < 10) {
+  if (wheel->cur_speed <= 10 && wheel->tar_speed > 0) {
     wheel->trust = CONFINE(wheel->trust, -1500, 1500);//起步限幅 如果车速很小 限幅防止PID调控过大
   }
 
@@ -114,7 +117,9 @@ void init_wheel(WHEEL *wheel, uint8_t which, int8_t dir) {
   wheel->cur_speed = 0;
   wheel->tar_speed = 0;
   wheel->dir = dir;
-  wheel->wheel_pid = init_pid(20, 0, 0, 1, 20);  // kd=0，导数项已禁用  P I D T integral_max
+  wheel->total_counts = 0;
+  wheel->distance_mm = 0.0f;
+  wheel->wheel_pid = init_pid(25, 0.08,8, 20, 50000);
   if (wheel->which == 1) {
     HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
   } else if (wheel->which == 2) {

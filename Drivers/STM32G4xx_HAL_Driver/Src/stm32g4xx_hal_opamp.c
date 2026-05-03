@@ -231,7 +231,7 @@
 /** @addtogroup STM32G4xx_HAL_Driver
   * @{
   */
-
+#if defined (OPAMP1) || defined (OPAMP2) || defined (OPAMP3) || defined (OPAMP4) || defined (OPAMP5) || defined (OPAMP6)
 #ifdef HAL_OPAMP_MODULE_ENABLED
 
 /** @defgroup OPAMP OPAMP
@@ -663,6 +663,9 @@ HAL_StatusTypeDef HAL_OPAMP_Stop(OPAMP_HandleTypeDef *hopamp)
   * @brief  Run the self calibration of one OPAMP
   * @note   Calibration is performed in the mode specified in OPAMP init
   *         structure (mode normal or high-speed).
+  * @note   If `OPAINTOEN` is enabled, disable it before calling this function
+  *         or perform the calibration procedure using HAL ADC in your application
+  *         code (refer to the reference manual).
   * @param  hopamp handle
   * @retval Updated offset trimming values (PMOS & NMOS), user trimming is enabled
   * @retval HAL status
@@ -677,6 +680,7 @@ HAL_StatusTypeDef HAL_OPAMP_SelfCalibrate(OPAMP_HandleTypeDef *hopamp)
   uint32_t trimmingvaluen;
   uint32_t trimmingvaluep;
   uint32_t delta;
+  uint32_t opampinten;
 
   /* Check the OPAMP handle allocation */
   /* Check if OPAMP locked */
@@ -691,8 +695,9 @@ HAL_StatusTypeDef HAL_OPAMP_SelfCalibrate(OPAMP_HandleTypeDef *hopamp)
   else
   {
 
-    /* Check if OPAMP in calibration mode and calibration not yet enable */
-    if (hopamp->State ==  HAL_OPAMP_STATE_READY)
+    opampinten = READ_BIT(hopamp->Instance->CSR, OPAMP_CSR_OPAMPINTEN);
+    /* Check if OPAMP is in calibration mode, calibration is not yet enabled and the OPAINTOEN bit is not set */
+    if ((hopamp->State ==  HAL_OPAMP_STATE_READY) && (opampinten == 0UL))
     {
       /* Check the parameter */
       assert_param(IS_OPAMP_ALL_INSTANCE(hopamp->Instance));
@@ -1194,9 +1199,8 @@ HAL_StatusTypeDef HAL_OPAMP_UnRegisterCallback(OPAMP_HandleTypeDef *hopamp, HAL_
   */
 
 #endif /* HAL_OPAMP_MODULE_ENABLED */
+#endif /* OPAMP1 || OPAMP2 || OPAMP3 || OPAMP4  || OPAMP5 || OPAMP6 */
+
 /**
   * @}
   */
-
-
-

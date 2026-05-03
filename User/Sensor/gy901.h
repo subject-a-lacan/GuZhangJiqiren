@@ -6,7 +6,6 @@
 #define __GYROSCOPE_H__
 
 #include "main.h"
-#include "pid.h"
 
 // GYR结构体
 // 挂载于status sensor
@@ -14,8 +13,10 @@
 typedef struct GYR {
   uint8_t data_buf[24];      // 读取数据暂存
   uint8_t device_addr;       // 设备iic地址 默认0xa1
-  uint8_t data_start_addr;   // gy901数据寄存器起始地址 默认0x34
-  PID gy901_keep_angle_pid;  // 陀螺仪保持角度PID
+  uint8_t data_start_addr;	// gy901数据寄存器起始地址 默认0x34
+  float cur_angle;       // 当前yaw角
+  float initial_angle;   // 上电初始偏置
+  float tar_angle;       // 目标yaw角
 } GYR;
 
 enum gyroscope {

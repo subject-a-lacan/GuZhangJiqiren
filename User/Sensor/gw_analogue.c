@@ -2,8 +2,10 @@
 #include "gpio.h"
 #include "gw_anagloge.h"
 #include "log.h"
-#include "main.h"
 #include "status.h"
+#include "main.h"
+#include "stdbool.h"
+#include "usart.h"
 
 float distance[8] = {-30, -20, -15, -10, 10, 15, 20, 30};
 
@@ -15,116 +17,125 @@ void gw_analogue_gray_show(GW_ANALOGUE *gw_analogue) {
     str[i] = buf & 0x80 ? '#' : '.';
     buf <<= 1;
   }
-  PRINTLN("%s", str);
+}
+
+static void init_road_determine(Cross *cross) {
+  cross->integral = 0;
+  cross->data_buf = 0;
+  cross->cross = Straight;
+  cross->cross_cnt = 0;
+  cross->maybe = 0;
+  cross->integral_times = 5;
+}
+
+static void init_road_cnt(Cross *cross) {
+  cross->CrossRoad_cnt = 0;
+  cross->LeftRoad_cnt = 0;
+  cross->RightRoad_cnt = 0;
+  cross->Straight_cnt = 0;
+  cross->TBRoad_cnt = 0;
+  cross->TLRoad_cnt = 0;
+  cross->TRRoadd_cnt = 0;
+  cross->UnknowRoad_cnt = 0;
 }
 
 void init_gw_analogue(GW_ANALOGUE *gw_analogue) {
-  // Initialize the ADC and GPIO for the analogue channels
-  for (int i = 0; i < 8; i++) {
-    gw_analogue->channel[i] = 0;  // Initialize channel values to 0
-  }
-  for (int i = 0; i < 8; i++) {
-    gw_analogue->correction_data_w[i] = 0;  // Initialize correction data to 0
-    gw_analogue->correction_data_b[i] = 0;  // Initialize correction data to 0
-  }
- gw_analogue->digital_high_threshold[0] = 46;
-  gw_analogue->digital_high_threshold[1] = 46;
-  gw_analogue->digital_high_threshold[2] = 47;
-  gw_analogue->digital_high_threshold[3] = 47;
-  gw_analogue->digital_high_threshold[4] = 47;
-  gw_analogue->digital_high_threshold[5] = 47;
-  gw_analogue->digital_high_threshold[6] = 46;
-  gw_analogue->digital_high_threshold[7] = 46;
-
-  gw_analogue->digital_low_threshold[0] = 24;
-  gw_analogue->digital_low_threshold[1] = 24;
-  gw_analogue->digital_low_threshold[2] = 24;
-  gw_analogue->digital_low_threshold[3] = 25;
-  gw_analogue->digital_low_threshold[4] = 25;
-  gw_analogue->digital_low_threshold[5] = 25;
-  gw_analogue->digital_low_threshold[6] = 25;
-  gw_analogue->digital_low_threshold[7] = 24;
+  init_road_determine(&gw_analogue->cross);
+  init_road_cnt(&gw_analogue->cross);
 
   for (int i = 0; i < 8; i++) {
-    gw_analogue->correction_data_w[i] = 2 * gw_analogue->digital_high_threshold[i] - gw_analogue->digital_low_threshold[i];  // Initialize high threshold to 0
-    gw_analogue->correction_data_b[i] = 2 * gw_analogue->digital_low_threshold[i] - gw_analogue->digital_high_threshold[i];  // Initialize low threshold to 0
+    gw_analogue->channel[i] = 0;
+  }
+  for (int i = 0; i < 8; i++) {
+    gw_analogue->correction_data_w[i] = 0;
+    gw_analogue->correction_data_b[i] = 0;
+  }
+  gw_analogue->digital_high_threshold[0] = 81;
+  gw_analogue->digital_high_threshold[1] = 137;
+  gw_analogue->digital_high_threshold[2] = 77;
+  gw_analogue->digital_high_threshold[3] = 82;
+  gw_analogue->digital_high_threshold[4] = 61;
+  gw_analogue->digital_high_threshold[5] = 115;
+  gw_analogue->digital_high_threshold[6] = 129;
+  gw_analogue->digital_high_threshold[7] = 75;
+
+  gw_analogue->digital_low_threshold[0] = 49;
+  gw_analogue->digital_low_threshold[1] = 95;
+  gw_analogue->digital_low_threshold[2] = 49;
+  gw_analogue->digital_low_threshold[3] = 55;
+  gw_analogue->digital_low_threshold[4] = 37;
+  gw_analogue->digital_low_threshold[5] = 77;
+  gw_analogue->digital_low_threshold[6] = 89;
+  gw_analogue->digital_low_threshold[7] = 47;
+
+  for (int i = 0; i < 8; i++) {
+    gw_analogue->correction_data_w[i] = 2 * gw_analogue->digital_high_threshold[i] - gw_analogue->digital_low_threshold[i];
+    gw_analogue->correction_data_b[i] = 2 * gw_analogue->digital_low_threshold[i] - gw_analogue->digital_high_threshold[i];
   }
 
-  gw_analogue->sta = 0;           // Set the state to 0 (normal mode)
-  gw_analogue->digital_8bit = 0;  // Initialize the 8-bit digital value to 0
+  gw_analogue->sta = 0;
+  gw_analogue->digital_8bit = 0;
+  gw_analogue->diff = 0.0f;
 
-  gw_analogue->diff = 0.0f;  // Initialize the difference value to 0.0f
-
-  select_channel(0);  // Select channel 0 for initial setup
+  select_channel(0);
 }
 
 void select_channel(uint8_t channel) {
-  // Select the ADC channel to read from
   if (channel & 0x01) {
-    HAL_GPIO_WritePin(IO2_GPIO_Port, IO2_Pin, GPIO_PIN_SET);  // Set PA0 high
+    HAL_GPIO_WritePin(AD0_GPIO_Port, AD0_Pin, GPIO_PIN_SET);
   } else {
-    HAL_GPIO_WritePin(IO2_GPIO_Port, IO2_Pin, GPIO_PIN_RESET);  // Set PA0 low
+    HAL_GPIO_WritePin(AD0_GPIO_Port, AD0_Pin, GPIO_PIN_RESET);
   }
   if (channel & 0x02) {
-    HAL_GPIO_WritePin(IO3_GPIO_Port, IO3_Pin, GPIO_PIN_SET);  // Set PA1 high
+    HAL_GPIO_WritePin(AD1_GPIO_Port, AD1_Pin, GPIO_PIN_SET);
   } else {
-    HAL_GPIO_WritePin(IO3_GPIO_Port, IO3_Pin, GPIO_PIN_RESET);  // Set PA1 low
+    HAL_GPIO_WritePin(AD1_GPIO_Port, AD1_Pin, GPIO_PIN_RESET);
   }
   if (channel & 0x04) {
-    HAL_GPIO_WritePin(IO4_GPIO_Port, IO4_Pin, GPIO_PIN_SET);  // Set PA2 high
+    HAL_GPIO_WritePin(AD2_GPIO_Port, AD2_Pin, GPIO_PIN_SET);
   } else {
-    HAL_GPIO_WritePin(IO4_GPIO_Port, IO4_Pin, GPIO_PIN_RESET);  // Set PA2 low
+    HAL_GPIO_WritePin(AD2_GPIO_Port, AD2_Pin, GPIO_PIN_RESET);
   }
 }
 
 void get_gw_raw_data(GW_ANALOGUE *gw_analogue) {
-  // Read the ADC value for the selected channel
   for (int i = 0; i < 8; i++) {
-    select_channel(i);                                   // Select the channel to read from
-    HAL_ADC_Start(&hadc3);                               // Start the ADC conversion
-    HAL_ADC_PollForConversion(&hadc3, 1);                // Wait for conversion to complete
-    gw_analogue->channel[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
-    HAL_ADC_Stop(&hadc3);                                // Stop the ADC conversion
+    select_channel(i);
+    HAL_ADC_Start(&hadc3);
+    HAL_ADC_PollForConversion(&hadc3, 1);
+    gw_analogue->channel[i] = HAL_ADC_GetValue(&hadc3);
+    HAL_ADC_Stop(&hadc3);
   }
 }
 
 void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
   if (gw_analogue->sta == 0) {
     for (int i = 0; i < 8; i++) {
-      select_channel(i);                                             // Select the channel to read from
-      HAL_ADC_Start(&hadc3);                                         // Start the ADC conversion
-      HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
-      gw_analogue->correction_data_w[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value      
-      HAL_ADC_Stop(&hadc3);                                // Stop the ADC conversion
+      select_channel(i);
+      HAL_ADC_Start(&hadc3);
+      HAL_ADC_PollForConversion(&hadc3, 1);
+      gw_analogue->correction_data_w[i] = HAL_ADC_GetValue(&hadc3);
+      HAL_ADC_Stop(&hadc3);
     }
-    status.device.led_on_board.on = 1;
-    gw_analogue->sta = 1;  // Set the state to calibration mode 1
+    status.device.led1.on = 1;
+    gw_analogue->sta = 1;
     return;
   }
   if (gw_analogue->sta == 1) {
     for (int i = 0; i < 8; i++) {
-      select_channel(i);                                             // Select the channel to read from
-      HAL_ADC_Start(&hadc3);                                         // Start the ADC conversion
-      HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
-      gw_analogue->correction_data_b[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
-      HAL_ADC_Stop(&hadc3);                                          // Stop the ADC conversion
+      select_channel(i);
+      HAL_ADC_Start(&hadc3);
+      HAL_ADC_PollForConversion(&hadc3, 1);
+      gw_analogue->correction_data_b[i] = HAL_ADC_GetValue(&hadc3);
+      HAL_ADC_Stop(&hadc3);
     }
-    status.device.led_on_board.on = 0;
-    gw_analogue->sta = 0;  // Set the state to calibration mode 2
+    status.device.led1.on = 0;
+    gw_analogue->sta = 0;
     for (int i = 0; i < 8; i++) {
       gw_analogue->digital_low_threshold[i] = gw_analogue->correction_data_b[i] +
                                               (gw_analogue->correction_data_w[i] - gw_analogue->correction_data_b[i]) * 0.33;
-      // Calculate the low threshold
       gw_analogue->digital_high_threshold[i] = gw_analogue->correction_data_b[i] +
                                                (gw_analogue->correction_data_w[i] - gw_analogue->correction_data_b[i]) * 0.66;
-      // Calculate the high threshold
-    }
-    for (int i = 0; i < 8; i++) {
-      log_uprintf(&huart1, "%d ", gw_analogue->digital_low_threshold[i]);
-    }
-    log_uprintf(&huart1, "\n\n");
-    for (int i = 0; i < 8; i++) {
-      log_uprintf(&huart1, "%d ", gw_analogue->digital_high_threshold[i]);
     }
     return;
   }
@@ -149,14 +160,10 @@ void normalize_gray_weight(float *raw_data) {
   for (int i = 2; i < 6; i++) {
     total += raw_data[i];
   }
-  if (total == 0) {
-    return;
-  }
+  if (total == 0) return;
   for (int i = 2; i < 6; i++) {
     raw_data[i] = (raw_data[i] / total);
   }
-
-  return;
 }
 
 void get_gw_analogue_analogue_diff(GW_ANALOGUE *gw_analogue) {
@@ -170,6 +177,119 @@ void get_gw_analogue_analogue_diff(GW_ANALOGUE *gw_analogue) {
   for (int i = 2; i < 6; i++) {
     diff += buff[i] * distance[i];
   }
-
   status.sensor.gw_analogue.diff = diff;
+}
+
+// ── 路口判断（来自 xiao 项目）──
+
+enum Road road_new_from_bit(bool L, bool F, bool R) {
+  uint8_t left = L ? 0b100 : 0;
+  uint8_t font = F ? 0b010 : 0;
+  uint8_t right = R ? 0b001 : 0;
+
+  return left | font | right;
+}
+
+Road road_decision(Cross *cross) {
+  bool left = (cross->integral >> 6) == 0x03;     // 0b1100_0000
+  bool right = (cross->integral & 0x03) == 0x03;  // 0b0000_0011
+  bool font = cross->data_buf & 0x3C;             // 0b0011_1100
+  Road road = road_new_from_bit(left, font, right);
+  return road;
+}
+
+void serve_road(Cross *cross, Road road) {
+  switch (road) {
+    case CrossRoad:
+      cross->CrossRoad_cnt++;
+      break;
+    case TBRoad:
+      cross->TBRoad_cnt++;
+      break;
+    case TLRoad:
+      cross->TLRoad_cnt++;
+      break;
+    case TRRoad:
+      cross->TRRoadd_cnt++;
+      break;
+    case LeftRoad:
+      cross->LeftRoad_cnt++;
+      break;
+    case RightRoad:
+      cross->RightRoad_cnt++;
+      break;
+    case Straight:
+      cross->Straight_cnt++;
+      break;
+    case UnknowRoad:
+      cross->UnknowRoad_cnt++;
+      break;
+  }
+  cross->cross = road;
+}
+
+void get_road_type(Cross *cross, uint8_t road_data) {
+  cross->data_buf = road_data;
+  if (cross->cross == Straight) {
+    if ((cross->data_buf & 0x81)) {
+      if (cross->maybe == 0) {
+        log_uprintf(&huart1, "Maybe\n");
+        cross->maybe = cross->integral_times;
+        cross->integral = cross->integral | cross->data_buf;
+      }
+    }
+    if (cross->maybe > 1) {
+      cross->integral = cross->integral | cross->data_buf;
+      cross->maybe--;
+    } else if (cross->maybe == 1) {
+      switch (road_decision(cross)) {
+        case UnknowRoad:
+          log_uprintf(&huart1, "Unknow road\n");
+          serve_road(cross, UnknowRoad);
+          break;
+        case CrossRoad:
+          log_uprintf(&huart1, "Cross road\n");
+          serve_road(cross, CrossRoad);
+          break;
+        case TBRoad:
+          log_uprintf(&huart1, "T B road\n");
+          serve_road(cross, TBRoad);
+          break;
+        case TLRoad:
+          log_uprintf(&huart1, "T L road\n");
+          serve_road(cross, TLRoad);
+          break;
+        case TRRoad:
+          log_uprintf(&huart1, "T R road\n");
+          serve_road(cross, TRRoad);
+          break;
+        case LeftRoad:
+          log_uprintf(&huart1, "Left road\n");
+          serve_road(cross, LeftRoad);
+          break;
+        case RightRoad:
+          log_uprintf(&huart1, "Right road\n");
+          serve_road(cross, RightRoad);
+          break;
+        case Straight:
+          serve_road(cross, Straight);
+          break;
+      }
+      cross->maybe = 0;
+      cross->integral = 0;
+    }
+  } else if ((status.sensor.gw_analogue.digital_8bit & 0x81) == 0
+             && (status.sensor.gw_analogue.digital_8bit & 0x3C) != 0) {
+    log_uprintf(&huart1, "Straight road\n");
+    serve_road(cross, Straight);
+  }
+}
+
+// ── 统一驱动入口 ──
+
+void driver_gw_analogue(GW_ANALOGUE *gw_analogue) {
+  get_gw_raw_data(gw_analogue);
+  get_gw_analoge_digital_data(gw_analogue);
+  get_gw_analogue_analogue_diff(gw_analogue);
+  get_road_type(&gw_analogue->cross, gw_analogue->digital_8bit);
 }
