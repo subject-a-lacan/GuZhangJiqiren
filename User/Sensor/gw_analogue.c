@@ -40,7 +40,7 @@ void init_road_determine(Cross *cross) {
   cross->maybe = 0;
   cross->cross = Straight;
   cross->cross_cnt = 0;
-  cross->integral_times = 7;
+  cross->integral_times = 5;
 
   return;
 }

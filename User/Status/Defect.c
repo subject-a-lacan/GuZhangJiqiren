@@ -7,20 +7,21 @@
 
 /* Q1 tunable parameters */
 #define Q1_START_PULSE                 200   /* 起步脉冲阈值, 待标定 */
-#define Q1_TURN_TARGET_ANGLE           90.0f /* 左转目标角度 */
+#define Q1_TURN_TARGET_ANGLE           79.0f /* 左转目标角度 */
+#define Q1_TURN_TARGET_ANGLE_C         77.0f /* C点左转目标角度, 多转4°补偿 */
 #define Q1_TURN_TOLERANCE_DEG          6.0f  /* 转弯完成的角度容差 */
 #define Q1_TURN_TO_FIND_TOLERANCE_DEG  10.0f /* 转弯→找线接管角度阈值 */
 #define Q1_TURN_LINE_MASK_6            0x7E  /* bit1~bit6, 中间6路 */
 #define Q1_TURN_LINE_MASK_4            0x3C  /* bit2~bit5, 中间4路 */
 #define Q1_LINE_STABLE_CNT             3     /* 中间4路稳定帧数 */
-#define Q1_FLASH_SPEED                 65    /* 直线冲刺速度 */
-#define Q1_CRUISE_SPEED                50    /* 巡线直走速度 */
+#define Q1_FLASH_SPEED                 55    /* 直线冲刺速度 */
+#define Q1_CRUISE_SPEED                44    /* 巡线直走速度 */
 #define Q1_TURN_SPEED                  35    /* 转弯时的基础速度 */
 #define Q1_FINAL_SLOW_SPEED            20    /* 终点前降速 / 找线低速 */
 #define Q1_STRAIGHT_FLASH_CM           65.0f /* 直线冲刺距离(cm) */
-#define Q1_FINAL_SLOW_CM               90.0f /* 终点降速距离(cm) */
+#define Q1_FINAL_SLOW_CM               70.0f /* 终点降速距离(cm) */
 #define Q1_BA_PULSE                    3500  /* BA 边停车脉冲阈值, 待标定 */
-#define Q1_BA_STOP_CM                  93.0f /* BA 边停车里程阈值(cm) */
+#define Q1_BA_STOP_CM                  80.0f /* BA 边停车里程阈值(cm) */
 
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
@@ -195,6 +196,7 @@ static uint8_t task1_final_stop_condition(STATUS *status, Road road) {
   if (road == LeftRoad
       && status->task.cnt_seen == 0
       && encoder_pulse_to_cm((int32_t)status->task.phase_mileage) > Q1_BA_STOP_CM) {
+        status->task.stop_cmd = 1;
     return 1;
   }
   return 0;
@@ -330,7 +332,7 @@ static void driver_task1(STATUS *status) {
 
         task1_enter_phase(status, next);
         status->state.initial_angle = status->state.cur_angle;
-        status->state.tar_angle = Q1_TURN_TARGET_ANGLE;
+        status->state.tar_angle = (next == Q1_TURN_C) ? Q1_TURN_TARGET_ANGLE_C : Q1_TURN_TARGET_ANGLE;
         status->state.motion = KEEP_ANGLE;
         status->state.base_speed = Q1_TURN_SPEED;
       }

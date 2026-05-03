@@ -125,8 +125,8 @@ void init_state(STATUS *status, uint8_t T) {
  *       初始化保角 PID，这几个数字决定转向纠偏力度和稳定性，后续都可调
  */
 void init_status_pid(STATUS *status) {
-  status->state.status_pid.follow_line_pid = init_pid(1, 0.03, 0, 10, 1, 0.0f);
-  status->state.status_pid.keep_angle_pid = init_pid(1, 0, 0, 10, 1, 0.0f);
+  status->state.status_pid.follow_line_pid = init_pid(1, 0.03, 0, 20, 1, 0.0f);
+  status->state.status_pid.keep_angle_pid = init_pid(1, 0, 0, 20, 1, 0.0f);
 }
 
 /**
@@ -214,7 +214,7 @@ void keep_angle(STATUS *status) {
     diff_angle += 360.0;
   }
   float diff = compute_pid(&status->state.status_pid.keep_angle_pid, diff_angle);  // PID计算
-  diff = CONFINE(diff, -35, 35);                                                   // 限制速度范围
+  diff = CONFINE(diff, -25, 25);                                                   // 限制速度范围
   status->motor.wheel[0].tar_speed = status->state.base_speed + (int16_t)diff;
   status->motor.wheel[1].tar_speed = status->state.base_speed - (int16_t)diff;  // 设置电机速度
 
@@ -224,7 +224,7 @@ void keep_angle(STATUS *status) {
     } else {
       if (flag == 1) {
         keep_angle_time = status->state.time;  // 记录保持角度的时间 为后续时间提供时间
-        status->state.base_speed = 40;         // 角度稳定后加速
+        status->state.base_speed = 30;         // 角度稳定后加速
         flag = 0;
       }
     }
