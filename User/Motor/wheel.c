@@ -90,8 +90,17 @@ void driver_wheel(WHEEL *wheel) {
     return;
   }
 
-  wheel->trust = compute_pid(&wheel->wheel_pid, wheel->tar_speed - wheel->cur_speed);
-  wheel->trust = CONFINE(wheel->trust, -TRUST_CONFINE, TRUST_CONFINE); //trust的单位是PWM占空比的值 
+  // 前馈 (from qiankui.md): steady_offset=157, kff=18.3, start_min=254
+  float ff_abs = 157.0f + 18.3f * ABS(wheel->tar_speed);
+  if (ff_abs < 254.0f) ff_abs = 254.0f;
+  float ff;
+  if (wheel->tar_speed > 0)      ff = ff_abs;
+  else if (wheel->tar_speed < 0) ff = -ff_abs;
+  else                           ff = 0;
+
+  float pid_out = compute_pid(&wheel->wheel_pid, wheel->tar_speed - wheel->cur_speed);
+  wheel->trust = (int16_t)(ff + pid_out);
+  wheel->trust = CONFINE(wheel->trust, -TRUST_CONFINE, TRUST_CONFINE);
 
   if (wheel->tar_speed == 0 && ABS(wheel->cur_speed) < 3) {
     wheel->trust = 0;
