@@ -3,9 +3,9 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Tue May  5 04:03:27 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Tue May  5 04:39:11 2026
 <BR><P>
-<H3>Maximum Stack Usage =        808 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        800 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 TIM1_TRG_COM_TIM17_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 <P>
@@ -1322,7 +1322,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[f7]"></a>HAL_TIM_IRQHandler</STRONG> (Thumb, 528 bytes, Stack size 8 bytes, stm32g4xx_hal_tim.o(.text.HAL_TIM_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 808<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
+<BR><BR>[Stack]<UL><LI>Max Depth = 800<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 </UL>
 <BR>[Calls]<UL><LI><a href="#[fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_TriggerCallback
 <LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_PulseFinishedCallback
@@ -1399,7 +1399,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[fb]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, timer_it.o(.text.HAL_TIM_PeriodElapsedCallback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 800<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
+<BR><BR>[Stack]<UL><LI>Max Depth = 792<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 <LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uldivmod
@@ -1562,7 +1562,8 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 <LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
+<BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[1aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
 </UL>
 
 <P><STRONG><a name="[14a]"></a>HAL_UART_TxCpltCallback</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32g4xx_hal_uart.o(.text.HAL_UART_TxCpltCallback))
@@ -1822,21 +1823,21 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(.text)
 </UL>
 <P><STRONG><a name="[24]"></a>TIM1_TRG_COM_TIM17_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.TIM1_TRG_COM_TIM17_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 808<LI>Call Chain = TIM1_TRG_COM_TIM17_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
+<BR><BR>[Stack]<UL><LI>Max Depth = 800<LI>Call Chain = TIM1_TRG_COM_TIM17_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IRQHandler
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
 </UL>
 <P><STRONG><a name="[3c]"></a>TIM5_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.TIM5_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 808<LI>Call Chain = TIM5_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
+<BR><BR>[Stack]<UL><LI>Max Depth = 800<LI>Call Chain = TIM5_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IRQHandler
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
 </UL>
 <P><STRONG><a name="[40]"></a>TIM6_DAC_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.TIM6_DAC_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 808<LI>Call Chain = TIM6_DAC_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
+<BR><BR>[Stack]<UL><LI>Max Depth = 800<LI>Call Chain = TIM6_DAC_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IRQHandler
 </UL>
@@ -2278,8 +2279,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 224 bytes, Stack size 40 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 292<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
+<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 388 bytes, Stack size 48 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 300<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_pid_tune_it
 <LI><a href="#[19d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
@@ -2306,6 +2307,7 @@ Global Symbols
 <LI><a href="#[12f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_ADC3_Init
 <LI><a href="#[1a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Start_IT
 <LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
+<LI><a href="#[129]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[187]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
@@ -2399,8 +2401,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1aa]"></a>task_start</STRONG> (Thumb, 404 bytes, Stack size 32 bytes, defect.o(.text.task_start))
-<BR><BR>[Stack]<UL><LI>Max Depth = 760<LI>Call Chain = task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
+<P><STRONG><a name="[1aa]"></a>task_start</STRONG> (Thumb, 404 bytes, Stack size 24 bytes, defect.o(.text.task_start))
+<BR><BR>[Stack]<UL><LI>Max Depth = 752<LI>Call Chain = task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 </UL>
 <BR>[Calls]<UL><LI><a href="#[129]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[156]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_wheel_ff_param_by_which
@@ -2415,7 +2417,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[10f]"></a>update_status</STRONG> (Thumb, 320 bytes, Stack size 24 bytes, status.o(.text.update_status))
-<BR><BR>[Stack]<UL><LI>Max Depth = 792<LI>Call Chain = update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
+<BR><BR>[Stack]<UL><LI>Max Depth = 784<LI>Call Chain = update_status &rArr; update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 <LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_angle
@@ -2434,7 +2436,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[1ac]"></a>update_task</STRONG> (Thumb, 250 bytes, Stack size 8 bytes, defect.o(.text.update_task))
-<BR><BR>[Stack]<UL><LI>Max Depth = 768<LI>Call Chain = update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
+<BR><BR>[Stack]<UL><LI>Max Depth = 760<LI>Call Chain = update_task &rArr; task_start &rArr; apply_basic_control_param &rArr; apply_control_param &rArr; set_wheel_ff_param_by_which
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task_led
 <LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
@@ -2902,7 +2904,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[17c]"></a>driver_task3</STRONG> (Thumb, 1080 bytes, Stack size 16 bytes, defect.o(.text.driver_task3))
+<P><STRONG><a name="[17c]"></a>driver_task3</STRONG> (Thumb, 1140 bytes, Stack size 16 bytes, defect.o(.text.driver_task3))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = driver_task3 &rArr; task3_accept_road
 </UL>
 <BR>[Calls]<UL><LI><a href="#[170]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish

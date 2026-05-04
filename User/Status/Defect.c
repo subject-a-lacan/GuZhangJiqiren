@@ -222,6 +222,10 @@ void task_start(STATUS *status) {
 
   switch (status->task.task_id) {
     case TASK_BASIC_1:
+      {
+        uint8_t h3c[] = {0x48, 0x33, 0x43};
+        HAL_UART_Transmit(&huart3, h3c, 3, 100);
+      }
       status->task.race_phase = Q1_START_TO_A;
       break;
     case TASK_BASIC_2:
