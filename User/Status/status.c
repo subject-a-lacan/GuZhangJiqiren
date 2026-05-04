@@ -124,7 +124,7 @@ void init_state(STATUS *status, uint8_t T) {
  *       初始化保角 PID，这几个数字决定转向纠偏力度和稳定性，后续都可调
  */
 void init_status_pid(STATUS *status) {
-  status->state.status_pid.follow_line_pid = init_pid(1, 0.03, 0, 20, 1, 0.0f);
+  status->state.status_pid.follow_line_pid = init_pid(1.8, 0.03, 1, 20, 1, 0.0f);
   status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 20, 1, 0.0f);
   status->state.status_pid.angle_output_limit = 25.0f;
 }
@@ -147,10 +147,10 @@ void apply_basic_control_param(STATUS *status) {
   p.wheel_right_pid = init_pid(8, 0, 0, 20, 100, 0.50f);
   p.ff_offset = 114.70f;
   p.ff_k = 18.28f;
-  p.ff_min = 254.0f;
+  p.ff_min = 220.0f;
   p.ff_offset_r = 97.26f;
   p.ff_k_r = 17.80f;
-  p.ff_min_r = 254.0f;
+  p.ff_min_r = 220.0f;
   apply_control_param(status, p);
 }
 
@@ -162,10 +162,10 @@ void apply_adv_control_param(STATUS *status) {
   p.wheel_right_pid = init_pid(8, 0, 0, 20, 100, 0.50f);    // TODO: 负重后实车标定
   p.ff_offset = 124.64f;   // TODO: 负重后实车标定
   p.ff_k = 19.23f;         // TODO: 负重后实车标定
-  p.ff_min = 254.0f;       // TODO: 负重后实车标定
+  p.ff_min = 260.0f;       // TODO: 负重后实车标定
   p.ff_offset_r = 164.53f; // TODO: 负重后实车标定
   p.ff_k_r = 17.64f;       // TODO: 负重后实车标定
-  p.ff_min_r = 254.0f;     // TODO: 负重后实车标定
+  p.ff_min_r = 260.0f;     // TODO: 负重后实车标定
   apply_control_param(status, p);
 }
 

@@ -64,6 +64,9 @@
 /* USER CODE BEGIN PV */
 int16_t cmd_speed = 40;
 extern uint8_t cross_cnt;
+volatile float l1 = 0.0f;
+volatile float l2 = 0.0f;
+volatile uint8_t task3_finished = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -144,6 +147,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    if (task3_finished) {
+      printf("%.2f,%.2f\r\n", (double)l1, (double)l2);
+    }
+
     //  uint8_t d = status.sensor.gw_analogue.digital_8bit;
     // float gw_val = 0.0f;
     // if (d & 0x80) gw_val += 1.0f;
@@ -334,6 +341,8 @@ void UART_PID_Tune(uint8_t cmd, float val) {
       status.task.start_request=1;
       break;
     case 'h': cmd_speed = (int16_t)val;  break;
+    case 'l': l1 = val; break;  /* 视觉模块发送 l1 (待测A4第1条线距离) */
+    case 'L': l2 = val; break;  /* 视觉模块发送 l2 (待测A4第2条线距离) */
     default: break;
   }
 }

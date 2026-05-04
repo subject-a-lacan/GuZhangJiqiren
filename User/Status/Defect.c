@@ -59,24 +59,60 @@
 #define Q2_AD_TURN_B_LEFT_ANGLE         80.0f /* 回程B点左转进入BA */
 
 /* Q3/Q4 feed-forward defaults. wheel0 = wheel[0]/which 1, wheel1 = wheel[1]/which 2. */
-#define Q3_WHEEL0_FF_OFFSET             157.0f
-#define Q3_WHEEL0_FF_K                  18.3f
-#define Q3_WHEEL0_FF_MIN                254.0f
-#define Q3_WHEEL1_FF_OFFSET             157.0f
-#define Q3_WHEEL1_FF_K                  18.3f
-#define Q3_WHEEL1_FF_MIN                254.0f
+#define Q3_WHEEL0_FF_OFFSET             124.64f
+#define Q3_WHEEL0_FF_K                  19.23f
+#define Q3_WHEEL0_FF_MIN                260.0f
+#define Q3_WHEEL1_FF_OFFSET             164.53f
+#define Q3_WHEEL1_FF_K                  17.64f
+#define Q3_WHEEL1_FF_MIN                260.0f
 
-#define Q4_WHEEL0_FF_OFFSET             157.0f
-#define Q4_WHEEL0_FF_K                  18.3f
-#define Q4_WHEEL0_FF_MIN                254.0f
-#define Q4_WHEEL1_FF_OFFSET             157.0f
-#define Q4_WHEEL1_FF_K                  18.3f
-#define Q4_WHEEL1_FF_MIN                254.0f
+#define Q4_WHEEL0_FF_OFFSET             124.64f
+#define Q4_WHEEL0_FF_K                  19.23f
+#define Q4_WHEEL0_FF_MIN                260.0f
+#define Q4_WHEEL1_FF_OFFSET             164.53f
+#define Q4_WHEEL1_FF_K                  17.64f
+#define Q4_WHEEL1_FF_MIN                260.0f
+
+/* Q3 tunable parameters */
+
+/* AB per-turn left angles (independently calibrated, like TASK2) */
+#define Q3_AB_TURN_A_LEFT_ANGLE    80.0f
+#define Q3_AB_TURN_D_LEFT_ANGLE    80.0f
+#define Q3_AB_TURN_C_LEFT_ANGLE    77.0f
+#define Q3_AB_TURN_B_LEFT_ANGLE    79.0f
+
+/* AD per-turn right angles */
+#define Q3_AD_TURN_A_RIGHT_ANGLE   -80.0f
+#define Q3_AD_TURN_B_RIGHT_ANGLE   -80.0f
+#define Q3_AD_TURN_C_RIGHT_ANGLE   -80.0f
+#define Q3_AD_TURN_D_RIGHT_ANGLE   -80.0f
+
+/* Turn control */
+#define Q3_TURN_TOLERANCE_DEG       10.0f /* 转弯→找线接管角度阈值 */
+#define Q3_TURN_LINE_MASK_6         0x7E  /* bit1~bit6, 中间6路 */
+#define Q3_TURN_LINE_MASK_4         0x3C  /* bit2~bit5, 中间4路 */
+#define Q3_LINE_STABLE_CNT          3     /* 中间4路稳定帧数, 防止假Straight误清零cnt_seen */
+
+/* Speeds */
+#define Q3_FLASH_SPEED              55
+#define Q3_CRUISE_SPEED             40
+#define Q3_TURN_SPEED               35
+#define Q3_FINAL_SLOW_SPEED         20
+#define Q3_CD_SLOW_SPEED            25    /* CD边过A4时的低速 */
+
+/* Distance thresholds (cm, 通过 encoder_pulse_to_cm 换算后比较) */
+#define Q3_STRAIGHT_FLASH_CM        65.0f
+#define Q3_FINAL_SLOW_CM            80.0f
+#define Q3_CD_SLOW_AFTER_CM         20.0f /* CD边行驶20cm后降速, 给视觉更多帧 */
+#define Q3_CD_IGNORE_END_CM         75.0f /* A4横线干扰结束, 之后允许接受路口 */
 
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
 extern uint8_t cross_delay;
 extern Road road_buf;
+extern volatile float l1;
+extern volatile float l2;
+extern volatile uint8_t task3_finished;
 
 void init_task(TASK *task) {
   task->task_id = TASK_BASIC_1;
@@ -163,7 +199,14 @@ void task_start(STATUS *status) {
       }
       break;
     case TASK_ADV_1:
-      status->task.race_phase = 0;  // TODO: Q3_RACE_PHASE
+      l1 = 0;
+      l2 = 0;
+      task3_finished = 0;
+      if (status->task.start_pose == START_AB) {
+        status->task.race_phase = Q3_AB_START_TO_A;
+      } else {
+        status->task.race_phase = Q3_AD_START_TO_A;
+      }
       break;
     case TASK_ADV_2:
       status->task.race_phase = 0;  // TODO: Q4_RACE_PHASE
@@ -993,27 +1036,352 @@ static void driver_task2(STATUS *status) {
   }
 }
 
+/* ---- TASK3 小工具函数 ---- */
+
+static uint8_t q3_mid4_stable_cnt = 0;
+
+/* 路口映射: T 路口合并为单边路口, 不改底层 get_road_type() */
+static Road task3_map_road(Road raw) {
+  if (raw == TLRoad) return LeftRoad;
+  if (raw == TRRoad) return RightRoad;
+  return raw;
+}
+
+static void task3_enter_phase(STATUS *status, uint8_t next_phase) {
+  status->task.race_phase = next_phase;
+  status->task.phase_mileage = 0;
+  status->task.phase_start_time = status->state.time;
+  q3_mid4_stable_cnt = 0;
+}
+
+static float task3_angle_error(STATUS *status) {
+  float target = status->state.tar_angle + status->state.initial_angle;
+  float diff = target - status->state.cur_angle;
+  if (diff > 180.0f)        diff -= 360.0f;
+  else if (diff < -180.0f)  diff += 360.0f;
+  return diff;
+}
+
+static uint8_t task3_turn_angle_ready(STATUS *status) {
+  return (ABS(task3_angle_error(status)) < Q3_TURN_TOLERANCE_DEG);
+}
+
+static uint8_t task3_middle6_seen(STATUS *status) {
+  return (status->sensor.gw_analogue.digital_8bit & Q3_TURN_LINE_MASK_6) != 0;
+}
+
+static uint8_t task3_middle4_seen(STATUS *status) {
+  return (status->sensor.gw_analogue.digital_8bit & Q3_TURN_LINE_MASK_4) != 0;
+}
+
+/* 里程门控路口消费: 只有行驶超过 min_cm 且路口类型匹配且未消费时才接受
+   用于 CD 边屏蔽 A4 横线干扰 (传入 Q3_CD_IGNORE_END_CM) */
+static uint8_t task3_accept_road(STATUS *status, Road expected, float min_cm) {
+  Road road = task3_map_road(status->sensor.gw_analogue.cross.cross);
+  float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+  if (cm < min_cm) return 0;
+  if (road != expected) return 0;
+  if (status->task.cnt_seen == 1) return 0;
+  status->task.cnt_seen = 1;
+  status->task.cross_cnt++;
+  return 1;
+}
+
+/* 普通边速度曲线: 稳定前低速找线 → 闪冲 → 巡航 */
+static void task3_apply_side_speed(STATUS *status) {
+  float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+  if (q3_mid4_stable_cnt < Q3_LINE_STABLE_CNT) {
+    status->state.base_speed = Q3_FINAL_SLOW_SPEED;
+  } else if (cm <= Q3_STRAIGHT_FLASH_CM) {
+    status->state.base_speed = Q3_FLASH_SPEED;
+  } else {
+    status->state.base_speed = Q3_CRUISE_SPEED;
+  }
+}
+
+/* CD 边专用速度: 前 20cm 正常巡线, 之后降速提高视觉有效帧数 */
+static void task3_apply_cd_speed(STATUS *status) {
+  float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+  if (cm <= Q3_CD_SLOW_AFTER_CM) {
+    task3_apply_side_speed(status);
+  } else {
+    status->state.base_speed = Q3_CD_SLOW_SPEED;
+  }
+}
+
+/* 最后一段速度: 正常巡线 → 终点前降速 */
+static void task3_apply_final_speed(STATUS *status) {
+  float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+  if (cm <= Q3_FINAL_SLOW_CM) {
+    status->state.base_speed = Q3_CRUISE_SPEED;
+  } else {
+    status->state.base_speed = Q3_FINAL_SLOW_SPEED;
+  }
+}
+
 static void driver_task3(STATUS *status) {
   if (!status->task.task_running) return;
-  status->task.task_running = 1;
 
-  if (status->task.race_phase == 0) {
-    status->state.initial_angle = status->state.cur_angle;
-    status->state.tar_angle = -90.0f;
-    status->state.motion = KEEP_ANGLE;
-    status->state.base_speed = 35;
-    status->task.race_phase = 1;
-    return;
-  }
+  if (status->task.start_pose == START_AB) {
+    /* ====== AB 发车: A→D→C→B→A, 逆时针, 全部左转 ====== */
+    Road road = task3_map_road(status->sensor.gw_analogue.cross.cross);
 
-  if (status->task.race_phase == 1) {
-    float target = status->state.tar_angle + status->state.initial_angle;
-    float diff_angle = target - status->state.cur_angle;
-    if (diff_angle > 180.0f)  diff_angle -= 360.0f;
-    else if (diff_angle < -180.0f) diff_angle += 360.0f;
+    /* cnt_seen 复位: 仿 TASK2, 中间4路稳定后才清零, 防横线干扰误清零 */
+    if (road == Straight && status->state.motion == FIND_LINE
+        && status->task.race_phase != Q3_AB_FIND_AD
+        && status->task.race_phase != Q3_AB_FIND_DC
+        && status->task.race_phase != Q3_AB_FIND_CB
+        && status->task.race_phase != Q3_AB_FIND_BA) {
+      if (status->task.race_phase == Q3_AB_SIDE_BA_FINAL || q3_mid4_stable_cnt >= Q3_LINE_STABLE_CNT) {
+        status->task.cnt_seen = 0;
+      }
+    }
 
-    if (ABS(diff_angle) < 3.0f) {
-      task_finish(status);
+    switch (status->task.race_phase) {
+
+      /* ---- 起步, 走到 A 点左转 ---- */
+      case Q3_AB_START_TO_A:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        status->state.base_speed = Q3_TURN_SPEED;
+        if (task3_accept_road(status, LeftRoad, 0)) {
+          task3_enter_phase(status, Q3_AB_TURN_A_TO_AD);
+          status->state.initial_angle = status->state.cur_angle;
+          status->state.tar_angle = Q3_AB_TURN_A_LEFT_ANGLE;
+          status->state.motion = KEEP_ANGLE;
+          status->state.base_speed = Q3_TURN_SPEED;
+        }
+        break;
+
+      /* ---- 转弯: 角度环 KEEP_ANGLE ---- */
+      case Q3_AB_TURN_A_TO_AD:
+      case Q3_AB_TURN_D_TO_DC:
+      case Q3_AB_TURN_C_TO_CB:
+      case Q3_AB_TURN_B_TO_BA:
+        status->task.task_running = 1;
+        status->state.motion = KEEP_ANGLE;
+        if (task3_turn_angle_ready(status)) {
+          uint8_t next;
+          if (status->task.race_phase == Q3_AB_TURN_A_TO_AD)      next = Q3_AB_FIND_AD;
+          else if (status->task.race_phase == Q3_AB_TURN_D_TO_DC) next = Q3_AB_FIND_DC;
+          else if (status->task.race_phase == Q3_AB_TURN_C_TO_CB) next = Q3_AB_FIND_CB;
+          else                                                     next = Q3_AB_FIND_BA;
+          task3_enter_phase(status, next);
+          status->state.motion = FIND_LINE;
+          status->state.base_speed = Q3_FINAL_SLOW_SPEED;
+        }
+        break;
+
+      /* ---- 转弯后低速找线, 中间6路看到线即切换 ---- */
+      case Q3_AB_FIND_AD:
+      case Q3_AB_FIND_DC:
+      case Q3_AB_FIND_CB:
+      case Q3_AB_FIND_BA:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        status->state.base_speed = Q3_FINAL_SLOW_SPEED;
+        if (task3_middle6_seen(status)) {
+          uint8_t next;
+          if (status->task.race_phase == Q3_AB_FIND_AD)      next = Q3_AB_SIDE_AD;
+          else if (status->task.race_phase == Q3_AB_FIND_DC) next = Q3_AB_SIDE_DC;
+          else if (status->task.race_phase == Q3_AB_FIND_CB) next = Q3_AB_SIDE_CB;
+          else                                                next = Q3_AB_SIDE_BA_FINAL;
+          task3_enter_phase(status, next);
+        }
+        break;
+
+      /* ---- 普通边巡线: AD / DC(前半段) / CB ---- */
+      case Q3_AB_SIDE_AD:
+      case Q3_AB_SIDE_CB:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        if (task3_middle4_seen(status)) {
+          q3_mid4_stable_cnt++;
+        } else {
+          q3_mid4_stable_cnt = 0;
+        }
+        task3_apply_side_speed(status);
+        if (task3_accept_road(status, LeftRoad, 0)) {
+          uint8_t next;
+          float angle;
+          if (status->task.race_phase == Q3_AB_SIDE_AD) {
+            next = Q3_AB_TURN_D_TO_DC;
+            angle = Q3_AB_TURN_D_LEFT_ANGLE;
+          } else {
+            next = Q3_AB_TURN_B_TO_BA;
+            angle = Q3_AB_TURN_B_LEFT_ANGLE;
+          }
+          task3_enter_phase(status, next);
+          status->state.initial_angle = status->state.cur_angle;
+          status->state.tar_angle = angle;
+          status->state.motion = KEEP_ANGLE;
+          status->state.base_speed = Q3_TURN_SPEED;
+        }
+        break;
+
+      /* ---- CD 边: 前段正常巡线 → 20cm 后降速 → 屏蔽 A4 横线 → 等 C 点 ---- */
+      case Q3_AB_SIDE_DC:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        if (task3_middle4_seen(status)) {
+          q3_mid4_stable_cnt++;
+        } else {
+          q3_mid4_stable_cnt = 0;
+        }
+        task3_apply_cd_speed(status);
+        if (task3_accept_road(status, LeftRoad, Q3_CD_IGNORE_END_CM)) {
+          task3_enter_phase(status, Q3_AB_TURN_C_TO_CB);
+          status->state.initial_angle = status->state.cur_angle;
+          status->state.tar_angle = Q3_AB_TURN_C_LEFT_ANGLE;
+          status->state.motion = KEEP_ANGLE;
+          status->state.base_speed = Q3_TURN_SPEED;
+        }
+        break;
+
+      /* ---- BA 最后一段: 巡线回发车点 ---- */
+      case Q3_AB_SIDE_BA_FINAL:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        task3_apply_final_speed(status);
+        if (task3_accept_road(status, LeftRoad, Q3_FINAL_SLOW_CM)) {
+          task3_enter_phase(status, Q3_AB_FINISH);
+        }
+        break;
+
+      case Q3_AB_FINISH:
+        task3_finished = 1;
+        task_finish(status);
+        break;
+    }
+
+  } else {
+    /* ====== AD 发车: A→B→C→D→A, 顺时针, 全部右转 ====== */
+    Road road = task3_map_road(status->sensor.gw_analogue.cross.cross);
+
+    if (road == Straight && status->state.motion == FIND_LINE
+        && status->task.race_phase != Q3_AD_FIND_AB
+        && status->task.race_phase != Q3_AD_FIND_BC
+        && status->task.race_phase != Q3_AD_FIND_CD
+        && status->task.race_phase != Q3_AD_FIND_DA) {
+      if (status->task.race_phase == Q3_AD_SIDE_DA_FINAL || q3_mid4_stable_cnt >= Q3_LINE_STABLE_CNT) {
+        status->task.cnt_seen = 0;
+      }
+    }
+
+    switch (status->task.race_phase) {
+
+      case Q3_AD_START_TO_A:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        status->state.base_speed = Q3_TURN_SPEED;
+        if (task3_accept_road(status, RightRoad, 0)) {
+          task3_enter_phase(status, Q3_AD_TURN_A_TO_AB);
+          status->state.initial_angle = status->state.cur_angle;
+          status->state.tar_angle = Q3_AD_TURN_A_RIGHT_ANGLE;
+          status->state.motion = KEEP_ANGLE;
+          status->state.base_speed = Q3_TURN_SPEED;
+        }
+        break;
+
+      /* ---- 转弯 ---- */
+      case Q3_AD_TURN_A_TO_AB:
+      case Q3_AD_TURN_B_TO_BC:
+      case Q3_AD_TURN_C_TO_CD:
+      case Q3_AD_TURN_D_TO_DA:
+        status->task.task_running = 1;
+        status->state.motion = KEEP_ANGLE;
+        if (task3_turn_angle_ready(status)) {
+          uint8_t next;
+          if (status->task.race_phase == Q3_AD_TURN_A_TO_AB)      next = Q3_AD_FIND_AB;
+          else if (status->task.race_phase == Q3_AD_TURN_B_TO_BC) next = Q3_AD_FIND_BC;
+          else if (status->task.race_phase == Q3_AD_TURN_C_TO_CD) next = Q3_AD_FIND_CD;
+          else                                                     next = Q3_AD_FIND_DA;
+          task3_enter_phase(status, next);
+          status->state.motion = FIND_LINE;
+          status->state.base_speed = Q3_FINAL_SLOW_SPEED;
+        }
+        break;
+
+      /* ---- 找线 ---- */
+      case Q3_AD_FIND_AB:
+      case Q3_AD_FIND_BC:
+      case Q3_AD_FIND_CD:
+      case Q3_AD_FIND_DA:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        status->state.base_speed = Q3_FINAL_SLOW_SPEED;
+        if (task3_middle6_seen(status)) {
+          uint8_t next;
+          if (status->task.race_phase == Q3_AD_FIND_AB)      next = Q3_AD_SIDE_AB;
+          else if (status->task.race_phase == Q3_AD_FIND_BC) next = Q3_AD_SIDE_BC;
+          else if (status->task.race_phase == Q3_AD_FIND_CD) next = Q3_AD_SIDE_CD;
+          else                                                next = Q3_AD_SIDE_DA_FINAL;
+          task3_enter_phase(status, next);
+        }
+        break;
+
+      /* ---- 普通边巡线: AB / BC ---- */
+      case Q3_AD_SIDE_AB:
+      case Q3_AD_SIDE_BC:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        if (task3_middle4_seen(status)) {
+          q3_mid4_stable_cnt++;
+        } else {
+          q3_mid4_stable_cnt = 0;
+        }
+        task3_apply_side_speed(status);
+        if (task3_accept_road(status, RightRoad, 0)) {
+          uint8_t next;
+          float angle;
+          if (status->task.race_phase == Q3_AD_SIDE_AB) {
+            next = Q3_AD_TURN_B_TO_BC;
+            angle = Q3_AD_TURN_B_RIGHT_ANGLE;
+          } else {
+            next = Q3_AD_TURN_C_TO_CD;
+            angle = Q3_AD_TURN_C_RIGHT_ANGLE;
+          }
+          task3_enter_phase(status, next);
+          status->state.initial_angle = status->state.cur_angle;
+          status->state.tar_angle = angle;
+          status->state.motion = KEEP_ANGLE;
+          status->state.base_speed = Q3_TURN_SPEED;
+        }
+        break;
+
+      /* ---- CD 边: 前段正常 → 20cm 后降速 → 屏蔽 A4 横线 → 等 D 点 ---- */
+      case Q3_AD_SIDE_CD:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        if (task3_middle4_seen(status)) {
+          q3_mid4_stable_cnt++;
+        } else {
+          q3_mid4_stable_cnt = 0;
+        }
+        task3_apply_cd_speed(status);
+        if (task3_accept_road(status, RightRoad, Q3_CD_IGNORE_END_CM)) {
+          task3_enter_phase(status, Q3_AD_TURN_D_TO_DA);
+          status->state.initial_angle = status->state.cur_angle;
+          status->state.tar_angle = Q3_AD_TURN_D_RIGHT_ANGLE;
+          status->state.motion = KEEP_ANGLE;
+          status->state.base_speed = Q3_TURN_SPEED;
+        }
+        break;
+
+      /* ---- DA 最后一段 ---- */
+      case Q3_AD_SIDE_DA_FINAL:
+        status->task.task_running = 1;
+        status->state.motion = FIND_LINE;
+        task3_apply_final_speed(status);
+        if (task3_accept_road(status, RightRoad, Q3_FINAL_SLOW_CM)) {
+          task3_enter_phase(status, Q3_AD_FINISH);
+        }
+        break;
+
+      case Q3_AD_FINISH:
+        task3_finished = 1;
+        task_finish(status);
+        break;
     }
   }
 }

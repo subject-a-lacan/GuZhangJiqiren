@@ -210,11 +210,11 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
       // Calculate the high threshold
     }
     for (int i = 0; i < 8; i++) {
-      log_uprintf(&huart1, "%d ", gw_analogue->digital_low_threshold[i]);
+      // log_uprintf(&huart1, "%d ", gw_analogue->digital_low_threshold[i]);
     }
-    log_uprintf(&huart1, "\n\n");
+    // log_uprintf(&huart1, "\n\n");
     for (int i = 0; i < 8; i++) {
-      log_uprintf(&huart1, "%d ", gw_analogue->digital_high_threshold[i]);
+      // log_uprintf(&huart1, "%d ", gw_analogue->digital_high_threshold[i]);
     }
     return;
   }

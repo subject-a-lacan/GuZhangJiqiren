@@ -82,7 +82,41 @@ typedef enum Q2_AD_RACE_PHASE {
   Q2_AD_FINISH,             /* 停车收尾 */
 } Q2_AD_RACE_PHASE;
 
-/* Q3/Q4 race phases — to be defined per-task */
+/* Q3 AB race phases (AB发车: A→D→C→B→A, 一圈, CD边有待测A4) */
+typedef enum Q3_AB_RACE_PHASE {
+  Q3_AB_START_TO_A,
+  Q3_AB_TURN_A_TO_AD,
+  Q3_AB_FIND_AD,
+  Q3_AB_SIDE_AD,
+  Q3_AB_TURN_D_TO_DC,
+  Q3_AB_FIND_DC,
+  Q3_AB_SIDE_DC,       /* CD边, 里程控速 + 屏蔽A4干扰 */
+  Q3_AB_TURN_C_TO_CB,
+  Q3_AB_FIND_CB,
+  Q3_AB_SIDE_CB,
+  Q3_AB_TURN_B_TO_BA,
+  Q3_AB_FIND_BA,
+  Q3_AB_SIDE_BA_FINAL,
+  Q3_AB_FINISH,
+} Q3_AB_RACE_PHASE;
+
+/* Q3 AD race phases (AD发车: A→B→C→D→A, 一圈, CD边有待测A4) */
+typedef enum Q3_AD_RACE_PHASE {
+  Q3_AD_START_TO_A,
+  Q3_AD_TURN_A_TO_AB,
+  Q3_AD_FIND_AB,
+  Q3_AD_SIDE_AB,
+  Q3_AD_TURN_B_TO_BC,
+  Q3_AD_FIND_BC,
+  Q3_AD_SIDE_BC,
+  Q3_AD_TURN_C_TO_CD,
+  Q3_AD_FIND_CD,
+  Q3_AD_SIDE_CD,       /* CD边, 里程控速 + 屏蔽A4干扰 */
+  Q3_AD_TURN_D_TO_DA,
+  Q3_AD_FIND_DA,
+  Q3_AD_SIDE_DA_FINAL,
+  Q3_AD_FINISH,
+} Q3_AD_RACE_PHASE;
 
 typedef struct TASK {
   uint8_t task_id;     //任务编号
