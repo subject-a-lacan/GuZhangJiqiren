@@ -148,6 +148,10 @@
 #define Q3_CD_IGNORE_END_CM         75.0f /* A4横线干扰结束, 之后允许接受路口 */
 #define Q3_ROAD_ENABLE_CM            70.0f /* 普通路口里程门槛, 防止误触发 */
 
+#define Q3_CD_DISTANCE_MASK          0x66  /* bit1/bit2/bit5/bit6 */
+#define Q3_CD_EDGE_DELTA_THRESHOLD   2
+#define Q3_CD_EDGE_COUNT             6
+
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
 extern uint8_t cross_delay;
@@ -1108,6 +1112,51 @@ static void driver_task2(STATUS *status) {
 /* ---- TASK3 小工具函数 ---- */
 
 static uint8_t q3_mid4_stable_cnt = 0;
+static uint8_t q3_cd_prev_mask = 0;
+static uint8_t q3_cd_edge_index = 0;
+static float q3_cd_edge_pulse[Q3_CD_EDGE_COUNT] = {0};
+
+static uint8_t task3_count_bits(uint8_t value) {
+  uint8_t count = 0;
+  for (uint8_t i = 0; i < 8; i++) {
+    if (value & (1 << i)) {
+      count++;
+    }
+  }
+  return count;
+}
+
+static void task3_cd_distance_reset(STATUS *status) {
+  q3_cd_prev_mask = status->sensor.gw_analogue.digital_8bit & Q3_CD_DISTANCE_MASK;
+  q3_cd_edge_index = 0;
+  for (uint8_t i = 0; i < Q3_CD_EDGE_COUNT; i++) {
+    q3_cd_edge_pulse[i] = 0;
+  }
+}
+
+static void task3_cd_distance_update(STATUS *status) {
+  uint8_t cur = status->sensor.gw_analogue.digital_8bit & Q3_CD_DISTANCE_MASK;
+  uint8_t black_added = task3_count_bits(cur & (uint8_t)(~q3_cd_prev_mask));
+  uint8_t white_added = task3_count_bits(q3_cd_prev_mask & (uint8_t)(~cur));
+
+  if (q3_cd_edge_index < Q3_CD_EDGE_COUNT) {
+    uint8_t expect_black = ((q3_cd_edge_index & 1) == 0);
+    uint8_t edge_seen = expect_black
+                            ? (black_added >= Q3_CD_EDGE_DELTA_THRESHOLD)
+                            : (white_added >= Q3_CD_EDGE_DELTA_THRESHOLD);
+    if (edge_seen) {
+      q3_cd_edge_pulse[q3_cd_edge_index] = status->task.phase_mileage;
+      q3_cd_edge_index++;
+      if (q3_cd_edge_index == 3) {
+        l1 = encoder_pulse_to_cm((int32_t)(q3_cd_edge_pulse[2] - q3_cd_edge_pulse[1]));
+      } else if (q3_cd_edge_index == 5) {
+        l2 = encoder_pulse_to_cm((int32_t)(q3_cd_edge_pulse[4] - q3_cd_edge_pulse[3]));
+      }
+    }
+  }
+
+  q3_cd_prev_mask = cur;
+}
 
 /* 路口映射: T 路口合并为单边路口, 不改底层 get_road_type() */
 static Road task3_map_road(Road raw) {
@@ -1121,6 +1170,9 @@ static void task3_enter_phase(STATUS *status, uint8_t next_phase) {
   status->task.phase_mileage = 0;
   status->task.phase_start_time = status->state.time;
   q3_mid4_stable_cnt = 0;
+  if (next_phase == Q3_AB_SIDE_DC || next_phase == Q3_AD_SIDE_CD) {
+    task3_cd_distance_reset(status);
+  }
 }
 
 static float task3_angle_error(STATUS *status) {
@@ -1304,6 +1356,7 @@ static void driver_task3(STATUS *status) {
           q3_mid4_stable_cnt = 0;
         }
         task3_apply_cd_speed(status);
+        task3_cd_distance_update(status);
         if (task3_accept_road(status, LeftRoad, Q3_CD_IGNORE_END_CM)) {
           task3_enter_phase(status, Q3_AB_TURN_C_TO_CB);
           status->state.initial_angle = status->state.cur_angle;
@@ -1439,6 +1492,7 @@ static void driver_task3(STATUS *status) {
           q3_mid4_stable_cnt = 0;
         }
         task3_apply_cd_speed(status);
+        task3_cd_distance_update(status);
         if (task3_accept_road(status, RightRoad, Q3_CD_IGNORE_END_CM)) {
           task3_enter_phase(status, Q3_AD_TURN_D_TO_DA);
           status->state.initial_angle = status->state.cur_angle;
