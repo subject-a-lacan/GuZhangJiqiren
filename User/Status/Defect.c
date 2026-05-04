@@ -99,6 +99,31 @@
 #define Q4_WHEEL1_FF_K                  17.64f
 #define Q4_WHEEL1_FF_MIN                260.0f
 
+/* Q4 tunable parameters */
+#define Q4_TRACK_SPEED                  30
+#define Q4_SCAN_SPEED                   16
+#define Q4_FIND_LINE_SPEED              16
+#define Q4_TURN_BASE_SPEED              0
+#define Q4_START_TO_A_MIN_CM            5.0f
+#define Q4_ROAD_ENABLE_CM               60.0f
+#define Q4_DC_SCAN_START_CM             66.7f
+#define Q4_SCAN_SEGMENT_CM              33.3f
+#define Q4_SCAN_STOP_MS                 100
+#define Q4_TURN_A_LEFT_ANGLE            80.0f
+#define Q4_TURN_D_LEFT_ANGLE            85.0f
+#define Q4_SCAN_TURN_1_LEFT_ANGLE       83.0f
+#define Q4_SCAN_TURN_2_LEFT_ANGLE       83.0f
+#define Q4_SCAN_TURN_3_LEFT_ANGLE       83.0f
+#define Q4_TURN_A_ANGLE_LIMIT           22.0f
+#define Q4_TURN_D_ANGLE_LIMIT           22.0f
+#define Q4_SCAN_TURN_1_ANGLE_LIMIT      22.0f
+#define Q4_SCAN_TURN_2_ANGLE_LIMIT      22.0f
+#define Q4_SCAN_TURN_3_ANGLE_LIMIT      22.0f
+#define Q4_STRAIGHT_ANGLE_LIMIT         12.0f
+#define Q4_TURN_TOLERANCE_DEG           8.0f
+#define Q4_TURN_LINE_MASK_6             0x7E
+#define Q4_LINE_STABLE_CNT              3
+
 /* Q3 tunable parameters */
 
 /* AB per-turn left angles (independently calibrated, like TASK2) */
@@ -139,17 +164,19 @@
 #define Q3_CD_FAST_SPEED            30    /* CD边视觉识别完成后的提速 */
 
 /* Distance thresholds (cm, 通过 encoder_pulse_to_cm 换算后比较) */
-#define Q3_STRAIGHT_FLASH_CM        68.0f
-#define Q3_PRE_TURN_SLOW_CM         64.0f /* 普通直道入弯前减速距离(cm) */
+#define Q3_STRAIGHT_FLASH_CM        62.0f
+#define Q3_PRE_TURN_SLOW_CM         56.0f /* 普通直道入弯前减速距离(cm) */
 #define Q3_PRE_TURN_SLOW_SPEED      22   /* 普通直道入弯前减速目标速度 */
 #define Q3_FINAL_SLOW_CM            70.0f
-#define Q3_CD_SLOW_AFTER_CM         14.0f /* CD边行驶14cm后降速, 给视觉更多帧 */
+#define Q3_CD_SLOW_AFTER_CM         14.0f
 #define Q3_CD_FAST_AFTER_CM         68.0f /* CD边视觉识别完成后的提速距离 */
 #define Q3_CD_IGNORE_END_CM         75.0f /* A4横线干扰结束, 之后允许接受路口 */
 #define Q3_ROAD_ENABLE_CM            70.0f /* 普通路口里程门槛, 防止误触发 */
 
 #define Q3_CD_DISTANCE_MASK          0x66  /* bit1/bit2/bit5/bit6 */
-#define Q3_CD_EDGE_DELTA_THRESHOLD   2
+#define Q3_CD_BLACK_COUNT_THRESHOLD  2
+#define Q3_CD_WHITE_COUNT_THRESHOLD  1
+#define Q3_CD_EDGE_MIN_GAP_CM        0.8f
 #define Q3_CD_EDGE_COUNT             6
 
 extern uint8_t cross_cnt;
@@ -261,7 +288,7 @@ void task_start(STATUS *status) {
       }
       break;
     case TASK_ADV_2:
-      status->task.race_phase = 0;  // TODO: Q4_RACE_PHASE
+      status->task.race_phase = Q4_START_TO_A;
       break;
   }
 
@@ -1111,8 +1138,8 @@ static void driver_task2(STATUS *status) {
 /* ---- TASK3 小工具函数 ---- */
 
 static uint8_t q3_mid4_stable_cnt = 0;
-static uint8_t q3_cd_prev_mask = 0;
 static uint8_t q3_cd_edge_index = 0;
+static float q3_cd_last_edge_pulse = 0;
 static float q3_cd_edge_pulse[Q3_CD_EDGE_COUNT] = {0};
 
 static uint8_t task3_count_bits(uint8_t value) {
@@ -1126,35 +1153,41 @@ static uint8_t task3_count_bits(uint8_t value) {
 }
 
 static void task3_cd_distance_reset(STATUS *status) {
-  q3_cd_prev_mask = status->sensor.gw_analogue.digital_8bit & Q3_CD_DISTANCE_MASK;
   q3_cd_edge_index = 0;
+  q3_cd_last_edge_pulse = status->task.phase_mileage;
   for (uint8_t i = 0; i < Q3_CD_EDGE_COUNT; i++) {
     q3_cd_edge_pulse[i] = 0;
   }
 }
 
+static void task3_cd_record_edge(STATUS *status) {
+  q3_cd_edge_pulse[q3_cd_edge_index] = status->task.phase_mileage;
+  q3_cd_last_edge_pulse = status->task.phase_mileage;
+  q3_cd_edge_index++;
+  if (q3_cd_edge_index == 3) {
+    l1 = encoder_pulse_to_cm((int32_t)(q3_cd_edge_pulse[2] - q3_cd_edge_pulse[1]));
+  } else if (q3_cd_edge_index == 5) {
+    l2 = encoder_pulse_to_cm((int32_t)(q3_cd_edge_pulse[4] - q3_cd_edge_pulse[3]));
+  }
+}
+
 static void task3_cd_distance_update(STATUS *status) {
   uint8_t cur = status->sensor.gw_analogue.digital_8bit & Q3_CD_DISTANCE_MASK;
-  uint8_t black_added = task3_count_bits(cur & (uint8_t)(~q3_cd_prev_mask));
-  uint8_t white_added = task3_count_bits(q3_cd_prev_mask & (uint8_t)(~cur));
+  uint8_t black_count = task3_count_bits(cur);
+  uint8_t is_black = (black_count >= Q3_CD_BLACK_COUNT_THRESHOLD);
+  uint8_t is_white = (black_count <= Q3_CD_WHITE_COUNT_THRESHOLD);
 
   if (q3_cd_edge_index < Q3_CD_EDGE_COUNT) {
+    float gap_cm = encoder_pulse_to_cm((int32_t)(status->task.phase_mileage - q3_cd_last_edge_pulse));
+    if (q3_cd_edge_index != 0 && gap_cm <= Q3_CD_EDGE_MIN_GAP_CM) {
+      return;
+    }
+
     uint8_t expect_black = ((q3_cd_edge_index & 1) == 0);
-    uint8_t edge_seen = expect_black
-                            ? (black_added >= Q3_CD_EDGE_DELTA_THRESHOLD)
-                            : (white_added >= Q3_CD_EDGE_DELTA_THRESHOLD);
-    if (edge_seen) {
-      q3_cd_edge_pulse[q3_cd_edge_index] = status->task.phase_mileage;
-      q3_cd_edge_index++;
-      if (q3_cd_edge_index == 3) {
-        l1 = encoder_pulse_to_cm((int32_t)(q3_cd_edge_pulse[2] - q3_cd_edge_pulse[1]));
-      } else if (q3_cd_edge_index == 5) {
-        l2 = encoder_pulse_to_cm((int32_t)(q3_cd_edge_pulse[4] - q3_cd_edge_pulse[3]));
-      }
+    if ((expect_black && is_black) || (!expect_black && is_white)) {
+      task3_cd_record_edge(status);
     }
   }
-
-  q3_cd_prev_mask = cur;
 }
 
 /* 路口映射: T 路口合并为单边路口, 不改底层 get_road_type() */
@@ -1518,29 +1551,260 @@ static void driver_task3(STATUS *status) {
   }
 }
 
+/* ---- TASK4 helpers ---- */
+
+static uint8_t q4_line_stable_cnt = 0;
+
+static Road task4_map_road(Road raw) {
+  if (raw == TLRoad) return LeftRoad;
+  if (raw == TRRoad) return RightRoad;
+  return raw;
+}
+
+static void task4_enter_phase(STATUS *status, uint8_t next_phase) {
+  status->task.race_phase = next_phase;
+  status->task.phase_mileage = 0;
+  status->task.phase_start_time = status->state.time;
+  q4_line_stable_cnt = 0;
+}
+
+static float task4_angle_error(STATUS *status) {
+  float target = status->state.tar_angle + status->state.initial_angle;
+  float diff = target - status->state.cur_angle;
+  if (diff > 180.0f)        diff -= 360.0f;
+  else if (diff < -180.0f)  diff += 360.0f;
+  return diff;
+}
+
+static uint8_t task4_turn_angle_ready(STATUS *status) {
+  return (ABS(task4_angle_error(status)) < Q4_TURN_TOLERANCE_DEG);
+}
+
+static uint8_t task4_middle6_seen(STATUS *status) {
+  return (status->sensor.gw_analogue.digital_8bit & Q4_TURN_LINE_MASK_6) != 0;
+}
+
+static void task4_start_left_turn(STATUS *status, uint8_t next_phase, float angle, float limit) {
+  task4_enter_phase(status, next_phase);
+  status->state.initial_angle = status->state.cur_angle;
+  status->state.tar_angle = angle;
+  status->state.motion = KEEP_ANGLE;
+  status->state.base_speed = Q4_TURN_BASE_SPEED;
+  status->state.status_pid.angle_output_limit = limit;
+}
+
+static void task4_start_heading_drive(STATUS *status, uint8_t next_phase) {
+  task4_enter_phase(status, next_phase);
+  status->state.initial_angle = status->state.cur_angle;
+  status->state.tar_angle = 0;
+  status->state.motion = KEEP_ANGLE;
+  status->state.base_speed = Q4_SCAN_SPEED;
+  status->state.status_pid.angle_output_limit = Q4_STRAIGHT_ANGLE_LIMIT;
+}
+
+static uint8_t task4_accept_road(STATUS *status, Road road, Road expected, float min_cm) {
+  float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+  if (cm < min_cm) return 0;
+  if (road != expected) return 0;
+  if (status->task.cnt_seen == 1) return 0;
+  status->task.cnt_seen = 1;
+  status->task.cross_cnt++;
+  return 1;
+}
+
+static void task4_wait_stop(STATUS *status, uint8_t next_phase) {
+  status->state.motion = STOP;
+  status->state.base_speed = 0;
+  if (status->state.time - status->task.phase_start_time >= Q4_SCAN_STOP_MS) {
+    task4_start_heading_drive(status, next_phase);
+  }
+}
+
 static void driver_task4(STATUS *status) {
-  if (!status->task.task_running) return;
-  Road road = status->sensor.gw_analogue.cross.cross;
-  if (road == TLRoad) road = LeftRoad;
-  if (road == TRRoad) road = RightRoad;
+  Road road = task4_map_road(status->sensor.gw_analogue.cross.cross);
 
-  if (status->task.race_phase == 0) {
-    status->task.task_running = 1;
-    status->state.base_speed = 30;
-    status->state.motion = FIND_LINE;
-    status->task.race_phase = 1;
-    return;
+  if (road == Straight && status->state.motion == FIND_LINE
+      && status->task.race_phase != Q4_FIND_AD
+      && status->task.race_phase != Q4_FIND_DC) {
+    status->task.cnt_seen = 0;
   }
 
-  if (status->task.race_phase == 1 && road == LeftRoad) {
-    status->state.motion = STOP;
-    status->task.race_phase = 2;
-    return;
-  }
+  switch (status->task.race_phase) {
+    case Q4_START_TO_A:
+      status->task.task_running = 1;
+      status->state.motion = FIND_LINE;
+      status->state.base_speed = Q4_TRACK_SPEED;
+      if (task4_accept_road(status, road, LeftRoad, Q4_START_TO_A_MIN_CM)) {
+        task4_start_left_turn(status, Q4_TURN_A_TO_AD, Q4_TURN_A_LEFT_ANGLE, Q4_TURN_A_ANGLE_LIMIT);
+      }
+      break;
 
-  if (status->task.race_phase == 2) {
-    float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
-    printf("%.2f\r\n", cm);
+    case Q4_TURN_A_TO_AD:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_TURN_BASE_SPEED;
+      if (task4_turn_angle_ready(status)) {
+        task4_enter_phase(status, Q4_FIND_AD);
+        status->state.motion = FIND_LINE;
+        status->state.base_speed = Q4_FIND_LINE_SPEED;
+      }
+      break;
+
+    case Q4_FIND_AD:
+      status->task.task_running = 1;
+      status->state.motion = FIND_LINE;
+      status->state.base_speed = Q4_FIND_LINE_SPEED;
+      if (task4_middle6_seen(status)) {
+        q4_line_stable_cnt++;
+      } else {
+        q4_line_stable_cnt = 0;
+      }
+      if (q4_line_stable_cnt >= Q4_LINE_STABLE_CNT) {
+        task4_enter_phase(status, Q4_SIDE_AD);
+      }
+      break;
+
+    case Q4_SIDE_AD:
+      status->task.task_running = 1;
+      status->state.motion = FIND_LINE;
+      status->state.base_speed = Q4_TRACK_SPEED;
+      if (task4_accept_road(status, road, LeftRoad, Q4_ROAD_ENABLE_CM)) {
+        task4_start_left_turn(status, Q4_TURN_D_TO_DC, Q4_TURN_D_LEFT_ANGLE, Q4_TURN_D_ANGLE_LIMIT);
+      }
+      break;
+
+    case Q4_TURN_D_TO_DC:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_TURN_BASE_SPEED;
+      if (task4_turn_angle_ready(status)) {
+        task4_enter_phase(status, Q4_FIND_DC);
+        status->state.motion = FIND_LINE;
+        status->state.base_speed = Q4_FIND_LINE_SPEED;
+      }
+      break;
+
+    case Q4_FIND_DC:
+      status->task.task_running = 1;
+      status->state.motion = FIND_LINE;
+      status->state.base_speed = Q4_FIND_LINE_SPEED;
+      if (task4_middle6_seen(status)) {
+        q4_line_stable_cnt++;
+      } else {
+        q4_line_stable_cnt = 0;
+      }
+      if (q4_line_stable_cnt >= Q4_LINE_STABLE_CNT) {
+        task4_enter_phase(status, Q4_SIDE_DC_TO_SCAN_START);
+      }
+      break;
+
+    case Q4_SIDE_DC_TO_SCAN_START:
+      status->task.task_running = 1;
+      status->state.motion = FIND_LINE;
+      status->state.base_speed = Q4_SCAN_SPEED;
+      if (encoder_pulse_to_cm((int32_t)status->task.phase_mileage) >= Q4_DC_SCAN_START_CM) {
+        task4_start_left_turn(status, Q4_SCAN_TURN_1, Q4_SCAN_TURN_1_LEFT_ANGLE, Q4_SCAN_TURN_1_ANGLE_LIMIT);
+      }
+      break;
+
+    case Q4_SCAN_TURN_1:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_TURN_BASE_SPEED;
+      if (task4_turn_angle_ready(status)) {
+        task4_start_heading_drive(status, Q4_SCAN_DRIVE_1);
+      }
+      break;
+
+    case Q4_SCAN_DRIVE_1:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_SCAN_SPEED;
+      if (encoder_pulse_to_cm((int32_t)status->task.phase_mileage) >= Q4_SCAN_SEGMENT_CM) {
+        task4_enter_phase(status, Q4_SCAN_STOP_1);
+      }
+      break;
+
+    case Q4_SCAN_STOP_1:
+      status->task.task_running = 1;
+      task4_wait_stop(status, Q4_SCAN_DRIVE_2);
+      break;
+
+    case Q4_SCAN_DRIVE_2:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_SCAN_SPEED;
+      if (encoder_pulse_to_cm((int32_t)status->task.phase_mileage) >= Q4_SCAN_SEGMENT_CM) {
+        task4_enter_phase(status, Q4_SCAN_STOP_2);
+      }
+      break;
+
+    case Q4_SCAN_STOP_2:
+      status->task.task_running = 1;
+      status->state.motion = STOP;
+      status->state.base_speed = 0;
+      if (status->state.time - status->task.phase_start_time >= Q4_SCAN_STOP_MS) {
+        task4_start_left_turn(status, Q4_SCAN_TURN_2, Q4_SCAN_TURN_2_LEFT_ANGLE, Q4_SCAN_TURN_2_ANGLE_LIMIT);
+      }
+      break;
+
+    case Q4_SCAN_TURN_2:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_TURN_BASE_SPEED;
+      if (task4_turn_angle_ready(status)) {
+        task4_start_heading_drive(status, Q4_SCAN_DRIVE_3);
+      }
+      break;
+
+    case Q4_SCAN_DRIVE_3:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_SCAN_SPEED;
+      if (encoder_pulse_to_cm((int32_t)status->task.phase_mileage) >= Q4_SCAN_SEGMENT_CM) {
+        task4_enter_phase(status, Q4_SCAN_STOP_3);
+      }
+      break;
+
+    case Q4_SCAN_STOP_3:
+      status->task.task_running = 1;
+      status->state.motion = STOP;
+      status->state.base_speed = 0;
+      if (status->state.time - status->task.phase_start_time >= Q4_SCAN_STOP_MS) {
+        task4_start_left_turn(status, Q4_SCAN_TURN_3, Q4_SCAN_TURN_3_LEFT_ANGLE, Q4_SCAN_TURN_3_ANGLE_LIMIT);
+      }
+      break;
+
+    case Q4_SCAN_TURN_3:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_TURN_BASE_SPEED;
+      if (task4_turn_angle_ready(status)) {
+        task4_start_heading_drive(status, Q4_SCAN_DRIVE_4);
+      }
+      break;
+
+    case Q4_SCAN_DRIVE_4:
+      status->task.task_running = 1;
+      status->state.motion = KEEP_ANGLE;
+      status->state.base_speed = Q4_SCAN_SPEED;
+      if (encoder_pulse_to_cm((int32_t)status->task.phase_mileage) >= Q4_SCAN_SEGMENT_CM) {
+        task4_enter_phase(status, Q4_SCAN_STOP_4);
+      }
+      break;
+
+    case Q4_SCAN_STOP_4:
+      status->task.task_running = 1;
+      status->state.motion = STOP;
+      status->state.base_speed = 0;
+      if (status->state.time - status->task.phase_start_time >= Q4_SCAN_STOP_MS) {
+        task4_enter_phase(status, Q4_FINISH);
+      }
+      break;
+
+    case Q4_FINISH:
+      task_finish(status);
+      break;
   }
 }
 

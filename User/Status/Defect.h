@@ -118,6 +118,29 @@ typedef enum Q3_AD_RACE_PHASE {
   Q3_AD_FINISH,
 } Q3_AD_RACE_PHASE;
 
+/* Q4 race phases: A->D->DC near C, then scan third-points off the line. */
+typedef enum Q4_RACE_PHASE {
+  Q4_START_TO_A,
+  Q4_TURN_A_TO_AD,
+  Q4_FIND_AD,
+  Q4_SIDE_AD,
+  Q4_TURN_D_TO_DC,
+  Q4_FIND_DC,
+  Q4_SIDE_DC_TO_SCAN_START,
+  Q4_SCAN_TURN_1,
+  Q4_SCAN_DRIVE_1,
+  Q4_SCAN_STOP_1,
+  Q4_SCAN_DRIVE_2,
+  Q4_SCAN_STOP_2,
+  Q4_SCAN_TURN_2,
+  Q4_SCAN_DRIVE_3,
+  Q4_SCAN_STOP_3,
+  Q4_SCAN_TURN_3,
+  Q4_SCAN_DRIVE_4,
+  Q4_SCAN_STOP_4,
+  Q4_FINISH,
+} Q4_RACE_PHASE;
+
 typedef struct TASK {
   uint8_t task_id;     //任务编号
   uint8_t start_pose;  //起始位姿 第二问 第三问 要用

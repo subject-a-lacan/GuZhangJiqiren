@@ -149,23 +149,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (task3_finished && status.task.task_id == TASK_ADV_1 && status.task.task_running == 0) {
+    if (task3_finished) {
       task3_print_flag = 1;
-      task3_print_cnt = 5;
       task3_finished = 0;
     }
 
-    if (task3_print_flag && status.task.task_id == TASK_ADV_1 && status.task.task_running == 0) {
-      printf("%.2f,%.2f\r\n", (double)(l1 * 10.0f), (double)(l2 * 10.0f));
-      if (task3_print_cnt > 0) {
-        task3_print_cnt--;
-      }
-      if (task3_print_cnt == 0) {
-        task3_print_flag = 0;
-      }
-    } else if (task3_print_flag) {
-      task3_print_flag = 0;
-      task3_print_cnt = 0;
+    if (task3_print_flag) {
+      float task3_l1_out = (l1 == 0.0f) ? 290.0f : (l1 * 10.0f);
+      float task3_l2_out = (l2 == 0.0f) ? 290.0f : (l2 * 10.0f);
+      printf("%.2f,%.2f\r\n", (double)task3_l1_out, (double)task3_l2_out);
     }
 
     //  uint8_t d = status.sensor.gw_analogue.digital_8bit;
