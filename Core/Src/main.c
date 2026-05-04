@@ -43,7 +43,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+int fputc(int ch, FILE *f)
+{
+    while (!(USART1->ISR & USART_ISR_TXE));
+    USART1->TDR = (uint8_t)ch;
+    return ch;
+}
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -231,7 +236,7 @@ int main(void)
   init_wheel(&status.motor.wheel[0], 1, -1);
   init_wheel(&status.motor.wheel[1], 2, 1);
 
-  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  // ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
   __HAL_UART_DISABLE_IT(&huart1, UART_IT_RXNE);
   __HAL_UART_DISABLE_IT(&huart1, UART_IT_IDLE);
   HAL_NVIC_DisableIRQ(USART1_IRQn);
@@ -250,7 +255,9 @@ int main(void)
     /* USER CODE BEGIN 3 */
     poll_feedforward_cmd(100);
     set_feedforward_pwm();
-    log_uprintf(&huart1, "%d,%d,%d,%lu,%u\r\n", cmd_speed, actual_speed0, actual_speed1, (unsigned long)rx_count, last_rx);
+    printf("1");
+    HAL_Delay(100);
+    // log_uprintf(&huart1, "%d,%d,%d,%lu,%u\r\n", cmd_speed, actual_speed0, actual_speed1, (unsigned long)rx_count, last_rx);
   }
   /* USER CODE END 3 */
 }
