@@ -45,8 +45,8 @@
 /* USER CODE BEGIN PD */
 int fputc(int ch, FILE *f)
 {
-    while (!(USART1->ISR & USART_ISR_TXE));
-    USART1->TDR = (uint8_t)ch;
+    while (!(USART2->ISR & USART_ISR_TXE));
+    USART2->TDR = (uint8_t)ch;
     return ch;
 }
 /* USER CODE END PD */
@@ -169,11 +169,11 @@ static void poll_feedforward_cmd(uint32_t duration_ms) {
   uint32_t start = HAL_GetTick();
 
   while (HAL_GetTick() - start < duration_ms) {
-    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE)) {
-      __HAL_UART_CLEAR_OREFLAG(&huart1);
+    if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_ORE)) {
+      __HAL_UART_CLEAR_OREFLAG(&huart2);
     }
-    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE)) {
-      last_rx = (uint8_t)(huart1.Instance->RDR & 0xff);
+    if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE)) {
+      last_rx = (uint8_t)(huart2.Instance->RDR & 0xff);
       rx_count++;
       feedforward_cmd_put_char((char)last_rx);
     }
@@ -237,9 +237,9 @@ int main(void)
   init_wheel(&status.motor.wheel[1], 2, 1);
 
   // ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
-  __HAL_UART_DISABLE_IT(&huart1, UART_IT_RXNE);
-  __HAL_UART_DISABLE_IT(&huart1, UART_IT_IDLE);
-  HAL_NVIC_DisableIRQ(USART1_IRQn);
+  __HAL_UART_DISABLE_IT(&huart2, UART_IT_RXNE);
+  __HAL_UART_DISABLE_IT(&huart2, UART_IT_IDLE);
+  HAL_NVIC_DisableIRQ(USART2_IRQn);
   // after_init_state();
 
   HAL_TIM_Base_Start_IT(&htim5);
@@ -257,7 +257,7 @@ int main(void)
     set_feedforward_pwm();
     printf("1");
     HAL_Delay(100);
-    // log_uprintf(&huart1, "%d,%d,%d,%lu,%u\r\n", cmd_speed, actual_speed0, actual_speed1, (unsigned long)rx_count, last_rx);
+    // log_uprintf(&huart2, "%d,%d,%d,%lu,%u\r\n", cmd_speed, actual_speed0, actual_speed1, (unsigned long)rx_count, last_rx);
   }
   /* USER CODE END 3 */
 }

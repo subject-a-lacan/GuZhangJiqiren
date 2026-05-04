@@ -72,7 +72,7 @@ Section Cross References
     main.o(.text.main) refers to putchar.o(i.putchar) for putchar
     main.o(.text.main) refers to stm32g4xx_hal.o(.text.HAL_Delay) for HAL_Delay
     main.o(.text.main) refers to status.o(.bss.status) for status
-    main.o(.text.main) refers to usart.o(.bss.huart1) for huart1
+    main.o(.text.main) refers to usart.o(.bss.huart2) for huart2
     main.o(.text.main) refers to tim.o(.bss.htim5) for htim5
     main.o(.text.main) refers to main.o(.bss..L_MergedGlobals) for [Anonymous Symbol]
     main.o(.text.main) refers to main.o(.bss..L_MergedGlobals.2) for [Anonymous Symbol]
@@ -4689,8 +4689,8 @@ Image Symbol Table
     __arm_cp.2_12                            0x08004c10   Number         4  stm32g4xx_hal_uart.o(.text.UART_SetConfig)
     [Anonymous Symbol]                       0x08004c14   Section        0  stm32g4xx_hal_uart.o(.text.UART_WaitOnFlagUntilTimeout)
     [Anonymous Symbol]                       0x08004cec   Section        0  stm32g4xx_it.o(.text.USART1_IRQHandler)
-    [Anonymous Symbol]                       0x08004cf4   Section        0  stm32g4xx_it.o(.text.USART2_IRQHandler)
-    __arm_cp.19_0                            0x08004cfc   Number         4  stm32g4xx_it.o(.text.USART2_IRQHandler)
+    __arm_cp.18_0                            0x08004cf4   Number         4  stm32g4xx_it.o(.text.USART1_IRQHandler)
+    [Anonymous Symbol]                       0x08004cf8   Section        0  stm32g4xx_it.o(.text.USART2_IRQHandler)
     [Anonymous Symbol]                       0x08004d00   Section        0  stm32g4xx_it.o(.text.USART3_IRQHandler)
     __arm_cp.20_0                            0x08004d08   Number         4  stm32g4xx_it.o(.text.USART3_IRQHandler)
     [Anonymous Symbol]                       0x08004d0c   Section        0  stm32g4xx_it.o(.text.UsageFault_Handler)
@@ -5052,7 +5052,7 @@ Image Symbol Table
     UART_SetConfig                           0x080049cd   Thumb Code   584  stm32g4xx_hal_uart.o(.text.UART_SetConfig)
     UART_WaitOnFlagUntilTimeout              0x08004c15   Thumb Code   216  stm32g4xx_hal_uart.o(.text.UART_WaitOnFlagUntilTimeout)
     USART1_IRQHandler                        0x08004ced   Thumb Code    12  stm32g4xx_it.o(.text.USART1_IRQHandler)
-    USART2_IRQHandler                        0x08004cf5   Thumb Code    12  stm32g4xx_it.o(.text.USART2_IRQHandler)
+    USART2_IRQHandler                        0x08004cf9   Thumb Code    12  stm32g4xx_it.o(.text.USART2_IRQHandler)
     USART3_IRQHandler                        0x08004d01   Thumb Code    12  stm32g4xx_it.o(.text.USART3_IRQHandler)
     UsageFault_Handler                       0x08004d0d   Thumb Code     2  stm32g4xx_it.o(.text.UsageFault_Handler)
     fputc                                    0x08004d81   Thumb Code    20  main.o(.text.fputc)
@@ -5308,8 +5308,8 @@ Memory Map of the image
     0x08004978   0x08004978   0x00000054   Code   RO         1795    .text.UART_EndRxTransfer  stm32g4xx_hal_uart.o
     0x080049cc   0x080049cc   0x00000248   Code   RO         1739    .text.UART_SetConfig  stm32g4xx_hal_uart.o
     0x08004c14   0x08004c14   0x000000d8   Code   RO         1757    .text.UART_WaitOnFlagUntilTimeout  stm32g4xx_hal_uart.o
-    0x08004cec   0x08004cec   0x00000008   Code   RO          248    .text.USART1_IRQHandler  stm32g4xx_it.o
-    0x08004cf4   0x08004cf4   0x0000000c   Code   RO          250    .text.USART2_IRQHandler  stm32g4xx_it.o
+    0x08004cec   0x08004cec   0x0000000c   Code   RO          248    .text.USART1_IRQHandler  stm32g4xx_it.o
+    0x08004cf8   0x08004cf8   0x00000008   Code   RO          250    .text.USART2_IRQHandler  stm32g4xx_it.o
     0x08004d00   0x08004d00   0x0000000c   Code   RO          252    .text.USART3_IRQHandler  stm32g4xx_it.o
     0x08004d0c   0x08004d0c   0x00000002   Code   RO          220    .text.UsageFault_Handler  stm32g4xx_it.o
     0x08004d0e   0x08004d0e   0x00000002   PAD
