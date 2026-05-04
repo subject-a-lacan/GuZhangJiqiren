@@ -159,7 +159,6 @@ extern Road road_buf;
 extern volatile float l1;
 extern volatile float l2;
 extern volatile uint8_t task3_finished;
-extern volatile uint8_t send_h3c_flag;
 
 void init_task(TASK *task) {
   task->task_id = TASK_BASIC_1;
@@ -1331,7 +1330,6 @@ static void driver_task3(STATUS *status) {
           if (status->task.race_phase == Q3_AB_SIDE_AD) {
             next = Q3_AB_TURN_D_TO_DC;
             angle = Q3_AB_TURN_D_LEFT_ANGLE;
-            send_h3c_flag = 1;
           } else {
             next = Q3_AB_TURN_B_TO_BA;
             angle = Q3_AB_TURN_B_LEFT_ANGLE;
@@ -1470,7 +1468,6 @@ static void driver_task3(STATUS *status) {
           } else {
             next = Q3_AD_TURN_C_TO_CD;
             angle = Q3_AD_TURN_C_RIGHT_ANGLE;
-            send_h3c_flag = 1;
           }
           task3_enter_phase(status, next);
           status->state.initial_angle = status->state.cur_angle;

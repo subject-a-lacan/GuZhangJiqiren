@@ -67,7 +67,6 @@ extern uint8_t cross_cnt;
 volatile float l1 = 0.0f;
 volatile float l2 = 0.0f;
 volatile uint8_t task3_finished = 0;
-volatile uint8_t send_h3c_flag = 0;
 uint8_t task3_print_flag = 0;
 uint8_t task3_print_cnt = 0;
 /* USER CODE END PV */
@@ -150,11 +149,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (send_h3c_flag) {
-      uint8_t h3c[] = {0x48, 0x33, 0x43};
-      HAL_UART_Transmit(&huart3, h3c, 3, 100);
-      send_h3c_flag = 0;
-    }
     if (task3_finished && status.task.task_id == TASK_ADV_1 && status.task.task_running == 0) {
       task3_print_flag = 1;
       task3_print_cnt = 5;
@@ -162,7 +156,7 @@ int main(void)
     }
 
     if (task3_print_flag && status.task.task_id == TASK_ADV_1 && status.task.task_running == 0) {
-      printf("%.2f,%.2f\r\n", (double)l1, (double)l2);
+      printf("%.2f,%.2f\r\n", (double)(l1 * 10.0f), (double)(l2 * 10.0f));
       if (task3_print_cnt > 0) {
         task3_print_cnt--;
       }
@@ -265,107 +259,19 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 void UART_PID_Tune(uint8_t cmd, float val) {
+  (void)val;
   switch (cmd) {
-    // case 'a': status.state.status_pid.follow_line_pid.kp = val; log_uprintf(&huart1, "follow_line kp=%.3f\r\n", val); break;
-    // case 'c': status.state.status_pid.follow_line_pid.ki = val; log_uprintf(&huart1,"follow_line ki=%.3f\r\n", val); break;
-    // case 'e': status.state.status_pid.follow_line_pid.kd = val; printf("follow_line kd=%.3f\r\n", val); break;
-
-    // case 'g': status.state.status_pid.keep_angle_pid.kp = val; printf("keep_angle kp=%.3f\r\n", val); break;
-    // case 'i': status.state.status_pid.keep_angle_pid.ki = val; printf("keep_angle ki=%.3f\r\n", val); break;
-    // case 'k': status.state.status_pid.keep_angle_pid.kd = val; printf("keep_angle kd=%.3f\r\n", val); break;
-
-    // case 'm': status.motor.wheel[0].wheel_pid.kp = val; printf("wheel0 kp=%.3f\r\n", val); break;
-    // case 'o': status.motor.wheel[0].wheel_pid.ki = val; printf("wheel0 ki=%.3f\r\n", val); break;
-    // case 'q': status.motor.wheel[0].wheel_pid.kd = val; printf("wheel0 kd=%.3f\r\n", val); break;
-
-    // case 's': status.motor.wheel[1].wheel_pid.kp = val; printf("wheel1 kp=%.3f\r\n", val); break;
-    // case 'u': status.motor.wheel[1].wheel_pid.ki = val; printf("wheel1 ki=%.3f\r\n", val); break;
-    // case 'w': status.motor.wheel[1].wheel_pid.kd = val; printf("wheel1 kd=%.3f\r\n", val); break;
-
-    // case 'z': status.state.motion = STOP; printf("motion=STOP\r\n"); break;
-    // case 'y':
-    //   status.state.status_pid.follow_line_pid.integral = 0;
-    //   status.state.status_pid.follow_line_pid.last_error = 0;
-    //   status.state.status_pid.follow_line_pid.error = 0;
-    //   status.state.status_pid.follow_line_pid.out = 0;
-    //   status.state.status_pid.keep_angle_pid.integral = 0;
-    //   status.state.status_pid.keep_angle_pid.last_error = 0;
-    //   status.state.status_pid.keep_angle_pid.error = 0;
-    //   status.state.status_pid.keep_angle_pid.out = 0;
-    //   status.motor.wheel[0].wheel_pid.integral = 0;
-    //   status.motor.wheel[0].wheel_pid.last_error = 0;
-    //   status.motor.wheel[0].wheel_pid.error = 0;
-    //   status.motor.wheel[0].wheel_pid.out = 0;
-    //   status.motor.wheel[1].wheel_pid.integral = 0;
-    //   status.motor.wheel[1].wheel_pid.last_error = 0;
-    //   status.motor.wheel[1].wheel_pid.error = 0;
-    //   status.motor.wheel[1].wheel_pid.out = 0;
-    //   status.state.motion = MOTOR_TEST;
-    //   break;
-       case 'a': status.state.status_pid.follow_line_pid.kp = val;  break;
-    case 'c': status.state.status_pid.follow_line_pid.ki = val; break;
-    case 'e': status.state.status_pid.follow_line_pid.kd = val; break;
-
-    case 'g': status.state.status_pid.keep_angle_pid.kp = val;  break;
-    case 'i': status.state.status_pid.keep_angle_pid.ki = val; break;
-    case 'k': status.state.status_pid.keep_angle_pid.kd = val;  break;
-
-    case 'm': status.motor.wheel[0].wheel_pid.kp = val;  break;
-    case 'o': status.motor.wheel[0].wheel_pid.ki = val;  break;
-    case 'q': status.motor.wheel[0].wheel_pid.kd = val;  break;
-
-    case 's': status.motor.wheel[1].wheel_pid.kp = val;  break;
-    case 'u': status.motor.wheel[1].wheel_pid.ki = val;  break;
-    case 'w': status.motor.wheel[1].wheel_pid.kd = val;  break;
-
-    case 'M': set_wheel_ff_offset_by_which(1, val); break;
-    case 'O': set_wheel_ff_k_by_which(1, val); break;
-    case 'Q': set_wheel_ff_min_by_which(1, val); break;
-
-    case 'S': set_wheel_ff_offset_by_which(2, val); break;
-    case 'U': set_wheel_ff_k_by_which(2, val); break;
-    case 'W': set_wheel_ff_min_by_which(2, val); break;
-
-    case 'b': status.motor.wheel[0].wheel_pid.integral_max = val;  break;
-    case 'n': status.motor.wheel[1].wheel_pid.integral_max = val;  break;
-
-    case 'z': status.task.task_running = 0;
-              status.task.armed = 0;
-              status.task.start_request = 0;
-              status.task.stop_request = 0;
-              status.task.stop_cmd = 1;
-
-              status.state.motion = STOP;
-              status.state.base_speed = 0;
-
-              status.motor.wheel[0].tar_speed = 0;
-              status.motor.wheel[1].tar_speed = 0;
-    
-              break;
-    case 'y':
-      status.state.status_pid.follow_line_pid.integral = 0;
-      status.state.status_pid.follow_line_pid.last_error = 0;
-      status.state.status_pid.follow_line_pid.error = 0;
-      status.state.status_pid.follow_line_pid.out = 0;
-      status.state.status_pid.keep_angle_pid.integral = 0;
-      status.state.status_pid.keep_angle_pid.last_error = 0;
-      status.state.status_pid.keep_angle_pid.error = 0;
-      status.state.status_pid.keep_angle_pid.out = 0;
-      status.motor.wheel[0].wheel_pid.integral = 0;
-      status.motor.wheel[0].wheel_pid.last_error = 0;
-      status.motor.wheel[0].wheel_pid.error = 0;
-      status.motor.wheel[0].wheel_pid.out = 0;
-      status.motor.wheel[1].wheel_pid.integral = 0;
-      status.motor.wheel[1].wheel_pid.last_error = 0;
-      status.motor.wheel[1].wheel_pid.error = 0;
-      status.motor.wheel[1].wheel_pid.out = 0;
-      status.motor.wheel[0].trust = 0;
-      status.motor.wheel[1].trust = 0;
-      status.task.start_request=1;
+    case 'P':
+      status.task.task_running = 0;
+      status.task.armed = 0;
+      status.task.start_request = 0;
+      status.task.stop_request = 0;
+      status.task.stop_cmd = 1;
+      status.state.motion = STOP;
+      status.state.base_speed = 0;
+      status.motor.wheel[0].tar_speed = 0;
+      status.motor.wheel[1].tar_speed = 0;
       break;
-    case 'h': cmd_speed = (int16_t)val;  break;
-    case 'l': l1 = val; break;  /* 视觉模块发送 l1 (待测A4第1条线距离) */
-    case 'L': l2 = val; break;  /* 视觉模块发送 l2 (待测A4第2条线距离) */
     default: break;
   }
 }
