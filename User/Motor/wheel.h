@@ -28,5 +28,9 @@ void driver_wheel(WHEEL *wheel);
 // 初始化轮子 which传入轮子的编号 默认1-4 用于识别电机调用对应的硬件 dir传入 1或-1 用于设置轮子正转时的方向 放在init_motor()中
 void init_wheel(WHEEL *wheel, uint8_t which, int8_t dir);
 void set_wheel_ff_param(float offset, float k, float min_pwm);
+void set_wheel_ff_param_by_which(uint8_t which, float offset, float k, float min_pwm);
+void set_wheel_ff_offset_by_which(uint8_t which, float offset);
+void set_wheel_ff_k_by_which(uint8_t which, float k);
+void set_wheel_ff_min_by_which(uint8_t which, float min_pwm);
 
 #endif

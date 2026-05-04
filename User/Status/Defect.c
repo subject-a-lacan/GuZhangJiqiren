@@ -58,6 +58,21 @@
 #define Q2_AD_TURN_C_LEFT_ANGLE         80.0f /* 回程C点左转进入CB */
 #define Q2_AD_TURN_B_LEFT_ANGLE         80.0f /* 回程B点左转进入BA */
 
+/* Q3/Q4 feed-forward defaults. wheel0 = wheel[0]/which 1, wheel1 = wheel[1]/which 2. */
+#define Q3_WHEEL0_FF_OFFSET             157.0f
+#define Q3_WHEEL0_FF_K                  18.3f
+#define Q3_WHEEL0_FF_MIN                254.0f
+#define Q3_WHEEL1_FF_OFFSET             157.0f
+#define Q3_WHEEL1_FF_K                  18.3f
+#define Q3_WHEEL1_FF_MIN                254.0f
+
+#define Q4_WHEEL0_FF_OFFSET             157.0f
+#define Q4_WHEEL0_FF_K                  18.3f
+#define Q4_WHEEL0_FF_MIN                254.0f
+#define Q4_WHEEL1_FF_OFFSET             157.0f
+#define Q4_WHEEL1_FF_K                  18.3f
+#define Q4_WHEEL1_FF_MIN                254.0f
+
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
 extern uint8_t cross_delay;
@@ -108,8 +123,14 @@ void task_start(STATUS *status) {
 
   if (status->task.task_id == TASK_BASIC_1 || status->task.task_id == TASK_BASIC_2) {
     apply_basic_control_param(status);
-  } else {
+  } else if (status->task.task_id == TASK_ADV_1) {
     apply_adv_control_param(status);
+    set_wheel_ff_param_by_which(1, Q3_WHEEL0_FF_OFFSET, Q3_WHEEL0_FF_K, Q3_WHEEL0_FF_MIN);
+    set_wheel_ff_param_by_which(2, Q3_WHEEL1_FF_OFFSET, Q3_WHEEL1_FF_K, Q3_WHEEL1_FF_MIN);
+  } else if (status->task.task_id == TASK_ADV_2) {
+    apply_adv_control_param(status);
+    set_wheel_ff_param_by_which(1, Q4_WHEEL0_FF_OFFSET, Q4_WHEEL0_FF_K, Q4_WHEEL0_FF_MIN);
+    set_wheel_ff_param_by_which(2, Q4_WHEEL1_FF_OFFSET, Q4_WHEEL1_FF_K, Q4_WHEEL1_FF_MIN);
   }
 
   status->motor.wheel[0].trust = 0;

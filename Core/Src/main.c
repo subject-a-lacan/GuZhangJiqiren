@@ -62,11 +62,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t rx_byte = 0;
-uint8_t rx_cmd = 0;
-uint8_t rx_state = 0;
-char rx_buf[20];
-uint8_t rx_index = 0;
 int16_t cmd_speed = 40;
 extern uint8_t cross_cnt;
 /* USER CODE END PV */
@@ -137,7 +132,7 @@ int main(void)
   init_status(&status, 1);
   after_init_state();
   status.state.motion = STOP;
-  HAL_UART_Receive_IT(&huart1, &rx_byte, 1); // 开启 USART1 的接收中断，准备接收调参命令
+  init_uart_pid_tune_it(); // USART1/USART2/USART3 receive PID tune commands.
   // ESP8266_Init("F521F520","f521f520","192.168.112.85","8080");
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
@@ -292,6 +287,14 @@ void UART_PID_Tune(uint8_t cmd, float val) {
     case 's': status.motor.wheel[1].wheel_pid.kp = val;  break;
     case 'u': status.motor.wheel[1].wheel_pid.ki = val;  break;
     case 'w': status.motor.wheel[1].wheel_pid.kd = val;  break;
+
+    case 'M': set_wheel_ff_offset_by_which(1, val); break;
+    case 'O': set_wheel_ff_k_by_which(1, val); break;
+    case 'Q': set_wheel_ff_min_by_which(1, val); break;
+
+    case 'S': set_wheel_ff_offset_by_which(2, val); break;
+    case 'U': set_wheel_ff_k_by_which(2, val); break;
+    case 'W': set_wheel_ff_min_by_which(2, val); break;
 
     case 'b': status.motor.wheel[0].wheel_pid.integral_max = val;  break;
     case 'n': status.motor.wheel[1].wheel_pid.integral_max = val;  break;

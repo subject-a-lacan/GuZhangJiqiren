@@ -6,14 +6,40 @@
 #include "status.h"
 #include "tim.h"
 
-static float wheel_ff_offset = 157.0f;
-static float wheel_ff_k = 18.3f;
-static float wheel_ff_min = 254.0f;
+static float wheel_ff_offset[4] = {157.0f, 157.0f, 157.0f, 157.0f};
+static float wheel_ff_k[4] = {18.3f, 18.3f, 18.3f, 18.3f};
+static float wheel_ff_min[4] = {254.0f, 254.0f, 254.0f, 254.0f};
+
+static uint8_t wheel_ff_index(uint8_t which) {
+  if (which < 1 || which > 4) return 0;
+  return which - 1;
+}
 
 void set_wheel_ff_param(float offset, float k, float min_pwm) {
-  wheel_ff_offset = offset;
-  wheel_ff_k = k;
-  wheel_ff_min = min_pwm;
+  for (uint8_t i = 0; i < 4; i++) {
+    wheel_ff_offset[i] = offset;
+    wheel_ff_k[i] = k;
+    wheel_ff_min[i] = min_pwm;
+  }
+}
+
+void set_wheel_ff_param_by_which(uint8_t which, float offset, float k, float min_pwm) {
+  uint8_t index = wheel_ff_index(which);
+  wheel_ff_offset[index] = offset;
+  wheel_ff_k[index] = k;
+  wheel_ff_min[index] = min_pwm;
+}
+
+void set_wheel_ff_offset_by_which(uint8_t which, float offset) {
+  wheel_ff_offset[wheel_ff_index(which)] = offset;
+}
+
+void set_wheel_ff_k_by_which(uint8_t which, float k) {
+  wheel_ff_k[wheel_ff_index(which)] = k;
+}
+
+void set_wheel_ff_min_by_which(uint8_t which, float min_pwm) {
+  wheel_ff_min[wheel_ff_index(which)] = min_pwm;
 }
 
 int16_t get_wheel_speed(WHEEL *wheel) {
@@ -101,8 +127,9 @@ void driver_wheel(WHEEL *wheel) {
   }
 
   // 前馈 (from qiankui.md): steady_offset=157, kff=18.3, start_min=254
-  float ff_abs = wheel_ff_offset + wheel_ff_k * ABS(wheel->tar_speed);
-  if (ff_abs < wheel_ff_min) ff_abs = wheel_ff_min;
+  uint8_t ff_index = wheel_ff_index(wheel->which);
+  float ff_abs = wheel_ff_offset[ff_index] + wheel_ff_k[ff_index] * ABS(wheel->tar_speed);
+  if (ff_abs < wheel_ff_min[ff_index]) ff_abs = wheel_ff_min[ff_index];
   float ff;
   if (wheel->tar_speed > 0)      ff = ff_abs;
   else if (wheel->tar_speed < 0) ff = -ff_abs;
