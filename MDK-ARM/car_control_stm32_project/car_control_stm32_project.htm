@@ -3,7 +3,7 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Tue May  5 03:18:37 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Tue May  5 03:50:31 2026
 <BR><P>
 <H3>Maximum Stack Usage =        792 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -2890,7 +2890,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[1ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[17b]"></a>driver_task3</STRONG> (Thumb, 1020 bytes, Stack size 16 bytes, defect.o(.text.driver_task3))
+<P><STRONG><a name="[17b]"></a>driver_task3</STRONG> (Thumb, 1080 bytes, Stack size 16 bytes, defect.o(.text.driver_task3))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = driver_task3 &rArr; task3_accept_road
 </UL>
 <BR>[Calls]<UL><LI><a href="#[16f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
@@ -3049,11 +3049,10 @@ Local Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[17d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task3_turn_angle_ready
 </UL>
 
-<P><STRONG><a name="[183]"></a>task3_apply_cd_speed</STRONG> (Thumb, 50 bytes, Stack size 8 bytes, defect.o(.text.task3_apply_cd_speed))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = task3_apply_cd_speed &rArr; task3_apply_side_speed
+<P><STRONG><a name="[183]"></a>task3_apply_cd_speed</STRONG> (Thumb, 68 bytes, Stack size 8 bytes, defect.o(.text.task3_apply_cd_speed))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = task3_apply_cd_speed
 </UL>
 <BR>[Calls]<UL><LI><a href="#[178]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;encoder_pulse_to_cm
-<LI><a href="#[180]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task3_apply_side_speed
 </UL>
 <BR>[Called By]<UL><LI><a href="#[17b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
 </UL>
@@ -3071,8 +3070,7 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[178]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;encoder_pulse_to_cm
 </UL>
-<BR>[Called By]<UL><LI><a href="#[183]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task3_apply_cd_speed
-<LI><a href="#[17b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
+<BR>[Called By]<UL><LI><a href="#[17b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
 </UL>
 
 <P><STRONG><a name="[182]"></a>task3_enter_phase</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, defect.o(.text.task3_enter_phase))

@@ -106,8 +106,8 @@
 #define Q3_AB_TURN_C_LEFT_ANGLE    85.0f
 #define Q3_AB_TURN_B_LEFT_ANGLE    85.0f
 #define Q3_AB_TURN_A_ANGLE_LIMIT   27.0f /* AB A点转弯角度环限幅 */
-#define Q3_AB_TURN_D_ANGLE_LIMIT   23.0f /* AB D点转弯角度环限幅 */
-#define Q3_AB_TURN_C_ANGLE_LIMIT   23.0f /* AB C点转弯角度环限幅 */
+#define Q3_AB_TURN_D_ANGLE_LIMIT   20.0f /* AB D点转弯角度环限幅 */
+#define Q3_AB_TURN_C_ANGLE_LIMIT   20.0f /* AB C点转弯角度环限幅 */
 #define Q3_AB_TURN_B_ANGLE_LIMIT   23.0f /* AB B点转弯角度环限幅 */
 
 /* AD per-turn right angles */
@@ -127,20 +127,23 @@
 #define Q3_LINE_STABLE_CNT          3     /* 中间4路稳定帧数, 防止假Straight误清零cnt_seen */
 
 /* Speeds */
-#define Q3_FLASH_SPEED              55
-#define Q3_CRUISE_SPEED             40
+#define Q3_FLASH_SPEED              58
+#define Q3_CRUISE_SPEED             43
 #define Q3_TURN_SPEED               26
 #define Q3_AB_FIRST_TURN_SPEED      36    /* AB发车第一个路口(A点)转弯速度 */
 #define Q3_AD_FIRST_TURN_SPEED      36    /* AD发车第一个路口(A点)转弯速度 */
 #define Q3_FINAL_SLOW_SPEED         20
-#define Q3_CD_SLOW_SPEED            22    /* CD边过A4时的低速 */
+#define Q3_CD_START_SPEED           30    /* CD边刚进线后的速度 */
+#define Q3_CD_SLOW_SPEED            20    /* CD边给视觉更多帧的低速 */
+#define Q3_CD_FAST_SPEED            48    /* CD边视觉识别完成后的提速 */
 
 /* Distance thresholds (cm, 通过 encoder_pulse_to_cm 换算后比较) */
 #define Q3_STRAIGHT_FLASH_CM        68.0f
 #define Q3_PRE_TURN_SLOW_CM         64.0f /* 普通直道入弯前减速距离(cm) */
 #define Q3_PRE_TURN_SLOW_SPEED      22   /* 普通直道入弯前减速目标速度 */
 #define Q3_FINAL_SLOW_CM            70.0f
-#define Q3_CD_SLOW_AFTER_CM         17.0f /* CD边行驶20cm后降速, 给视觉更多帧 */
+#define Q3_CD_SLOW_AFTER_CM         14.0f /* CD边行驶14cm后降速, 给视觉更多帧 */
+#define Q3_CD_FAST_AFTER_CM         68.0f /* CD边视觉识别完成后的提速距离 */
 #define Q3_CD_IGNORE_END_CM         75.0f /* A4横线干扰结束, 之后允许接受路口 */
 #define Q3_ROAD_ENABLE_CM            70.0f /* 普通路口里程门槛, 防止误触发 */
 
@@ -1161,13 +1164,15 @@ static void task3_apply_side_speed(STATUS *status) {
   }
 }
 
-/* CD 边专用速度: 前 20cm 正常巡线, 之后降速提高视觉有效帧数 */
+/* CD 边专用速度: 先 30, 14cm 后降到 20 给视觉更多帧, 68cm 后提到 48 */
 static void task3_apply_cd_speed(STATUS *status) {
   float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
-  if (cm <= Q3_CD_SLOW_AFTER_CM) {
-    task3_apply_side_speed(status);
-  } else {
+  if (cm < Q3_CD_SLOW_AFTER_CM) {
+    status->state.base_speed = Q3_CD_START_SPEED;
+  } else if (cm < Q3_CD_FAST_AFTER_CM) {
     status->state.base_speed = Q3_CD_SLOW_SPEED;
+  } else {
+    status->state.base_speed = Q3_CD_FAST_SPEED;
   }
 }
 
@@ -1282,7 +1287,7 @@ static void driver_task3(STATUS *status) {
         }
         break;
 
-      /* ---- CD 边: 前段正常巡线 → 20cm 后降速 → 屏蔽 A4 横线 → 等 C 点 ---- */
+      /* ---- CD 边: 0~14cm 速度30 → 14~68cm 速度20 → 68cm后速度48 → 等 C 点 ---- */
       case Q3_AB_SIDE_DC:
         status->task.task_running = 1;
         status->state.motion = FIND_LINE;
@@ -1416,7 +1421,7 @@ static void driver_task3(STATUS *status) {
         }
         break;
 
-      /* ---- CD 边: 前段正常 → 20cm 后降速 → 屏蔽 A4 横线 → 等 D 点 ---- */
+      /* ---- CD 边: 0~14cm 速度30 → 14~68cm 速度20 → 68cm后速度48 → 等 D 点 ---- */
       case Q3_AD_SIDE_CD:
         status->task.task_running = 1;
         status->state.motion = FIND_LINE;
