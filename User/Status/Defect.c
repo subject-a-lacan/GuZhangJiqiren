@@ -131,8 +131,8 @@
 #define Q3_FLASH_SPEED              58
 #define Q3_CRUISE_SPEED             43
 #define Q3_TURN_SPEED               26
-#define Q3_AB_FIRST_TURN_SPEED      36    /* AB发车第一个路口(A点)转弯速度 */
-#define Q3_AD_FIRST_TURN_SPEED      36    /* AD发车第一个路口(A点)转弯速度 */
+#define Q3_AB_FIRST_TURN_SPEED      30    /* AB发车第一个路口(A点)转弯速度 */
+#define Q3_AD_FIRST_TURN_SPEED      30    /* AD发车第一个路口(A点)转弯速度 */
 #define Q3_FINAL_SLOW_SPEED         20
 #define Q3_CD_START_SPEED           30    /* CD边刚进线后的速度 */
 #define Q3_CD_SLOW_SPEED            20    /* CD边给视觉更多帧的低速 */
