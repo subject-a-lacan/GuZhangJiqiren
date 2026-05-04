@@ -7,56 +7,81 @@
 
 /* Q1 tunable parameters */
 #define Q1_START_PULSE                 200   /* 起步脉冲阈值, 待标定 */
-#define Q1_TURN_TARGET_ANGLE           79.0f /* 左转目标角度 */
-#define Q1_TURN_TARGET_ANGLE_C         77.0f /* C点左转目标角度, 多转4°补偿 */
-#define Q1_TURN_TOLERANCE_DEG          6.0f  /* 转弯完成的角度容差 */
-#define Q1_TURN_TO_FIND_TOLERANCE_DEG  10.0f /* 转弯→找线接管角度阈值 */
+#define Q1_TURN_A_LEFT_ANGLE           80.0f /* A点左转角度 */
+#define Q1_TURN_D_LEFT_ANGLE           85.0f /* D点左转角度 */
+#define Q1_TURN_C_LEFT_ANGLE           85.0f /* C点左转角度 */
+#define Q1_TURN_B_LEFT_ANGLE           85.0f /* B点左转角度 */
+#define Q1_TURN_A_ANGLE_LIMIT         20.0f /* A点转弯角度环限幅 */
+#define Q1_TURN_D_ANGLE_LIMIT         22.0f /* D点转弯角度环限幅 */
+#define Q1_TURN_C_ANGLE_LIMIT         22.0f /* C点转弯角度环限幅 */
+#define Q1_TURN_B_ANGLE_LIMIT         22.0f /* B点转弯角度环限幅 */
+#define Q1_TURN_TOLERANCE_DEG          8.0f  /* 转弯完成的角度容差 */
+#define Q1_TURN_TO_FIND_TOLERANCE_DEG  8.0f /* 转弯→找线接管角度阈值 */
 #define Q1_TURN_LINE_MASK_6            0x7E  /* bit1~bit6, 中间6路 */
 #define Q1_TURN_LINE_MASK_4            0x3C  /* bit2~bit5, 中间4路 */
 #define Q1_LINE_STABLE_CNT             3     /* 中间4路稳定帧数 */
 #define Q1_FLASH_SPEED                 55    /* 直线冲刺速度 */
-#define Q1_CRUISE_SPEED                44    /* 巡线直走速度 */
-#define Q1_TURN_SPEED                  35    /* 转弯时的基础速度 */
+#define Q1_CRUISE_SPEED                38    /* 巡线直走速度 (入弯前降速) */
+#define Q1_TURN_SPEED                  23    /* 转弯时的基础速度 */
+#define Q1_FIRST_TURN_SPEED            30    /* 第一个路口(A点)转弯速度, 距离短需降速 */
 #define Q1_FINAL_SLOW_SPEED            20    /* 终点前降速 / 找线低速 */
-#define Q1_STRAIGHT_FLASH_CM           65.0f /* 直线冲刺距离(cm) */
-#define Q1_FINAL_SLOW_CM               70.0f /* 终点降速距离(cm) */
+#define Q1_STRAIGHT_FLASH_CM           58.0f /* 直线冲刺距离(cm) */
+#define Q1_PRE_TURN_SLOW_CM            70.0f /* 普通直道入弯前减速距离(cm) */
+#define Q1_PRE_TURN_SLOW_SPEED         25    /* 普通直道入弯前减速速度 */
+#define Q1_FINAL_SLOW_CM               63.0f /* 终点降速距离(cm) */
 #define Q1_BA_PULSE                    3500  /* BA 边停车脉冲阈值, 待标定 */
 #define Q1_BA_STOP_CM                  80.0f /* BA 边停车里程阈值(cm) */
 
 /* Q2 tunable parameters (AB发车) */
 #define Q2_TURN_A_LEFT_ANGLE          76.0f /* A点左转角度 */
-#define Q2_TURN_D_LEFT_ANGLE          80.0f /* D点左转角度 */
-#define Q2_TURN_C_LEFT_ANGLE          80.0f /* C点左转角度 */
-#define Q2_UTURN_B_ANGLE              170.0f /* B点掉头角度 */
-#define Q2_TURN_C_RIGHT_ANGLE         -80.0f /* 回程C点右转角度 */
-#define Q2_TURN_D_RIGHT_ANGLE         -80.0f /* 回程D点右转角度 */
+#define Q2_TURN_D_LEFT_ANGLE          83.0f /* D点左转角度 */
+#define Q2_TURN_C_LEFT_ANGLE          81.0f /* C点左转角度 */
+#define Q2_UTURN_B_ANGLE              175.0f /* B点掉头角度 */
+#define Q2_TURN_C_RIGHT_ANGLE         -86.0f /* 回程C点右转角度 */
+#define Q2_TURN_D_RIGHT_ANGLE         -86.0f /* 回程D点右转角度 */
+#define Q2_TURN_A_ANGLE_LIMIT         27.0f /* A点转弯角度环限幅 */
+#define Q2_TURN_D_ANGLE_LIMIT         27.0f /* D点转弯角度环限幅 */
+#define Q2_TURN_C_ANGLE_LIMIT         27.0f /* C点转弯角度环限幅 */
+#define Q2_TURN_C_RETURN_ANGLE_LIMIT  27.0f /* 回程C点转弯角度环限幅 */
+#define Q2_TURN_D_RETURN_ANGLE_LIMIT  27.0f /* 回程D点转弯角度环限幅 */
 #define Q2_TURN_FIND_TOLERANCE_DEG    10.0f /* 90°转弯→找线接管角度阈值 */
-#define Q2_UTURN_TOLERANCE_DEG        8.0f /* 掉头→找线接管角度阈值 */
+#define Q2_UTURN_TOLERANCE_DEG        6.0f /* 掉头→找线接管角度阈值 */
 #define Q2_TURN_LINE_MASK_6           0x7E  /* bit1~bit6, 中间6路 */
 #define Q2_TURN_LINE_MASK_4           0x3C  /* bit2~bit5, 中间4路 */
 #define Q2_LINE_STABLE_CNT            3     /* 中间4路稳定帧数 */
 #define Q2_FLASH_SPEED                55    /* 直线冲刺速度 */
-#define Q2_CRUISE_SPEED               44    /* 巡线直走速度 */
-#define Q2_TURN_SPEED                 35    /* 转弯时的基础速度 */
+#define Q2_CRUISE_SPEED               40    /* 巡线直走速度 */
+#define Q2_TURN_SPEED                 23    /* 转弯时的基础速度 */
+#define Q2_AB_FIRST_TURN_SPEED        38   /* AB发车第一个路口(A点)转弯速度 */
+#define Q2_AD_FIRST_TURN_SPEED        38    /* AD发车第一个路口(A点)转弯速度 */
 #define Q2_UTURN_SPEED                20    /* 掉头速度 */
 #define Q2_FINAL_SLOW_SPEED           20    /* 终点前降速 / 找线低速 */
 #define Q2_STRAIGHT_FLASH_CM          65.0f /* 直线冲刺距离(cm) */
+#define Q2_PRE_TURN_SLOW_CM           70.0f /* 普通直道入弯前减速距离(cm) */
+#define Q2_PRE_TURN_SLOW_SPEED        25    /* 普通直道入弯前减速目标速度 */
 #define Q2_CB_ROAD_ENABLE_CM          79.0f /* C→B 路口使能里程(cm) */
 #define Q2_BC_ROAD_ENABLE_CM          79.0f /* B→C 路口使能里程(cm) */
-#define Q2_FINAL_SLOW_CM              80.0f /* 终点降速距离(cm) */
+#define Q2_FINAL_SLOW_CM              70.0f /* 终点降速距离(cm) */
 #define Q2_UTURN_PRE_SLOW_CM          70.0f /* B点掉头前预减速距离(cm) */
 #define Q2_UTURN_PRE_SLOW_SPEED       20    /* B点掉头前预减速目标速度 */
-#define Q2_UTURN_ANGLE_LIMIT          80.0f /* 掉头时角度环输出限幅 */
-#define Q2_NORMAL_ANGLE_LIMIT         25.0f /* 正常角度环输出限幅 */
-#define Q2_UTURN_STOP_SPEED_THRESHOLD 5     /* 掉头前停车轮速阈值 */
+#define Q2_AB_UTURN_ANGLE_LIMIT       93.0f /* AB掉头时角度环输出限幅 */
+#define Q2_AB_NORMAL_ANGLE_LIMIT      27.0f /* AB正常角度环输出限幅 */
+#define Q2_AD_UTURN_ANGLE_LIMIT       85.0f /* AD掉头时角度环输出限幅 */
+#define Q2_AD_NORMAL_ANGLE_LIMIT      27.0f /* AD正常角度环输出限幅 */
+#define Q2_AD_FIRST_TURN_ANGLE_LIMIT  25.0f  /* AD first turn angle output limit */
+#define Q2_UTURN_STOP_SPEED_THRESHOLD 4     /* 掉头前停车轮速阈值 */
 
 /* Q2 AD-specific tunable angles (AD发车: 顺时针去程右转, 逆时针回程左转) */
-#define Q2_AD_TURN_A_RIGHT_ANGLE       -80.0f /* A点右转进入AB */
-#define Q2_AD_TURN_B_RIGHT_ANGLE       -80.0f /* B点右转进入BC */
-#define Q2_AD_TURN_C_RIGHT_ANGLE       -80.0f /* C点右转进入CD */
+#define Q2_AD_TURN_A_RIGHT_ANGLE       -76.0f /* A点右转进入AB */
+#define Q2_AD_TURN_B_RIGHT_ANGLE       -83.0f /* B点右转进入BC */
+#define Q2_AD_TURN_C_RIGHT_ANGLE       -82.0f /* C点右转进入CD */
 #define Q2_AD_UTURN_D_ANGLE            -170.0f /* D点掉头角度 */
-#define Q2_AD_TURN_C_LEFT_ANGLE         80.0f /* 回程C点左转进入CB */
-#define Q2_AD_TURN_B_LEFT_ANGLE         80.0f /* 回程B点左转进入BA */
+#define Q2_AD_TURN_C_LEFT_ANGLE         83.0f /* 回程C点左转进入CB */
+#define Q2_AD_TURN_B_LEFT_ANGLE         86.0f /* 回程B点左转进入BA */
+#define Q2_AD_TURN_B_ANGLE_LIMIT        27.0f /* AD B点转弯角度环限幅 */
+#define Q2_AD_TURN_C_ANGLE_LIMIT        27.0f /* AD C点转弯角度环限幅 */
+#define Q2_AD_TURN_C_RETURN_ANGLE_LIMIT 24.0f /* AD回程C点转弯角度环限幅 */
+#define Q2_AD_TURN_B_RETURN_ANGLE_LIMIT 24.0f /* AD回程B点转弯角度环限幅 */
 
 /* Q3/Q4 feed-forward defaults. wheel0 = wheel[0]/which 1, wheel1 = wheel[1]/which 2. */
 #define Q3_WHEEL0_FF_OFFSET             124.64f
@@ -77,15 +102,23 @@
 
 /* AB per-turn left angles (independently calibrated, like TASK2) */
 #define Q3_AB_TURN_A_LEFT_ANGLE    80.0f
-#define Q3_AB_TURN_D_LEFT_ANGLE    80.0f
-#define Q3_AB_TURN_C_LEFT_ANGLE    77.0f
-#define Q3_AB_TURN_B_LEFT_ANGLE    79.0f
+#define Q3_AB_TURN_D_LEFT_ANGLE    85.0f
+#define Q3_AB_TURN_C_LEFT_ANGLE    85.0f
+#define Q3_AB_TURN_B_LEFT_ANGLE    85.0f
+#define Q3_AB_TURN_A_ANGLE_LIMIT   27.0f /* AB A点转弯角度环限幅 */
+#define Q3_AB_TURN_D_ANGLE_LIMIT   23.0f /* AB D点转弯角度环限幅 */
+#define Q3_AB_TURN_C_ANGLE_LIMIT   23.0f /* AB C点转弯角度环限幅 */
+#define Q3_AB_TURN_B_ANGLE_LIMIT   23.0f /* AB B点转弯角度环限幅 */
 
 /* AD per-turn right angles */
-#define Q3_AD_TURN_A_RIGHT_ANGLE   -80.0f
-#define Q3_AD_TURN_B_RIGHT_ANGLE   -80.0f
-#define Q3_AD_TURN_C_RIGHT_ANGLE   -80.0f
-#define Q3_AD_TURN_D_RIGHT_ANGLE   -80.0f
+#define Q3_AD_TURN_A_RIGHT_ANGLE   -83.0f
+#define Q3_AD_TURN_B_RIGHT_ANGLE   -83.0f
+#define Q3_AD_TURN_C_RIGHT_ANGLE   -83.0f
+#define Q3_AD_TURN_D_RIGHT_ANGLE   -83.0f
+#define Q3_AD_TURN_A_ANGLE_LIMIT   27.0f /* AD A点转弯角度环限幅 */
+#define Q3_AD_TURN_B_ANGLE_LIMIT   23.0f /* AD B点转弯角度环限幅 */
+#define Q3_AD_TURN_C_ANGLE_LIMIT   23.0f /* AD C点转弯角度环限幅 */
+#define Q3_AD_TURN_D_ANGLE_LIMIT   23.0f /* AD D点转弯角度环限幅 */
 
 /* Turn control */
 #define Q3_TURN_TOLERANCE_DEG       10.0f /* 转弯→找线接管角度阈值 */
@@ -96,15 +129,20 @@
 /* Speeds */
 #define Q3_FLASH_SPEED              55
 #define Q3_CRUISE_SPEED             40
-#define Q3_TURN_SPEED               35
+#define Q3_TURN_SPEED               26
+#define Q3_AB_FIRST_TURN_SPEED      36    /* AB发车第一个路口(A点)转弯速度 */
+#define Q3_AD_FIRST_TURN_SPEED      36    /* AD发车第一个路口(A点)转弯速度 */
 #define Q3_FINAL_SLOW_SPEED         20
-#define Q3_CD_SLOW_SPEED            25    /* CD边过A4时的低速 */
+#define Q3_CD_SLOW_SPEED            22    /* CD边过A4时的低速 */
 
 /* Distance thresholds (cm, 通过 encoder_pulse_to_cm 换算后比较) */
-#define Q3_STRAIGHT_FLASH_CM        65.0f
-#define Q3_FINAL_SLOW_CM            80.0f
-#define Q3_CD_SLOW_AFTER_CM         20.0f /* CD边行驶20cm后降速, 给视觉更多帧 */
+#define Q3_STRAIGHT_FLASH_CM        68.0f
+#define Q3_PRE_TURN_SLOW_CM         64.0f /* 普通直道入弯前减速距离(cm) */
+#define Q3_PRE_TURN_SLOW_SPEED      22   /* 普通直道入弯前减速目标速度 */
+#define Q3_FINAL_SLOW_CM            70.0f
+#define Q3_CD_SLOW_AFTER_CM         17.0f /* CD边行驶20cm后降速, 给视觉更多帧 */
 #define Q3_CD_IGNORE_END_CM         75.0f /* A4横线干扰结束, 之后允许接受路口 */
+#define Q3_ROAD_ENABLE_CM            70.0f /* 普通路口里程门槛, 防止误触发 */
 
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
@@ -187,14 +225,16 @@ void task_start(STATUS *status) {
         status->state.initial_angle = status->state.cur_angle;
         status->state.tar_angle = Q2_TURN_A_LEFT_ANGLE;
         status->state.motion = KEEP_ANGLE;
-        status->state.base_speed = Q2_TURN_SPEED;
+        status->state.base_speed = Q2_AB_FIRST_TURN_SPEED;
+        status->state.status_pid.angle_output_limit = Q2_TURN_A_ANGLE_LIMIT;
         status->task.task_running = 1;
       } else {
         status->task.race_phase = Q2_AD_TURN_A_TO_AB;
         status->state.initial_angle = status->state.cur_angle;
         status->state.tar_angle = Q2_AD_TURN_A_RIGHT_ANGLE;
         status->state.motion = KEEP_ANGLE;
-        status->state.base_speed = Q2_TURN_SPEED;
+        status->state.base_speed = Q2_AD_FIRST_TURN_SPEED;
+        status->state.status_pid.angle_output_limit = Q2_AD_FIRST_TURN_ANGLE_LIMIT;
         status->task.task_running = 1;
       }
       break;
@@ -324,6 +364,8 @@ static void task1_apply_side_speed(STATUS *status) {
     status->state.base_speed = Q1_FINAL_SLOW_SPEED;
   } else if (cm <= Q1_STRAIGHT_FLASH_CM) {
     status->state.base_speed = Q1_FLASH_SPEED;
+  } else if (cm >= Q1_PRE_TURN_SLOW_CM) {
+    status->state.base_speed = Q1_PRE_TURN_SLOW_SPEED;
   } else {
     status->state.base_speed = Q1_CRUISE_SPEED;
   }
@@ -354,14 +396,15 @@ static void driver_task1(STATUS *status) {
     case Q1_START_TO_A:
       status->task.task_running = 1;
       status->state.motion = FIND_LINE;
-      status->state.base_speed = Q1_TURN_SPEED;
+      status->state.base_speed = Q1_FIRST_TURN_SPEED;
 
       if (task1_accept_left_road(status, road)) {
         task1_enter_phase(status, Q1_TURN_A);
         status->state.initial_angle = status->state.cur_angle;
-        status->state.tar_angle = Q1_TURN_TARGET_ANGLE;
+        status->state.tar_angle = Q1_TURN_A_LEFT_ANGLE;
         status->state.motion = KEEP_ANGLE;
-        status->state.base_speed = Q1_TURN_SPEED;
+        status->state.base_speed = Q1_FIRST_TURN_SPEED;
+        status->state.status_pid.angle_output_limit = Q1_TURN_A_ANGLE_LIMIT;
       }
       break;
 
@@ -428,9 +471,14 @@ static void driver_task1(STATUS *status) {
 
         task1_enter_phase(status, next);
         status->state.initial_angle = status->state.cur_angle;
-        status->state.tar_angle = (next == Q1_TURN_C) ? Q1_TURN_TARGET_ANGLE_C : Q1_TURN_TARGET_ANGLE;
+        if (next == Q1_TURN_D)      status->state.tar_angle = Q1_TURN_D_LEFT_ANGLE;
+        else if (next == Q1_TURN_C) status->state.tar_angle = Q1_TURN_C_LEFT_ANGLE;
+        else                        status->state.tar_angle = Q1_TURN_B_LEFT_ANGLE;
         status->state.motion = KEEP_ANGLE;
         status->state.base_speed = Q1_TURN_SPEED;
+        if (next == Q1_TURN_D)      status->state.status_pid.angle_output_limit = Q1_TURN_D_ANGLE_LIMIT;
+        else if (next == Q1_TURN_C) status->state.status_pid.angle_output_limit = Q1_TURN_C_ANGLE_LIMIT;
+        else                        status->state.status_pid.angle_output_limit = Q1_TURN_B_ANGLE_LIMIT;
       }
       break;
 
@@ -502,11 +550,13 @@ static uint8_t task2_accept_road(STATUS *status, Road expected, float min_cm) {
 static void task2_apply_side_speed(STATUS *status) {
   float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
   if (q2_mid4_stable_cnt < Q2_LINE_STABLE_CNT) {
-    status->state.base_speed = Q2_FINAL_SLOW_SPEED;
+    status->state.base_speed = Q2_FINAL_SLOW_SPEED;       /* 20, 不稳时低速找线 */
   } else if (cm <= Q2_STRAIGHT_FLASH_CM) {
-    status->state.base_speed = Q2_FLASH_SPEED;
+    status->state.base_speed = Q2_FLASH_SPEED;             /* 55, 0~65cm 高速 */
+  } else if (cm <= Q2_PRE_TURN_SLOW_CM) {
+    status->state.base_speed = Q2_CRUISE_SPEED;            /* 44, 65~72cm 中速 */
   } else {
-    status->state.base_speed = Q2_CRUISE_SPEED;
+    status->state.base_speed = Q2_PRE_TURN_SLOW_SPEED;     /* 25, >72cm 入弯前减速 */
   }
 }
 
@@ -545,7 +595,7 @@ static void driver_task2(STATUS *status) {
       case Q2_AB_TURN_A_TO_AD:
         status->task.task_running = 1;
         status->state.motion = KEEP_ANGLE;
-        status->state.base_speed = Q2_TURN_SPEED;
+        status->state.base_speed = Q2_AB_FIRST_TURN_SPEED;
         if (task2_turn_angle_ready(status)) {
           task2_enter_phase(status, Q2_AB_FIND_AD_OUT);
           status->state.motion = FIND_LINE;
@@ -575,6 +625,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_TURN_D_LEFT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q2_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_TURN_D_ANGLE_LIMIT;
         }
         break;
 
@@ -610,6 +661,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_TURN_C_LEFT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q2_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_TURN_C_ANGLE_LIMIT;
         }
         break;
 
@@ -666,7 +718,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_UTURN_B_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = 0;
-          status->state.status_pid.angle_output_limit = Q2_UTURN_ANGLE_LIMIT;
+          status->state.status_pid.angle_output_limit = Q2_AB_UTURN_ANGLE_LIMIT;
         }
         break;
 
@@ -675,7 +727,7 @@ static void driver_task2(STATUS *status) {
       case Q2_AB_UTURN_B:
         status->state.motion = KEEP_ANGLE;
         status->state.base_speed = 0;
-        status->state.status_pid.angle_output_limit = Q2_UTURN_ANGLE_LIMIT;  /* 掉头放大角度限幅 */
+        status->state.status_pid.angle_output_limit = Q2_AB_UTURN_ANGLE_LIMIT;  /* AB掉头放大角度限幅 */
         if (task2_uturn_angle_ready(status)) {
           task2_enter_phase(status, Q2_AB_FIND_BC_RETURN);
           status->state.motion = FIND_LINE;
@@ -695,7 +747,7 @@ static void driver_task2(STATUS *status) {
 
       case Q2_AB_SIDE_BC_RETURN:
         status->state.motion = FIND_LINE;
-        status->state.status_pid.angle_output_limit = Q2_NORMAL_ANGLE_LIMIT;  /* 恢复正常角度限幅 */
+        status->state.status_pid.angle_output_limit = Q2_AB_NORMAL_ANGLE_LIMIT;  /* AB恢复正常角度限幅 */
         if (task2_middle4_seen(status)) {
           q2_mid4_stable_cnt++;
         } else {
@@ -708,6 +760,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_TURN_C_RIGHT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q2_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_TURN_C_RETURN_ANGLE_LIMIT;
         }
         break;
 
@@ -743,6 +796,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_TURN_D_RIGHT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q2_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_TURN_D_RETURN_ANGLE_LIMIT;
         }
         break;
 
@@ -800,11 +854,13 @@ static void driver_task2(STATUS *status) {
       case Q2_AD_TURN_A_TO_AB:
         status->task.task_running = 1;
         status->state.motion = KEEP_ANGLE;
-        status->state.base_speed = Q2_TURN_SPEED;
+        status->state.base_speed = Q2_AD_FIRST_TURN_SPEED;
+        status->state.status_pid.angle_output_limit = Q2_AD_FIRST_TURN_ANGLE_LIMIT;
         if (task2_turn_angle_ready(status)) {
           task2_enter_phase(status, Q2_AD_FIND_AB_OUT);
           status->state.motion = FIND_LINE;
           status->state.base_speed = Q2_FINAL_SLOW_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_AD_NORMAL_ANGLE_LIMIT;
         }
         break;
 
@@ -830,6 +886,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_AD_TURN_B_RIGHT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q2_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_AD_TURN_B_ANGLE_LIMIT;
         }
         break;
 
@@ -866,6 +923,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_AD_TURN_C_RIGHT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q2_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_AD_TURN_C_ANGLE_LIMIT;
         }
         break;
 
@@ -922,7 +980,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_AD_UTURN_D_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = 0;
-          status->state.status_pid.angle_output_limit = Q2_UTURN_ANGLE_LIMIT;
+          status->state.status_pid.angle_output_limit = Q2_AD_UTURN_ANGLE_LIMIT;
         }
         break;
 
@@ -931,7 +989,7 @@ static void driver_task2(STATUS *status) {
       case Q2_AD_UTURN_D:
         status->state.motion = KEEP_ANGLE;
         status->state.base_speed = 0;
-        status->state.status_pid.angle_output_limit = Q2_UTURN_ANGLE_LIMIT;  /* 掉头放大角度限幅 */
+        status->state.status_pid.angle_output_limit = Q2_AD_UTURN_ANGLE_LIMIT;  /* AD掉头放大角度限幅 */
         if (task2_uturn_angle_ready(status)) {
           task2_enter_phase(status, Q2_AD_FIND_DC_RETURN);
           status->state.motion = FIND_LINE;
@@ -951,7 +1009,7 @@ static void driver_task2(STATUS *status) {
 
       case Q2_AD_SIDE_DC_RETURN:
         status->state.motion = FIND_LINE;
-        status->state.status_pid.angle_output_limit = Q2_NORMAL_ANGLE_LIMIT;  /* 恢复正常角度限幅 */
+        status->state.status_pid.angle_output_limit = Q2_AD_NORMAL_ANGLE_LIMIT;  /* AD恢复正常角度限幅 */
         if (task2_middle4_seen(status)) {
           q2_mid4_stable_cnt++;
         } else {
@@ -964,6 +1022,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_AD_TURN_C_LEFT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q2_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_AD_TURN_C_RETURN_ANGLE_LIMIT;
         }
         break;
 
@@ -1000,6 +1059,7 @@ static void driver_task2(STATUS *status) {
           status->state.tar_angle = Q2_AD_TURN_B_LEFT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q2_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q2_AD_TURN_B_RETURN_ANGLE_LIMIT;
         }
         break;
 
@@ -1087,15 +1147,17 @@ static uint8_t task3_accept_road(STATUS *status, Road expected, float min_cm) {
   return 1;
 }
 
-/* 普通边速度曲线: 稳定前低速找线 → 闪冲 → 巡航 */
+/* 普通边速度曲线: 稳定前低速找线 → 闪冲 → 中速 → 入弯前减速 */
 static void task3_apply_side_speed(STATUS *status) {
   float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
   if (q3_mid4_stable_cnt < Q3_LINE_STABLE_CNT) {
-    status->state.base_speed = Q3_FINAL_SLOW_SPEED;
+    status->state.base_speed = Q3_FINAL_SLOW_SPEED;       /* 20, 不稳时低速找线 */
   } else if (cm <= Q3_STRAIGHT_FLASH_CM) {
-    status->state.base_speed = Q3_FLASH_SPEED;
+    status->state.base_speed = Q3_FLASH_SPEED;             /* 55, 0~65cm 高速 */
+  } else if (cm <= Q3_PRE_TURN_SLOW_CM) {
+    status->state.base_speed = Q3_CRUISE_SPEED;            /* 40, 65~72cm 中速 */
   } else {
-    status->state.base_speed = Q3_CRUISE_SPEED;
+    status->state.base_speed = Q3_PRE_TURN_SLOW_SPEED;     /* 25, >72cm 入弯前减速 */
   }
 }
 
@@ -1120,8 +1182,6 @@ static void task3_apply_final_speed(STATUS *status) {
 }
 
 static void driver_task3(STATUS *status) {
-  if (!status->task.task_running) return;
-
   if (status->task.start_pose == START_AB) {
     /* ====== AB 发车: A→D→C→B→A, 逆时针, 全部左转 ====== */
     Road road = task3_map_road(status->sensor.gw_analogue.cross.cross);
@@ -1143,13 +1203,14 @@ static void driver_task3(STATUS *status) {
       case Q3_AB_START_TO_A:
         status->task.task_running = 1;
         status->state.motion = FIND_LINE;
-        status->state.base_speed = Q3_TURN_SPEED;
+        status->state.base_speed = Q3_AB_FIRST_TURN_SPEED;
         if (task3_accept_road(status, LeftRoad, 0)) {
           task3_enter_phase(status, Q3_AB_TURN_A_TO_AD);
           status->state.initial_angle = status->state.cur_angle;
           status->state.tar_angle = Q3_AB_TURN_A_LEFT_ANGLE;
           status->state.motion = KEEP_ANGLE;
-          status->state.base_speed = Q3_TURN_SPEED;
+          status->state.base_speed = Q3_AB_FIRST_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q3_AB_TURN_A_ANGLE_LIMIT;
         }
         break;
 
@@ -1201,7 +1262,7 @@ static void driver_task3(STATUS *status) {
           q3_mid4_stable_cnt = 0;
         }
         task3_apply_side_speed(status);
-        if (task3_accept_road(status, LeftRoad, 0)) {
+        if (task3_accept_road(status, LeftRoad, Q3_ROAD_ENABLE_CM)) {
           uint8_t next;
           float angle;
           if (status->task.race_phase == Q3_AB_SIDE_AD) {
@@ -1216,6 +1277,8 @@ static void driver_task3(STATUS *status) {
           status->state.tar_angle = angle;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q3_TURN_SPEED;
+          if (next == Q3_AB_TURN_D_TO_DC) status->state.status_pid.angle_output_limit = Q3_AB_TURN_D_ANGLE_LIMIT;
+          else                            status->state.status_pid.angle_output_limit = Q3_AB_TURN_B_ANGLE_LIMIT;
         }
         break;
 
@@ -1235,6 +1298,7 @@ static void driver_task3(STATUS *status) {
           status->state.tar_angle = Q3_AB_TURN_C_LEFT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q3_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q3_AB_TURN_C_ANGLE_LIMIT;
         }
         break;
 
@@ -1273,13 +1337,14 @@ static void driver_task3(STATUS *status) {
       case Q3_AD_START_TO_A:
         status->task.task_running = 1;
         status->state.motion = FIND_LINE;
-        status->state.base_speed = Q3_TURN_SPEED;
+        status->state.base_speed = Q3_AD_FIRST_TURN_SPEED;
         if (task3_accept_road(status, RightRoad, 0)) {
           task3_enter_phase(status, Q3_AD_TURN_A_TO_AB);
           status->state.initial_angle = status->state.cur_angle;
           status->state.tar_angle = Q3_AD_TURN_A_RIGHT_ANGLE;
           status->state.motion = KEEP_ANGLE;
-          status->state.base_speed = Q3_TURN_SPEED;
+          status->state.base_speed = Q3_AD_FIRST_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q3_AD_TURN_A_ANGLE_LIMIT;
         }
         break;
 
@@ -1331,7 +1396,7 @@ static void driver_task3(STATUS *status) {
           q3_mid4_stable_cnt = 0;
         }
         task3_apply_side_speed(status);
-        if (task3_accept_road(status, RightRoad, 0)) {
+        if (task3_accept_road(status, RightRoad, Q3_ROAD_ENABLE_CM)) {
           uint8_t next;
           float angle;
           if (status->task.race_phase == Q3_AD_SIDE_AB) {
@@ -1346,6 +1411,8 @@ static void driver_task3(STATUS *status) {
           status->state.tar_angle = angle;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q3_TURN_SPEED;
+          if (next == Q3_AD_TURN_B_TO_BC) status->state.status_pid.angle_output_limit = Q3_AD_TURN_B_ANGLE_LIMIT;
+          else                            status->state.status_pid.angle_output_limit = Q3_AD_TURN_C_ANGLE_LIMIT;
         }
         break;
 
@@ -1365,6 +1432,7 @@ static void driver_task3(STATUS *status) {
           status->state.tar_angle = Q3_AD_TURN_D_RIGHT_ANGLE;
           status->state.motion = KEEP_ANGLE;
           status->state.base_speed = Q3_TURN_SPEED;
+          status->state.status_pid.angle_output_limit = Q3_AD_TURN_D_ANGLE_LIMIT;
         }
         break;
 
