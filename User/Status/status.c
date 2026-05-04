@@ -134,7 +134,8 @@ static void apply_control_param(STATUS *status, CONTROL_PARAM p) {
   status->state.status_pid.keep_angle_pid = p.keep_angle_pid;
   status->motor.wheel[0].wheel_pid = p.wheel_left_pid;
   status->motor.wheel[1].wheel_pid = p.wheel_right_pid;
-  set_wheel_ff_param(p.ff_offset, p.ff_k, p.ff_min);
+  set_wheel_ff_param_by_which(1, p.ff_offset, p.ff_k, p.ff_min);
+  set_wheel_ff_param_by_which(2, p.ff_offset_r, p.ff_k_r, p.ff_min_r);
   status->state.status_pid.angle_output_limit = 25.0f;
 }
 
@@ -144,9 +145,12 @@ void apply_basic_control_param(STATUS *status) {
   p.keep_angle_pid  = init_pid(1, 0, 0, 20, 1, 0.0f);
   p.wheel_left_pid  = init_pid(8, 0, 0, 20, 100, 0.50f);
   p.wheel_right_pid = init_pid(8, 0, 0, 20, 100, 0.50f);
-  p.ff_offset = 157.0f;
-  p.ff_k = 18.3f;
+  p.ff_offset = 114.70f;
+  p.ff_k = 18.28f;
   p.ff_min = 254.0f;
+  p.ff_offset_r = 97.26f;
+  p.ff_k_r = 17.80f;
+  p.ff_min_r = 254.0f;
   apply_control_param(status, p);
 }
 
@@ -156,9 +160,12 @@ void apply_adv_control_param(STATUS *status) {
   p.keep_angle_pid  = init_pid(1, 0, 0, 20, 1, 0.0f);       // TODO: 负重后实车标定
   p.wheel_left_pid  = init_pid(8, 0, 0, 20, 100, 0.50f);    // TODO: 负重后实车标定
   p.wheel_right_pid = init_pid(8, 0, 0, 20, 100, 0.50f);    // TODO: 负重后实车标定
-  p.ff_offset = 157.0f;   // TODO: 负重后实车标定
-  p.ff_k = 18.3f;         // TODO: 负重后实车标定
-  p.ff_min = 254.0f;      // TODO: 负重后实车标定
+  p.ff_offset = 124.64f;   // TODO: 负重后实车标定
+  p.ff_k = 19.23f;         // TODO: 负重后实车标定
+  p.ff_min = 254.0f;       // TODO: 负重后实车标定
+  p.ff_offset_r = 164.53f; // TODO: 负重后实车标定
+  p.ff_k_r = 17.64f;       // TODO: 负重后实车标定
+  p.ff_min_r = 254.0f;     // TODO: 负重后实车标定
   apply_control_param(status, p);
 }
 

@@ -6,8 +6,8 @@
 #include "status.h"
 #include "tim.h"
 
-static float wheel_ff_offset[4] = {157.0f, 157.0f, 157.0f, 157.0f};
-static float wheel_ff_k[4] = {18.3f, 18.3f, 18.3f, 18.3f};
+static float wheel_ff_offset[4] = {114.70f, 97.26f, 114.70f, 97.26f};
+static float wheel_ff_k[4] = {18.28f, 17.80f, 18.28f, 17.80f};
 static float wheel_ff_min[4] = {254.0f, 254.0f, 254.0f, 254.0f};
 
 static uint8_t wheel_ff_index(uint8_t which) {
@@ -143,8 +143,8 @@ void driver_wheel(WHEEL *wheel) {
     wheel->trust = 0;
   }
 
-  if (ABS(wheel->cur_speed) < 10) {
-    wheel->trust = CONFINE(wheel->trust, -1500, 1500);//起步限幅 如果车速很小 限幅防止PID调控过大
+  if (ABS(wheel->cur_speed) < 10 && status.state.motion != KEEP_ANGLE) {
+    wheel->trust = CONFINE(wheel->trust, -1500, 1500);
   }
 
   set_wheel_dir(wheel, wheel->trust);
