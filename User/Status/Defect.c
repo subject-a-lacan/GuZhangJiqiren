@@ -110,12 +110,12 @@
 #define Q4_SCAN_SEGMENT_CM              33.3f
 #define Q4_SCAN_STOP_MS                 100
 #define Q4_TURN_A_LEFT_ANGLE            80.0f
-#define Q4_TURN_D_LEFT_ANGLE            85.0f
+#define Q4_TURN_D_LEFT_ANGLE            80.0f
 #define Q4_SCAN_TURN_1_LEFT_ANGLE       83.0f
 #define Q4_SCAN_TURN_2_LEFT_ANGLE       83.0f
 #define Q4_SCAN_TURN_3_LEFT_ANGLE       83.0f
 #define Q4_TURN_A_ANGLE_LIMIT           22.0f
-#define Q4_TURN_D_ANGLE_LIMIT           22.0f
+#define Q4_TURN_D_ANGLE_LIMIT           23.0f
 #define Q4_SCAN_TURN_1_ANGLE_LIMIT      22.0f
 #define Q4_SCAN_TURN_2_ANGLE_LIMIT      22.0f
 #define Q4_SCAN_TURN_3_ANGLE_LIMIT      22.0f
@@ -159,17 +159,14 @@
 #define Q3_AB_FIRST_TURN_SPEED      30    /* AB发车第一个路口(A点)转弯速度 */
 #define Q3_AD_FIRST_TURN_SPEED      30    /* AD发车第一个路口(A点)转弯速度 */
 #define Q3_FINAL_SLOW_SPEED         20
-#define Q3_CD_START_SPEED           30    /* CD边刚进线后的速度 */
-#define Q3_CD_SLOW_SPEED            20    /* CD边给视觉更多帧的低速 */
-#define Q3_CD_FAST_SPEED            30    /* CD边视觉识别完成后的提速 */
+#define Q3_CD_SPEED                 23    /* CD边恒定速度 */
 
 /* Distance thresholds (cm, 通过 encoder_pulse_to_cm 换算后比较) */
 #define Q3_STRAIGHT_FLASH_CM        62.0f
 #define Q3_PRE_TURN_SLOW_CM         56.0f /* 普通直道入弯前减速距离(cm) */
 #define Q3_PRE_TURN_SLOW_SPEED      22   /* 普通直道入弯前减速目标速度 */
 #define Q3_FINAL_SLOW_CM            70.0f
-#define Q3_CD_SLOW_AFTER_CM         14.0f
-#define Q3_CD_FAST_AFTER_CM         68.0f /* CD边视觉识别完成后的提速距离 */
+
 #define Q3_CD_IGNORE_END_CM         75.0f /* A4横线干扰结束, 之后允许接受路口 */
 #define Q3_ROAD_ENABLE_CM            70.0f /* 普通路口里程门槛, 防止误触发 */
 
@@ -1254,16 +1251,9 @@ static void task3_apply_side_speed(STATUS *status) {
   }
 }
 
-/* CD 边专用速度: 先 30, 14cm 后降到 20 给视觉更多帧, 68cm 后提到 48 */
+/* CD 边恒定速度 23 */
 static void task3_apply_cd_speed(STATUS *status) {
-  float cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
-  if (cm < Q3_CD_SLOW_AFTER_CM) {
-    status->state.base_speed = Q3_CD_START_SPEED;
-  } else if (cm < Q3_CD_FAST_AFTER_CM) {
-    status->state.base_speed = Q3_CD_SLOW_SPEED;
-  } else {
-    status->state.base_speed = Q3_CD_FAST_SPEED;
-  }
+  status->state.base_speed = Q3_CD_SPEED;
 }
 
 /* 最后一段速度: 正常巡线 → 终点前降速 */
