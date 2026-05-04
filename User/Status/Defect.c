@@ -222,6 +222,7 @@ void task_start(STATUS *status) {
 
   switch (status->task.task_id) {
     case TASK_BASIC_1:
+      send_h3c_flag = 1;
       status->task.race_phase = Q1_START_TO_A;
       break;
     case TASK_BASIC_2:
