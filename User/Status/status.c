@@ -17,7 +17,6 @@ int32_t rw_time_cur = -1;
 int32_t rw_time_tar = -1;
 extern uint8_t cross_cnt;      // 路口计数器
 uint8_t cross_delay = 0;       // 路口延时计数器
-int32_t keep_angle_time = -1;  // 保持角度时间
 uint8_t speed_show_flag = 0;   // 显示速度标志位
 
 /**
@@ -126,7 +125,8 @@ void init_state(STATUS *status, uint8_t T) {
  */
 void init_status_pid(STATUS *status) {
   status->state.status_pid.follow_line_pid = init_pid(1, 0.03, 0, 20, 1, 0.0f);
-  status->state.status_pid.keep_angle_pid = init_pid(1, 0, 0, 20, 1, 0.0f);
+  status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 20, 1, 0.0f);
+  status->state.status_pid.angle_output_limit = 25.0f;
 }
 
 static void apply_control_param(STATUS *status, CONTROL_PARAM p) {
@@ -135,6 +135,7 @@ static void apply_control_param(STATUS *status, CONTROL_PARAM p) {
   status->motor.wheel[0].wheel_pid = p.wheel_left_pid;
   status->motor.wheel[1].wheel_pid = p.wheel_right_pid;
   set_wheel_ff_param(p.ff_offset, p.ff_k, p.ff_min);
+  status->state.status_pid.angle_output_limit = 25.0f;
 }
 
 void apply_basic_control_param(STATUS *status) {
@@ -228,15 +229,6 @@ void follow_line(STATUS *status) {
   status->motor.wheel[1].tar_speed = status->state.base_speed + (int16_t)diff;
 }
 
-uint8_t cnt = 20;
-uint8_t flag = 1;
-/*
- * @brief 保持角度控制
- * @param status 状态结构体指针
- * @return 无
- * @note 每次被调用时，会完成一轮：计算当前与目标角度的差值 → 通过 PID 计算转向修正量 → 生成左右轮目标速度。
- * @note 当角度误差小于 1 度时，先让车稳定一小段时间（cnt 和 flag 的作用），然后把基础速度提高到 40，开始加速。
- */
 void keep_angle(STATUS *status) {
   float target = status->state.tar_angle + status->state.initial_angle;  // 目标角度
   float diff_angle = target - status->state.cur_angle;
@@ -246,21 +238,10 @@ void keep_angle(STATUS *status) {
     diff_angle += 360.0;
   }
   float diff = compute_pid(&status->state.status_pid.keep_angle_pid, diff_angle);  // PID计算
-  diff = CONFINE(diff, -25, 25);                                                   // 限制速度范围
+  float angle_limit = status->state.status_pid.angle_output_limit;
+  diff = CONFINE(diff, -angle_limit, angle_limit);                                 // 限制速度范围
   status->motor.wheel[0].tar_speed = status->state.base_speed + (int16_t)diff;
   status->motor.wheel[1].tar_speed = status->state.base_speed - (int16_t)diff;  // 设置电机速度
-
-  if (ABS(diff_angle) < 1.0) {
-    if (cnt > 0) {
-      cnt--;
-    } else {
-      if (flag == 1) {
-        keep_angle_time = status->state.time;  // 记录保持角度的时间 为后续时间提供时间
-        status->state.base_speed = 30;         // 角度稳定后加速
-        flag = 0;
-      }
-    }
-  }
 }
 /*
  * @brief 更新按钮状态 调用srver_button函数执行具体按键逻辑

@@ -93,10 +93,10 @@ I (..\Core\Inc\tim.h)(0x69EA35B8)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
 I (..\Core\Inc\gpio.h)(0x69EA35AD)
 I (..\User\Tool\log.h)(0x6819CEAC)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
 I (..\User\Device\buzzer.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Tool\pid.h)(0x69F76227)
@@ -1491,9 +1491,9 @@ I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart.h)(0x69EA2FEC)
 I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h)(0x69EA2FEC)
 I (..\Core\Inc\gpio.h)(0x69EA35AD)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\buzzer.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Tool\pid.h)(0x69F76227)
 I (..\User\Device\led.h)(0x6819CEAC)
@@ -1545,10 +1545,10 @@ I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h)(0x69EA2FEC)
 I (..\Core\Inc\gpio.h)(0x69EA35AD)
 I (..\User\Tool\log.h)(0x6819CEAC)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
 I (..\User\Device\buzzer.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Tool\pid.h)(0x69F76227)
@@ -1649,9 +1649,9 @@ I (..\Core\Inc\usart.h)(0x69EA35B9)
 I (..\User\Motor\lq_step.h)(0x6819CEAC)
 I (C:\Keil_v5\ARM\ARMCLANG\include\math.h)(0x58A47FFE)
 I (..\User\Motor\servo.h)(0x6819CEAC)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Tool\pid.h)(0x69F76227)
@@ -1703,8 +1703,8 @@ I (..\User\Tool\log.h)(0x6819CEAC)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdlib.h)(0x588CAFDA)
 F (..\User\It\uart_it.h)(0x69F76227)()
-F (..\User\Status\status.c)(0x69F7775D)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__MICROLIB -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ../User/Device -I ../User/It -I ../User/Motor -I ../User/Sensor -I ../User/Status -I ../User/Tool-I./RTE/_car_control_stm32_project-IC:/Keil_v5/ARM/PACK/ARM/CMSIS/5.0.1/CMSIS/Include-IC:/Keil_v5/ARM/PACK/Keil/STM32G4xx_DFP/1.4.0/Drivers/CMSIS/Device/ST/STM32G4xx/Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32G474xx -DUSE_HAL_DRIVER -DSTM32G474xx-o car_control_stm32_project/status.o -MD)
-I (..\User\Status\status.h)(0x69F7773F)
+F (..\User\Status\status.c)(0x69F829A9)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__MICROLIB -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ../User/Device -I ../User/It -I ../User/Motor -I ../User/Sensor -I ../User/Status -I ../User/Tool-I./RTE/_car_control_stm32_project-IC:/Keil_v5/ARM/PACK/ARM/CMSIS/5.0.1/CMSIS/Include-IC:/Keil_v5/ARM/PACK/Keil/STM32G4xx_DFP/1.4.0/Drivers/CMSIS/Device/ST/STM32G4xx/Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32G474xx -DUSE_HAL_DRIVER -DSTM32G474xx-o car_control_stm32_project/status.o -MD)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
 I (..\Core\Inc\main.h)(0x69F76227)
 I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal.h)(0x69EA2FEC)
@@ -1747,7 +1747,7 @@ I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_tim_ex.h)(0x69EA2FEC)
 I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart.h)(0x69EA2FEC)
 I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h)(0x69EA2FEC)
 I (..\User\Device\buzzer.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Tool\pid.h)(0x69F76227)
@@ -1758,11 +1758,11 @@ I (..\Core\Inc\i2c.h)(0x69EA35B8)
 I (..\User\Tool\log.h)(0x6819CEAC)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
 I (..\User\Tool\math_tool.h)(0x69EF899D)
-F (..\User\Status\status.h)(0x69F7773F)()
-F (..\User\Status\Defect.c)(0x69F78219)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__MICROLIB -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ../User/Device -I ../User/It -I ../User/Motor -I ../User/Sensor -I ../User/Status -I ../User/Tool-I./RTE/_car_control_stm32_project-IC:/Keil_v5/ARM/PACK/ARM/CMSIS/5.0.1/CMSIS/Include-IC:/Keil_v5/ARM/PACK/Keil/STM32G4xx_DFP/1.4.0/Drivers/CMSIS/Device/ST/STM32G4xx/Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32G474xx -DUSE_HAL_DRIVER -DSTM32G474xx-o car_control_stm32_project/defect.o -MD)
-I (..\User\Status\Defect.h)(0x69F76227)
+F (..\User\Status\status.h)(0x69F8298D)()
+F (..\User\Status\Defect.c)(0x69F831C0)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__MICROLIB -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ../User/Device -I ../User/It -I ../User/Motor -I ../User/Sensor -I ../User/Status -I ../User/Tool-I./RTE/_car_control_stm32_project-IC:/Keil_v5/ARM/PACK/ARM/CMSIS/5.0.1/CMSIS/Include-IC:/Keil_v5/ARM/PACK/Keil/STM32G4xx_DFP/1.4.0/Drivers/CMSIS/Device/ST/STM32G4xx/Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32G474xx -DUSE_HAL_DRIVER -DSTM32G474xx-o car_control_stm32_project/defect.o -MD)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x588CAFD2)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
 I (..\Core\Inc\main.h)(0x69F76227)
 I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal.h)(0x69EA2FEC)
@@ -2040,10 +2040,10 @@ I (..\Core\Inc\gpio.h)(0x69EA35AD)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
 I (..\User\Tool\log.h)(0x6819CEAC)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
 I (..\User\Device\buzzer.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Tool\pid.h)(0x69F76227)
 I (..\User\Device\led.h)(0x6819CEAC)
@@ -2141,10 +2141,10 @@ I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart.h)(0x69EA2FEC)
 I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h)(0x69EA2FEC)
 I (..\User\Tool\log.h)(0x6819CEAC)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
 I (..\User\Device\buzzer.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Tool\pid.h)(0x69F76227)
@@ -2200,10 +2200,10 @@ I (..\Core\Inc\gpio.h)(0x69EA35AD)
 I (..\User\Tool\log.h)(0x6819CEAC)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
 I (..\User\Tool\math_tool.h)(0x69EF899D)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
 I (..\User\Device\buzzer.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Device\led.h)(0x6819CEAC)
@@ -2392,10 +2392,10 @@ I (..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_uart_ex.h)(0x69EA2FEC)
 I (..\User\Tool\log.h)(0x6819CEAC)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
 I (..\User\Tool\math_tool.h)(0x69EF899D)
-I (..\User\Status\status.h)(0x69F7773F)
+I (..\User\Status\status.h)(0x69F8298D)
 I (..\User\Device\button.h)(0x69F76227)
 I (..\User\Device\buzzer.h)(0x69F76227)
-I (..\User\Status\Defect.h)(0x69F76227)
+I (..\User\Status\Defect.h)(0x69F78DFE)
 I (..\User\Sensor\gw_anagloge.h)(0x69F76227)
 I (..\User\Sensor\gy901.h)(0x6819CEAC)
 I (..\User\Device\led.h)(0x6819CEAC)

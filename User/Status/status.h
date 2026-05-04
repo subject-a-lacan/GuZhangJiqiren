@@ -19,6 +19,7 @@
 typedef struct STATUS_PID {
   PID follow_line_pid;
   PID keep_angle_pid;  // PID结构体
+  float angle_output_limit;  // 角度环输出限幅, 默认25, 掉头时可放大
 } STATUS_PID;
 
 typedef struct CONTROL_PARAM {

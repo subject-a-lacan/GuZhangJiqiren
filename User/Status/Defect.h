@@ -34,7 +34,55 @@ typedef enum Q1_RACE_PHASE {
   Q1_BA_FINAL,    /* BA 最后一段回到停车点 */
 } Q1_RACE_PHASE;
 
-/* Q2/Q3/Q4 race phases — to be defined per-task */
+/* Q2 AB race phases (AB发车: A→D→C→B→掉头→C→D→A) */
+typedef enum Q2_AB_RACE_PHASE {
+  Q2_AB_TURN_A_TO_AD,     /* A 点起步左转进入 AD */
+  Q2_AB_FIND_AD_OUT,      /* 转弯后找 AD 线 */
+  Q2_AB_SIDE_AD_OUT,      /* AD 边直行等 D 点 */
+  Q2_AB_TURN_D_TO_DC,     /* D 点左转进入 DC */
+  Q2_AB_FIND_DC_OUT,      /* 转弯后找 DC 线 */
+  Q2_AB_SIDE_DC_OUT,      /* DC 边直行等 C 点 */
+  Q2_AB_TURN_C_TO_CB,     /* C 点左转进入 CB */
+  Q2_AB_FIND_CB_OUT,      /* 转弯后找 CB 线 */
+  Q2_AB_SIDE_CB_OUT,      /* C→B 直行, 79cm 前过滤路口, 等 B 点 */
+  Q2_AB_STOP_BEFORE_UTURN_B, /* B 点停车, 等轮速降为 0 */
+  Q2_AB_UTURN_B,          /* B 点 170° 掉头 */
+  Q2_AB_FIND_BC_RETURN,   /* 掉头后找 BC 线 */
+  Q2_AB_SIDE_BC_RETURN,   /* B→C 直行, 79cm 前过滤路口, 等 C 点 */
+  Q2_AB_TURN_C_RETURN,    /* C 点右转进入 CD */
+  Q2_AB_FIND_CD_RETURN,   /* 转弯后找 CD 线 */
+  Q2_AB_SIDE_CD_RETURN,   /* C→D 直行等 D 点 */
+  Q2_AB_TURN_D_RETURN,    /* D 点右转进入 DA */
+  Q2_AB_FIND_DA_RETURN,   /* 转弯后找 DA 线 */
+  Q2_AB_SIDE_DA_RETURN,   /* D→A 最后一段, 80cm 后降速, 等 A 点停车 */
+  Q2_AB_FINISH,           /* 停车收尾 */
+} Q2_AB_RACE_PHASE;
+
+/* Q2 AD race phases (AD发车: A→B→C→D→掉头→C→B→A) */
+typedef enum Q2_AD_RACE_PHASE {
+  Q2_AD_TURN_A_TO_AB,       /* A 点起步右转进入 AB */
+  Q2_AD_FIND_AB_OUT,        /* 转弯后找 AB 线 */
+  Q2_AD_SIDE_AB_OUT,        /* AB 边直行等 B 点 */
+  Q2_AD_TURN_B_TO_BC,       /* B 点右转进入 BC */
+  Q2_AD_FIND_BC_OUT,        /* 转弯后找 BC 线 */
+  Q2_AD_SIDE_BC_OUT,        /* B→C 直行, 79cm 前过滤路口, 等 C 点 */
+  Q2_AD_TURN_C_TO_CD,       /* C 点右转进入 CD */
+  Q2_AD_FIND_CD_OUT,        /* 转弯后找 CD 线 */
+  Q2_AD_SIDE_CD_OUT,        /* C→D 直行, 预减速后等 D 点 */
+  Q2_AD_STOP_BEFORE_UTURN_D, /* D 点停车, 等轮速降为 0 */
+  Q2_AD_UTURN_D,            /* D 点 170° 掉头 */
+  Q2_AD_FIND_DC_RETURN,     /* 掉头后找 DC 线 */
+  Q2_AD_SIDE_DC_RETURN,     /* D→C 直行等 C 点 */
+  Q2_AD_TURN_C_RETURN,      /* C 点左转进入 CB */
+  Q2_AD_FIND_CB_RETURN,     /* 转弯后找 CB 线 */
+  Q2_AD_SIDE_CB_RETURN,     /* C→B 直行, 79cm 前过滤路口, 等 B 点 */
+  Q2_AD_TURN_B_RETURN,      /* B 点左转进入 BA */
+  Q2_AD_FIND_BA_RETURN,     /* 转弯后找 BA 线 */
+  Q2_AD_SIDE_BA_RETURN,     /* B→A 最后一段, 80cm 后降速, 等 A 点停车 */
+  Q2_AD_FINISH,             /* 停车收尾 */
+} Q2_AD_RACE_PHASE;
+
+/* Q3/Q4 race phases — to be defined per-task */
 
 typedef struct TASK {
   uint8_t task_id;     //任务编号
