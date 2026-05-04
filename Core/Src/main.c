@@ -67,6 +67,9 @@ extern uint8_t cross_cnt;
 volatile float l1 = 0.0f;
 volatile float l2 = 0.0f;
 volatile uint8_t task3_finished = 0;
+volatile uint8_t send_h3c_flag = 0;
+uint8_t task3_print_flag = 0;
+uint8_t task3_print_cnt = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -147,8 +150,28 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (task3_finished) {
+    if (send_h3c_flag) {
+      uint8_t h3c[] = {0x48, 0x33, 0x43};
+      HAL_UART_Transmit(&huart3, h3c, 3, 100);
+      send_h3c_flag = 0;
+    }
+    if (task3_finished && status.task.task_id == TASK_ADV_1 && status.task.task_running == 0) {
+      task3_print_flag = 1;
+      task3_print_cnt = 5;
+      task3_finished = 0;
+    }
+
+    if (task3_print_flag && status.task.task_id == TASK_ADV_1 && status.task.task_running == 0) {
       printf("%.2f,%.2f\r\n", (double)l1, (double)l2);
+      if (task3_print_cnt > 0) {
+        task3_print_cnt--;
+      }
+      if (task3_print_cnt == 0) {
+        task3_print_flag = 0;
+      }
+    } else if (task3_print_flag) {
+      task3_print_flag = 0;
+      task3_print_cnt = 0;
     }
 
     //  uint8_t d = status.sensor.gw_analogue.digital_8bit;

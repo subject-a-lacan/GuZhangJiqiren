@@ -3,6 +3,7 @@
 #include "math_tool.h"
 #include "log.h"
 #include "pid.h"
+#include "usart.h"
 #include <stdio.h>
 
 /* Q1 tunable parameters */
@@ -135,7 +136,7 @@
 #define Q3_FINAL_SLOW_SPEED         20
 #define Q3_CD_START_SPEED           30    /* CD边刚进线后的速度 */
 #define Q3_CD_SLOW_SPEED            20    /* CD边给视觉更多帧的低速 */
-#define Q3_CD_FAST_SPEED            48    /* CD边视觉识别完成后的提速 */
+#define Q3_CD_FAST_SPEED            30    /* CD边视觉识别完成后的提速 */
 
 /* Distance thresholds (cm, 通过 encoder_pulse_to_cm 换算后比较) */
 #define Q3_STRAIGHT_FLASH_CM        68.0f
@@ -154,6 +155,7 @@ extern Road road_buf;
 extern volatile float l1;
 extern volatile float l2;
 extern volatile uint8_t task3_finished;
+extern volatile uint8_t send_h3c_flag;
 
 void init_task(TASK *task) {
   task->task_id = TASK_BASIC_1;
@@ -1273,6 +1275,7 @@ static void driver_task3(STATUS *status) {
           if (status->task.race_phase == Q3_AB_SIDE_AD) {
             next = Q3_AB_TURN_D_TO_DC;
             angle = Q3_AB_TURN_D_LEFT_ANGLE;
+            send_h3c_flag = 1;
           } else {
             next = Q3_AB_TURN_B_TO_BA;
             angle = Q3_AB_TURN_B_LEFT_ANGLE;
@@ -1410,6 +1413,7 @@ static void driver_task3(STATUS *status) {
           } else {
             next = Q3_AD_TURN_C_TO_CD;
             angle = Q3_AD_TURN_C_RIGHT_ANGLE;
+            send_h3c_flag = 1;
           }
           task3_enter_phase(status, next);
           status->state.initial_angle = status->state.cur_angle;
