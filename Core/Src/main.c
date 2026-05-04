@@ -236,10 +236,10 @@ int main(void)
   init_wheel(&status.motor.wheel[0], 1, -1);
   init_wheel(&status.motor.wheel[1], 2, 1);
 
-  // ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
-  __HAL_UART_DISABLE_IT(&huart2, UART_IT_RXNE);
-  __HAL_UART_DISABLE_IT(&huart2, UART_IT_IDLE);
-  HAL_NVIC_DisableIRQ(USART2_IRQn);
+  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  __HAL_UART_DISABLE_IT(&huart1, UART_IT_RXNE);
+  __HAL_UART_DISABLE_IT(&huart1, UART_IT_IDLE);
+  HAL_NVIC_DisableIRQ(USART1_IRQn);
   // after_init_state();
 
   HAL_TIM_Base_Start_IT(&htim5);
