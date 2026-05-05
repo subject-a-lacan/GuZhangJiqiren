@@ -264,6 +264,19 @@ void UART_PID_Tune(uint8_t cmd, float val) {
       status.motor.wheel[0].tar_speed = 0;
       status.motor.wheel[1].tar_speed = 0;
       break;
+    case '9':
+      if (status.task.task_id == TASK_ADV_2) {
+        status.task.task_running = 0;
+        status.task.armed = 0;
+        status.task.start_request = 0;
+        status.task.stop_request = 0;
+        status.task.stop_cmd = 1;
+        status.state.motion = STOP;
+        status.state.base_speed = 0;
+        status.motor.wheel[0].tar_speed = 0;
+        status.motor.wheel[1].tar_speed = 0;
+      }
+      break;
     default: break;
   }
 }
