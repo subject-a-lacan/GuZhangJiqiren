@@ -157,6 +157,8 @@ int main(void)
     if (task3_print_flag) {
       float task3_l1_out = (l1 == 0.0f) ? 290.0f : (l1 * 10.0f);
       float task3_l2_out = (l2 == 0.0f) ? 290.0f : (l2 * 10.0f);
+      if (task3_l1_out > 80.0f) task3_l1_out = 60.0f;
+      if (task3_l2_out > 80.0f) task3_l2_out = 60.0f;
       printf("%.2f,%.2f\r\n", (double)task3_l1_out, (double)task3_l2_out);
     }
 

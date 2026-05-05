@@ -106,7 +106,7 @@
 #define Q4_TURN_BASE_SPEED              0
 #define Q4_START_TO_A_MIN_CM            5.0f
 #define Q4_ROAD_ENABLE_CM               60.0f
-#define Q4_DC_SCAN_START_CM             66.7f
+#define Q4_DC_SCAN_START_CM             60.7f
 #define Q4_SCAN_SEGMENT_CM              33.3f
 #define Q4_SCAN_STOP_MS                 100
 #define Q4_TURN_A_LEFT_ANGLE            80.0f
@@ -119,7 +119,7 @@
 #define Q4_SCAN_TURN_1_ANGLE_LIMIT      22.0f
 #define Q4_SCAN_TURN_2_ANGLE_LIMIT      22.0f
 #define Q4_SCAN_TURN_3_ANGLE_LIMIT      22.0f
-#define Q4_STRAIGHT_ANGLE_LIMIT         12.0f
+#define Q4_STRAIGHT_ANGLE_LIMIT         10.0f
 #define Q4_TURN_TOLERANCE_DEG           8.0f
 #define Q4_TURN_LINE_MASK_6             0x7E
 #define Q4_LINE_STABLE_CNT              3
