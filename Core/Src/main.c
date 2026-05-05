@@ -76,8 +76,8 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 int fputc(int ch, FILE *f)
 {
-    while (!(USART2->ISR & USART_ISR_TXE));
-    USART2->TDR = (uint8_t)ch;
+    while (!(USART1->ISR & USART_ISR_TXE));
+    USART1->TDR = (uint8_t)ch;
     return ch;
 }
 /* USER CODE END PFP */

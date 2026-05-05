@@ -1580,6 +1580,10 @@ static uint8_t task4_turn_angle_ready(STATUS *status) {
   return (ABS(task4_angle_error(status)) < Q4_TURN_TOLERANCE_DEG);
 }
 
+static uint8_t task4_scan_turn_angle_ready(STATUS *status) {
+  return (ABS(task4_angle_error(status)) <= 0.0f);
+}
+
 static uint8_t task4_middle6_seen(STATUS *status) {
   return (status->sensor.gw_analogue.digital_8bit & Q4_TURN_LINE_MASK_6) != 0;
 }
@@ -1711,7 +1715,7 @@ static void driver_task4(STATUS *status) {
       status->task.task_running = 1;
       status->state.motion = KEEP_ANGLE;
       status->state.base_speed = Q4_TURN_BASE_SPEED;
-      if (task4_turn_angle_ready(status)) {
+      if (task4_scan_turn_angle_ready(status)) {
         task4_start_heading_drive(status, Q4_SCAN_DRIVE_1);
       }
       break;
@@ -1752,7 +1756,7 @@ static void driver_task4(STATUS *status) {
       status->task.task_running = 1;
       status->state.motion = KEEP_ANGLE;
       status->state.base_speed = Q4_TURN_BASE_SPEED;
-      if (task4_turn_angle_ready(status)) {
+      if (task4_scan_turn_angle_ready(status)) {
         task4_start_heading_drive(status, Q4_SCAN_DRIVE_3);
       }
       break;
@@ -1779,7 +1783,7 @@ static void driver_task4(STATUS *status) {
       status->task.task_running = 1;
       status->state.motion = KEEP_ANGLE;
       status->state.base_speed = Q4_TURN_BASE_SPEED;
-      if (task4_turn_angle_ready(status)) {
+      if (task4_scan_turn_angle_ready(status)) {
         task4_start_heading_drive(status, Q4_SCAN_DRIVE_4);
       }
       break;
