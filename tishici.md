@@ -1,5 +1,47 @@
- 
- 先阅读，不准改代码：任务2的核心计算公式：base_speed = K_angle * pend_angle
-          + K_gyro  * pend_angle_speed
-          + K_pos   * car_position
-          + K_vel   * car_speed;首先 在工作区主循环里按照pitch,roll,pitch角速度,roll角速度\r\n的格式打印这四个量，然后封装一个叫balance的PID结构体 这样一来它的error就是roll 它的微分项就是角速度 这样一来它的输出就是的base_speed的前两项了 再写一个叫mileage 的结构体  他的error就是负的编码器累加   微分x项就是两轮当前速度之和除以2并取负 所以这个结构体的PID输出就是base_speed的后两项  补全balance和mileage相关的初始化代码  请你再增加一个MOTION叫做BALANCE 然后写好keep_balance函数：里面就是先读取target为0 diff_balance为0减去roll ....总之模仿keep_angle写就行 但是注意现在只需要加公式里的前两项，也就是暂时不控制位置 然后· 更新keep_balance后也需要在update_status里更新对应的代码  然后 改写driver_task2：一直保持keep_balance状态  最后 在update_status里累加 mileage 先评估我说的对不对 我的方案行不行 然后不准改代码 告诉我你打算怎么改
+
+## TASK2 起摆新想法：满 PWM kick 脉冲
+
+现在一前一后普通方波加速度不够，说明需要的不是稳态速度，而是更大的瞬时冲量。起摆阶段优先使用短时满 PWM 冲击，而不是温柔的速度/PWM 方波。
+
+核心方案：
+
+```text
+后冲：PWM -3000，40~80ms
+前冲：PWM +3000，80~160ms
+然后可以短暂停 0 PWM 等摆自然运动，再重复
+```
+
+第一组建议直接试：
+
+```text
+t3000
+p3000
+v60
+r140
+```
+
+含义：
+
+```text
+t3000  后冲 PWM 幅值 3000，代码里实际输出 -3000
+p3000  前冲 PWM 幅值 3000，代码里实际输出 +3000
+v60    后冲 60ms
+r140   前冲 140ms
+```
+
+再按现象试几组：
+
+```text
+v40 r120
+v60 r160
+v80 r200
+```
+
+判断标准：
+
+1. 如果车只是打滑、摆杆没明显摆幅，优先查轮胎抓地、电池电压、TB6612 电流能力、车体重量和摆杆轴摩擦。
+2. 如果车明显猛动但摆幅仍然小，说明时间节奏不对，继续调 `v/r`。
+3. 如果摆幅变大，说明方向和冲量基本对，再调接管角度和 balance 的 `kp/kd`。
+4. 起摆阶段不要太早切 PD。可以先把捕获角度从 12deg 临时收小到 6~8deg，或者后续加角速度条件。
+
+注意：这个阶段追求的是瞬时加速度和冲量，不是速度闭环的稳定跟踪。
