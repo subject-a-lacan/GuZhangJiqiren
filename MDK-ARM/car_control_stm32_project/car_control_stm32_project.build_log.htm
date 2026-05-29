@@ -27,7 +27,6 @@ Project File Date:  05/26/2026
 <h2>Output:</h2>
 *** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'car_control_stm32_project'
-assembling startup_stm32g474xx.s...
 ../Core/Src/main.c(32): warning: In file included from...
 ../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
@@ -37,10 +36,100 @@ typedef struct STATUS STATUS;
                       ^
 1 warning generated.
 compiling main.c...
+../User/Device/led.c(5): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling led.c...
+../User/Motor/wheel.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling wheel.c...
+../User/It/uart_it.c(3): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling uart_it.c...
+../User/Tool/pid.c(7): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling pid.c...
+../User/Motor/servo.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling servo.c...
+../User/It/timer_it.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling timer_it.c...
+../User/Device/button.c(5): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling button.c...
+../User/Status/Defect.c(2): warning: In file included from...
+../User/Status/status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling Defect.c...
+../User/Sensor/gw_analogue.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling gw_analogue.c...
+../User/Status/status.c(1): warning: In file included from...
+../User/Status/status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling status.c...
 linking...
-Program Size: Code=43386 RO-data=554 RW-data=104 ZI-data=4096  
+Program Size: Code=32920 RO-data=552 RW-data=100 ZI-data=4060  
 FromELF: creating hex file...
-"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 1 Warning(s).
+"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 11 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -63,7 +152,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.0.1
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>
