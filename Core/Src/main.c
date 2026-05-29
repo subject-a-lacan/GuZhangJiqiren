@@ -62,7 +62,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-int16_t cmd_speed = 30;
+int16_t cmd_speed = 12;
 extern uint8_t cross_cnt;
 /* USER CODE END PV */
 

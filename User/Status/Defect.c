@@ -114,7 +114,7 @@ static uint8_t t1_black_frames = 0;
 static void driver_task1(STATUS *status) {
   status->task.task_running = 1;
   status->state.motion = FIND_LINE;
-  status->state.base_speed = 25;
+  status->state.base_speed = 10;
 
   uint8_t mid4 = status->sensor.gw_analogue.digital_8bit & 0x3C;
   uint8_t black = ((mid4 & 0x04) != 0)
@@ -128,7 +128,7 @@ static void driver_task1(STATUS *status) {
     t1_black_frames = 0;
   }
 
-  if (t1_black_frames >= 2
+  if (t1_black_frames >= 3
       && encoder_pulse_to_cm((int32_t)status->task.phase_mileage) > 99.0f) {
     task_finish(status);
   }

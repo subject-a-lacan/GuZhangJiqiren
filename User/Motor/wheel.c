@@ -6,9 +6,9 @@
 #include "status.h"
 #include "tim.h"
 
-static float wheel_ff_offset[4] = {114.70f, 97.26f, 114.70f, 97.26f};
-static float wheel_ff_k[4] = {18.28f, 17.80f, 18.28f, 17.80f};
-static float wheel_ff_min[4] = {254.0f, 254.0f, 254.0f, 254.0f};
+static float wheel_ff_offset[4] = {200.68f, 107.12f, 200.68f, 107.12f};
+static float wheel_ff_k[4] = {47.24f, 46.27f, 47.24f, 46.27f};
+static float wheel_ff_min[4] = {250.0f, 260.0f, 250.0f, 260.0f};
 
 static uint8_t wheel_ff_index(uint8_t which) {
   if (which < 1 || which > 4) return 0;
@@ -126,7 +126,7 @@ void driver_wheel(WHEEL *wheel) {
     return;
   }
 
-  // 前馈 (from qiankui.md): steady_offset=157, kff=18.3, start_min=254
+  // Feedforward uses 8ms encoder-pulse speed calibration.
   uint8_t ff_index = wheel_ff_index(wheel->which);
   float ff_abs = wheel_ff_offset[ff_index] + wheel_ff_k[ff_index] * ABS(wheel->tar_speed);
   if (ff_abs < wheel_ff_min[ff_index]) ff_abs = wheel_ff_min[ff_index];
@@ -139,11 +139,11 @@ void driver_wheel(WHEEL *wheel) {
   wheel->trust = (int16_t)(ff + pid_out);
   wheel->trust = CONFINE(wheel->trust, -TRUST_CONFINE, TRUST_CONFINE);
 
-  if (wheel->tar_speed == 0 && ABS(wheel->cur_speed) < 3) {
+  if (wheel->tar_speed == 0 && ABS(wheel->cur_speed) < 2) {
     wheel->trust = 0;
   }
 
-  if (ABS(wheel->cur_speed) < 10 && status.state.motion != KEEP_ANGLE) {
+  if (ABS(wheel->cur_speed) < 4 && status.state.motion != KEEP_ANGLE) {
     wheel->trust = CONFINE(wheel->trust, -1500, 1500);
   }
 
@@ -174,7 +174,7 @@ void init_wheel(WHEEL *wheel, uint8_t which, int8_t dir) {
   wheel->cur_speed = 0;
   wheel->tar_speed = 0;
   wheel->dir = dir;
-  wheel->wheel_pid = init_pid(8, 0, 0, 20, 100, 0.50f);  // P I D T integral_max InteralCoef
+  wheel->wheel_pid = init_pid(8, 0, 0, 8, 100, 0.50f);  // P I D T integral_max InteralCoef
   if (wheel->which == 1) {
     HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
   } else if (wheel->which == 2) {

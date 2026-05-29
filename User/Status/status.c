@@ -118,16 +118,16 @@ void init_state(STATUS *status, uint8_t T) {
  * @brief 初始化状态层控制用的 PID
  * @param status 状态结构体指针，用来保存巡线和保角 PID
  * @return 无
- *@note 调用 init_pid(1.5, 0, 0, 20, 20)
+ *@note 调用 init_pid(1.5, 0, 0, 8, 20)
  *       初始化巡线 PID，这几个数字分别控制跟线反应快慢和积分限制，后续都可调
- *@note 调用 init_pid(1, 0, 1, 20, 20)
+ *@note 调用 init_pid(1, 0, 1, 8, 20)
  *       初始化保角 PID，这几个数字决定转向纠偏力度和稳定性，后续都可调
  */
 void init_status_pid(STATUS *status) {
-  status->state.status_pid.follow_line_pid = init_pid(1.8, 0.03, 1, 20, 1, 0.0f);
-  status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 20, 1, 0.0f);
-  status->state.status_pid.balance_pid = init_pid(0, 0, 0, 20, 1, 0.0f);
-  status->state.status_pid.mileage_pid = init_pid(0, 0, 0, 20, 1, 0.0f);
+  status->state.status_pid.follow_line_pid = init_pid(1.8, 0.012, 0.4, 8,1, 0.0f);
+  status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 8,1, 0.0f);
+  status->state.status_pid.balance_pid = init_pid(0, 0, 0, 8,1, 0.0f);
+  status->state.status_pid.mileage_pid = init_pid(0, 0, 0, 8,1, 0.0f);
   status->state.status_pid.angle_output_limit = 25.0f;
 }
 
@@ -143,30 +143,30 @@ static void apply_control_param(STATUS *status, CONTROL_PARAM p) {
 
 void apply_basic_control_param(STATUS *status) {
   CONTROL_PARAM p;
-  p.follow_line_pid = init_pid(1, 0.03, 0, 20, 1, 0.0f);
-  p.keep_angle_pid  = init_pid(1, 0, 0, 20, 1, 0.0f);
-  p.wheel_left_pid  = init_pid(8, 0, 0, 20, 100, 0.50f);
-  p.wheel_right_pid = init_pid(8, 0, 0, 20, 100, 0.50f);
-  p.ff_offset = 114.70f;
-  p.ff_k = 18.28f;
-  p.ff_min = 220.0f;
-  p.ff_offset_r = 97.26f;
-  p.ff_k_r = 17.80f;
-  p.ff_min_r = 220.0f;
+  p.follow_line_pid = init_pid(1, 0.03, 0, 8,1, 0.0f);
+  p.keep_angle_pid  = init_pid(1, 0, 0, 8,1, 0.0f);
+  p.wheel_left_pid  = init_pid(8, 0, 0, 8,100, 0.50f);
+  p.wheel_right_pid = init_pid(8, 0, 0, 8,100, 0.50f);
+  p.ff_offset = 200.68f;
+  p.ff_k = 47.24f;
+  p.ff_min = 250.0f;
+  p.ff_offset_r = 107.12f;
+  p.ff_k_r = 46.27f;
+  p.ff_min_r = 260.0f;
   apply_control_param(status, p);
 }
 
 void apply_adv_control_param(STATUS *status) {
   CONTROL_PARAM p;
-  p.follow_line_pid = init_pid(1, 0.03, 0, 20, 1, 0.0f);   // TODO: 负重后实车标定
-  p.keep_angle_pid  = init_pid(1, 0, 0, 20, 1, 0.0f);       // TODO: 负重后实车标定
-  p.wheel_left_pid  = init_pid(8, 0, 0, 20, 100, 0.50f);    // TODO: 负重后实车标定
-  p.wheel_right_pid = init_pid(8, 0, 0, 20, 100, 0.50f);    // TODO: 负重后实车标定
-  p.ff_offset = 124.64f;   // TODO: 负重后实车标定
-  p.ff_k = 19.23f;         // TODO: 负重后实车标定
-  p.ff_min = 260.0f;       // TODO: 负重后实车标定
-  p.ff_offset_r = 164.53f; // TODO: 负重后实车标定
-  p.ff_k_r = 17.64f;       // TODO: 负重后实车标定
+  p.follow_line_pid = init_pid(1, 0.03, 0, 8,1, 0.0f);   // TODO: 负重后实车标定
+  p.keep_angle_pid  = init_pid(1, 0, 0, 8,1, 0.0f);       // TODO: 负重后实车标定
+  p.wheel_left_pid  = init_pid(8, 0, 0, 8,100, 0.50f);    // TODO: 负重后实车标定
+  p.wheel_right_pid = init_pid(8, 0, 0, 8,100, 0.50f);    // TODO: 负重后实车标定
+  p.ff_offset = 200.68f;   // TODO: 负重后实车标定
+  p.ff_k = 47.24f;         // TODO: 负重后实车标定
+  p.ff_min = 250.0f;       // TODO: 负重后实车标定
+  p.ff_offset_r = 107.12f; // TODO: 负重后实车标定
+  p.ff_k_r = 46.27f;       // TODO: 负重后实车标定
   p.ff_min_r = 260.0f;     // TODO: 负重后实车标定
   apply_control_param(status, p);
 }
@@ -214,7 +214,7 @@ Road Turn_or_Straight() {
   if (road_buf != status.sensor.gw_analogue.cross.cross) {
     status.motor.wheel[0].tar_speed = 0; //路况发生变化就先停车
     status.motor.wheel[1].tar_speed = 0;
-    if ((ABS(status.motor.wheel[0].cur_speed) < 5) && (ABS(status.motor.wheel[1].cur_speed) < 5)) {
+    if ((ABS(status.motor.wheel[0].cur_speed) < 2) && (ABS(status.motor.wheel[1].cur_speed) < 2)) {
       road_buf = status.sensor.gw_analogue.cross.cross;
     }
   }
