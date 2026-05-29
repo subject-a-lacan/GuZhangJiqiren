@@ -169,6 +169,7 @@ int main(void)
     //          (unsigned long)task2_swing_time_fwd,
     //          (unsigned long)task2_swing_time_bwd);
     // PERIODIC_END
+    
   }
   /* USER CODE END 3 */
 }
