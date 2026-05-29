@@ -196,11 +196,60 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
 void UART_PID_Tune(uint8_t cmd, float val) {
-  (void)val;
   switch (cmd) {
-   
+    case 'a': status.state.status_pid.follow_line_pid.kp = val;  break;
+    case 'c': status.state.status_pid.follow_line_pid.ki = val; break;
+    case 'e': status.state.status_pid.follow_line_pid.kd = val; break;
+
+    case 'g': status.state.status_pid.keep_angle_pid.kp = val;  break;
+    case 'i': status.state.status_pid.keep_angle_pid.ki = val; break;
+    case 'k': status.state.status_pid.keep_angle_pid.kd = val;  break;
+
+    case 'm': status.motor.wheel[0].wheel_pid.kp = val;  break;
+    case 'o': status.motor.wheel[0].wheel_pid.ki = val;  break;
+    case 'q': status.motor.wheel[0].wheel_pid.kd = val;  break;
+
+    case 's': status.motor.wheel[1].wheel_pid.kp = val;  break;
+    case 'u': status.motor.wheel[1].wheel_pid.ki = val;  break;
+    case 'w': status.motor.wheel[1].wheel_pid.kd = val;  break;
+    case 'b': status.motor.wheel[0].wheel_pid.integral_max = val;  break;
+    case 'n': status.motor.wheel[1].wheel_pid.integral_max = val;  break;
+    case 'z': status.task.task_running = 0;
+              status.task.armed = 0;
+              status.task.start_request = 0;
+              status.task.stop_request = 0;
+              status.task.stop_cmd = 1;
+
+              status.state.motion = STOP;
+              status.state.base_speed = 0;
+
+              status.motor.wheel[0].tar_speed = 0;
+              status.motor.wheel[1].tar_speed = 0;
+    
+              break;
+    case 'y':
+      status.state.status_pid.follow_line_pid.integral = 0;
+      status.state.status_pid.follow_line_pid.last_error = 0;
+      status.state.status_pid.follow_line_pid.error = 0;
+      status.state.status_pid.follow_line_pid.out = 0;
+      status.state.status_pid.keep_angle_pid.integral = 0;
+      status.state.status_pid.keep_angle_pid.last_error = 0;
+      status.state.status_pid.keep_angle_pid.error = 0;
+      status.state.status_pid.keep_angle_pid.out = 0;
+      status.motor.wheel[0].wheel_pid.integral = 0;
+      status.motor.wheel[0].wheel_pid.last_error = 0;
+      status.motor.wheel[0].wheel_pid.error = 0;
+      status.motor.wheel[0].wheel_pid.out = 0;
+      status.motor.wheel[1].wheel_pid.integral = 0;
+      status.motor.wheel[1].wheel_pid.last_error = 0;
+      status.motor.wheel[1].wheel_pid.error = 0;
+      status.motor.wheel[1].wheel_pid.out = 0;
+      status.motor.wheel[0].trust = 0;
+      status.motor.wheel[1].trust = 0;
+      status.task.start_request=1;
+      break;
+    case 'h': cmd_speed = (int16_t)val;  break;
     default: break;
   }
 }
