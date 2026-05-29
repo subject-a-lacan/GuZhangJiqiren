@@ -62,7 +62,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-int16_t cmd_speed = 40;
+int16_t cmd_speed = 30;
 extern uint8_t cross_cnt;
 /* USER CODE END PV */
 
@@ -133,7 +133,7 @@ int main(void)
   after_init_state();
   status.state.motion = STOP;
   init_uart_pid_tune_it(); // USART1/USART2/USART3 receive PID tune commands.
-  // ESP8266_Init("F521F520","f521f520","192.168.112.85","8080");
+  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
 

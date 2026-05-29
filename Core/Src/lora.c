@@ -32,7 +32,7 @@ void ESP8266_Init(char *ssid, char *pwd, char *ip, char *port) {
 
     // 3. Set single connection mode
     uart1_tx((uint8_t*)"AT+CIPMUX=0\r\n", 13);
-    HAL_Delay(100);
+    HAL_Delay(1000);
 
     // 4. Establish TCP connection
     sprintf(buf, "AT+CIPSTART=\"TCP\",\"%s\",%s\r\n", ip, port);
