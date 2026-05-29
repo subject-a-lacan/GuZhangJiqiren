@@ -10,10 +10,10 @@ extern Road road_buf;
 
 #define TASK2_CAPTURE_ANGLE_DEG   12.0f
 
-int16_t  task2_swing_speed_fwd = 2200;
-int16_t  task2_swing_speed_bwd = 1200;
-uint32_t task2_swing_time_fwd  = 400;
-uint32_t task2_swing_time_bwd  = 800;
+int16_t  task2_swing_speed_fwd = 2800;
+int16_t  task2_swing_speed_bwd = 1800;
+uint32_t task2_swing_time_fwd  = 300;
+uint32_t task2_swing_time_bwd  = 540;
 uint8_t task2_direct_pwm = 0;
 
 typedef enum {
