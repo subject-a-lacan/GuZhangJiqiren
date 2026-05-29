@@ -149,18 +149,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    // PERIODIC_START(Balance_Debug_Print, 20)
-    //   float roll = get_gyr_value(&status.sensor.gy901, gyr_x_roll);
-    //   PID *bp = &status.state.status_pid.balance_pid;
-    //   printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
-    //          (double)roll,
-    //          (double)bp->kp,
-    //          (double)bp->kd,
-    //          (double)task2_swing_speed_fwd,
-    //          (double)task2_swing_speed_bwd,
-    //          (double)task2_swing_time_fwd,
-    //          (double)task2_swing_time_bwd);
-    // PERIODIC_END
+    PERIODIC_START(Balance_Debug_Print, 80)
+      float roll = get_gyr_value(&status.sensor.gy901, gyr_x_roll);
+      PID *bp = &status.state.status_pid.balance_pid;
+      printf("%.2f,%.2f,%.2f,%.2f\r\n",
+             (double)roll,
+             (double)bp->kp,
+             (double)bp->ki,
+             (double)bp->kd);
+    PERIODIC_END
     
   }
   /* USER CODE END 3 */
@@ -231,6 +228,7 @@ void UART_PID_Tune(uint8_t cmd, float val) {
     case 'u': status.motor.wheel[1].wheel_pid.ki = val;  break;
     case 'w': status.motor.wheel[1].wheel_pid.kd = val;  break;
     case 'd': status.state.status_pid.balance_pid.kp = val;  break;
+    case 'x': status.state.status_pid.balance_pid.ki = val;  break;
     case 'f': status.state.status_pid.balance_pid.kd = val;  break;
     case 'j': status.state.status_pid.mileage_pid.kp = val;  break;
     case 'l': status.state.status_pid.mileage_pid.kd = val;  break;

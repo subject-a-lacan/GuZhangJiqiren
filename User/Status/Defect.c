@@ -8,12 +8,13 @@ extern uint8_t left_cnt;
 extern uint8_t cross_delay;
 extern Road road_buf;
 
-#define TASK2_CAPTURE_ANGLE_DEG   12.0f
+#define TASK2_CAPTURE_ANGLE_DEG   6.0f
+#define TASK2_FALLBACK_ANGLE_DEG  20.0f
 
-int16_t  task2_swing_speed_fwd = 2800;
-int16_t  task2_swing_speed_bwd = 1800;
+int16_t  task2_swing_speed_fwd = 3000;
+int16_t  task2_swing_speed_bwd = 1400;
 uint32_t task2_swing_time_fwd  = 300;
-uint32_t task2_swing_time_bwd  = 540;
+uint32_t task2_swing_time_bwd  = 600;
 uint8_t task2_direct_pwm = 0;
 
 typedef enum {
@@ -181,7 +182,6 @@ static void driver_task1(STATUS *status) {
 
 static void driver_task2(STATUS *status) {
   float roll = get_gyr_value(&status->sensor.gy901, gyr_x_roll);
-  float roll_speed = get_gyr_value(&status->sensor.gy901, gyr_w_x);
   float target_roll = 0.0f;
   float angle_error = target_roll - roll;
   float balance_out;
@@ -196,6 +196,7 @@ static void driver_task2(STATUS *status) {
     case TASK2_SWING_UP:
       if (ABS(angle_error) < TASK2_CAPTURE_ANGLE_DEG) {
         task2_state = TASK2_BALANCE_PD;
+        balance_param->is_first = 1;
         break;
       }
 
@@ -217,7 +218,12 @@ static void driver_task2(STATUS *status) {
 
     case TASK2_BALANCE_PD:
     default:
-      balance_out = balance_param->kp * angle_error + balance_param->kd * roll_speed;
+      if (ABS(angle_error) > TASK2_FALLBACK_ANGLE_DEG) {
+        task2_enter_swing_up(status);
+        break;
+      }
+
+      balance_out = compute_pid(balance_param, angle_error);
       status->state.motion = STRAIGHT;
       status->state.base_speed = 0;
       task2_set_pwm((int16_t)balance_out);
