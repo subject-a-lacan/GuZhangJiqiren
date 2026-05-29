@@ -136,7 +136,7 @@ static void driver_task1(STATUS *status) {
 
 static void driver_task2(STATUS *status) {
   status->task.task_running = 1;
-  status->state.motion = MOTOR_TEST;
+  status->state.motion = BALANCE;
 }
 
 

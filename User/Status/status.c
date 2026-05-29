@@ -126,6 +126,8 @@ void init_state(STATUS *status, uint8_t T) {
 void init_status_pid(STATUS *status) {
   status->state.status_pid.follow_line_pid = init_pid(1.8, 0.03, 1, 20, 1, 0.0f);
   status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 20, 1, 0.0f);
+  status->state.status_pid.balance_pid = init_pid(0, 0, 0, 20, 1, 0.0f);
+  status->state.status_pid.mileage_pid = init_pid(0, 0, 0, 20, 1, 0.0f);
   status->state.status_pid.angle_output_limit = 25.0f;
 }
 
@@ -250,6 +252,19 @@ void keep_angle(STATUS *status) {
   status->motor.wheel[0].tar_speed = status->state.base_speed + (int16_t)diff;
   status->motor.wheel[1].tar_speed = status->state.base_speed - (int16_t)diff;  // 设置电机速度
 }
+
+void keep_balance(STATUS *status) {
+  float roll = get_gyr_value(&status->sensor.gy901, gyr_x_roll);
+  float roll_gyro = get_gyr_value(&status->sensor.gy901, gyr_w_x);
+  float target = 0;
+  float error = target - roll;
+  PID *bp = &status->state.status_pid.balance_pid;
+  float balance_out = bp->kp * error + bp->kd * roll_gyro;
+  status->state.base_speed = (int16_t)balance_out;
+  status->motor.wheel[0].tar_speed = status->state.base_speed;
+  status->motor.wheel[1].tar_speed = status->state.base_speed;
+}
+
 /*
  * @brief 更新按钮状态 调用srver_button函数执行具体按键逻辑
  * @param status 状态结构体指针
@@ -284,6 +299,19 @@ void update_status(STATUS *status) {
   if (status->state.motion == KEEP_ANGLE) {
     status->task.stop_cmd = 0;
     keep_angle(status);
+  }
+  if (status->state.motion == BALANCE) {
+    status->task.stop_cmd = 0;
+    float pitch = get_gyr_value(&status->sensor.gy901, gyr_y_pitch);
+    float pitch_gyro = get_gyr_value(&status->sensor.gy901, gyr_w_y);
+    float roll = get_gyr_value(&status->sensor.gy901, gyr_x_roll);
+    float roll_gyro = get_gyr_value(&status->sensor.gy901, gyr_w_x);
+    PID *bp = &status->state.status_pid.balance_pid;
+    PID *mp = &status->state.status_pid.mileage_pid;
+    log_uprintf(&huart1, "%.2f,%.2f,%.2f,%.2f, bp:%.2f,%.2f, mp:%.2f,%.2f\r\n",
+                pitch, roll, pitch_gyro, roll_gyro,
+                bp->kp, bp->kd, mp->kp, mp->kd);
+    keep_balance(status);
   }
   if (status->state.motion == STOP) {
     status->task.stop_cmd = 1;

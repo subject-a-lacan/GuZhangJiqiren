@@ -37,9 +37,6 @@ void get_gyr_raw_data(I2C_HandleTypeDef *i2c, GYR *gyr) {
      * @param  key: 枚举类型，指定要获取哪种数据（加速度、角速度或角度）
      * @return 转换后的浮点型物理数值
      * @note   转换逻辑说明：
-     *         1. 加速度 (a): 原始值 * 16 * 9.8 / 32768 (映射到 ±16G 范围)
-     *         2. 角速度 (w): 原始值 / (32768 / 2000) (映射到 ±2000 deg/s 范围)
-     *         3. 角度 (roll/pitch/yaw): 原始值 * 180 / 32768 (映射到 ±180 度范围)
      */
 float get_gyr_value(GYR *gyr, enum gyroscope key) {
   uint8_t cnt = (key - gyr->data_start_addr) * 2;
