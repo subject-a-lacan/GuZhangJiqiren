@@ -111,7 +111,6 @@ void task_select(STATUS *status, uint8_t id) {
 static void driver_task1(STATUS *status) {
   status->task.task_running = 1;
   status->state.motion = FIND_LINE;
-  status->state.base_speed = 30;
 }
 
 static void driver_task2(STATUS *status) {
