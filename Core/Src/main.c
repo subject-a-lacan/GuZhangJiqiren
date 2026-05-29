@@ -133,7 +133,7 @@ int main(void)
   after_init_state();
   status.state.motion = STOP;
   init_uart_pid_tune_it(); // USART1/USART2/USART3 receive PID tune commands.
-  ESP8266_Init("F521F520","f521f520","192.168.112.85","8080");
+  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
 
@@ -144,8 +144,23 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-   
-    // PERIODIC_END
+    PERIODIC_START(Balance_Debug_Print, 20)
+      float roll = get_gyr_value(&status.sensor.gy901, gyr_x_roll);
+      float roll_gyro = get_gyr_value(&status.sensor.gy901, gyr_w_x);
+      float pitch = get_gyr_value(&status.sensor.gy901, gyr_y_pitch);
+      float pitch_gyro = get_gyr_value(&status.sensor.gy901, gyr_w_y);
+      PID *bp = &status.state.status_pid.balance_pid;
+      PID *mp = &status.state.status_pid.mileage_pid;
+      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+             (double)roll,
+             (double)roll_gyro,
+             (double)pitch,
+             (double)pitch_gyro,
+             (double)bp->kp,
+             (double)bp->kd,
+             (double)mp->kp,
+             (double)mp->kd);
+    PERIODIC_END
   }
   /* USER CODE END 3 */
 }
@@ -214,6 +229,11 @@ void UART_PID_Tune(uint8_t cmd, float val) {
     case 's': status.motor.wheel[1].wheel_pid.kp = val;  break;
     case 'u': status.motor.wheel[1].wheel_pid.ki = val;  break;
     case 'w': status.motor.wheel[1].wheel_pid.kd = val;  break;
+    case 'd': status.state.status_pid.balance_pid.kp = val;  break;
+    case 'f': status.state.status_pid.balance_pid.kd = val;  break;
+    case 'j': status.state.status_pid.mileage_pid.kp = val;  break;
+    case 'l': status.state.status_pid.mileage_pid.kd = val;  break;
+
     case 'b': status.motor.wheel[0].wheel_pid.integral_max = val;  break;
     case 'n': status.motor.wheel[1].wheel_pid.integral_max = val;  break;
     case 'z': status.task.task_running = 0;
@@ -238,6 +258,14 @@ void UART_PID_Tune(uint8_t cmd, float val) {
       status.state.status_pid.keep_angle_pid.last_error = 0;
       status.state.status_pid.keep_angle_pid.error = 0;
       status.state.status_pid.keep_angle_pid.out = 0;
+      status.state.status_pid.balance_pid.integral = 0;
+      status.state.status_pid.balance_pid.last_error = 0;
+      status.state.status_pid.balance_pid.error = 0;
+      status.state.status_pid.balance_pid.out = 0;
+      status.state.status_pid.mileage_pid.integral = 0;
+      status.state.status_pid.mileage_pid.last_error = 0;
+      status.state.status_pid.mileage_pid.error = 0;
+      status.state.status_pid.mileage_pid.out = 0;
       status.motor.wheel[0].wheel_pid.integral = 0;
       status.motor.wheel[0].wheel_pid.last_error = 0;
       status.motor.wheel[0].wheel_pid.error = 0;

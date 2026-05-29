@@ -302,15 +302,6 @@ void update_status(STATUS *status) {
   }
   if (status->state.motion == BALANCE) {
     status->task.stop_cmd = 0;
-    float pitch = get_gyr_value(&status->sensor.gy901, gyr_y_pitch);
-    float pitch_gyro = get_gyr_value(&status->sensor.gy901, gyr_w_y);
-    float roll = get_gyr_value(&status->sensor.gy901, gyr_x_roll);
-    float roll_gyro = get_gyr_value(&status->sensor.gy901, gyr_w_x);
-    PID *bp = &status->state.status_pid.balance_pid;
-    PID *mp = &status->state.status_pid.mileage_pid;
-    log_uprintf(&huart1, "%.2f,%.2f,%.2f,%.2f, bp:%.2f,%.2f, mp:%.2f,%.2f\r\n",
-                pitch, roll, pitch_gyro, roll_gyro,
-                bp->kp, bp->kd, mp->kp, mp->kd);
     keep_balance(status);
   }
   if (status->state.motion == STOP) {
