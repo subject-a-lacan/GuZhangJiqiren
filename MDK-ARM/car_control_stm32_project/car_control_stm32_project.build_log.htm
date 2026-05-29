@@ -21,13 +21,26 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.1.0
 Dialog DLL:      TCM.DLL V1.32.0.0
  
 <h2>Project:</h2>
-D:\KEIL_CUBE_VS\car_control_stm32_project-master\MDK-ARM\car_control_stm32_project.uvprojx
-Project File Date:  05/04/2026
+D:\KEIL_CUBE_VS\Episode1\MDK-ARM\car_control_stm32_project.uvprojx
+Project File Date:  05/26/2026
 
 <h2>Output:</h2>
 *** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'car_control_stm32_project'
-"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 0 Warning(s).
+assembling startup_stm32g474xx.s...
+../Core/Src/main.c(32): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling main.c...
+linking...
+Program Size: Code=43386 RO-data=554 RW-data=104 ZI-data=4096  
+FromELF: creating hex file...
+"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
