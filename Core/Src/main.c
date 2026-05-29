@@ -64,11 +64,6 @@
 /* USER CODE BEGIN PV */
 int16_t cmd_speed = 40;
 extern uint8_t cross_cnt;
-volatile float l1 = 0.0f;
-volatile float l2 = 0.0f;
-volatile uint8_t task3_finished = 0;
-uint8_t task3_print_flag = 0;
-uint8_t task3_print_cnt = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -149,56 +144,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (task3_finished) {
-      task3_print_flag = 1;
-      task3_finished = 0;
-    }
-
-    if (task3_print_flag) {
-      float task3_l1_out = (l1 == 0.0f) ? 290.0f : (l1 * 10.0f);
-      float task3_l2_out = (l2 == 0.0f) ? 290.0f : (l2 * 10.0f);
-      if (task3_l1_out > 80.0f) task3_l1_out = 60.0f;
-      if (task3_l2_out > 80.0f) task3_l2_out = 60.0f;
-      printf("%.2f,%.2f\r\n", (double)task3_l1_out, (double)task3_l2_out);
-    }
-
-    //  uint8_t d = status.sensor.gw_analogue.digital_8bit;
-    // float gw_val = 0.0f;
-    // if (d & 0x80) gw_val += 1.0f;
-    // if (d & 0x40) gw_val += 0.1f;
-    // if (d & 0x20) gw_val += 0.01f;
-    // if (d & 0x10) gw_val += 0.001f;
-    // if (d & 0x08) gw_val += 0.0001f;
-    // if (d & 0x04) gw_val += 0.00001f;
-    // if (d & 0x02) gw_val += 0.000001f;
-    // if (d & 0x01) gw_val += 0.0000001f;
-    // PERIODIC_START(Task_Vofa_Print,200)
-    // printf("%.7f,"                            // gw 8-bit as float
-    //        "%.7f,%.7f,%.7f,%.7f,%.7f,%.7f,"  // fw: target, actual, out, kp, ki, kd
-    //        "%.7f,%.7f,%.7f,%.7f,%.7f,%.7f,"  // ka: actual, target, out, kp, ki, kd
-    //        "%.7f,%.7f\r\n"                            // task_id, base_speed
-    //        ,
-    //        (double)gw_val,
-    //        // follow_line
-    //        (double)0.0,
-    //        (double)status.sensor.gw_analogue.diff,
-    //        (double)status.state.status_pid.follow_line_pid.out,
-    //        (double)status.state.status_pid.follow_line_pid.kp,
-    //        (double)status.state.status_pid.follow_line_pid.ki,
-    //        (double)status.state.status_pid.follow_line_pid.kd,
-    //        // keep_angle
-    //        (double)status.state.cur_angle,
-    //        (double)(status.state.tar_angle + status.state.initial_angle),
-    //        (double)status.state.status_pid.keep_angle_pid.out,
-    //        (double)status.state.status_pid.keep_angle_pid.kp,
-    //        (double)status.state.status_pid.keep_angle_pid.ki,
-    //        (double)status.state.status_pid.keep_angle_pid.kd,
-    //        // task_id, base_speed
-    //        (double)status.task.task_id,
-    //        (double)status.state.base_speed
-    //        // cross counts
-    //       );
-
+   
     // PERIODIC_END
   }
   /* USER CODE END 3 */
@@ -254,30 +200,7 @@ void SystemClock_Config(void)
 void UART_PID_Tune(uint8_t cmd, float val) {
   (void)val;
   switch (cmd) {
-    case 'P':
-      status.task.task_running = 0;
-      status.task.armed = 0;
-      status.task.start_request = 0;
-      status.task.stop_request = 0;
-      status.task.stop_cmd = 1;
-      status.state.motion = STOP;
-      status.state.base_speed = 0;
-      status.motor.wheel[0].tar_speed = 0;
-      status.motor.wheel[1].tar_speed = 0;
-      break;
-    case '9':
-      if (status.task.task_id == TASK_ADV_2) {
-        status.task.task_running = 0;
-        status.task.armed = 0;
-        status.task.start_request = 0;
-        status.task.stop_request = 0;
-        status.task.stop_cmd = 1;
-        status.state.motion = STOP;
-        status.state.base_speed = 0;
-        status.motor.wheel[0].tar_speed = 0;
-        status.motor.wheel[1].tar_speed = 0;
-      }
-      break;
+   
     default: break;
   }
 }

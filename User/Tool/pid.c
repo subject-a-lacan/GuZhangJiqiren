@@ -38,7 +38,7 @@ float compute_pid(PID *pid, float error) {
   float ki_abs = pid->ki >= 0 ? pid->ki : -pid->ki;
   if (ki_abs > 0.000001f) {
     float error_abs = pid->error >= 0 ? pid->error : -pid->error;
-    float k = 1.0f / (1.0f + pid->InteralCoef * error_abs);
+    float k = 1.0f / (1.0f + pid->InteralCoef * error_abs);    //变速积分
     pid->integral += pid->error * pid->T * k;
     pid->integral = CONFINE(pid->integral, -pid->integral_max, pid->integral_max);
   } else {
