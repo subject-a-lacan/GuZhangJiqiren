@@ -1,197 +1,194 @@
-# 8ms 控制周期修改备忘
+# TASK2 起摆方案：方波起摆 + 小角度 PD 接管
 
-本文记录如果把控制响应从 20ms 改到 8ms，需要一起检查和修改的地方。
+当前判断：TASK2 不能一开始就靠平衡 PD 起摆。摆杆离直立位置太远时，PD 控制器只能“接住”，不能有效给摆注入足够能量。所以 TASK2 进入后先做开环方波前后运动，让小车往返抽动起摆；一旦角度差值进入可控范围，再切到 PD 平衡。
 
-当前建议：不要直接把 TIM5 硬件周期改成 8ms。保持 TIM5 每 1ms 进一次中断，让 `status.state.time` 继续表示毫秒，只把 `update_status()` 的触发周期从 20ms 改成 8ms。
+## 另一个评估里指出的问题
 
-## 必改点
+那些问题确实存在，尤其是前两个：
 
-### 1. update_status 调度周期
+1. motion 冲突确实存在。
+   - `update_status()` 的顺序是先 `update_task()`，再根据 `status->state.motion` 调对应控制函数。
+   - 如果 TASK2 的 `SWING_UP` 阶段把 `motion` 设成 `BALANCE`，后面 `if (motion == BALANCE)` 会调用 `keep_balance()`，把方波起摆写入的 `tar_speed` 覆盖掉。
 
-文件：`User/It/timer_it.c`
-
-当前逻辑：
+2. `compute_pid()` 不适合作为第一版 balance PD。
+   - `compute_pid()` 的 D 项来自误差差分。
+   - 现在更想直接用陀螺仪角速度 `roll_speed` 做 D 项。
+   - `status->state.status_pid.balance_pid` 仍然保留，但只当作存放 `kp/kd` 参数的结构体空壳。
+   - 所以第一版平衡接管阶段直接手写：
 
 ```c
-if (status.state.time % 20 == 0) {
-    update_status(&status);
+balance_out = kp * angle_error + kd * roll_speed;
+```
+
+3. `task2_enter_swing_up()` 的调用时机必须明确。
+   - 建议在 `task_start()` 进入 `TASK_BASIC_2` 时调用。
+   - 或者在 `driver_task2()` 第一次执行时根据静态标志初始化。
+   - 更清楚的做法是在 `task_start()` 里初始化 TASK2 小状态机。
+
+## 加 STRAIGHT Motion
+
+建议给 `MOTION_STATION` 加一个 `STRAIGHT`，专门表示“按当前 `base_speed` 直行，不做循迹、不做保角、不做平衡”。
+
+```c
+typedef enum MOTION_STATION {
+  STOP,
+  KEEP_ANGLE,
+  FIND_LINE,
+  MOTOR_TEST,
+  BALANCE,
+  STRAIGHT,
+} MOTION_STATION;
+```
+
+然后在 `update_status()` 里增加：
+
+```c
+if (status->state.motion == STRAIGHT) {
+    status->task.stop_cmd = 0;
+    status->motor.wheel[0].tar_speed = status->state.base_speed;
+    status->motor.wheel[1].tar_speed = status->state.base_speed;
 }
 ```
 
-改成：
+这样 TASK2 的 `SWING_UP` 阶段只需要：
 
 ```c
-if (status.state.time % 8 == 0) {
-    update_status(&status);
+status->state.motion = STRAIGHT;
+status->state.base_speed = swing_speed;
+```
+
+后续不会被 `keep_balance()` 覆盖，也不会被 `MOTOR_TEST` 的 `cmd_speed` 覆盖。
+
+## TASK2 状态划分
+
+TASK2 只需要两个状态：
+
+```c
+typedef enum {
+  TASK2_SWING_UP = 0,
+  TASK2_BALANCE_PD,
+} TASK2_STATE;
+```
+
+需要保存：
+
+```c
+static TASK2_STATE task2_state;
+static uint32_t task2_last_switch_time;
+static int8_t task2_square_dir;
+```
+
+不需要 `TASK2_FAIL_STOP`。调试阶段如果摆不起来，就继续方波起摆，不自动停止。
+
+保留 `task2_square_dir`。方波方向用显式状态保存，每到半周期再翻转一次，方便调试和重置。
+
+## 方波起摆参数第一版
+
+```c
+#define TASK2_CAPTURE_ANGLE_DEG   12.0f
+#define TASK2_SWING_SPEED         50
+#define TASK2_SWING_HALF_PERIOD   120   // ms
+```
+
+- `TASK2_SWING_SPEED` 是 8ms 速度单位下的目标速度，不是 PWM。
+- `TASK2_SWING_HALF_PERIOD` 是方波半周期，每隔这段时间前后换向一次。
+- 第一版不加最大次数停止，摆不起来就继续摆。
+
+## 初始化时机
+
+建议在 `task_start()` 中处理 `TASK_BASIC_2`：
+
+```c
+case TASK_BASIC_2:
+  apply_basic_control_param(status);
+  task2_enter_swing_up(status);
+  break;
+```
+
+`task2_enter_swing_up()`：
+
+```c
+static void task2_enter_swing_up(STATUS *status)
+{
+    task2_state = TASK2_SWING_UP;
+    task2_last_switch_time = status->state.time;
+    task2_square_dir = -1;
 }
 ```
 
-这是控制周期真正变快的核心。
-
-### 2. PID 采样周期 T
-
-所有原来 `init_pid(..., 20, ...)` 的 PID，如果它跟着 `update_status()` 每周期计算，都要把 `T` 从 20 改成 8。
-
-重点位置：
-
-- `User/Status/status.c`
-  - `init_status_pid()`
-  - `apply_basic_control_param()`
-  - `apply_adv_control_param()`
-- `User/Motor/wheel.c`
-  - `init_wheel()` 里的默认轮速 PID
-
-原因：`compute_pid()` 内部积分和微分都使用 `pid->T`。周期改了但 T 不改，会导致积分/微分量纲错误。
-
-### 3. 长按计数
-
-文件：`User/Device/button.h`
-
-当前：
+## TASK2 大体框架
 
 ```c
-#define LONG_PRESS_CNT 50
+static void driver_task2(STATUS *status)
+{
+    float roll = get_gyr_value(&status->sensor.gy901, gyr_x_roll);
+    float roll_speed = get_gyr_value(&status->sensor.gy901, gyr_w_x);
+    float target_roll = 0.0f;
+    float angle_error = target_roll - roll;
+    float balance_out;
+    int16_t swing_speed;
+    PID *balance_param = &status->state.status_pid.balance_pid;
+
+    status->task.task_running = 1;
+    status->task.stop_cmd = 0;
+
+    switch (task2_state) {
+      case TASK2_SWING_UP:
+        if (ABS(angle_error) < TASK2_CAPTURE_ANGLE_DEG) {
+            task2_state = TASK2_BALANCE_PD;
+            break;
+        }
+
+        if (status->state.time - task2_last_switch_time >= TASK2_SWING_HALF_PERIOD) {
+            task2_last_switch_time = status->state.time;
+            task2_square_dir = -task2_square_dir;
+        }
+
+        swing_speed = task2_square_dir * TASK2_SWING_SPEED;
+        status->state.motion = STRAIGHT;
+        status->state.base_speed = swing_speed;
+        break;
+
+      case TASK2_BALANCE_PD:
+      default:
+        balance_out = balance_param->kp * angle_error + balance_param->kd * roll_speed;
+        status->state.motion = STRAIGHT;
+        status->state.base_speed = (int16_t)balance_out;
+        break;
+    }
+}
 ```
 
-20ms 周期下：
+这里 `TASK2_BALANCE_PD` 也可以把 `motion` 设成 `STRAIGHT`，因为 `driver_task2()` 已经算好了 `base_speed`，只需要运动分发层把 `base_speed` 下发给左右轮。
 
-```text
-50 * 20ms = 1000ms
-```
+## 关键点
 
-8ms 周期下如果仍然是 50：
+1. 起摆阶段不能用 `MOTOR_TEST`。
+   - `MOTOR_TEST` 会使用 `cmd_speed` 覆盖 TASK2 自己的速度。
 
-```text
-50 * 8ms = 400ms
-```
+2. 起摆阶段也不能用 `BALANCE`。
+   - `BALANCE` 会触发 `keep_balance()`，覆盖方波起摆速度。
 
-如果还想保持约 1 秒长按，应改为：
+3. 新增 `STRAIGHT` 可以解决 motion 冲突。
+   - `STRAIGHT` 只负责把 `base_speed` 送到左右轮。
+   - 方波起摆和 PD 接管都可以通过写 `base_speed` 工作。
+
+4. 第一版 balance PD 不用 `compute_pid()`。
+   - 直接使用陀螺仪角速度作为 D 项：
+   - `balance_pid` 结构体仍然保留，只负责保存 `kp/kd` 参数。
 
 ```c
-#define LONG_PRESS_CNT 125
+balance_out = kp * angle_error + kd * roll_speed;
 ```
 
-## 需要重标或换算的点
+5. `task2_square_dir` 保留。
+   - 每隔 `TASK2_SWING_HALF_PERIOD` 翻转一次。
+   - 重新进入 TASK2 时明确初始化为 `-1`。
 
-### 4. 速度目标量纲
-
-`cur_speed` 和 `tar_speed` 本质上是“单个控制周期内的编码器脉冲数”。
-
-从 20ms 改成 8ms 后，同样物理速度下，每周期脉冲数约变为：
-
-```text
-8 / 20 = 0.4
-```
-
-所以如果想保持原来的实际车速，原来的速度目标大约要乘 0.4。
-
-涉及：
-
-- `cmd_speed`
-- `status.state.base_speed`
-- 任务里的固定速度值
-- `keep_balance()` 输出到 `base_speed` 后的限幅/调参尺度
-
-### 5. 轮子前馈参数
-
-文件：`User/Motor/wheel.c`
-
-当前前馈形式：
+6. 如果切入 PD 后经常接不住，再加角速度切换条件，例如：
 
 ```c
-ff_abs = offset + k * ABS(wheel->tar_speed);
+ABS(angle_error) < 12.0f && ABS(roll_speed) < 某个阈值
 ```
 
-周期改成 8ms 后，同样物理速度下 `tar_speed` 数值变小。如果不重标，前馈会不匹配。
-
-临时理解：
-
-```text
-tar_speed_new ~= tar_speed_old * 0.4
-k_new 可能需要约等于 k_old * 2.5
-```
-
-但前馈最好实车重新标定，不要只靠比例换算。
-
-### 6. 轮速阈值
-
-这些阈值也是“每周期脉冲数”，8ms 后同物理速度下数值会变小。
-
-需要检查：
-
-- `User/Status/status.c`
-  - `ABS(cur_speed) < 5` 这类停车/路况更新判断
-- `User/Motor/wheel.c`
-  - `wheel->tar_speed == 0 && ABS(wheel->cur_speed) < 3`
-  - `ABS(wheel->cur_speed) < 10 && status.state.motion != KEEP_ANGLE`
-
-这些阈值如果想对应同样物理速度，也要大约乘 0.4，之后实车微调。
-
-## 不一定要改的点
-
-### 7. phase_mileage 距离累计
-
-`phase_mileage` 现在是累加每次读取到的编码器脉冲。
-
-改成 8ms 后，每次读到的脉冲少了，但读取次数多了。只要每次读取后仍然清编码器计数，总累计脉冲理论上仍然等于实际走过距离。
-
-所以距离累计本身不用乘 0.4。
-
-但是注释里如果写“每 20ms 累加”，应改成“每控制周期累加”。
-
-### 8. PERIODIC_START 调试打印
-
-`PERIODIC_START(NAME, T)` 用的是 `HAL_GetTick()`，单位是毫秒，不依赖 `update_status()` 周期。
-
-所以主循环里：
-
-```c
-PERIODIC_START(Balance_Debug_Print, 100)
-```
-
-仍然是 100ms 打印一次，不需要因为控制周期改成 8ms 而改变。
-
-## 需要风险验证
-
-### 9. update_status 是否能在 8ms 内跑完
-
-`update_status()` 里包含：
-
-- 8 路模拟灰度 ADC 读取
-- 4 路编码器读取
-- GY901 I2C 读取
-- 按键扫描
-- `update_task()`
-- motion 控制
-- LED / 舵机 / 蜂鸣器 / 电机驱动
-
-尤其要注意：
-
-```c
-get_gyr_raw_data(&hi2c1, &status->sensor.gy901);
-```
-
-它内部是阻塞 I2C 读取，timeout 当前是 10ms。正常成功时不会等满 10ms，但如果 I2C 异常，8ms 控制周期会被拖垮。
-
-建议验证：
-
-```text
-GPIO 翻转测 update_status 耗时；
-或者临时打印/示波器看 8ms 周期是否稳定。
-```
-
-## 建议修改顺序
-
-1. 只把 `timer_it.c` 中 `update_status()` 触发从 `% 20` 改成 `% 8`。
-2. 把跟随 `update_status()` 的 PID 初始化周期 `T` 从 20 改为 8。
-3. 把 `LONG_PRESS_CNT` 从 50 改为 125。
-4. 速度目标先按 0.4 缩放，低速验证。
-5. 检查轮速阈值，先按 0.4 缩放再实车微调。
-6. 前馈参数不要一次性相信比例换算，实车重新标定。
-7. 验证 `update_status()` 在 8ms 内稳定跑完。
-
-## 不推荐的做法
-
-不要第一步就把 TIM5 的硬件周期改成 8ms。
-
-原因：现在 `status.state.time += status.state.T`，而 `init_status(&status, 1)` 让 `status.state.time` 按 1ms 语义走。直接改 TIM5 硬件周期会让很多基于 `status.state.time` 的 ms 逻辑变错，比如蜂鸣器 `off_time`、调试时间判断等。
+7. 如果 `TASK2_SWING_SPEED = 50` 还是起不来，优先加大速度或延长半周期，而不是继续提高 balance 的 `kp`。

@@ -304,6 +304,11 @@ void update_status(STATUS *status) {
     status->task.stop_cmd = 0;
     keep_balance(status);
   }
+  if (status->state.motion == STRAIGHT) {
+    status->task.stop_cmd = 0;
+    status->motor.wheel[0].tar_speed = status->state.base_speed;
+    status->motor.wheel[1].tar_speed = status->state.base_speed;
+  }
   if (status->state.motion == STOP) {
     status->task.stop_cmd = 1;
     status->motor.wheel[0].tar_speed = 0;

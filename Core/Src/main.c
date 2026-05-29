@@ -64,6 +64,10 @@
 /* USER CODE BEGIN PV */
 int16_t cmd_speed = 12;
 extern uint8_t cross_cnt;
+extern int16_t  task2_swing_speed_fwd;
+extern int16_t  task2_swing_speed_bwd;
+extern uint32_t task2_swing_time_fwd;
+extern uint32_t task2_swing_time_bwd;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -144,23 +148,27 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Balance_Debug_Print, 20)
-      float roll = get_gyr_value(&status.sensor.gy901, gyr_x_roll);
-      float roll_gyro = get_gyr_value(&status.sensor.gy901, gyr_w_x);
-      float pitch = get_gyr_value(&status.sensor.gy901, gyr_y_pitch);
-      float pitch_gyro = get_gyr_value(&status.sensor.gy901, gyr_w_y);
-      PID *bp = &status.state.status_pid.balance_pid;
-      PID *mp = &status.state.status_pid.mileage_pid;
-      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
-             (double)roll,
-             (double)roll_gyro,
-             (double)pitch,
-             (double)pitch_gyro,
-             (double)bp->kp,
-             (double)bp->kd,
-             (double)mp->kp,
-             (double)mp->kd);
-    PERIODIC_END
+    // PERIODIC_START(Balance_Debug_Print, 20)
+    //   float roll = get_gyr_value(&status.sensor.gy901, gyr_x_roll);
+    //   float roll_gyro = get_gyr_value(&status.sensor.gy901, gyr_w_x);
+    //   float pitch = get_gyr_value(&status.sensor.gy901, gyr_y_pitch);
+    //   float pitch_gyro = get_gyr_value(&status.sensor.gy901, gyr_w_y);
+    //   PID *bp = &status.state.status_pid.balance_pid;
+    //   PID *mp = &status.state.status_pid.mileage_pid;
+    //   printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%d,%d,%lu,%lu\r\n",
+    //          (double)roll,
+    //          (double)roll_gyro,
+    //          (double)pitch,
+    //          (double)pitch_gyro,
+    //          (double)bp->kp,
+    //          (double)bp->kd,
+    //          (double)mp->kp,
+    //          (double)mp->kd,
+    //          task2_swing_speed_fwd,
+    //          task2_swing_speed_bwd,
+    //          (unsigned long)task2_swing_time_fwd,
+    //          (unsigned long)task2_swing_time_bwd);
+    // PERIODIC_END
   }
   /* USER CODE END 3 */
 }
@@ -233,6 +241,11 @@ void UART_PID_Tune(uint8_t cmd, float val) {
     case 'f': status.state.status_pid.balance_pid.kd = val;  break;
     case 'j': status.state.status_pid.mileage_pid.kp = val;  break;
     case 'l': status.state.status_pid.mileage_pid.kd = val;  break;
+
+    case 'p': task2_swing_speed_fwd = (int16_t)val;     break;
+    case 'r': task2_swing_time_fwd  = (uint32_t)val;    break;
+    case 't': task2_swing_speed_bwd = (int16_t)val;     break;
+    case 'v': task2_swing_time_bwd  = (uint32_t)val;    break;
 
     case 'b': status.motor.wheel[0].wheel_pid.integral_max = val;  break;
     case 'n': status.motor.wheel[1].wheel_pid.integral_max = val;  break;

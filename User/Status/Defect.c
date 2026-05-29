@@ -7,6 +7,22 @@ extern uint8_t left_cnt;
 extern uint8_t cross_delay;
 extern Road road_buf;
 
+#define TASK2_CAPTURE_ANGLE_DEG   12.0f
+
+int16_t  task2_swing_speed_fwd = 50;
+int16_t  task2_swing_speed_bwd = 50;
+uint32_t task2_swing_time_fwd  = 400;
+uint32_t task2_swing_time_bwd  = 400;
+
+typedef enum {
+  TASK2_SWING_UP = 0,
+  TASK2_BALANCE_PD,
+} TASK2_STATE;
+
+static TASK2_STATE task2_state;
+static uint32_t task2_last_switch_time;
+static int8_t  task2_square_dir;
+
 void init_task(TASK *task) {
   task->task_id = TASK_BASIC_1;
   task->start_pose = START_AB;
@@ -28,6 +44,13 @@ void init_task(TASK *task) {
 
   task->phase_start_time = 0;
   task->phase_mileage = 0;
+}
+
+static void task2_enter_swing_up(STATUS *status) {
+  task2_state = TASK2_SWING_UP;
+  task2_last_switch_time = status->state.time;
+  task2_square_dir = -1;
+  (void)status;
 }
 
 void task_start(STATUS *status) {
@@ -62,7 +85,10 @@ void task_start(STATUS *status) {
     case TASK_BASIC_1:
       apply_basic_control_param(status);
       break;
-    case TASK_BASIC_2: break;
+    case TASK_BASIC_2:
+      apply_basic_control_param(status);
+      task2_enter_swing_up(status);
+      break;
     case TASK_ADV_1:   break;
     case TASK_ADV_2:   break;
   }
@@ -109,6 +135,7 @@ void task_select(STATUS *status, uint8_t id) {
   update_task_led(status);
 }
 
+
 static uint8_t t1_black_frames = 0;
 
 static void driver_task1(STATUS *status) {
@@ -135,8 +162,46 @@ static void driver_task1(STATUS *status) {
 }
 
 static void driver_task2(STATUS *status) {
+  float roll = get_gyr_value(&status->sensor.gy901, gyr_x_roll);
+  float roll_speed = get_gyr_value(&status->sensor.gy901, gyr_w_x);
+  float target_roll = 0.0f;
+  float angle_error = target_roll - roll;
+  float balance_out;
+  int16_t swing_speed;
+  PID *balance_param = &status->state.status_pid.balance_pid;
+
   status->task.task_running = 1;
-  status->state.motion = BALANCE;
+  status->task.stop_cmd = 0;
+
+  switch (task2_state) {
+    case TASK2_SWING_UP:
+      if (ABS(angle_error) < TASK2_CAPTURE_ANGLE_DEG) {
+        task2_state = TASK2_BALANCE_PD;
+        break;
+      }
+
+      {
+        uint32_t phase_time = (task2_square_dir == 1)
+                              ? task2_swing_time_fwd : task2_swing_time_bwd;
+        if (status->state.time - task2_last_switch_time >= phase_time) {
+          task2_last_switch_time = status->state.time;
+          task2_square_dir = -task2_square_dir;
+        }
+      }
+
+      swing_speed = (task2_square_dir == 1)
+                    ? task2_swing_speed_fwd : -task2_swing_speed_bwd;
+      status->state.motion = STRAIGHT;
+      status->state.base_speed = swing_speed;
+      break;
+
+    case TASK2_BALANCE_PD:
+    default:
+      balance_out = balance_param->kp * angle_error + balance_param->kd * roll_speed;
+      status->state.motion = STRAIGHT;
+      status->state.base_speed = (int16_t)balance_out;
+      break;
+  }
 }
 
 

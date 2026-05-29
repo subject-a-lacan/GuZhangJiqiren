@@ -43,6 +43,7 @@ typedef enum MOTION_STATION {
   FIND_LINE,
   MOTOR_TEST,
   BALANCE,
+  STRAIGHT,
 } MOTION_STATION;
 /*
  * @brief 传感器结构体
