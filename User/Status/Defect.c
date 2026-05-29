@@ -1,5 +1,6 @@
 #include "Defect.h"
 #include "status.h"
+#include "math_tool.h"
 
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
@@ -108,10 +109,29 @@ void task_select(STATUS *status, uint8_t id) {
   update_task_led(status);
 }
 
+static uint8_t t1_black_frames = 0;
+
 static void driver_task1(STATUS *status) {
   status->task.task_running = 1;
   status->state.motion = FIND_LINE;
-  status->state.base_speed = 30;
+  status->state.base_speed = 25;
+
+  uint8_t mid4 = status->sensor.gw_analogue.digital_8bit & 0x3C;
+  uint8_t black = ((mid4 & 0x04) != 0)
+                + ((mid4 & 0x08) != 0)
+                + ((mid4 & 0x10) != 0)
+                + ((mid4 & 0x20) != 0);
+
+  if (black >= 3) {
+    t1_black_frames++;
+  } else {
+    t1_black_frames = 0;
+  }
+
+  if (t1_black_frames >= 2
+      && encoder_pulse_to_cm((int32_t)status->task.phase_mileage) > 99.0f) {
+    task_finish(status);
+  }
 }
 
 static void driver_task2(STATUS *status) {
