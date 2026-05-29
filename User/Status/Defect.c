@@ -58,7 +58,9 @@ void task_start(STATUS *status) {
   status->motor.wheel[1].tar_speed = 0;
 
   switch (status->task.task_id) {
-    case TASK_BASIC_1: break;
+    case TASK_BASIC_1:
+      apply_basic_control_param(status);
+      break;
     case TASK_BASIC_2: break;
     case TASK_ADV_1:   break;
     case TASK_ADV_2:   break;
@@ -107,6 +109,9 @@ void task_select(STATUS *status, uint8_t id) {
 }
 
 static void driver_task1(STATUS *status) {
+  status->task.task_running = 1;
+  status->state.motion = FIND_LINE;
+  status->state.base_speed = 30;
 }
 
 static void driver_task2(STATUS *status) {
