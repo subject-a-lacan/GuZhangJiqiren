@@ -13,6 +13,7 @@
 STATUS status;
 
 extern int16_t cmd_speed;
+extern uint8_t task2_direct_pwm;
 int32_t rw_time_cur = -1;
 int32_t rw_time_tar = -1;
 extern uint8_t cross_cnt;      // 路口计数器
@@ -332,8 +333,10 @@ void update_status(STATUS *status) {
   }
   driver_BUZZER(&status->device.buzzer);
 
-  driver_wheel(&status->motor.wheel[0]);
-  driver_wheel(&status->motor.wheel[1]);
+  if (!task2_direct_pwm) {
+    driver_wheel(&status->motor.wheel[0]);
+    driver_wheel(&status->motor.wheel[1]);
+  }
 
   return;
 }

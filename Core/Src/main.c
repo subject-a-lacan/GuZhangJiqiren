@@ -68,6 +68,7 @@ extern int16_t  task2_swing_speed_fwd;
 extern int16_t  task2_swing_speed_bwd;
 extern uint32_t task2_swing_time_fwd;
 extern uint32_t task2_swing_time_bwd;
+extern uint8_t  task2_direct_pwm;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -150,24 +151,15 @@ int main(void)
     /* USER CODE BEGIN 3 */
     // PERIODIC_START(Balance_Debug_Print, 20)
     //   float roll = get_gyr_value(&status.sensor.gy901, gyr_x_roll);
-    //   float roll_gyro = get_gyr_value(&status.sensor.gy901, gyr_w_x);
-    //   float pitch = get_gyr_value(&status.sensor.gy901, gyr_y_pitch);
-    //   float pitch_gyro = get_gyr_value(&status.sensor.gy901, gyr_w_y);
     //   PID *bp = &status.state.status_pid.balance_pid;
-    //   PID *mp = &status.state.status_pid.mileage_pid;
-    //   printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%d,%d,%lu,%lu\r\n",
+    //   printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
     //          (double)roll,
-    //          (double)roll_gyro,
-    //          (double)pitch,
-    //          (double)pitch_gyro,
     //          (double)bp->kp,
     //          (double)bp->kd,
-    //          (double)mp->kp,
-    //          (double)mp->kd,
-    //          task2_swing_speed_fwd,
-    //          task2_swing_speed_bwd,
-    //          (unsigned long)task2_swing_time_fwd,
-    //          (unsigned long)task2_swing_time_bwd);
+    //          (double)task2_swing_speed_fwd,
+    //          (double)task2_swing_speed_bwd,
+    //          (double)task2_swing_time_fwd,
+    //          (double)task2_swing_time_bwd);
     // PERIODIC_END
     
   }
@@ -261,6 +253,7 @@ void UART_PID_Tune(uint8_t cmd, float val) {
 
               status.motor.wheel[0].tar_speed = 0;
               status.motor.wheel[1].tar_speed = 0;
+              task2_direct_pwm = 0;
     
               break;
     case 'y':

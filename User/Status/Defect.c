@@ -1,6 +1,7 @@
 #include "Defect.h"
 #include "status.h"
 #include "math_tool.h"
+#include "tim.h"
 
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
@@ -9,10 +10,11 @@ extern Road road_buf;
 
 #define TASK2_CAPTURE_ANGLE_DEG   12.0f
 
-int16_t  task2_swing_speed_fwd = 50;
-int16_t  task2_swing_speed_bwd = 50;
+int16_t  task2_swing_speed_fwd = 2200;
+int16_t  task2_swing_speed_bwd = 1200;
 uint32_t task2_swing_time_fwd  = 400;
-uint32_t task2_swing_time_bwd  = 400;
+uint32_t task2_swing_time_bwd  = 800;
+uint8_t task2_direct_pwm = 0;
 
 typedef enum {
   TASK2_SWING_UP = 0,
@@ -22,6 +24,19 @@ typedef enum {
 static TASK2_STATE task2_state;
 static uint32_t task2_last_switch_time;
 static int8_t  task2_square_dir;
+
+static void task2_set_pwm(int16_t pwm) {
+  pwm = CONFINE(pwm, -TRUST_CONFINE, TRUST_CONFINE);
+
+  status.motor.wheel[0].trust = pwm;
+  status.motor.wheel[1].trust = pwm;
+
+  set_wheel_dir(&status.motor.wheel[0], pwm);
+  set_wheel_dir(&status.motor.wheel[1], pwm);
+
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, ABS(pwm));
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, ABS(pwm));
+}
 
 void init_task(TASK *task) {
   task->task_id = TASK_BASIC_1;
@@ -50,6 +65,7 @@ static void task2_enter_swing_up(STATUS *status) {
   task2_state = TASK2_SWING_UP;
   task2_last_switch_time = status->state.time;
   task2_square_dir = -1;
+  task2_direct_pwm = 1;
   (void)status;
 }
 
@@ -108,6 +124,7 @@ void task_finish(STATUS *status) {
   status->state.base_speed = 0;
   status->motor.wheel[0].tar_speed = 0;
   status->motor.wheel[1].tar_speed = 0;
+  task2_direct_pwm = 0;
   status->device.buzzer.on = 1;
   status->device.buzzer.off_time = status->state.time + 200;
 }
@@ -122,6 +139,7 @@ void task_stop(STATUS *status) {
   status->state.base_speed = 0;
   status->motor.wheel[0].tar_speed = 0;
   status->motor.wheel[1].tar_speed = 0;
+  task2_direct_pwm = 0;
 }
 
 void task_select(STATUS *status, uint8_t id) {
@@ -167,11 +185,12 @@ static void driver_task2(STATUS *status) {
   float target_roll = 0.0f;
   float angle_error = target_roll - roll;
   float balance_out;
-  int16_t swing_speed;
+  int16_t swing_pwm;
   PID *balance_param = &status->state.status_pid.balance_pid;
 
   status->task.task_running = 1;
   status->task.stop_cmd = 0;
+  task2_direct_pwm = 1;
 
   switch (task2_state) {
     case TASK2_SWING_UP:
@@ -189,17 +208,19 @@ static void driver_task2(STATUS *status) {
         }
       }
 
-      swing_speed = (task2_square_dir == 1)
-                    ? task2_swing_speed_fwd : -task2_swing_speed_bwd;
+      swing_pwm = (task2_square_dir == 1)
+                  ? task2_swing_speed_fwd : -task2_swing_speed_bwd;
       status->state.motion = STRAIGHT;
-      status->state.base_speed = swing_speed;
+      status->state.base_speed = 0;
+      task2_set_pwm(swing_pwm);
       break;
 
     case TASK2_BALANCE_PD:
     default:
       balance_out = balance_param->kp * angle_error + balance_param->kd * roll_speed;
       status->state.motion = STRAIGHT;
-      status->state.base_speed = (int16_t)balance_out;
+      status->state.base_speed = 0;
+      task2_set_pwm((int16_t)balance_out);
       break;
   }
 }
