@@ -6,7 +6,9 @@
       "Read(//d/KEIL_CUBE_VS/datou_reference/**)",
       "Bash(python3)",
       "Bash(python3 -c ' *)",
-      "Read(//d/KEIL_CUBE_VS/idn/**)"
+      "Read(//d/KEIL_CUBE_VS/idn/**)",
+      "Bash(awk -F',' '{sum+=$10; n++} END {printf \"average = %.2f, n = %d\\\\n\", sum/n, n}' ADC.md)",
+      "Bash(awk -F',' '{sum+=$10; n++} END {printf \"%.2f\\\\n\", sum/n}' ADC.md)"
     ]
   }
 }

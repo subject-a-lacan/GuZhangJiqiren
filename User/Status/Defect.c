@@ -2,6 +2,7 @@
 #include "status.h"
 #include "math_tool.h"
 #include "tim.h"
+#include "adc.h"
 
 extern uint8_t cross_cnt;
 extern uint8_t left_cnt;
@@ -9,15 +10,21 @@ extern uint8_t cross_delay;
 extern Road road_buf;
 
 #define TASK2_BACK_RECOVER_ANGLE  -20.0f
+#define TASK2_POT_ADC_ZERO        3533.578947f
+#define TASK2_POT_DEG_PER_ADC     0.3600993f
+#define TASK2_POT_LPF_ALPHA       0.20f
 
-int16_t  task2_front_kick_pwm  = 2500;
-uint32_t task2_front_kick_time = 100;
+int16_t  task2_front_kick_pwm  = 2800;
+uint32_t task2_front_kick_time = 250;
+int16_t  task2_back_swing_pwm  = 1600;
+uint32_t task2_back_swing_time = 800;
 int16_t  task2_recover_pwm     = 2000;
 uint32_t task2_recover_time    = 100;
 uint8_t  task2_direct_pwm      = 0;
 
 typedef enum {
-  TASK2_FRONT_KICK = 0,
+  TASK2_BACK_SWING = 0,
+  TASK2_FRONT_KICK,
   TASK2_BALANCE_LQR,
   TASK2_BACK_RECOVER,
 } TASK2_STATE;
@@ -26,6 +33,32 @@ static TASK2_STATE task2_state;
 static uint32_t task2_last_switch_time;
 static int8_t  task2_square_dir;
 static float task2_car_position;
+static float task2_pot_angle;
+static uint8_t task2_pot_angle_inited;
+
+static float task2_adc_to_angle(float adc) {
+  return (adc - TASK2_POT_ADC_ZERO) * TASK2_POT_DEG_PER_ADC;
+}
+
+static float task2_update_pot_angle(void) {
+  float raw_angle;
+
+  if (HAL_ADC_PollForConversion(&hadc5, 0) != HAL_OK) {
+    return task2_pot_angle;
+  }
+
+  raw_angle = task2_adc_to_angle((float)HAL_ADC_GetValue(&hadc5));
+  HAL_ADC_Start(&hadc5);
+
+  if (!task2_pot_angle_inited) {
+    task2_pot_angle = raw_angle;
+    task2_pot_angle_inited = 1;
+  } else {
+    task2_pot_angle += TASK2_POT_LPF_ALPHA * (raw_angle - task2_pot_angle);
+  }
+
+  return task2_pot_angle;
+}
 
 static int16_t task2_compensate_wheel0(int16_t pwm) {
   float abs_pwm = ABS(pwm);
@@ -73,6 +106,10 @@ float get_task2_state_debug(void) {
   return (float)task2_state;
 }
 
+float get_task2_pot_angle_debug(void) {
+  return task2_update_pot_angle();
+}
+
 void init_task(TASK *task) {
   task->task_id = TASK_BASIC_1;
   task->start_pose = START_AB;
@@ -96,8 +133,8 @@ void init_task(TASK *task) {
   task->phase_mileage = 0;
 }
 
-static void task2_enter_front_kick(STATUS *status) {
-  task2_state = TASK2_FRONT_KICK;
+static void task2_enter_back_swing(STATUS *status) {
+  task2_state = TASK2_BACK_SWING;
   task2_last_switch_time = status->state.time;
   task2_direct_pwm = 1;
   (void)status;
@@ -138,7 +175,8 @@ void task_start(STATUS *status) {
     case TASK_BASIC_2:
       apply_basic_control_param(status);
       task2_car_position = 0;
-      task2_enter_front_kick(status);
+      task2_pot_angle_inited = 0;
+      task2_enter_back_swing(status);
       break;
     case TASK_ADV_1:   break;
     case TASK_ADV_2:   break;
@@ -215,7 +253,7 @@ static void driver_task1(STATUS *status) {
 }
 
 static void driver_task2(STATUS *status) {
-  float roll = get_gyr_value(&status->sensor.gy901, gyr_x_roll);
+  float roll = task2_update_pot_angle();
   float angle_error = 0.0f - roll;
   float balance_out;
   float car_speed;
@@ -229,36 +267,32 @@ static void driver_task2(STATUS *status) {
   task2_direct_pwm = 1;
 
   switch (task2_state) {
-    case TASK2_FRONT_KICK:
-      if (status->state.time - task2_last_switch_time >= task2_front_kick_time) {
-        task2_state = TASK2_BALANCE_LQR;
-        balance_param->is_first = 1;
-        /* fall through to LQR */
+    case TASK2_BACK_SWING:
+      if (status->state.time - task2_last_switch_time >= task2_back_swing_time) {
+        task2_state = TASK2_FRONT_KICK;
+        task2_last_switch_time = status->state.time;
       } else {
-        kick_pwm = task2_front_kick_pwm;
+        kick_pwm = -ABS(task2_back_swing_pwm);
         status->state.motion = STRAIGHT;
         status->state.base_speed = 0;
         task2_set_pwm(kick_pwm);
         break;
       }
 
-    case TASK2_BACK_RECOVER:
-      if (status->state.time - task2_last_switch_time >= task2_recover_time) {
-        task2_last_switch_time = status->state.time;
-        task2_square_dir = -task2_square_dir;
-        if (task2_square_dir == 1) {
-          task2_state = TASK2_BALANCE_LQR;
-          balance_param->is_first = 1;
-        }
+    case TASK2_FRONT_KICK:
+      if (status->state.time - task2_last_switch_time >= task2_front_kick_time) {
+        task2_state = TASK2_BALANCE_LQR;
+        balance_param->is_first = 1;
+        /* fall through to LQR */
+      } else {
+        kick_pwm = ABS(task2_front_kick_pwm);
+        status->state.motion = STRAIGHT;
+        status->state.base_speed = 0;
+        task2_set_pwm(kick_pwm);
+        break;
       }
-      kick_pwm = (task2_square_dir == 1) ? task2_recover_pwm : -task2_recover_pwm;
-      status->state.motion = STRAIGHT;
-      status->state.base_speed = 0;
-      task2_set_pwm(kick_pwm);
-      break;
 
     case TASK2_BALANCE_LQR:
-    default:
       if (roll < TASK2_BACK_RECOVER_ANGLE) {
         task2_state = TASK2_BACK_RECOVER;
         task2_last_switch_time = status->state.time;
@@ -274,6 +308,22 @@ static void driver_task2(STATUS *status) {
       status->state.motion = STRAIGHT;
       status->state.base_speed = 0;
       task2_set_pwm((int16_t)(balance_out + position_out));
+      break;
+
+    case TASK2_BACK_RECOVER:
+    default:
+      if (status->state.time - task2_last_switch_time >= task2_recover_time) {
+        task2_last_switch_time = status->state.time;
+        task2_square_dir = -task2_square_dir;
+        if (task2_square_dir == 1) {
+          task2_state = TASK2_BALANCE_LQR;
+          balance_param->is_first = 1;
+        }
+      }
+      kick_pwm = (task2_square_dir == 1) ? task2_recover_pwm : -task2_recover_pwm;
+      status->state.motion = STRAIGHT;
+      status->state.base_speed = 0;
+      task2_set_pwm(kick_pwm);
       break;
   }
 }

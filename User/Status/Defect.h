@@ -48,5 +48,6 @@ void task_select(STATUS *status, uint8_t id);
 void update_task(STATUS *status);
 void update_task_led(STATUS *status);
 float get_task2_state_debug(void);
+float get_task2_pot_angle_debug(void);
 
 #endif

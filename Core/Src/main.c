@@ -66,9 +66,12 @@ int16_t cmd_speed = 12;
 extern uint8_t cross_cnt;
 extern int16_t  task2_front_kick_pwm;
 extern uint32_t task2_front_kick_time;
+extern int16_t  task2_back_swing_pwm;
+extern uint32_t task2_back_swing_time;
 extern int16_t  task2_recover_pwm;
 extern uint32_t task2_recover_time;
 extern uint8_t  task2_direct_pwm;
+extern ADC_HandleTypeDef hadc5;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -141,6 +144,7 @@ int main(void)
   status.state.motion = STOP;
   init_uart_pid_tune_it(); // USART1/USART2/USART3 receive PID tune commands.
   ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  HAL_ADC_Start(&hadc5);
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
 
@@ -151,20 +155,18 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Balance_Debug_Print, 80)
-      float roll = get_gyr_value(&status.sensor.gy901, gyr_x_roll);
+    PERIODIC_START(Balance_Debug_Print, 100)
       PID *bp = &status.state.status_pid.balance_pid;
       PID *mp = &status.state.status_pid.mileage_pid;
-      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
-             (double)roll,
+      float pot_angle = get_task2_pot_angle_debug();
+      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
              (double)bp->kp,
              (double)bp->ki,
              (double)bp->kd,
-             (double)bp->out,
              (double)status.motor.wheel[0].trust,
              (double)mp->kp,
              (double)mp->kd,
-             (double)get_task2_state_debug());
+             (double)pot_angle);
     PERIODIC_END
     
   }
@@ -241,6 +243,8 @@ void UART_PID_Tune(uint8_t cmd, float val) {
     case 'j': status.state.status_pid.mileage_pid.kp = val;  break;
     case 'l': status.state.status_pid.mileage_pid.kd = val;  break;
 
+    case 'A': task2_back_swing_pwm  = (int16_t)val;     break;
+    case 'B': task2_back_swing_time = (uint32_t)val;    break;
     case 'p': task2_front_kick_pwm  = (int16_t)val;     break;
     case 'r': task2_front_kick_time = (uint32_t)val;    break;
     case 't': task2_recover_pwm     = (int16_t)val;     break;
