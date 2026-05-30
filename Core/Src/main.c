@@ -159,14 +159,15 @@ int main(void)
       PID *bp = &status.state.status_pid.balance_pid;
       PID *mp = &status.state.status_pid.mileage_pid;
       float pot_angle = get_task2_pot_angle_debug();
-      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
              (double)bp->kp,
              (double)bp->ki,
              (double)bp->kd,
              (double)status.motor.wheel[0].trust,
              (double)mp->kp,
              (double)mp->kd,
-             (double)pot_angle);
+             (double)pot_angle,
+             (double)HAL_ADC_GetValue(&hadc5));
     PERIODIC_END
     
   }

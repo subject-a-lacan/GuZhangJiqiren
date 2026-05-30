@@ -2,14 +2,14 @@
 
 数据来源：`SHIT.md`
 
-结论：同样 PWM 下，`wheel1` 明显比 `wheel0` 快，低 PWM 时差距更大。所以 TASK2 不能继续：
+结论：同 PWM 下，`wheel1` 明显比 `wheel0` 快，小车有右转趋势。TASK2 不能继续直接：
 
 ```c
 wheel0_pwm = u;
 wheel1_pwm = u;
 ```
 
-而应该把控制器输出的统一控制量 `u` 映射成左右轮不同 PWM：
+应该把统一控制量 `u` 映射成左右轮不同 PWM：
 
 ```c
 wheel0_pwm = compensate_wheel0(u);
@@ -20,54 +20,66 @@ wheel1_pwm = compensate_wheel1(u);
 
 单位：8ms 内编码器累计值。
 
+正转：
+
 ```text
 PWM    wheel0_avg    wheel1_avg
-500      5.776         8.845
-800     12.346        15.769
-1100    18.621        22.448
-1400    24.255        27.766
+500      5.826         9.163
+800     12.390        15.780
+1100    18.723        22.787
+1400    24.475        28.443
 1700    31.739        36.217
 2000    36.821        42.464
-2500    47.538        51.846
+2500    46.063        50.938
 ```
 
-可以看到 `wheel1` 始终更快，所以它应该被压低，`wheel0` 应该被补高。
-
-## 2. PWM-速度线性拟合
-
-拟合形式：
+反转：
 
 ```text
-speed = k * pwm + b
+PWM     wheel0_avg    wheel1_avg
+-800     -10.318      -16.227
+-1200    -18.400      -25.960
+-1600    -26.111      -34.667
+-2000    -33.389      -41.889
+-2400    -39.518      -50.071
 ```
 
-得到：
+`800` 正转数据里有一个明显异常点 `13,1`，拟合时剔除了这个坏点。
+
+## 2. PWM-速度拟合结果
+
+正转拟合：
 
 ```text
-wheel0_speed = 0.02081293 * pwm - 4.433174
-wheel1_speed = 0.02173805 * pwm - 1.717761
+wheel0_speed = 0.0202345 * pwm - 3.7604
+wheel1_speed = 0.0211757 * pwm - 0.7993
+avg_speed    = 0.0207051 * pwm - 2.2798
 ```
 
-反解：
+反转按绝对值拟合：
 
 ```text
-wheel0_pwm = 48.047064 * speed + 213.000983
-wheel1_pwm = 46.002297 * speed + 79.020959
+wheel0_speed_abs = 0.0183470 * pwm_abs - 3.8080
+wheel1_speed_abs = 0.0209039 * pwm_abs + 0.3165
+avg_speed_abs    = 0.0196254 * pwm_abs - 1.7457
 ```
 
-## 3. 把统一控制量 u 映射到左右轮 PWM
+## 3. 推荐补偿公式
 
-把原来的 `u` 理解成“平均轮特性下的等效 PWM”。平均轮拟合为：
+把输入 `u` 理解为“平均轮特性下的等效 PWM”，补偿到左右轮相同平均速度。
+
+正转：
 
 ```text
-avg_speed = 0.02127549 * u - 3.075467
+wheel0_pwm = 1.0232 * u + 71.80
+wheel1_pwm = 0.9778 * u - 68.61
 ```
 
-代入左右轮反解，得到正向补偿公式：
+反转：
 
 ```text
-wheel0_pwm = 1.022225 * u + 65.233801
-wheel1_pwm = 0.978721 * u - 62.457607
+wheel0_pwm = -(1.0697 * abs(u) + 112.40)
+wheel1_pwm = -(0.9388 * abs(u) - 98.65)
 ```
 
 直观含义：
@@ -75,29 +87,21 @@ wheel1_pwm = 0.978721 * u - 62.457607
 ```text
 wheel0 比较弱，需要加 PWM
 wheel1 比较强，需要减 PWM
+反转时两轮差异更大，所以必须正反转分开补偿
 ```
 
-## 4. 启动 PWM
+## 4. 新死区
 
-从 `SHIT.md` 记录：
+这次重新测得的可靠启动死区：
 
 ```text
-wheel0 正转可靠启动 PWM: 约 201
-wheel0 反转可靠启动 PWM: 约 180
-
-wheel1 正转可靠启动 PWM: 约 255
-wheel1 反转可靠启动 PWM: 约 173
+wheel0 正转: 185
+wheel0 反转: 182
+wheel1 正转: 175
+wheel1 反转: 173
 ```
 
-注意：`wheel1` 正转 233 时只是“有时能动/碰一下又停”，不算可靠启动 PWM；第一版用 255 更稳。
-
-## 5. 推荐补偿函数
-
-当前只有正向完整速度曲线；反向只有最小启动 PWM，没有完整反向 PWM-速度曲线。所以：
-
-- 正向用拟合公式。
-- 反向先用同一套斜率补偿，再按反向可靠启动 PWM 做下限保护。
-- 后续最好补测反向 `PWM-speed` 曲线，再替换反向公式。
+## 5. 可直接使用的代码
 
 ```c
 static int16_t task2_compensate_wheel0(int16_t u)
@@ -107,10 +111,13 @@ static int16_t task2_compensate_wheel0(int16_t u)
 
     if (u == 0) return 0;
 
-    pwm_abs = 1.022225f * abs_u + 65.233801f;
-
-    if (u > 0 && pwm_abs < 201.0f) pwm_abs = 201.0f;
-    if (u < 0 && pwm_abs < 180.0f) pwm_abs = 180.0f;
+    if (u > 0) {
+        pwm_abs = 1.0232f * abs_u + 71.80f;
+        if (pwm_abs < 185.0f) pwm_abs = 185.0f;
+    } else {
+        pwm_abs = 1.0697f * abs_u + 112.40f;
+        if (pwm_abs < 182.0f) pwm_abs = 182.0f;
+    }
 
     pwm_abs = CONFINE(pwm_abs, 0, TRUST_CONFINE);
     return (u > 0) ? (int16_t)pwm_abs : -(int16_t)pwm_abs;
@@ -123,17 +130,20 @@ static int16_t task2_compensate_wheel1(int16_t u)
 
     if (u == 0) return 0;
 
-    pwm_abs = 0.978721f * abs_u - 62.457607f;
-
-    if (u > 0 && pwm_abs < 255.0f) pwm_abs = 255.0f;
-    if (u < 0 && pwm_abs < 173.0f) pwm_abs = 173.0f;
+    if (u > 0) {
+        pwm_abs = 0.9778f * abs_u - 68.61f;
+        if (pwm_abs < 175.0f) pwm_abs = 175.0f;
+    } else {
+        pwm_abs = 0.9388f * abs_u - 98.65f;
+        if (pwm_abs < 173.0f) pwm_abs = 173.0f;
+    }
 
     pwm_abs = CONFINE(pwm_abs, 0, TRUST_CONFINE);
     return (u > 0) ? (int16_t)pwm_abs : -(int16_t)pwm_abs;
 }
 ```
 
-## 6. `task2_set_pwm()` 应该改成这样
+## 6. `task2_set_pwm()` 使用方式
 
 ```c
 static void task2_set_pwm(int16_t pwm)
@@ -152,11 +162,9 @@ static void task2_set_pwm(int16_t pwm)
 }
 ```
 
-## 7. 重要注意
+## 7. 注意
 
-这个补偿只解决“左右轮同 PWM 下速度/驱动力不一致”的静态差异。
-
-它不能完全解决：
+这个补偿只能解决“左右轮同 PWM 下速度不同”的静态差异，不能完全解决：
 
 ```text
 轮胎打滑
@@ -166,7 +174,7 @@ static void task2_set_pwm(int16_t pwm)
 车体原地旋转时平均速度欺骗控制器
 ```
 
-如果补偿后仍然转圈，下一步加一个很弱的左右轮同步修正：
+如果补偿后仍然明显转圈，下一步应该加一个很弱的左右轮同步修正：
 
 ```c
 sync_error = status.motor.wheel[0].cur_speed - status.motor.wheel[1].cur_speed;
@@ -176,4 +184,4 @@ wheel0_pwm -= sync_trim;
 wheel1_pwm += sync_trim;
 ```
 
-这个不是完整速度环，只是防止左右轮差速太大导致原地转圈。
+这不是完整速度环，只是防止左右轮差速太大导致原地旋转。

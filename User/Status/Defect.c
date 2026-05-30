@@ -66,9 +66,13 @@ static int16_t task2_compensate_wheel0(int16_t pwm) {
 
   if (pwm == 0) return 0;
 
-  out = 1.022564f * abs_pwm + 64.123901f;
-  if (pwm > 0 && out < 201.0f) out = 201.0f;
-  if (pwm < 0 && out < 180.0f) out = 180.0f;
+  if (pwm > 0) {
+    out = 1.0232f * abs_pwm + 71.80f;
+    if (out < 185.0f) out = 185.0f;
+  } else {
+    out = 1.0697f * abs_pwm + 112.40f;
+    if (out < 182.0f) out = 182.0f;
+  }
   out = CONFINE(out, 0, TRUST_CONFINE);
 
   return (pwm > 0) ? (int16_t)out : -(int16_t)out;
@@ -80,9 +84,13 @@ static int16_t task2_compensate_wheel1(int16_t pwm) {
 
   if (pwm == 0) return 0;
 
-  out = 0.978411f * abs_pwm - 61.355804f;
-  if (pwm > 0 && out < 255.0f) out = 255.0f;
-  if (pwm < 0 && out < 173.0f) out = 173.0f;
+  if (pwm > 0) {
+    out = 0.9778f * abs_pwm - 68.61f;
+    if (out < 175.0f) out = 175.0f;
+  } else {
+    out = 0.9388f * abs_pwm - 98.65f;
+    if (out < 173.0f) out = 173.0f;
+  }
   out = CONFINE(out, 0, TRUST_CONFINE);
 
   return (pwm > 0) ? (int16_t)out : -(int16_t)out;

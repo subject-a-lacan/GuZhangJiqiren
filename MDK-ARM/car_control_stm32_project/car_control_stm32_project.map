@@ -5083,48 +5083,48 @@ Image Symbol Table
     [Anonymous Symbol]                       0x08009884   Section        0  defect.o(.text.task2_adc_to_angle)
     task2_adc_to_angle                       0x08009885   Thumb Code    28  defect.o(.text.task2_adc_to_angle)
     [Anonymous Symbol]                       0x080098a0   Section        0  defect.o(.text.task2_compensate_wheel0)
-    task2_compensate_wheel0                  0x080098a1   Thumb Code   168  defect.o(.text.task2_compensate_wheel0)
-    [Anonymous Symbol]                       0x08009948   Section        0  defect.o(.text.task2_compensate_wheel1)
-    task2_compensate_wheel1                  0x08009949   Thumb Code   168  defect.o(.text.task2_compensate_wheel1)
-    [Anonymous Symbol]                       0x080099f0   Section        0  defect.o(.text.task2_enter_back_swing)
-    task2_enter_back_swing                   0x080099f1   Thumb Code    38  defect.o(.text.task2_enter_back_swing)
-    [Anonymous Symbol]                       0x08009a18   Section        0  defect.o(.text.task2_set_pwm)
-    task2_set_pwm                            0x08009a19   Thumb Code    84  defect.o(.text.task2_set_pwm)
-    [Anonymous Symbol]                       0x08009a6c   Section        0  defect.o(.text.task2_update_pot_angle)
-    task2_update_pot_angle                   0x08009a6d   Thumb Code   140  defect.o(.text.task2_update_pot_angle)
-    [Anonymous Symbol]                       0x08009af8   Section        0  defect.o(.text.task_finish)
-    [Anonymous Symbol]                       0x08009b3c   Section        0  defect.o(.text.task_select)
-    [Anonymous Symbol]                       0x08009b60   Section        0  defect.o(.text.task_start)
-    [Anonymous Symbol]                       0x08009c0c   Section        0  defect.o(.text.task_stop)
-    [Anonymous Symbol]                       0x08009c3c   Section        0  lora.o(.text.uart1_tx)
-    uart1_tx                                 0x08009c3d   Thumb Code    34  lora.o(.text.uart1_tx)
-    [Anonymous Symbol]                       0x08009c60   Section        0  status.o(.text.update_status)
-    [Anonymous Symbol]                       0x08009de0   Section        0  defect.o(.text.update_task)
-    [Anonymous Symbol]                       0x08009ef4   Section        0  defect.o(.text.update_task_led)
-    [Anonymous Symbol]                       0x08009f54   Section        0  wheel.o(.text.wheel_ff_index)
-    wheel_ff_index                           0x08009f55   Thumb Code    18  wheel.o(.text.wheel_ff_index)
-    i.__0printf                              0x08009f68   Section        0  printfa.o(i.__0printf)
-    i.__0sprintf                             0x08009f88   Section        0  printfa.o(i.__0sprintf)
-    i.__hardfp_atof                          0x08009fb0   Section        0  atof.o(i.__hardfp_atof)
-    i.__read_errno                           0x08009fe8   Section        0  errno.o(i.__read_errno)
-    i.__scatterload_copy                     0x08009ff4   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_null                     0x0800a002   Section        2  handlers.o(i.__scatterload_null)
-    i.__scatterload_zeroinit                 0x0800a004   Section       14  handlers.o(i.__scatterload_zeroinit)
-    i.__set_errno                            0x0800a014   Section        0  errno.o(i.__set_errno)
-    i._fp_digits                             0x0800a020   Section        0  printfa.o(i._fp_digits)
-    _fp_digits                               0x0800a021   Thumb Code   366  printfa.o(i._fp_digits)
-    i._is_digit                              0x0800a1a4   Section        0  scanf_fp.o(i._is_digit)
-    i._printf_core                           0x0800a1b4   Section        0  printfa.o(i._printf_core)
-    _printf_core                             0x0800a1b5   Thumb Code  1744  printfa.o(i._printf_core)
-    i._printf_post_padding                   0x0800a890   Section        0  printfa.o(i._printf_post_padding)
-    _printf_post_padding                     0x0800a891   Thumb Code    36  printfa.o(i._printf_post_padding)
-    i._printf_pre_padding                    0x0800a8b4   Section        0  printfa.o(i._printf_pre_padding)
-    _printf_pre_padding                      0x0800a8b5   Thumb Code    46  printfa.o(i._printf_pre_padding)
-    i._sputc                                 0x0800a8e2   Section        0  printfa.o(i._sputc)
-    _sputc                                   0x0800a8e3   Thumb Code    10  printfa.o(i._sputc)
-    .constdata                               0x0800a8ec   Section      129  ctype_o.o(.constdata)
-    .constdata                               0x0800a970   Section        4  ctype_o.o(.constdata)
-    table                                    0x0800a970   Data           4  ctype_o.o(.constdata)
+    task2_compensate_wheel0                  0x080098a1   Thumb Code   152  defect.o(.text.task2_compensate_wheel0)
+    [Anonymous Symbol]                       0x08009938   Section        0  defect.o(.text.task2_compensate_wheel1)
+    task2_compensate_wheel1                  0x08009939   Thumb Code   152  defect.o(.text.task2_compensate_wheel1)
+    [Anonymous Symbol]                       0x080099d0   Section        0  defect.o(.text.task2_enter_back_swing)
+    task2_enter_back_swing                   0x080099d1   Thumb Code    38  defect.o(.text.task2_enter_back_swing)
+    [Anonymous Symbol]                       0x080099f8   Section        0  defect.o(.text.task2_set_pwm)
+    task2_set_pwm                            0x080099f9   Thumb Code    84  defect.o(.text.task2_set_pwm)
+    [Anonymous Symbol]                       0x08009a4c   Section        0  defect.o(.text.task2_update_pot_angle)
+    task2_update_pot_angle                   0x08009a4d   Thumb Code   140  defect.o(.text.task2_update_pot_angle)
+    [Anonymous Symbol]                       0x08009ad8   Section        0  defect.o(.text.task_finish)
+    [Anonymous Symbol]                       0x08009b1c   Section        0  defect.o(.text.task_select)
+    [Anonymous Symbol]                       0x08009b40   Section        0  defect.o(.text.task_start)
+    [Anonymous Symbol]                       0x08009bec   Section        0  defect.o(.text.task_stop)
+    [Anonymous Symbol]                       0x08009c1c   Section        0  lora.o(.text.uart1_tx)
+    uart1_tx                                 0x08009c1d   Thumb Code    34  lora.o(.text.uart1_tx)
+    [Anonymous Symbol]                       0x08009c40   Section        0  status.o(.text.update_status)
+    [Anonymous Symbol]                       0x08009dc0   Section        0  defect.o(.text.update_task)
+    [Anonymous Symbol]                       0x08009ed4   Section        0  defect.o(.text.update_task_led)
+    [Anonymous Symbol]                       0x08009f34   Section        0  wheel.o(.text.wheel_ff_index)
+    wheel_ff_index                           0x08009f35   Thumb Code    18  wheel.o(.text.wheel_ff_index)
+    i.__0printf                              0x08009f48   Section        0  printfa.o(i.__0printf)
+    i.__0sprintf                             0x08009f68   Section        0  printfa.o(i.__0sprintf)
+    i.__hardfp_atof                          0x08009f90   Section        0  atof.o(i.__hardfp_atof)
+    i.__read_errno                           0x08009fc8   Section        0  errno.o(i.__read_errno)
+    i.__scatterload_copy                     0x08009fd4   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x08009fe2   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x08009fe4   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i.__set_errno                            0x08009ff4   Section        0  errno.o(i.__set_errno)
+    i._fp_digits                             0x0800a000   Section        0  printfa.o(i._fp_digits)
+    _fp_digits                               0x0800a001   Thumb Code   366  printfa.o(i._fp_digits)
+    i._is_digit                              0x0800a184   Section        0  scanf_fp.o(i._is_digit)
+    i._printf_core                           0x0800a194   Section        0  printfa.o(i._printf_core)
+    _printf_core                             0x0800a195   Thumb Code  1744  printfa.o(i._printf_core)
+    i._printf_post_padding                   0x0800a870   Section        0  printfa.o(i._printf_post_padding)
+    _printf_post_padding                     0x0800a871   Thumb Code    36  printfa.o(i._printf_post_padding)
+    i._printf_pre_padding                    0x0800a894   Section        0  printfa.o(i._printf_pre_padding)
+    _printf_pre_padding                      0x0800a895   Thumb Code    46  printfa.o(i._printf_pre_padding)
+    i._sputc                                 0x0800a8c2   Section        0  printfa.o(i._sputc)
+    _sputc                                   0x0800a8c3   Thumb Code    10  printfa.o(i._sputc)
+    .constdata                               0x0800a8cc   Section      129  ctype_o.o(.constdata)
+    .constdata                               0x0800a950   Section        4  ctype_o.o(.constdata)
+    table                                    0x0800a950   Data           4  ctype_o.o(.constdata)
     .data                                    0x20000000   Section        4  stdout.o(.data)
     .data                                    0x20000004   Section        4  errno.o(.data)
     _errno                                   0x20000004   Data           4  errno.o(.data)
@@ -5558,36 +5558,36 @@ Image Symbol Table
     server_button                            0x0800967d   Thumb Code   166  button.o(.text.server_button)
     set_wheel_dir                            0x08009725   Thumb Code   274  wheel.o(.text.set_wheel_dir)
     set_wheel_ff_param_by_which              0x08009839   Thumb Code    76  wheel.o(.text.set_wheel_ff_param_by_which)
-    task_finish                              0x08009af9   Thumb Code    68  defect.o(.text.task_finish)
-    task_select                              0x08009b3d   Thumb Code    36  defect.o(.text.task_select)
-    task_start                               0x08009b61   Thumb Code   172  defect.o(.text.task_start)
-    task_stop                                0x08009c0d   Thumb Code    48  defect.o(.text.task_stop)
-    update_status                            0x08009c61   Thumb Code   382  status.o(.text.update_status)
-    update_task                              0x08009de1   Thumb Code   274  defect.o(.text.update_task)
-    update_task_led                          0x08009ef5   Thumb Code    96  defect.o(.text.update_task_led)
-    __0printf                                0x08009f69   Thumb Code    22  printfa.o(i.__0printf)
-    __1printf                                0x08009f69   Thumb Code     0  printfa.o(i.__0printf)
-    __2printf                                0x08009f69   Thumb Code     0  printfa.o(i.__0printf)
-    __c89printf                              0x08009f69   Thumb Code     0  printfa.o(i.__0printf)
-    printf                                   0x08009f69   Thumb Code     0  printfa.o(i.__0printf)
-    __0sprintf                               0x08009f89   Thumb Code    34  printfa.o(i.__0sprintf)
-    __1sprintf                               0x08009f89   Thumb Code     0  printfa.o(i.__0sprintf)
-    __2sprintf                               0x08009f89   Thumb Code     0  printfa.o(i.__0sprintf)
-    __c89sprintf                             0x08009f89   Thumb Code     0  printfa.o(i.__0sprintf)
-    sprintf                                  0x08009f89   Thumb Code     0  printfa.o(i.__0sprintf)
-    __hardfp_atof                            0x08009fb1   Thumb Code    44  atof.o(i.__hardfp_atof)
-    __read_errno                             0x08009fe9   Thumb Code     6  errno.o(i.__read_errno)
-    __scatterload_copy                       0x08009ff5   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_null                       0x0800a003   Thumb Code     2  handlers.o(i.__scatterload_null)
-    __scatterload_zeroinit                   0x0800a005   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    __set_errno                              0x0800a015   Thumb Code     6  errno.o(i.__set_errno)
-    _is_digit                                0x0800a1a5   Thumb Code    14  scanf_fp.o(i._is_digit)
-    __ctype_table                            0x0800a8ec   Data         129  ctype_o.o(.constdata)
-    AHBPrescTable                            0x0800a974   Data          16  system_stm32g4xx.o(.rodata.AHBPrescTable)
-    APBPrescTable                            0x0800a984   Data           8  system_stm32g4xx.o(.rodata.APBPrescTable)
-    UARTPrescTable                           0x0800a98c   Data          24  stm32g4xx_hal_uart.o(.rodata.UARTPrescTable)
-    Region$$Table$$Base                      0x0800a9a4   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x0800a9c4   Number         0  anon$$obj.o(Region$$Table)
+    task_finish                              0x08009ad9   Thumb Code    68  defect.o(.text.task_finish)
+    task_select                              0x08009b1d   Thumb Code    36  defect.o(.text.task_select)
+    task_start                               0x08009b41   Thumb Code   172  defect.o(.text.task_start)
+    task_stop                                0x08009bed   Thumb Code    48  defect.o(.text.task_stop)
+    update_status                            0x08009c41   Thumb Code   382  status.o(.text.update_status)
+    update_task                              0x08009dc1   Thumb Code   274  defect.o(.text.update_task)
+    update_task_led                          0x08009ed5   Thumb Code    96  defect.o(.text.update_task_led)
+    __0printf                                0x08009f49   Thumb Code    22  printfa.o(i.__0printf)
+    __1printf                                0x08009f49   Thumb Code     0  printfa.o(i.__0printf)
+    __2printf                                0x08009f49   Thumb Code     0  printfa.o(i.__0printf)
+    __c89printf                              0x08009f49   Thumb Code     0  printfa.o(i.__0printf)
+    printf                                   0x08009f49   Thumb Code     0  printfa.o(i.__0printf)
+    __0sprintf                               0x08009f69   Thumb Code    34  printfa.o(i.__0sprintf)
+    __1sprintf                               0x08009f69   Thumb Code     0  printfa.o(i.__0sprintf)
+    __2sprintf                               0x08009f69   Thumb Code     0  printfa.o(i.__0sprintf)
+    __c89sprintf                             0x08009f69   Thumb Code     0  printfa.o(i.__0sprintf)
+    sprintf                                  0x08009f69   Thumb Code     0  printfa.o(i.__0sprintf)
+    __hardfp_atof                            0x08009f91   Thumb Code    44  atof.o(i.__hardfp_atof)
+    __read_errno                             0x08009fc9   Thumb Code     6  errno.o(i.__read_errno)
+    __scatterload_copy                       0x08009fd5   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x08009fe3   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x08009fe5   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    __set_errno                              0x08009ff5   Thumb Code     6  errno.o(i.__set_errno)
+    _is_digit                                0x0800a185   Thumb Code    14  scanf_fp.o(i._is_digit)
+    __ctype_table                            0x0800a8cc   Data         129  ctype_o.o(.constdata)
+    AHBPrescTable                            0x0800a954   Data          16  system_stm32g4xx.o(.rodata.AHBPrescTable)
+    APBPrescTable                            0x0800a964   Data           8  system_stm32g4xx.o(.rodata.APBPrescTable)
+    UARTPrescTable                           0x0800a96c   Data          24  stm32g4xx_hal_uart.o(.rodata.UARTPrescTable)
+    Region$$Table$$Base                      0x0800a984   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x0800a9a4   Number         0  anon$$obj.o(Region$$Table)
     __stdout                                 0x20000000   Data           4  stdout.o(.data)
     SystemCoreClock                          0x20000008   Data           4  system_stm32g4xx.o(.data.SystemCoreClock)
     cmd_speed                                0x2000000c   Data           2  main.o(.data.cmd_speed)
@@ -5642,9 +5642,9 @@ Memory Map of the image
 
   Image Entry point : 0x080001d9
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x0000aa48, Max: 0x00020000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x0000aa28, Max: 0x00020000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x0000a9c4, Max: 0x00020000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x0000a9a4, Max: 0x00020000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -6124,75 +6124,75 @@ Memory Map of the image
     0x08009836   0x08009836   0x00000002   PAD
     0x08009838   0x08009838   0x0000004c   Code   RO         2503    .text.set_wheel_ff_param_by_which  wheel.o
     0x08009884   0x08009884   0x0000001c   Code   RO         2283    .text.task2_adc_to_angle  defect.o
-    0x080098a0   0x080098a0   0x000000a8   Code   RO         2287    .text.task2_compensate_wheel0  defect.o
-    0x08009948   0x08009948   0x000000a8   Code   RO         2289    .text.task2_compensate_wheel1  defect.o
-    0x080099f0   0x080099f0   0x00000026   Code   RO         2267    .text.task2_enter_back_swing  defect.o
-    0x08009a16   0x08009a16   0x00000002   PAD
-    0x08009a18   0x08009a18   0x00000054   Code   RO         2285    .text.task2_set_pwm  defect.o
-    0x08009a6c   0x08009a6c   0x0000008c   Code   RO         2261    .text.task2_update_pot_angle  defect.o
-    0x08009af8   0x08009af8   0x00000044   Code   RO         2269    .text.task_finish   defect.o
-    0x08009b3c   0x08009b3c   0x00000024   Code   RO         2273    .text.task_select   defect.o
-    0x08009b60   0x08009b60   0x000000ac   Code   RO         2265    .text.task_start    defect.o
-    0x08009c0c   0x08009c0c   0x00000030   Code   RO         2271    .text.task_stop     defect.o
-    0x08009c3c   0x08009c3c   0x00000022   Code   RO           13    .text.uart1_tx      lora.o
-    0x08009c5e   0x08009c5e   0x00000002   PAD
-    0x08009c60   0x08009c60   0x0000017e   Code   RO         2234    .text.update_status  status.o
-    0x08009dde   0x08009dde   0x00000002   PAD
-    0x08009de0   0x08009de0   0x00000112   Code   RO         2277    .text.update_task   defect.o
-    0x08009ef2   0x08009ef2   0x00000002   PAD
-    0x08009ef4   0x08009ef4   0x00000060   Code   RO         2275    .text.update_task_led  defect.o
-    0x08009f54   0x08009f54   0x00000012   Code   RO         2505    .text.wheel_ff_index  wheel.o
-    0x08009f66   0x08009f66   0x00000002   PAD
-    0x08009f68   0x08009f68   0x00000020   Code   RO         2865    i.__0printf         mc_w.l(printfa.o)
-    0x08009f88   0x08009f88   0x00000028   Code   RO         2867    i.__0sprintf        mc_w.l(printfa.o)
-    0x08009fb0   0x08009fb0   0x00000038   Code   RO         2617    i.__hardfp_atof     m_wm.l(atof.o)
-    0x08009fe8   0x08009fe8   0x0000000c   Code   RO         2935    i.__read_errno      mc_w.l(errno.o)
-    0x08009ff4   0x08009ff4   0x0000000e   Code   RO         3003    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x0800a002   0x0800a002   0x00000002   Code   RO         3004    i.__scatterload_null  mc_w.l(handlers.o)
-    0x0800a004   0x0800a004   0x0000000e   Code   RO         3005    i.__scatterload_zeroinit  mc_w.l(handlers.o)
-    0x0800a012   0x0800a012   0x00000002   PAD
-    0x0800a014   0x0800a014   0x0000000c   Code   RO         2936    i.__set_errno       mc_w.l(errno.o)
-    0x0800a020   0x0800a020   0x00000184   Code   RO         2872    i._fp_digits        mc_w.l(printfa.o)
-    0x0800a1a4   0x0800a1a4   0x0000000e   Code   RO         2988    i._is_digit         mc_w.l(scanf_fp.o)
-    0x0800a1b2   0x0800a1b2   0x00000002   PAD
-    0x0800a1b4   0x0800a1b4   0x000006dc   Code   RO         2873    i._printf_core      mc_w.l(printfa.o)
-    0x0800a890   0x0800a890   0x00000024   Code   RO         2874    i._printf_post_padding  mc_w.l(printfa.o)
-    0x0800a8b4   0x0800a8b4   0x0000002e   Code   RO         2875    i._printf_pre_padding  mc_w.l(printfa.o)
-    0x0800a8e2   0x0800a8e2   0x0000000a   Code   RO         2877    i._sputc            mc_w.l(printfa.o)
-    0x0800a8ec   0x0800a8ec   0x00000081   Data   RO         2959    .constdata          mc_w.l(ctype_o.o)
-    0x0800a96d   0x0800a96d   0x00000003   PAD
-    0x0800a970   0x0800a970   0x00000004   Data   RO         2960    .constdata          mc_w.l(ctype_o.o)
-    0x0800a974   0x0800a974   0x00000010   Data   RO         2105    .rodata.AHBPrescTable  system_stm32g4xx.o
-    0x0800a984   0x0800a984   0x00000008   Data   RO         2106    .rodata.APBPrescTable  system_stm32g4xx.o
-    0x0800a98c   0x0800a98c   0x00000018   Data   RO         2043    .rodata.UARTPrescTable  stm32g4xx_hal_uart.o
-    0x0800a9a4   0x0800a9a4   0x00000020   Data   RO         3001    Region$$Table       anon$$obj.o
+    0x080098a0   0x080098a0   0x00000098   Code   RO         2287    .text.task2_compensate_wheel0  defect.o
+    0x08009938   0x08009938   0x00000098   Code   RO         2289    .text.task2_compensate_wheel1  defect.o
+    0x080099d0   0x080099d0   0x00000026   Code   RO         2267    .text.task2_enter_back_swing  defect.o
+    0x080099f6   0x080099f6   0x00000002   PAD
+    0x080099f8   0x080099f8   0x00000054   Code   RO         2285    .text.task2_set_pwm  defect.o
+    0x08009a4c   0x08009a4c   0x0000008c   Code   RO         2261    .text.task2_update_pot_angle  defect.o
+    0x08009ad8   0x08009ad8   0x00000044   Code   RO         2269    .text.task_finish   defect.o
+    0x08009b1c   0x08009b1c   0x00000024   Code   RO         2273    .text.task_select   defect.o
+    0x08009b40   0x08009b40   0x000000ac   Code   RO         2265    .text.task_start    defect.o
+    0x08009bec   0x08009bec   0x00000030   Code   RO         2271    .text.task_stop     defect.o
+    0x08009c1c   0x08009c1c   0x00000022   Code   RO           13    .text.uart1_tx      lora.o
+    0x08009c3e   0x08009c3e   0x00000002   PAD
+    0x08009c40   0x08009c40   0x0000017e   Code   RO         2234    .text.update_status  status.o
+    0x08009dbe   0x08009dbe   0x00000002   PAD
+    0x08009dc0   0x08009dc0   0x00000112   Code   RO         2277    .text.update_task   defect.o
+    0x08009ed2   0x08009ed2   0x00000002   PAD
+    0x08009ed4   0x08009ed4   0x00000060   Code   RO         2275    .text.update_task_led  defect.o
+    0x08009f34   0x08009f34   0x00000012   Code   RO         2505    .text.wheel_ff_index  wheel.o
+    0x08009f46   0x08009f46   0x00000002   PAD
+    0x08009f48   0x08009f48   0x00000020   Code   RO         2865    i.__0printf         mc_w.l(printfa.o)
+    0x08009f68   0x08009f68   0x00000028   Code   RO         2867    i.__0sprintf        mc_w.l(printfa.o)
+    0x08009f90   0x08009f90   0x00000038   Code   RO         2617    i.__hardfp_atof     m_wm.l(atof.o)
+    0x08009fc8   0x08009fc8   0x0000000c   Code   RO         2935    i.__read_errno      mc_w.l(errno.o)
+    0x08009fd4   0x08009fd4   0x0000000e   Code   RO         3003    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x08009fe2   0x08009fe2   0x00000002   Code   RO         3004    i.__scatterload_null  mc_w.l(handlers.o)
+    0x08009fe4   0x08009fe4   0x0000000e   Code   RO         3005    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x08009ff2   0x08009ff2   0x00000002   PAD
+    0x08009ff4   0x08009ff4   0x0000000c   Code   RO         2936    i.__set_errno       mc_w.l(errno.o)
+    0x0800a000   0x0800a000   0x00000184   Code   RO         2872    i._fp_digits        mc_w.l(printfa.o)
+    0x0800a184   0x0800a184   0x0000000e   Code   RO         2988    i._is_digit         mc_w.l(scanf_fp.o)
+    0x0800a192   0x0800a192   0x00000002   PAD
+    0x0800a194   0x0800a194   0x000006dc   Code   RO         2873    i._printf_core      mc_w.l(printfa.o)
+    0x0800a870   0x0800a870   0x00000024   Code   RO         2874    i._printf_post_padding  mc_w.l(printfa.o)
+    0x0800a894   0x0800a894   0x0000002e   Code   RO         2875    i._printf_pre_padding  mc_w.l(printfa.o)
+    0x0800a8c2   0x0800a8c2   0x0000000a   Code   RO         2877    i._sputc            mc_w.l(printfa.o)
+    0x0800a8cc   0x0800a8cc   0x00000081   Data   RO         2959    .constdata          mc_w.l(ctype_o.o)
+    0x0800a94d   0x0800a94d   0x00000003   PAD
+    0x0800a950   0x0800a950   0x00000004   Data   RO         2960    .constdata          mc_w.l(ctype_o.o)
+    0x0800a954   0x0800a954   0x00000010   Data   RO         2105    .rodata.AHBPrescTable  system_stm32g4xx.o
+    0x0800a964   0x0800a964   0x00000008   Data   RO         2106    .rodata.APBPrescTable  system_stm32g4xx.o
+    0x0800a96c   0x0800a96c   0x00000018   Data   RO         2043    .rodata.UARTPrescTable  stm32g4xx_hal_uart.o
+    0x0800a984   0x0800a984   0x00000020   Data   RO         3001    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x0800a9c8, Size: 0x00001078, Max: 0x00020000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x0800a9a8, Size: 0x00001078, Max: 0x00020000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x0800a9c8   0x00000004   Data   RW         2925    .data               mc_w.l(stdout.o)
-    0x20000004   0x0800a9cc   0x00000004   Data   RW         2937    .data               mc_w.l(errno.o)
-    0x20000008   0x0800a9d0   0x00000004   Data   RW         2104    .data.SystemCoreClock  system_stm32g4xx.o
-    0x2000000c   0x0800a9d4   0x00000002   Data   RW           36    .data.cmd_speed     main.o
-    0x2000000e   0x0800a9d6   0x00000002   PAD
-    0x20000010   0x0800a9d8   0x00000020   Data   RW         2451    .data.distance      gw_analogue.o
-    0x20000030   0x0800a9f8   0x00000001   Data   RW         2245    .data.road_buf      status.o
-    0x20000031   0x0800a9f9   0x00000001   PAD
-    0x20000032   0x0800a9fa   0x00000002   Data   RW         2293    .data.task2_back_swing_pwm  defect.o
-    0x20000034   0x0800a9fc   0x00000004   Data   RW         2294    .data.task2_back_swing_time  defect.o
-    0x20000038   0x0800aa00   0x00000002   Data   RW         2291    .data.task2_front_kick_pwm  defect.o
-    0x2000003a   0x0800aa02   0x00000002   PAD
-    0x2000003c   0x0800aa04   0x00000004   Data   RW         2292    .data.task2_front_kick_time  defect.o
-    0x20000040   0x0800aa08   0x00000002   Data   RW         2295    .data.task2_recover_pwm  defect.o
-    0x20000042   0x0800aa0a   0x00000002   PAD
-    0x20000044   0x0800aa0c   0x00000004   Data   RW         2296    .data.task2_recover_time  defect.o
-    0x20000048   0x0800aa10   0x00000004   Data   RW          635    .data.uwTickFreq    stm32g4xx_hal.o
-    0x2000004c   0x0800aa14   0x00000004   Data   RW          634    .data.uwTickPrio    stm32g4xx_hal.o
-    0x20000050   0x0800aa18   0x00000010   Data   RW         2522    .data.wheel_ff_k    wheel.o
-    0x20000060   0x0800aa28   0x00000010   Data   RW         2523    .data.wheel_ff_min  wheel.o
-    0x20000070   0x0800aa38   0x00000010   Data   RW         2521    .data.wheel_ff_offset  wheel.o
+    0x20000000   0x0800a9a8   0x00000004   Data   RW         2925    .data               mc_w.l(stdout.o)
+    0x20000004   0x0800a9ac   0x00000004   Data   RW         2937    .data               mc_w.l(errno.o)
+    0x20000008   0x0800a9b0   0x00000004   Data   RW         2104    .data.SystemCoreClock  system_stm32g4xx.o
+    0x2000000c   0x0800a9b4   0x00000002   Data   RW           36    .data.cmd_speed     main.o
+    0x2000000e   0x0800a9b6   0x00000002   PAD
+    0x20000010   0x0800a9b8   0x00000020   Data   RW         2451    .data.distance      gw_analogue.o
+    0x20000030   0x0800a9d8   0x00000001   Data   RW         2245    .data.road_buf      status.o
+    0x20000031   0x0800a9d9   0x00000001   PAD
+    0x20000032   0x0800a9da   0x00000002   Data   RW         2293    .data.task2_back_swing_pwm  defect.o
+    0x20000034   0x0800a9dc   0x00000004   Data   RW         2294    .data.task2_back_swing_time  defect.o
+    0x20000038   0x0800a9e0   0x00000002   Data   RW         2291    .data.task2_front_kick_pwm  defect.o
+    0x2000003a   0x0800a9e2   0x00000002   PAD
+    0x2000003c   0x0800a9e4   0x00000004   Data   RW         2292    .data.task2_front_kick_time  defect.o
+    0x20000040   0x0800a9e8   0x00000002   Data   RW         2295    .data.task2_recover_pwm  defect.o
+    0x20000042   0x0800a9ea   0x00000002   PAD
+    0x20000044   0x0800a9ec   0x00000004   Data   RW         2296    .data.task2_recover_time  defect.o
+    0x20000048   0x0800a9f0   0x00000004   Data   RW          635    .data.uwTickFreq    stm32g4xx_hal.o
+    0x2000004c   0x0800a9f4   0x00000004   Data   RW          634    .data.uwTickPrio    stm32g4xx_hal.o
+    0x20000050   0x0800a9f8   0x00000010   Data   RW         2522    .data.wheel_ff_k    wheel.o
+    0x20000060   0x0800aa08   0x00000010   Data   RW         2523    .data.wheel_ff_min  wheel.o
+    0x20000070   0x0800aa18   0x00000010   Data   RW         2521    .data.wheel_ff_offset  wheel.o
     0x20000080        -       0x00000004   Zero   RW           73    .bss.HAL_RCC_ADC345_CLK_ENABLED  adc.o
     0x20000084        -       0x00000001   Zero   RW         2452    .bss.cross_cnt      gw_analogue.o
     0x20000085        -       0x00000001   Zero   RW         2242    .bss.cross_delay    status.o
@@ -6222,14 +6222,14 @@ Memory Map of the image
     0x20000830        -       0x00000090   Zero   RW          201    .bss.huart3         usart.o
     0x200008c0        -       0x00000090   Zero   RW          198    .bss.huart4         usart.o
     0x20000950        -       0x00000001   Zero   RW         2453    .bss.left_cnt       gw_analogue.o
-    0x20000951   0x0800aa48   0x00000003   PAD
+    0x20000951   0x0800aa28   0x00000003   PAD
     0x20000954        -       0x00000004   Zero   RW           37    .bss.main.Balance_Debug_Print_nxt  main.o
     0x20000958        -       0x000002b8   Zero   RW         2244    .bss.status         status.o
     0x20000c10        -       0x00000001   Zero   RW         2303    .bss.t1_black_frames  defect.o
-    0x20000c11   0x0800aa48   0x00000003   PAD
+    0x20000c11   0x0800aa28   0x00000003   PAD
     0x20000c14        -       0x00000004   Zero   RW         2299    .bss.task2_car_position  defect.o
     0x20000c18        -       0x00000001   Zero   RW         2297    .bss.task2_direct_pwm  defect.o
-    0x20000c19   0x0800aa48   0x00000003   PAD
+    0x20000c19   0x0800aa28   0x00000003   PAD
     0x20000c1c        -       0x00000004   Zero   RW         2302    .bss.task2_last_switch_time  defect.o
     0x20000c20        -       0x00000004   Zero   RW         2301    .bss.task2_pot_angle  defect.o
     0x20000c24        -       0x00000001   Zero   RW         2300    .bss.task2_pot_angle_inited  defect.o
@@ -6237,9 +6237,9 @@ Memory Map of the image
     0x20000c26        -       0x00000018   Zero   RW         2194    .bss.uart1_pid_rx   uart_it.o
     0x20000c3e        -       0x00000018   Zero   RW         2195    .bss.uart2_pid_rx   uart_it.o
     0x20000c56        -       0x00000018   Zero   RW         2196    .bss.uart3_pid_rx   uart_it.o
-    0x20000c6e   0x0800aa48   0x00000002   PAD
+    0x20000c6e   0x0800aa28   0x00000002   PAD
     0x20000c70        -       0x00000004   Zero   RW          636    .bss.uwTick         stm32g4xx_hal.o
-    0x20000c74   0x0800aa48   0x00000004   PAD
+    0x20000c74   0x0800aa28   0x00000004   PAD
     0x20000c78        -       0x00000400   Zero   RW            1    STACK               startup_stm32g474xx.o
 
 
@@ -6253,7 +6253,7 @@ Image component sizes
        682          0          0          0        316       8607   adc.o
        378          0          0          0          0       2480   button.o
         56          0          0          0          0       1554   buzzer.o
-      1852         60          0         18         16       9919   defect.o
+      1820         76          0         18         16       9974   defect.o
        184          0          0          0          0       4033   dma.o
        404          0          0          0          0       2822   gpio.o
       1454         48          0         32          2       7201   gw_analogue.o
@@ -6293,7 +6293,7 @@ Image component sizes
       1210         36          0         48          0       5681   wheel.o
 
     ----------------------------------------------------------------------
-     37460        714        552        120       4088     417054   Object Totals
+     37428        730        552        120       4088     417109   Object Totals
          0          0         32          0          0          0   (incl. Generated)
        304          0          0          7         15          0   (incl. Padding)
 
@@ -6364,15 +6364,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     42772        880        688        128       4088     418314   Grand Totals
-     42772        880        688        128       4088     418314   ELF Image Totals
-     42772        880        688        128          0          0   ROM Totals
+     42740        896        688        128       4088     418369   Grand Totals
+     42740        896        688        128       4088     418369   ELF Image Totals
+     42740        896        688        128          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                43460 (  42.44kB)
+    Total RO  Size (Code + RO Data)                43428 (  42.41kB)
     Total RW  Size (RW Data + ZI Data)              4216 (   4.12kB)
-    Total ROM Size (Code + RO Data + RW Data)      43588 (  42.57kB)
+    Total ROM Size (Code + RO Data + RW Data)      43556 (  42.54kB)
 
 ==============================================================================
 
