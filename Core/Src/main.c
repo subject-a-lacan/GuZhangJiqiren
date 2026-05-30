@@ -135,6 +135,8 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   init_status(&status, 1);
+  get_gyr_raw_data_dma(&hi2c1, &status.sensor.gy901);
+  HAL_Delay(10);
   after_init_state();
   status.state.motion = STOP;
   init_uart_pid_tune_it(); // USART1/USART2/USART3 receive PID tune commands.

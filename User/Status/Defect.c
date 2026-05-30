@@ -8,13 +8,13 @@ extern uint8_t left_cnt;
 extern uint8_t cross_delay;
 extern Road road_buf;
 
-#define TASK2_CAPTURE_ANGLE_DEG   10.0f
+#define TASK2_CAPTURE_ANGLE_DEG   3.0f
 #define TASK2_FALLBACK_ANGLE_DEG  16.0f
 
-int16_t  task2_swing_speed_fwd = 3000;
-int16_t  task2_swing_speed_bwd = 3000;
-uint32_t task2_swing_time_fwd  = 60;
-uint32_t task2_swing_time_bwd  = 140;
+int16_t  task2_swing_speed_fwd = 2000;
+int16_t  task2_swing_speed_bwd = 1000;
+uint32_t task2_swing_time_fwd  = 200;
+uint32_t task2_swing_time_bwd  = 800;
 uint8_t task2_direct_pwm = 0;
 
 typedef enum {

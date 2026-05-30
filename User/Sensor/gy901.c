@@ -7,7 +7,10 @@
 #include "i2c.h"
 #include "pid.h"
 
-#define GYR_ADDR 0xa1
+#define GYR_ADDR 0xa0
+
+volatile uint8_t gyro_dma_ready = 0;
+volatile uint8_t gyro_dma_busy = 0;
 
 void init_gyr(GYR *gyr) {
   gyr->device_addr = GYR_ADDR;
@@ -26,10 +29,33 @@ void init_gyr(GYR *gyr) {
       * @note   该函数通过 I2C 连续读取 24 字节数据，涵盖了加速度、角速度和欧拉角等核心信息。
       *         数据存放在 gyr->data_buf 中，等待 get_gyr_value 函数解析。
       */
-void get_gyr_raw_data(I2C_HandleTypeDef *i2c, GYR *gyr) {
-  HAL_I2C_Mem_Read(i2c, GYR_ADDR, gyr->data_start_addr, I2C_MEMADD_SIZE_8BIT, gyr->data_buf, 24, 10);
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
+  if (hi2c == &hi2c1) {
+    gyro_dma_busy = 0;
+    gyro_dma_ready = 1;
+  }
+}
 
-  return;
+void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
+  if (hi2c == &hi2c1) {
+    gyro_dma_busy = 0;
+  }
+}
+
+HAL_StatusTypeDef get_gyr_raw_data_dma(I2C_HandleTypeDef *i2c, GYR *gyr) {
+  HAL_StatusTypeDef ret;
+
+  if (gyro_dma_busy) {
+    return HAL_BUSY;
+  }
+
+  ret = HAL_I2C_Mem_Read_DMA(i2c, GYR_ADDR, gyr->data_start_addr, I2C_MEMADD_SIZE_8BIT, gyr->data_buf, 24);
+  if (ret == HAL_OK) {
+    gyro_dma_ready = 0;
+    gyro_dma_busy = 1;
+  }
+
+  return ret;
 }
  /**
      * @brief  解析原始数据并转换为实际物理量

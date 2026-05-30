@@ -127,7 +127,7 @@ void init_state(STATUS *status, uint8_t T) {
 void init_status_pid(STATUS *status) {
   status->state.status_pid.follow_line_pid = init_pid(1.8, 0.012, 0.4, 8,1, 0.0f);
   status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 8,1, 0.0f);
-  status->state.status_pid.balance_pid = init_pid(6000, 0, 0, 8,1, 0.0f);
+  status->state.status_pid.balance_pid = init_pid(20, 0, 0, 8,1, 0.0f);
   status->state.status_pid.mileage_pid = init_pid(0, 0, 0, 8,1, 0.0f);
   status->state.status_pid.angle_output_limit = 25.0f;
 }
@@ -278,8 +278,9 @@ void update_status(STATUS *status) {
   status->motor.wheel[1].cur_speed = get_wheel_speed(&status->motor.wheel[1]);
   status->motor.wheel[2].cur_speed = get_wheel_speed(&status->motor.wheel[2]);
   status->motor.wheel[3].cur_speed = get_wheel_speed(&status->motor.wheel[3]);
-  //get_gyr_raw_data是获取原始数据 get_gyr_value则是解析映射原始数据
-  get_gyr_raw_data(&hi2c1, &status->sensor.gy901);
+  if (gyro_dma_ready) {
+    gyro_dma_ready = 0;
+  }
   status->state.cur_angle = get_gyr_value(&status->sensor.gy901, gyr_z_yaw);
 
   
@@ -338,6 +339,10 @@ void update_status(STATUS *status) {
     driver_wheel(&status->motor.wheel[1]);
   }
 
+  if (!gyro_dma_busy) {
+    get_gyr_raw_data_dma(&hi2c1, &status->sensor.gy901);
+  }
+
   return;
 }
 
@@ -349,7 +354,5 @@ void driver_status(STATUS *status) {  //
  * @return 无
  */
 void after_init_state() {
-  get_gyr_raw_data(&hi2c1, &status.sensor.gy901);
-  HAL_Delay(50);
   status.state.initial_angle = get_gyr_value(&status.sensor.gy901, gyr_z_yaw);
 }
