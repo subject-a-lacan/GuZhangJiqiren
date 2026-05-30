@@ -254,7 +254,7 @@ static void driver_task1(STATUS *status) {
 
 static void driver_task2(STATUS *status) {
   float roll = task2_update_pot_angle();
-  float angle_error = 0.0f - roll;
+  float angle_error = roll;
   float balance_out;
   float car_speed;
   float position_out;
@@ -293,12 +293,12 @@ static void driver_task2(STATUS *status) {
       }
 
     case TASK2_BALANCE_LQR:
-      if (roll < TASK2_BACK_RECOVER_ANGLE) {
-        task2_state = TASK2_BACK_RECOVER;
-        task2_last_switch_time = status->state.time;
-        task2_square_dir = 1;
-        break;
-      }
+      // if (roll < TASK2_BACK_RECOVER_ANGLE) {
+      //   task2_state = TASK2_BACK_RECOVER;
+      //   task2_last_switch_time = status->state.time;
+      //   task2_square_dir = 1;
+      //   break;
+      // }
 
       balance_out = compute_pid(balance_param, angle_error);
       car_speed = ((float)status->motor.wheel[0].cur_speed
