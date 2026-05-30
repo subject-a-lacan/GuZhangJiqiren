@@ -8,18 +8,18 @@ extern uint8_t left_cnt;
 extern uint8_t cross_delay;
 extern Road road_buf;
 
-#define TASK2_CAPTURE_ANGLE_DEG   3.0f
-#define TASK2_FALLBACK_ANGLE_DEG  16.0f
+#define TASK2_BACK_RECOVER_ANGLE  -20.0f
 
-int16_t  task2_swing_speed_fwd = 2000;
-int16_t  task2_swing_speed_bwd = 1000;
-uint32_t task2_swing_time_fwd  = 200;
-uint32_t task2_swing_time_bwd  = 800;
-uint8_t task2_direct_pwm = 0;
+int16_t  task2_front_kick_pwm  = 2500;
+uint32_t task2_front_kick_time = 100;
+int16_t  task2_recover_pwm     = 2000;
+uint32_t task2_recover_time    = 100;
+uint8_t  task2_direct_pwm      = 0;
 
 typedef enum {
-  TASK2_SWING_UP = 0,
-  TASK2_BALANCE_PD,
+  TASK2_FRONT_KICK = 0,
+  TASK2_BALANCE_LQR,
+  TASK2_BACK_RECOVER,
 } TASK2_STATE;
 
 static TASK2_STATE task2_state;
@@ -67,10 +67,9 @@ void init_task(TASK *task) {
   task->phase_mileage = 0;
 }
 
-static void task2_enter_swing_up(STATUS *status) {
-  task2_state = TASK2_SWING_UP;
+static void task2_enter_front_kick(STATUS *status) {
+  task2_state = TASK2_FRONT_KICK;
   task2_last_switch_time = status->state.time;
-  task2_square_dir = -1;
   task2_direct_pwm = 1;
   (void)status;
 }
@@ -110,7 +109,7 @@ void task_start(STATUS *status) {
     case TASK_BASIC_2:
       apply_basic_control_param(status);
       task2_car_position = 0;
-      task2_enter_swing_up(status);
+      task2_enter_front_kick(status);
       break;
     case TASK_ADV_1:   break;
     case TASK_ADV_2:   break;
@@ -188,12 +187,11 @@ static void driver_task1(STATUS *status) {
 
 static void driver_task2(STATUS *status) {
   float roll = get_gyr_value(&status->sensor.gy901, gyr_x_roll);
-  float target_roll = 0.0f;
-  float angle_error = target_roll - roll;
+  float angle_error = 0.0f - roll;
   float balance_out;
   float car_speed;
   float position_out;
-  int16_t swing_pwm;
+  int16_t kick_pwm;
   PID *balance_param = &status->state.status_pid.balance_pid;
   PID *mileage_param = &status->state.status_pid.mileage_pid;
 
@@ -202,33 +200,40 @@ static void driver_task2(STATUS *status) {
   task2_direct_pwm = 1;
 
   switch (task2_state) {
-    case TASK2_SWING_UP:
-      if (ABS(angle_error) < TASK2_CAPTURE_ANGLE_DEG) {
-        task2_state = TASK2_BALANCE_PD;
+    case TASK2_FRONT_KICK:
+      if (status->state.time - task2_last_switch_time >= task2_front_kick_time) {
+        task2_state = TASK2_BALANCE_LQR;
         balance_param->is_first = 1;
+        /* fall through to LQR */
       } else {
-        {
-          uint32_t phase_time = (task2_square_dir == 1)
-                                ? task2_swing_time_fwd : task2_swing_time_bwd;
-          if (status->state.time - task2_last_switch_time >= phase_time) {
-            task2_last_switch_time = status->state.time;
-            task2_square_dir = -task2_square_dir;
-          }
-        }
-
-        swing_pwm = (task2_square_dir == 1)
-                    ? task2_swing_speed_fwd : -task2_swing_speed_bwd;
+        kick_pwm = task2_front_kick_pwm;
         status->state.motion = STRAIGHT;
         status->state.base_speed = 0;
-        task2_set_pwm(swing_pwm);
+        task2_set_pwm(kick_pwm);
         break;
       }
-      /* Fall through to run balance PD in the same control tick. */
 
-    case TASK2_BALANCE_PD:
+    case TASK2_BACK_RECOVER:
+      if (status->state.time - task2_last_switch_time >= task2_recover_time) {
+        task2_last_switch_time = status->state.time;
+        task2_square_dir = -task2_square_dir;
+        if (task2_square_dir == 1) {
+          task2_state = TASK2_BALANCE_LQR;
+          balance_param->is_first = 1;
+        }
+      }
+      kick_pwm = (task2_square_dir == 1) ? task2_recover_pwm : -task2_recover_pwm;
+      status->state.motion = STRAIGHT;
+      status->state.base_speed = 0;
+      task2_set_pwm(kick_pwm);
+      break;
+
+    case TASK2_BALANCE_LQR:
     default:
-      if (ABS(angle_error) > TASK2_FALLBACK_ANGLE_DEG) {
-        task2_enter_swing_up(status);
+      if (roll < TASK2_BACK_RECOVER_ANGLE) {
+        task2_state = TASK2_BACK_RECOVER;
+        task2_last_switch_time = status->state.time;
+        task2_square_dir = 1;
         break;
       }
 

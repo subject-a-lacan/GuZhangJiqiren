@@ -64,10 +64,10 @@
 /* USER CODE BEGIN PV */
 int16_t cmd_speed = 12;
 extern uint8_t cross_cnt;
-extern int16_t  task2_swing_speed_fwd;
-extern int16_t  task2_swing_speed_bwd;
-extern uint32_t task2_swing_time_fwd;
-extern uint32_t task2_swing_time_bwd;
+extern int16_t  task2_front_kick_pwm;
+extern uint32_t task2_front_kick_time;
+extern int16_t  task2_recover_pwm;
+extern uint32_t task2_recover_time;
 extern uint8_t  task2_direct_pwm;
 /* USER CODE END PV */
 
@@ -241,10 +241,10 @@ void UART_PID_Tune(uint8_t cmd, float val) {
     case 'j': status.state.status_pid.mileage_pid.kp = val;  break;
     case 'l': status.state.status_pid.mileage_pid.kd = val;  break;
 
-    case 'p': task2_swing_speed_fwd = (int16_t)val;     break;
-    case 'r': task2_swing_time_fwd  = (uint32_t)val;    break;
-    case 't': task2_swing_speed_bwd = (int16_t)val;     break;
-    case 'v': task2_swing_time_bwd  = (uint32_t)val;    break;
+    case 'p': task2_front_kick_pwm  = (int16_t)val;     break;
+    case 'r': task2_front_kick_time = (uint32_t)val;    break;
+    case 't': task2_recover_pwm     = (int16_t)val;     break;
+    case 'v': task2_recover_time    = (uint32_t)val;    break;
 
     case 'b': status.motor.wheel[0].wheel_pid.integral_max = val;  break;
     case 'n': status.motor.wheel[1].wheel_pid.integral_max = val;  break;
