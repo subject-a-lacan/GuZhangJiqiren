@@ -9,11 +9,11 @@ extern uint8_t cross_delay;
 extern Road road_buf;
 
 #define TASK2_CAPTURE_ANGLE_DEG   10.0f
-#define TASK2_FALLBACK_ANGLE_DEG  15.0f
+#define TASK2_FALLBACK_ANGLE_DEG  16.0f
 
 int16_t  task2_swing_speed_fwd = 3000;
-int16_t  task2_swing_speed_bwd = 1400;
-uint32_t task2_swing_time_fwd  = 200;
+int16_t  task2_swing_speed_bwd = 1200;
+uint32_t task2_swing_time_fwd  = 230;
 uint32_t task2_swing_time_bwd  = 800;
 uint8_t task2_direct_pwm = 0;
 
