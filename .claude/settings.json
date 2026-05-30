@@ -8,7 +8,10 @@
       "Bash(python3 -c ' *)",
       "Read(//d/KEIL_CUBE_VS/idn/**)",
       "Bash(awk -F',' '{sum+=$10; n++} END {printf \"average = %.2f, n = %d\\\\n\", sum/n, n}' ADC.md)",
-      "Bash(awk -F',' '{sum+=$10; n++} END {printf \"%.2f\\\\n\", sum/n}' ADC.md)"
+      "Bash(awk -F',' '{sum+=$10; n++} END {printf \"%.2f\\\\n\", sum/n}' ADC.md)",
+      "Bash(sed -i '141s/^/\\\\/\\\\/ /' Core/Src/main.c)",
+      "Bash(sed -i '142s/^/\\\\/\\\\/ /' Core/Src/main.c)",
+      "Bash(sed -i '143s/^/\\\\/\\\\/ /' Core/Src/main.c)"
     ]
   }
 }

@@ -115,13 +115,13 @@ void MX_ADC5_Init(void)
   hadc5.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc5.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc5.Init.LowPowerAutoWait = DISABLE;
-  hadc5.Init.ContinuousConvMode = DISABLE;
+  hadc5.Init.ContinuousConvMode = ENABLE;
   hadc5.Init.NbrOfConversion = 1;
   hadc5.Init.DiscontinuousConvMode = DISABLE;
   hadc5.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc5.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc5.Init.DMAContinuousRequests = DISABLE;
-  hadc5.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  hadc5.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
   hadc5.Init.OversamplingMode = DISABLE;
   if (HAL_ADC_Init(&hadc5) != HAL_OK)
   {

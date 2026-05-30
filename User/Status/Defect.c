@@ -12,7 +12,7 @@ extern Road road_buf;
 #define TASK2_BACK_RECOVER_ANGLE  -20.0f
 #define TASK2_POT_ADC_ZERO        3533.578947f
 #define TASK2_POT_DEG_PER_ADC     0.3600993f
-#define TASK2_POT_LPF_ALPHA       0.20f
+#define TASK2_POT_LPF_ALPHA       0.45f
 
 int16_t  task2_front_kick_pwm  = 2800;
 uint32_t task2_front_kick_time = 250;
@@ -43,12 +43,7 @@ static float task2_adc_to_angle(float adc) {
 static float task2_update_pot_angle(void) {
   float raw_angle;
 
-  if (HAL_ADC_PollForConversion(&hadc5, 0) != HAL_OK) {
-    return task2_pot_angle;
-  }
-
   raw_angle = task2_adc_to_angle((float)HAL_ADC_GetValue(&hadc5));
-  HAL_ADC_Start(&hadc5);
 
   if (!task2_pot_angle_inited) {
     task2_pot_angle = raw_angle;
@@ -115,7 +110,7 @@ float get_task2_state_debug(void) {
 }
 
 float get_task2_pot_angle_debug(void) {
-  return task2_update_pot_angle();
+  return task2_adc_to_angle((float)HAL_ADC_GetValue(&hadc5));
 }
 
 void init_task(TASK *task) {
@@ -238,9 +233,17 @@ void task_select(STATUS *status, uint8_t id) {
 static uint8_t t1_black_frames = 0;
 
 static void driver_task1(STATUS *status) {
+  float dist_cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
+
   status->task.task_running = 1;
   status->state.motion = FIND_LINE;
-  status->state.base_speed = 10;
+
+  if (dist_cm >= 101.0f) {
+    task_finish(status);
+    return;
+  }
+
+  status->state.base_speed = (dist_cm < 60.0f) ? 14 : 6;
 
   uint8_t mid4 = status->sensor.gw_analogue.digital_8bit & 0x3C;
   uint8_t black = ((mid4 & 0x04) != 0)
@@ -254,8 +257,7 @@ static void driver_task1(STATUS *status) {
     t1_black_frames = 0;
   }
 
-  if (t1_black_frames >= 3
-      && encoder_pulse_to_cm((int32_t)status->task.phase_mileage) > 99.0f) {
+  if (t1_black_frames >= 3 && dist_cm > 99.0f) {
     task_finish(status);
   }
 }
@@ -288,7 +290,8 @@ static void driver_task2(STATUS *status) {
       }
 
     case TASK2_FRONT_KICK:
-      if (status->state.time - task2_last_switch_time >= task2_front_kick_time) {
+      if (status->state.time - task2_last_switch_time >= task2_front_kick_time
+          || ABS(roll) < 8.0f) {
         task2_state = TASK2_BALANCE_LQR;
         balance_param->is_first = 1;
         /* fall through to LQR */

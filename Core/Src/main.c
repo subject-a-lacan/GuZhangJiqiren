@@ -138,12 +138,12 @@ int main(void)
   MX_ADC5_Init();
   /* USER CODE BEGIN 2 */
   init_status(&status, 1);
-  get_gyr_raw_data_dma(&hi2c1, &status.sensor.gy901);
-  HAL_Delay(10);
-  after_init_state();
+//   get_gyr_raw_data_dma(&hi2c1, &status.sensor.gy901);
+//   HAL_Delay(10);
+//   after_init_state();
   status.state.motion = STOP;
   init_uart_pid_tune_it(); // USART1/USART2/USART3 receive PID tune commands.
-  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  ESP8266_Init("F521F520","f521f520","192.168.112.85","8080");
   HAL_ADC_Start(&hadc5);
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
@@ -155,20 +155,20 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Balance_Debug_Print, 100)
-      PID *bp = &status.state.status_pid.balance_pid;
-      PID *mp = &status.state.status_pid.mileage_pid;
-      float pot_angle = get_task2_pot_angle_debug();
-      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
-             (double)bp->kp,
-             (double)bp->ki,
-             (double)bp->kd,
-             (double)status.motor.wheel[0].trust,
-             (double)mp->kp,
-             (double)mp->kd,
-             (double)pot_angle,
-             (double)HAL_ADC_GetValue(&hadc5));
-    PERIODIC_END
+    // PERIODIC_START(Balance_Debug_Print, 100)
+    //   PID *bp = &status.state.status_pid.balance_pid;
+    //   PID *mp = &status.state.status_pid.mileage_pid;
+    //   float pot_angle = get_task2_pot_angle_debug();
+    //   printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+    //          (double)bp->kp,
+    //          (double)bp->ki,
+    //          (double)bp->kd,
+    //          (double)status.motor.wheel[0].trust,
+    //          (double)mp->kp,
+    //          (double)mp->kd,
+    //          (double)pot_angle,
+    //          (double)HAL_ADC_GetValue(&hadc5));
+    // PERIODIC_END
     
   }
   /* USER CODE END 3 */

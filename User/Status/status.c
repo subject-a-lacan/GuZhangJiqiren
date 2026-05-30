@@ -125,9 +125,9 @@ void init_state(STATUS *status, uint8_t T) {
  *       初始化保角 PID，这几个数字决定转向纠偏力度和稳定性，后续都可调
  */
 void init_status_pid(STATUS *status) {
-  status->state.status_pid.follow_line_pid = init_pid(1.8, 0.012, 0.4, 8,1, 0.0f);
+  status->state.status_pid.follow_line_pid = init_pid(1.8, 0.006, 0.4, 8,1, 0.0f);
   status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 8,1, 0.0f);
-  status->state.status_pid.balance_pid = init_pid(20, 0, 0, 8,1, 0.0f);
+  status->state.status_pid.balance_pid = init_pid(80, 0, 300, 8,1, 0.0f);
   status->state.status_pid.mileage_pid = init_pid(0, 0, 0, 8,1, 0.0f);
   status->state.status_pid.angle_output_limit = 25.0f;
 }
@@ -278,10 +278,10 @@ void update_status(STATUS *status) {
   status->motor.wheel[1].cur_speed = get_wheel_speed(&status->motor.wheel[1]);
   status->motor.wheel[2].cur_speed = get_wheel_speed(&status->motor.wheel[2]);
   status->motor.wheel[3].cur_speed = get_wheel_speed(&status->motor.wheel[3]);
-  if (gyro_dma_ready) {
-    gyro_dma_ready = 0;
-  }
-  status->state.cur_angle = get_gyr_value(&status->sensor.gy901, gyr_z_yaw);
+  // if (gyro_dma_ready) {
+  //   gyro_dma_ready = 0;
+  // }
+  // status->state.cur_angle = get_gyr_value(&status->sensor.gy901, gyr_z_yaw);
 
   
 
@@ -339,9 +339,9 @@ void update_status(STATUS *status) {
     driver_wheel(&status->motor.wheel[1]);
   }
 
-  if (!gyro_dma_busy) {
-    get_gyr_raw_data_dma(&hi2c1, &status->sensor.gy901);
-  }
+  // if (!gyro_dma_busy) {
+  //   get_gyr_raw_data_dma(&hi2c1, &status->sensor.gy901);
+  // }
 
   return;
 }
