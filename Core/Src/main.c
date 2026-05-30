@@ -152,12 +152,17 @@ int main(void)
     PERIODIC_START(Balance_Debug_Print, 80)
       float roll = get_gyr_value(&status.sensor.gy901, gyr_x_roll);
       PID *bp = &status.state.status_pid.balance_pid;
-      printf("%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+      PID *mp = &status.state.status_pid.mileage_pid;
+      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
              (double)roll,
              (double)bp->kp,
              (double)bp->ki,
              (double)bp->kd,
-             (double)bp->out);
+             (double)bp->out,
+             (double)status.motor.wheel[0].trust,
+             (double)mp->kp,
+             (double)mp->kd,
+             (double)get_task2_state_debug());
     PERIODIC_END
     
   }

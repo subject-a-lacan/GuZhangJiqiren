@@ -12,9 +12,9 @@ extern Road road_buf;
 #define TASK2_FALLBACK_ANGLE_DEG  16.0f
 
 int16_t  task2_swing_speed_fwd = 3000;
-int16_t  task2_swing_speed_bwd = 1200;
-uint32_t task2_swing_time_fwd  = 230;
-uint32_t task2_swing_time_bwd  = 800;
+int16_t  task2_swing_speed_bwd = 3000;
+uint32_t task2_swing_time_fwd  = 60;
+uint32_t task2_swing_time_bwd  = 140;
 uint8_t task2_direct_pwm = 0;
 
 typedef enum {
@@ -25,6 +25,7 @@ typedef enum {
 static TASK2_STATE task2_state;
 static uint32_t task2_last_switch_time;
 static int8_t  task2_square_dir;
+static float task2_car_position;
 
 static void task2_set_pwm(int16_t pwm) {
   pwm = CONFINE(pwm, -TRUST_CONFINE, TRUST_CONFINE);
@@ -37,6 +38,10 @@ static void task2_set_pwm(int16_t pwm) {
 
   __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, ABS(pwm));
   __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, ABS(pwm));
+}
+
+float get_task2_state_debug(void) {
+  return (float)task2_state;
 }
 
 void init_task(TASK *task) {
@@ -104,6 +109,7 @@ void task_start(STATUS *status) {
       break;
     case TASK_BASIC_2:
       apply_basic_control_param(status);
+      task2_car_position = 0;
       task2_enter_swing_up(status);
       break;
     case TASK_ADV_1:   break;
@@ -185,8 +191,11 @@ static void driver_task2(STATUS *status) {
   float target_roll = 0.0f;
   float angle_error = target_roll - roll;
   float balance_out;
+  float car_speed;
+  float position_out;
   int16_t swing_pwm;
   PID *balance_param = &status->state.status_pid.balance_pid;
+  PID *mileage_param = &status->state.status_pid.mileage_pid;
 
   status->task.task_running = 1;
   status->task.stop_cmd = 0;
@@ -224,9 +233,13 @@ static void driver_task2(STATUS *status) {
       }
 
       balance_out = compute_pid(balance_param, angle_error);
+      car_speed = ((float)status->motor.wheel[0].cur_speed
+                 + (float)status->motor.wheel[1].cur_speed) / 2.0f;
+      position_out = -(mileage_param->kp * task2_car_position
+                     + mileage_param->kd * car_speed);
       status->state.motion = STRAIGHT;
       status->state.base_speed = 0;
-      task2_set_pwm((int16_t)balance_out);
+      task2_set_pwm((int16_t)(balance_out + position_out));
       break;
   }
 }
@@ -310,6 +323,9 @@ void update_task(STATUS *status) {
 
   int32_t wheel0_pulse = status->motor.wheel[0].cur_speed;
   int32_t wheel1_pulse = status->motor.wheel[1].cur_speed;
+  if (status->task.task_id == TASK_BASIC_2) {
+    task2_car_position += ((float)wheel0_pulse + (float)wheel1_pulse) / 2.0f;
+  }
   if (wheel0_pulse < 0) wheel0_pulse = -wheel0_pulse;
   if (wheel1_pulse < 0) wheel1_pulse = -wheel1_pulse;
   status->task.phase_mileage += ((float)wheel0_pulse + (float)wheel1_pulse) / 2.0f;

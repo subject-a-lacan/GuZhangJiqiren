@@ -127,7 +127,7 @@ void init_state(STATUS *status, uint8_t T) {
 void init_status_pid(STATUS *status) {
   status->state.status_pid.follow_line_pid = init_pid(1.8, 0.012, 0.4, 8,1, 0.0f);
   status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 8,1, 0.0f);
-  status->state.status_pid.balance_pid = init_pid(0, 0, 0, 8,1, 0.0f);
+  status->state.status_pid.balance_pid = init_pid(6000, 0, 0, 8,1, 0.0f);
   status->state.status_pid.mileage_pid = init_pid(0, 0, 0, 8,1, 0.0f);
   status->state.status_pid.angle_output_limit = 25.0f;
 }
