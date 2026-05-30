@@ -64,6 +64,7 @@ volatile int16_t cmd_left_pwm = 0;
 volatile int16_t cmd_right_pwm = 0;
 volatile int16_t actual_speed0 = 0;
 volatile int16_t actual_speed1 = 0;
+volatile uint8_t actual_speed_ready = 0;
 volatile uint32_t rx_count = 0;
 volatile uint8_t last_rx = 0;
 
@@ -91,12 +92,48 @@ static uint16_t abs_pwm(int16_t pwm) {
   return (pwm < 0) ? (uint16_t)(-pwm) : (uint16_t)pwm;
 }
 
+static int16_t compensate_wheel0_pwm(int16_t pwm) {
+  float abs_value = (float)abs_pwm(pwm);
+  float out;
+
+  if (pwm == 0) return 0;
+
+  if (pwm > 0) {
+    out = 1.0232f * abs_value + 71.80f;
+    if (out < 185.0f) out = 185.0f;
+  } else {
+    out = 1.0697f * abs_value + 112.40f;
+    if (out < 182.0f) out = 182.0f;
+  }
+
+  if (out > TRUST_CONFINE) out = TRUST_CONFINE;
+  return (pwm > 0) ? (int16_t)out : -(int16_t)out;
+}
+
+static int16_t compensate_wheel1_pwm(int16_t pwm) {
+  float abs_value = (float)abs_pwm(pwm);
+  float out;
+
+  if (pwm == 0) return 0;
+
+  if (pwm > 0) {
+    out = 0.9778f * abs_value - 68.61f;
+    if (out < 175.0f) out = 175.0f;
+  } else {
+    out = 0.9388f * abs_value - 98.65f;
+    if (out < 173.0f) out = 173.0f;
+  }
+
+  if (out > TRUST_CONFINE) out = TRUST_CONFINE;
+  return (pwm > 0) ? (int16_t)out : -(int16_t)out;
+}
+
 static char feedforward_cmd_buf[16];
 static uint8_t feedforward_cmd_len = 0;
 
 static void set_feedforward_pwm(void) {
-  int16_t left_pwm  = clamp_pwm(cmd_left_pwm);
-  int16_t right_pwm = clamp_pwm(cmd_right_pwm);
+  int16_t left_pwm  = compensate_wheel0_pwm(clamp_pwm(cmd_left_pwm));
+  int16_t right_pwm = compensate_wheel1_pwm(clamp_pwm(cmd_right_pwm));
 
   status.motor.wheel[0].trust = left_pwm;
   status.motor.wheel[1].trust = right_pwm;
@@ -203,6 +240,25 @@ static void poll_feedforward_cmd(uint32_t duration_ms) {
   feedforward_cmd_apply();
 }
 
+static void print_speed_if_ready(void) {
+  char line[32];
+  int len;
+  int16_t speed0;
+  int16_t speed1;
+
+  if (!actual_speed_ready) {
+    return;
+  }
+
+  actual_speed_ready = 0;
+  speed0 = actual_speed0;
+  speed1 = actual_speed1;
+  len = snprintf(line, sizeof(line), "%d,%d\r\n", speed0, speed1);
+  if (len > 0) {
+    HAL_UART_Transmit(&huart1, (uint8_t *)line, (uint16_t)len, 4);
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -276,13 +332,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
     poll_feedforward_cmd(2);
     set_feedforward_pwm();
-    {
-      static uint32_t last_print = 0;
-      if (HAL_GetTick() - last_print >= 100) {
-        last_print = HAL_GetTick();
-        printf("%d,%d\r\n", actual_speed0, actual_speed1);
-      }
-    }
+    print_speed_if_ready();
   }
   /* USER CODE END 3 */
 }

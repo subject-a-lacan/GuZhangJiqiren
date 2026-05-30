@@ -3,9 +3,9 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sun May 31 00:56:02 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sun May 31 04:06:15 2026
 <BR><P>
-<H3>Maximum Stack Usage =        292 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        324 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 <P>
@@ -18,7 +18,6 @@ Mutually Recursive functions
  <LI><a href="#[1]">NMI_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[1]">NMI_Handler</a><BR>
  <LI><a href="#[d7]">UART_EndRxTransfer</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[d7]">UART_EndRxTransfer</a><BR>
  <LI><a href="#[5]">UsageFault_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[5]">UsageFault_Handler</a><BR>
- <LI><a href="#[7d]">fputc</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[7d]">fputc</a><BR>
 </UL>
 <P>
 <H3>
@@ -146,8 +145,8 @@ Function Pointers
  <LI><a href="#[73]">_sbackspace</a> from _sgetc.o(.text) referenced from __0sscanf.o(.text)
  <LI><a href="#[74]">_scanf_char_input</a> from scanf_char.o(.text) referenced from scanf_char.o(.text)
  <LI><a href="#[72]">_sgetc</a> from _sgetc.o(.text) referenced from __0sscanf.o(.text)
+ <LI><a href="#[7d]">_snputc</a> from printfa.o(i._snputc) referenced from printfa.o(i.__0snprintf)
  <LI><a href="#[7e]">_sputc</a> from printfa.o(i._sputc) referenced from printfa.o(i.__0sprintf)
- <LI><a href="#[7d]">fputc</a> from main.o(.text.fputc) referenced from printfa.o(i.__0printf)
  <LI><a href="#[75]">isspace</a> from isspace_o.o(.text) referenced from scanf_char.o(.text)
  <LI><a href="#[6f]">main</a> from main.o(.text.main) referenced from entry9a.o(.ARM.Collect$$$$0000000B)
  <LI><a href="#[76]">uart1_tx</a> from lora.o(.text.uart1_tx) referenced from lora.o(.text.ESP8266_Init)
@@ -504,10 +503,10 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[8b]"></a>__aeabi_dadd</STRONG> (Thumb, 322 bytes, Stack size 48 bytes, dadd.o(.text), UNUSED)
-<BR><BR>[Calls]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_lasr
-<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
+<BR><BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
 <LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
+<LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_lasr
 </UL>
 <BR>[Called By]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_drsub
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dsub
@@ -868,9 +867,9 @@ Global Symbols
 <P><STRONG><a name="[a5]"></a>HAL_GetTick</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_hal.o(.text.HAL_GetTick))
 <BR><BR>[Called By]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCCEx_PeriphCLKConfig
 <LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_OscConfig
 <LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_ClockConfig
-<LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 <LI><a href="#[e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
 <LI><a href="#[e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_CheckIdleState
@@ -1236,7 +1235,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[105]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
 </UL>
 
-<P><STRONG><a name="[bf]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 80 bytes, Stack size 8 bytes, timer_it.o(.text.HAL_TIM_PeriodElapsedCallback))
+<P><STRONG><a name="[bf]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 92 bytes, Stack size 8 bytes, timer_it.o(.text.HAL_TIM_PeriodElapsedCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; get_wheel_speed
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_wheel_speed
@@ -1351,7 +1350,8 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 <LI><a href="#[e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Called By]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart1_tx
+<BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart1_tx
 </UL>
 
 <P><STRONG><a name="[de]"></a>HAL_UART_TxCpltCallback</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32g4xx_hal_uart.o(.text.HAL_UART_TxCpltCallback))
@@ -1714,13 +1714,6 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
 </UL>
-<P><STRONG><a name="[7d]"></a>fputc</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, main.o(.text.fputc))
-<BR><BR>[Calls]<UL><LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fputc
-</UL>
-<BR>[Called By]<UL><LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fputc
-</UL>
-<BR>[Address Reference Count : 1]<UL><LI> printfa.o(i.__0printf)
-</UL>
 <P><STRONG><a name="[d2]"></a>get_wheel_speed</STRONG> (Thumb, 80 bytes, Stack size 8 bytes, wheel.o(.text.get_wheel_speed))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = get_wheel_speed
 </UL>
@@ -1742,8 +1735,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 476 bytes, Stack size 40 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 292<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
+<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 504 bytes, Stack size 72 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 324<LI>Call Chain = main &rArr; MX_ADC3_Init &rArr; HAL_ADC_Init &rArr; HAL_ADC_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[105]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
 <LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
@@ -1765,6 +1758,7 @@ Global Symbols
 <LI><a href="#[10a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_GPIO_Init
 <LI><a href="#[10b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_DMA_Init
 <LI><a href="#[e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_ADC3_Init
+<LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Start_IT
 <LI><a href="#[10c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_NVIC_DisableIRQ
 <LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
@@ -1772,7 +1766,7 @@ Global Symbols
 <LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Init
 <LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_feedforward_pwm
 <LI><a href="#[103]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;feedforward_cmd_apply
-<LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
+<LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
 </UL>
@@ -1784,21 +1778,21 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_feedforward_pwm
 </UL>
 
-<P><STRONG><a name="[110]"></a>__0printf</STRONG> (Thumb, 22 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
+<P><STRONG><a name="[110]"></a>__0snprintf</STRONG> (Thumb, 44 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
-<P><STRONG><a name="[129]"></a>__1printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
+<P><STRONG><a name="[129]"></a>__1snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
 
-<P><STRONG><a name="[10e]"></a>__2printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = __2printf
+<P><STRONG><a name="[10e]"></a>__2snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf))
+<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = __2snprintf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[12a]"></a>__c89printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
+<P><STRONG><a name="[12a]"></a>__c89snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
 
-<P><STRONG><a name="[12b]"></a>printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
+<P><STRONG><a name="[12b]"></a>snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
 
 <P><STRONG><a name="[112]"></a>__0sprintf</STRONG> (Thumb, 34 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_sputc
@@ -1826,7 +1820,7 @@ Global Symbols
 <H3>
 Local Symbols
 </H3>
-<P><STRONG><a name="[103]"></a>feedforward_cmd_apply</STRONG> (Thumb, 200 bytes, Stack size 24 bytes, main.o(.text.feedforward_cmd_apply))
+<P><STRONG><a name="[103]"></a>feedforward_cmd_apply</STRONG> (Thumb, 196 bytes, Stack size 24 bytes, main.o(.text.feedforward_cmd_apply))
 <BR><BR>[Stack]<UL><LI>Max Depth = 240<LI>Call Chain = feedforward_cmd_apply &rArr; __0sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_int
 </UL>
 <BR>[Calls]<UL><LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_feedforward_pwm
@@ -1835,8 +1829,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[104]"></a>set_feedforward_pwm</STRONG> (Thumb, 124 bytes, Stack size 16 bytes, main.o(.text.set_feedforward_pwm))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = set_feedforward_pwm &rArr; set_wheel_dir
+<P><STRONG><a name="[104]"></a>set_feedforward_pwm</STRONG> (Thumb, 500 bytes, Stack size 24 bytes, main.o(.text.set_feedforward_pwm))
+<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = set_feedforward_pwm &rArr; set_wheel_dir
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_wheel_dir
 </UL>
@@ -1941,7 +1935,7 @@ Local Symbols
 <LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uldivmod
 </UL>
 <BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sprintf
-<LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0printf
+<LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0snprintf
 </UL>
 
 <P><STRONG><a name="[116]"></a>_printf_post_padding</STRONG> (Thumb, 36 bytes, Stack size 24 bytes, printfa.o(i._printf_post_padding), UNUSED)
@@ -1952,6 +1946,9 @@ Local Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
+<P><STRONG><a name="[7d]"></a>_snputc</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, printfa.o(i._snputc))
+<BR>[Address Reference Count : 1]<UL><LI> printfa.o(i.__0snprintf)
+</UL>
 <P><STRONG><a name="[7e]"></a>_sputc</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, printfa.o(i._sputc))
 <BR><BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sprintf
 </UL>

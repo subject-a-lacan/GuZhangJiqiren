@@ -17,6 +17,7 @@ extern int32_t keep_angle_time;  // 保持角度时间
 extern uint8_t speed_show_flag;  // 显示速度标志位
 extern volatile int16_t actual_speed0;
 extern volatile int16_t actual_speed1;
+extern volatile uint8_t actual_speed_ready;
 uint8_t is_init = 0;
 
 uint8_t maixcam[3] = {0xAA, 0x02, 0xBB};
@@ -158,6 +159,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim == &htim5 && status.state.time % 8 == 0) {
       actual_speed0 = get_wheel_speed(&status.motor.wheel[0]);
       actual_speed1 = get_wheel_speed(&status.motor.wheel[1]);
+      actual_speed_ready = 1;
     }
   //   if (status.state.time % 100 == 0) {  // 周期 100ms
   //     log_uprintf(&huart4, "n0.val=%d\xff\xff\xff", (int)(0.83 * ((status.motor.wheel[0].cur_speed + status.motor.wheel[1].cur_speed) / 2)));
