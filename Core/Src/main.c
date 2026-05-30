@@ -118,7 +118,6 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_ADC3_Init();
-  MX_I2C2_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
@@ -133,6 +132,7 @@ int main(void)
   MX_TIM6_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
+  MX_ADC5_Init();
   /* USER CODE BEGIN 2 */
   init_status(&status, 1);
   get_gyr_raw_data_dma(&hi2c1, &status.sensor.gy901);
