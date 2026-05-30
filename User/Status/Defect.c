@@ -12,7 +12,7 @@ extern Road road_buf;
 #define TASK2_BACK_RECOVER_ANGLE  -20.0f
 #define TASK2_POT_ADC_ZERO        3533.578947f
 #define TASK2_POT_DEG_PER_ADC     0.3600993f
-#define TASK2_POT_LPF_ALPHA       0.45f
+#define TASK2_POT_LPF_ALPHA       0.80f
 
 int16_t  task2_front_kick_pwm  = 2800;
 uint32_t task2_front_kick_time = 250;
