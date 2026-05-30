@@ -8,13 +8,13 @@ extern uint8_t left_cnt;
 extern uint8_t cross_delay;
 extern Road road_buf;
 
-#define TASK2_CAPTURE_ANGLE_DEG   6.0f
-#define TASK2_FALLBACK_ANGLE_DEG  20.0f
+#define TASK2_CAPTURE_ANGLE_DEG   10.0f
+#define TASK2_FALLBACK_ANGLE_DEG  15.0f
 
 int16_t  task2_swing_speed_fwd = 3000;
 int16_t  task2_swing_speed_bwd = 1400;
-uint32_t task2_swing_time_fwd  = 300;
-uint32_t task2_swing_time_bwd  = 600;
+uint32_t task2_swing_time_fwd  = 200;
+uint32_t task2_swing_time_bwd  = 800;
 uint8_t task2_direct_pwm = 0;
 
 typedef enum {
@@ -197,24 +197,24 @@ static void driver_task2(STATUS *status) {
       if (ABS(angle_error) < TASK2_CAPTURE_ANGLE_DEG) {
         task2_state = TASK2_BALANCE_PD;
         balance_param->is_first = 1;
+      } else {
+        {
+          uint32_t phase_time = (task2_square_dir == 1)
+                                ? task2_swing_time_fwd : task2_swing_time_bwd;
+          if (status->state.time - task2_last_switch_time >= phase_time) {
+            task2_last_switch_time = status->state.time;
+            task2_square_dir = -task2_square_dir;
+          }
+        }
+
+        swing_pwm = (task2_square_dir == 1)
+                    ? task2_swing_speed_fwd : -task2_swing_speed_bwd;
+        status->state.motion = STRAIGHT;
+        status->state.base_speed = 0;
+        task2_set_pwm(swing_pwm);
         break;
       }
-
-      {
-        uint32_t phase_time = (task2_square_dir == 1)
-                              ? task2_swing_time_fwd : task2_swing_time_bwd;
-        if (status->state.time - task2_last_switch_time >= phase_time) {
-          task2_last_switch_time = status->state.time;
-          task2_square_dir = -task2_square_dir;
-        }
-      }
-
-      swing_pwm = (task2_square_dir == 1)
-                  ? task2_swing_speed_fwd : -task2_swing_speed_bwd;
-      status->state.motion = STRAIGHT;
-      status->state.base_speed = 0;
-      task2_set_pwm(swing_pwm);
-      break;
+      /* Fall through to run balance PD in the same control tick. */
 
     case TASK2_BALANCE_PD:
     default:
