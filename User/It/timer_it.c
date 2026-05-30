@@ -155,7 +155,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   //       status.device.buzzer.on = 0;
   //     }
   //   }
-    if (htim == &htim5 && status.state.time % 20 == 0) {
+    if (htim == &htim5 && status.state.time % 8 == 0) {
       actual_speed0 = get_wheel_speed(&status.motor.wheel[0]);
       actual_speed1 = get_wheel_speed(&status.motor.wheel[1]);
     }

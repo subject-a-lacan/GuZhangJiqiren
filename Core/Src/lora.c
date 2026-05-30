@@ -28,20 +28,20 @@ void ESP8266_Init(char *ssid, char *pwd, char *ip, char *port) {
     // 2. Connect to WiFi
     sprintf(buf, "AT+CWJAP=\"%s\",\"%s\"\r\n", ssid, pwd);
     uart1_tx((uint8_t*)buf, strlen(buf));
-    HAL_Delay(5000);
+    HAL_Delay(10000);
 
     // 3. Set single connection mode
     uart1_tx((uint8_t*)"AT+CIPMUX=0\r\n", 13);
-    HAL_Delay(100);
+    HAL_Delay(1000);
 
     // 4. Establish TCP connection
     sprintf(buf, "AT+CIPSTART=\"TCP\",\"%s\",%s\r\n", ip, port);
     uart1_tx((uint8_t*)buf, strlen(buf));
-    HAL_Delay(500);
+    HAL_Delay(5000);
 
     // 5. Enable transparent mode and start sending
     uart1_tx((uint8_t*)"AT+CIPMODE=1\r\n", 14);
-    HAL_Delay(100);
+    HAL_Delay(1000);
     uart1_tx((uint8_t*)"AT+CIPSEND\r\n", 12);
-    HAL_Delay(100);
+    HAL_Delay(1000);
 }

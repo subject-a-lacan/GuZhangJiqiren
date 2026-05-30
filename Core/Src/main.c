@@ -60,6 +60,8 @@ int fputc(int ch, FILE *f)
 
 /* USER CODE BEGIN PV */
 volatile int16_t cmd_speed = 0;
+volatile int16_t cmd_left_pwm = 0;
+volatile int16_t cmd_right_pwm = 0;
 volatile int16_t actual_speed0 = 0;
 volatile int16_t actual_speed1 = 0;
 volatile uint32_t rx_count = 0;
@@ -93,26 +95,33 @@ static char feedforward_cmd_buf[16];
 static uint8_t feedforward_cmd_len = 0;
 
 static void set_feedforward_pwm(void) {
-  int16_t pwm = clamp_pwm(cmd_speed);
+  int16_t left_pwm  = clamp_pwm(cmd_left_pwm);
+  int16_t right_pwm = clamp_pwm(cmd_right_pwm);
 
-  status.motor.wheel[0].trust = pwm;
-  status.motor.wheel[1].trust = pwm;
+  status.motor.wheel[0].trust = left_pwm;
+  status.motor.wheel[1].trust = right_pwm;
 
-  set_wheel_dir(&status.motor.wheel[0], pwm);
-  set_wheel_dir(&status.motor.wheel[1], pwm);
+  set_wheel_dir(&status.motor.wheel[0], left_pwm);
+  set_wheel_dir(&status.motor.wheel[1], right_pwm);
 
-  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, abs_pwm(pwm));
-  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, abs_pwm(pwm));
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, abs_pwm(left_pwm));
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, abs_pwm(right_pwm));
 }
 
 static void handle_feedforward_cmd(const char *cmd) {
   int value = 0;
+  char which = cmd[0];
 
-  if (cmd[0] != 'C') {
+  if (which >= 'a' && which <= 'z') {
+    which = (char)(which - 'a' + 'A');
+  }
+  if (which != 'C' && which != 'L' && which != 'R') {
     return;
   }
   if (cmd[1] == 'z' || cmd[1] == 'Z') {
     cmd_speed = 0;
+    cmd_left_pwm = 0;
+    cmd_right_pwm = 0;
     return;
   }
   if (sscanf(&cmd[1], "%d", &value) == 1) {
@@ -121,7 +130,19 @@ static void handle_feedforward_cmd(const char *cmd) {
     } else if (value < -TRUST_CONFINE) {
       value = -TRUST_CONFINE;
     }
-    cmd_speed = (int16_t)value;
+    if (which == 'C') {
+      cmd_speed = (int16_t)value;
+      cmd_left_pwm = (int16_t)value;
+      cmd_right_pwm = (int16_t)value;
+    } else if (which == 'L') {
+      cmd_speed = 0;
+      cmd_left_pwm = (int16_t)value;
+      cmd_right_pwm = 0;
+    } else if (which == 'R') {
+      cmd_speed = 0;
+      cmd_left_pwm = 0;
+      cmd_right_pwm = (int16_t)value;
+    }
   }
 }
 
@@ -135,8 +156,8 @@ static void feedforward_cmd_apply(void) {
 }
 
 static void feedforward_cmd_put_char(char ch) {
-  if (ch == 'C' || ch == 'c') {
-    feedforward_cmd_buf[0] = 'C';
+  if (ch == 'C' || ch == 'c' || ch == 'L' || ch == 'l' || ch == 'R' || ch == 'r') {
+    feedforward_cmd_buf[0] = ch;
     feedforward_cmd_len = 1;
     return;
   }
@@ -169,11 +190,11 @@ static void poll_feedforward_cmd(uint32_t duration_ms) {
   uint32_t start = HAL_GetTick();
 
   while (HAL_GetTick() - start < duration_ms) {
-    if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_ORE)) {
-      __HAL_UART_CLEAR_OREFLAG(&huart2);
+    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE)) {
+      __HAL_UART_CLEAR_OREFLAG(&huart1);
     }
-    if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE)) {
-      last_rx = (uint8_t)(huart2.Instance->RDR & 0xff);
+    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE)) {
+      last_rx = (uint8_t)(huart1.Instance->RDR & 0xff);
       rx_count++;
       feedforward_cmd_put_char((char)last_rx);
     }
@@ -253,11 +274,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    poll_feedforward_cmd(100);
+    poll_feedforward_cmd(2);
     set_feedforward_pwm();
-    printf("1");
-    HAL_Delay(100);
-    // log_uprintf(&huart2, "%d,%d,%d,%lu,%u\r\n", cmd_speed, actual_speed0, actual_speed1, (unsigned long)rx_count, last_rx);
+    {
+      static uint32_t last_print = 0;
+      if (HAL_GetTick() - last_print >= 100) {
+        last_print = HAL_GetTick();
+        printf("%d,%d\r\n", actual_speed0, actual_speed1);
+      }
+    }
   }
   /* USER CODE END 3 */
 }
