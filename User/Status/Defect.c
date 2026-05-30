@@ -27,17 +27,46 @@ static uint32_t task2_last_switch_time;
 static int8_t  task2_square_dir;
 static float task2_car_position;
 
+static int16_t task2_compensate_wheel0(int16_t pwm) {
+  float abs_pwm = ABS(pwm);
+  float out;
+
+  if (pwm == 0) return 0;
+
+  out = 1.022564f * abs_pwm + 64.123901f;
+  if (pwm > 0 && out < 201.0f) out = 201.0f;
+  if (pwm < 0 && out < 180.0f) out = 180.0f;
+  out = CONFINE(out, 0, TRUST_CONFINE);
+
+  return (pwm > 0) ? (int16_t)out : -(int16_t)out;
+}
+
+static int16_t task2_compensate_wheel1(int16_t pwm) {
+  float abs_pwm = ABS(pwm);
+  float out;
+
+  if (pwm == 0) return 0;
+
+  out = 0.978411f * abs_pwm - 61.355804f;
+  if (pwm > 0 && out < 255.0f) out = 255.0f;
+  if (pwm < 0 && out < 173.0f) out = 173.0f;
+  out = CONFINE(out, 0, TRUST_CONFINE);
+
+  return (pwm > 0) ? (int16_t)out : -(int16_t)out;
+}
+
 static void task2_set_pwm(int16_t pwm) {
-  pwm = CONFINE(pwm, -TRUST_CONFINE, TRUST_CONFINE);
+  int16_t wheel0_pwm = task2_compensate_wheel0(pwm);
+  int16_t wheel1_pwm = task2_compensate_wheel1(pwm);
 
-  status.motor.wheel[0].trust = pwm;
-  status.motor.wheel[1].trust = pwm;
+  status.motor.wheel[0].trust = wheel0_pwm;
+  status.motor.wheel[1].trust = wheel1_pwm;
 
-  set_wheel_dir(&status.motor.wheel[0], pwm);
-  set_wheel_dir(&status.motor.wheel[1], pwm);
+  set_wheel_dir(&status.motor.wheel[0], wheel0_pwm);
+  set_wheel_dir(&status.motor.wheel[1], wheel1_pwm);
 
-  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, ABS(pwm));
-  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, ABS(pwm));
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, ABS(wheel0_pwm));
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, ABS(wheel1_pwm));
 }
 
 float get_task2_state_debug(void) {
