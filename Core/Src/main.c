@@ -68,6 +68,7 @@ extern int16_t  task2_front_kick_pwm;
 extern uint32_t task2_front_kick_time;
 extern int16_t  task2_back_swing_pwm;
 extern uint32_t task2_back_swing_time;
+extern int16_t  task2_balance_min_pwm;
 extern int16_t  task2_recover_pwm;
 extern uint32_t task2_recover_time;
 extern uint8_t  task2_direct_pwm;
@@ -246,6 +247,7 @@ void UART_PID_Tune(uint8_t cmd, float val) {
 
     case 'A': task2_back_swing_pwm  = (int16_t)val;     break;
     case 'B': task2_back_swing_time = (uint32_t)val;    break;
+    case 'M': task2_balance_min_pwm = (int16_t)val;     break;
     case 'p': task2_front_kick_pwm  = (int16_t)val;     break;
     case 'r': task2_front_kick_time = (uint32_t)val;    break;
     case 't': task2_recover_pwm     = (int16_t)val;     break;

@@ -18,6 +18,7 @@ int16_t  task2_front_kick_pwm  = 2800;
 uint32_t task2_front_kick_time = 250;
 int16_t  task2_back_swing_pwm  = 1600;
 uint32_t task2_back_swing_time = 800;
+int16_t  task2_balance_min_pwm = 1000;
 int16_t  task2_recover_pwm     = 2000;
 uint32_t task2_recover_time    = 100;
 uint8_t  task2_direct_pwm      = 0;
@@ -103,6 +104,23 @@ static void task2_set_pwm(int16_t pwm) {
 
   __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, ABS(wheel0_pwm));
   __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, ABS(wheel1_pwm));
+}
+
+static float task2_apply_min_pwm(float pwm) {
+  const float blend_pwm = 300.0f;
+  float abs_pwm = ABS(pwm);
+  float min_pwm;
+
+  if (abs_pwm <= 1.0f) {
+    return 0.0f;
+  }
+
+  min_pwm = (float)task2_balance_min_pwm;
+  if (abs_pwm < blend_pwm) {
+    min_pwm *= abs_pwm / blend_pwm;
+  }
+
+  return (pwm > 0.0f) ? (pwm + min_pwm) : (pwm - min_pwm);
 }
 
 float get_task2_state_debug(void) {
@@ -268,6 +286,7 @@ static void driver_task2(STATUS *status) {
   float balance_out;
   float car_speed;
   float position_out;
+  float pwm_out;
   int16_t kick_pwm;
   PID *balance_param = &status->state.status_pid.balance_pid;
   PID *mileage_param = &status->state.status_pid.mileage_pid;
@@ -318,7 +337,8 @@ static void driver_task2(STATUS *status) {
                      + mileage_param->kd * car_speed);
       status->state.motion = STRAIGHT;
       status->state.base_speed = 0;
-      task2_set_pwm((int16_t)(balance_out + position_out));
+      pwm_out = task2_apply_min_pwm(balance_out + position_out);
+      task2_set_pwm((int16_t)pwm_out);
       break;
 
     case TASK2_BACK_RECOVER:
