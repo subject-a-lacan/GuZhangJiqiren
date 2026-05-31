@@ -163,23 +163,6 @@ static void task2_set_pwm(int16_t pwm) {
   __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, ABS(wheel1_pwm));
 }
 
-static float task2_apply_min_pwm(float pwm) {
-  const float blend_pwm = 300.0f;
-  float abs_pwm = ABS(pwm);
-  float min_pwm;
-
-  if (abs_pwm <= 1.0f) {
-    return 0.0f;
-  }
-
-  min_pwm = (float)task2_balance_min_pwm;
-  if (abs_pwm < blend_pwm) {
-    min_pwm *= abs_pwm / blend_pwm;
-  }
-
-  return (pwm > 0.0f) ? (pwm + min_pwm) : (pwm - min_pwm);
-}
-
 float get_task2_state_debug(void) {
   return (float)task2_state;
 }
@@ -382,7 +365,7 @@ static void driver_task2(STATUS *status) {
   float pwm_out;
   float d_raw;
   float d_angle_delta;
-  float delta_pwm;
+  float pwm_delta;
   int16_t kick_pwm;
   PID *balance_param = &status->state.status_pid.balance_pid;
   PID *mileage_param = &status->state.status_pid.mileage_pid;
@@ -455,11 +438,11 @@ static void driver_task2(STATUS *status) {
       status->state.motion = STRAIGHT;
       status->state.base_speed = 0;
 
-      task2_debug_raw_pwm = balance_out + position_out;
-      pwm_out = task2_apply_min_pwm(task2_debug_raw_pwm);
-      delta_pwm = pwm_out - task2_last_pwm;
-      delta_pwm = CONFINE(delta_pwm, -TASK2_PWM_SLEW, TASK2_PWM_SLEW);
-      pwm_out = task2_last_pwm + delta_pwm;
+      pwm_delta = balance_out + position_out;
+      pwm_delta = CONFINE(pwm_delta, -TASK2_PWM_SLEW, TASK2_PWM_SLEW);
+      task2_debug_raw_pwm = pwm_delta;
+      pwm_out = task2_last_pwm + pwm_delta;
+      pwm_out = CONFINE(pwm_out, -TRUST_CONFINE, TRUST_CONFINE);
       task2_last_pwm = pwm_out;
       task2_debug_pwm_out = pwm_out;
       task2_set_pwm((int16_t)pwm_out);
