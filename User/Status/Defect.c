@@ -13,12 +13,20 @@ extern Road road_buf;
 #define TASK2_POT_ADC_ZERO        3533.578947f
 #define TASK2_POT_DEG_PER_ADC     0.3600993f
 #define TASK2_POT_LPF_ALPHA       0.80f
+#define TASK2_POT_STEP_LIMIT      4.00f
+#define TASK2_D_DEADBAND          0.50f
+#define TASK2_D_ANGLE_ALPHA       0.12f
+#define TASK2_D_ALPHA             0.08f
+#define TASK2_D_LIMIT             2000.0f
+#define TASK2_D_LOOKBACK          4
+#define TASK2_D_HISTORY_SIZE      (TASK2_D_LOOKBACK + 1)
+#define TASK2_PWM_SLEW            1200.0f
 
 int16_t  task2_front_kick_pwm  = 2800;
 uint32_t task2_front_kick_time = 250;
 int16_t  task2_back_swing_pwm  = 1600;
 uint32_t task2_back_swing_time = 800;
-int16_t  task2_balance_min_pwm = 1000;
+int16_t  task2_balance_min_pwm = 200;
 int16_t  task2_recover_pwm     = 2000;
 uint32_t task2_recover_time    = 100;
 uint8_t  task2_direct_pwm      = 0;
@@ -35,6 +43,17 @@ static uint32_t task2_last_switch_time;
 static int8_t  task2_square_dir;
 static float task2_car_position;
 static float task2_pot_angle;
+static float task2_debug_position_out;
+static float task2_debug_mileage_speed_out;
+static float task2_debug_balance_d_out;
+static float task2_debug_balance_p_out;
+static float task2_debug_raw_pwm;
+static float task2_debug_pwm_out;
+static float task2_d_angle;
+static float task2_d_filt;
+static float task2_d_angle_hist[TASK2_D_HISTORY_SIZE];
+static float task2_last_pwm;
+static uint8_t task2_d_hist_idx;
 static uint8_t task2_pot_angle_inited;
 
 static float task2_adc_to_angle(float adc) {
@@ -43,6 +62,7 @@ static float task2_adc_to_angle(float adc) {
 
 static float task2_update_pot_angle(void) {
   float raw_angle;
+  float angle_delta;
 
   raw_angle = task2_adc_to_angle((float)HAL_ADC_GetValue(&hadc5));
 
@@ -50,10 +70,47 @@ static float task2_update_pot_angle(void) {
     task2_pot_angle = raw_angle;
     task2_pot_angle_inited = 1;
   } else {
-    task2_pot_angle += TASK2_POT_LPF_ALPHA * (raw_angle - task2_pot_angle);
+    angle_delta = raw_angle - task2_pot_angle;
+    angle_delta = CONFINE(angle_delta, -TASK2_POT_STEP_LIMIT, TASK2_POT_STEP_LIMIT);
+    task2_pot_angle += TASK2_POT_LPF_ALPHA * angle_delta;
   }
 
   return task2_pot_angle;
+}
+
+static void task2_reset_d_state(float angle) {
+  uint8_t i;
+
+  task2_d_angle = angle;
+  task2_d_filt = 0.0f;
+  task2_d_hist_idx = 0;
+  for (i = 0; i < TASK2_D_HISTORY_SIZE; i++) {
+    task2_d_angle_hist[i] = angle;
+  }
+}
+
+static float task2_get_angle_delta(float angle) {
+  float old_angle;
+
+  task2_d_hist_idx++;
+  if (task2_d_hist_idx >= TASK2_D_HISTORY_SIZE) {
+    task2_d_hist_idx = 0;
+  }
+
+  old_angle = task2_d_angle_hist[task2_d_hist_idx];
+  task2_d_angle_hist[task2_d_hist_idx] = angle;
+
+  return (angle - old_angle) / (float)TASK2_D_LOOKBACK;
+}
+
+static float task2_soft_limit(float value, float limit) {
+  float abs_value = ABS(value);
+
+  if (limit <= 0.0f) {
+    return 0.0f;
+  }
+
+  return value * limit / (limit + abs_value);
 }
 
 static int16_t task2_compensate_wheel0(int16_t pwm) {
@@ -131,6 +188,34 @@ float get_task2_pot_angle_debug(void) {
   return task2_adc_to_angle((float)HAL_ADC_GetValue(&hadc5));
 }
 
+float get_task2_control_angle_debug(void) {
+  return task2_pot_angle;
+}
+
+float get_task2_position_out_debug(void) {
+  return task2_debug_position_out;
+}
+
+float get_task2_mileage_speed_out_debug(void) {
+  return task2_debug_mileage_speed_out;
+}
+
+float get_task2_balance_d_out_debug(void) {
+  return task2_debug_balance_d_out;
+}
+
+float get_task2_balance_p_out_debug(void) {
+  return task2_debug_balance_p_out;
+}
+
+float get_task2_raw_pwm_debug(void) {
+  return task2_debug_raw_pwm;
+}
+
+float get_task2_pwm_out_debug(void) {
+  return task2_debug_pwm_out;
+}
+
 void init_task(TASK *task) {
   task->task_id = TASK_BASIC_1;
   task->start_pose = START_AB;
@@ -157,6 +242,14 @@ void init_task(TASK *task) {
 static void task2_enter_back_swing(STATUS *status) {
   task2_state = TASK2_BACK_SWING;
   task2_last_switch_time = status->state.time;
+  task2_debug_position_out = 0.0f;
+  task2_debug_mileage_speed_out = 0.0f;
+  task2_debug_balance_d_out = 0.0f;
+  task2_debug_balance_p_out = 0.0f;
+  task2_debug_raw_pwm = 0.0f;
+  task2_debug_pwm_out = 0.0f;
+  task2_reset_d_state(0.0f);
+  task2_last_pwm = 0.0f;
   task2_direct_pwm = 1;
   (void)status;
 }
@@ -287,6 +380,9 @@ static void driver_task2(STATUS *status) {
   float car_speed;
   float position_out;
   float pwm_out;
+  float d_raw;
+  float d_angle_delta;
+  float delta_pwm;
   int16_t kick_pwm;
   PID *balance_param = &status->state.status_pid.balance_pid;
   PID *mileage_param = &status->state.status_pid.mileage_pid;
@@ -302,6 +398,7 @@ static void driver_task2(STATUS *status) {
         task2_last_switch_time = status->state.time;
       } else {
         kick_pwm = -ABS(task2_back_swing_pwm);
+        task2_debug_pwm_out = (float)kick_pwm;
         status->state.motion = STRAIGHT;
         status->state.base_speed = 0;
         task2_set_pwm(kick_pwm);
@@ -312,10 +409,12 @@ static void driver_task2(STATUS *status) {
       if (status->state.time - task2_last_switch_time >= task2_front_kick_time
           || ABS(roll) < 8.0f) {
         task2_state = TASK2_BALANCE_LQR;
-        balance_param->is_first = 1;
+        task2_reset_d_state(angle_error);
+        task2_last_pwm = 0.0f;
         /* fall through to LQR */
       } else {
         kick_pwm = ABS(task2_front_kick_pwm);
+        task2_debug_pwm_out = (float)kick_pwm;
         status->state.motion = STRAIGHT;
         status->state.base_speed = 0;
         task2_set_pwm(kick_pwm);
@@ -330,14 +429,39 @@ static void driver_task2(STATUS *status) {
       //   break;
       // }
 
-      balance_out = compute_pid(balance_param, angle_error);
+      d_angle_delta = angle_error - task2_d_angle;
+      d_angle_delta = CONFINE(d_angle_delta, -TASK2_POT_STEP_LIMIT, TASK2_POT_STEP_LIMIT);
+      task2_d_angle += TASK2_D_ANGLE_ALPHA * d_angle_delta;
+      d_raw = task2_get_angle_delta(task2_d_angle);
+      if (ABS(d_raw) < TASK2_D_DEADBAND) {
+        d_raw = 0.0f;
+      }
+      task2_d_filt += TASK2_D_ALPHA * (d_raw - task2_d_filt);
+      task2_debug_balance_d_out = balance_param->kd * task2_d_filt;
+      task2_debug_balance_d_out = task2_soft_limit(task2_debug_balance_d_out,
+                                                   TASK2_D_LIMIT);
+      task2_debug_balance_p_out = balance_param->kp * angle_error;
+      balance_out = task2_debug_balance_p_out + task2_debug_balance_d_out;
+      balance_param->error = angle_error;
+      balance_param->derivative = task2_d_filt;
+      balance_param->last_error = angle_error;
+      balance_param->out = balance_out;
       car_speed = ((float)status->motor.wheel[0].cur_speed
                  + (float)status->motor.wheel[1].cur_speed) / 2.0f;
+      task2_debug_mileage_speed_out = mileage_param->kd * car_speed;
       position_out = -(mileage_param->kp * task2_car_position
-                     + mileage_param->kd * car_speed);
+                     + task2_debug_mileage_speed_out);
+      task2_debug_position_out = position_out;
       status->state.motion = STRAIGHT;
       status->state.base_speed = 0;
-      pwm_out = task2_apply_min_pwm(balance_out + position_out);
+
+      task2_debug_raw_pwm = balance_out + position_out;
+      pwm_out = task2_apply_min_pwm(task2_debug_raw_pwm);
+      delta_pwm = pwm_out - task2_last_pwm;
+      delta_pwm = CONFINE(delta_pwm, -TASK2_PWM_SLEW, TASK2_PWM_SLEW);
+      pwm_out = task2_last_pwm + delta_pwm;
+      task2_last_pwm = pwm_out;
+      task2_debug_pwm_out = pwm_out;
       task2_set_pwm((int16_t)pwm_out);
       break;
 
@@ -348,10 +472,12 @@ static void driver_task2(STATUS *status) {
         task2_square_dir = -task2_square_dir;
         if (task2_square_dir == 1) {
           task2_state = TASK2_BALANCE_LQR;
-          balance_param->is_first = 1;
+          task2_reset_d_state(angle_error);
+          task2_last_pwm = 0.0f;
         }
       }
       kick_pwm = (task2_square_dir == 1) ? task2_recover_pwm : -task2_recover_pwm;
+      task2_debug_pwm_out = (float)kick_pwm;
       status->state.motion = STRAIGHT;
       status->state.base_speed = 0;
       task2_set_pwm(kick_pwm);

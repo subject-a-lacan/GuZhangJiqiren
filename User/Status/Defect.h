@@ -49,5 +49,12 @@ void update_task(STATUS *status);
 void update_task_led(STATUS *status);
 float get_task2_state_debug(void);
 float get_task2_pot_angle_debug(void);
+float get_task2_control_angle_debug(void);
+float get_task2_position_out_debug(void);
+float get_task2_mileage_speed_out_debug(void);
+float get_task2_balance_d_out_debug(void);
+float get_task2_balance_p_out_debug(void);
+float get_task2_raw_pwm_debug(void);
+float get_task2_pwm_out_debug(void);
 
 #endif

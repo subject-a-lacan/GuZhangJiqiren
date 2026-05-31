@@ -156,20 +156,26 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    // PERIODIC_START(Balance_Debug_Print, 100)
-    //   PID *bp = &status.state.status_pid.balance_pid;
-    //   PID *mp = &status.state.status_pid.mileage_pid;
-    //   float pot_angle = get_task2_pot_angle_debug();
-    //   printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
-    //          (double)bp->kp,
-    //          (double)bp->ki,
-    //          (double)bp->kd,
-    //          (double)status.motor.wheel[0].trust,
-    //          (double)mp->kp,
-    //          (double)mp->kd,
-    //          (double)pot_angle,
-    //          (double)HAL_ADC_GetValue(&hadc5));
-    // PERIODIC_END
+    PERIODIC_START(Balance_Debug_Print, 100)
+      PID *bp = &status.state.status_pid.balance_pid;
+      printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",
+             (double)status.motor.wheel[0].trust,
+             (double)status.motor.wheel[1].trust,
+             (double)get_task2_state_debug(),
+             (double)get_task2_pot_angle_debug(),
+             (double)get_task2_control_angle_debug(),
+             (double)bp->kp,
+             (double)bp->kd,
+             (double)get_task2_balance_p_out_debug(),
+             (double)get_task2_balance_d_out_debug(),
+             (double)bp->out,
+             (double)get_task2_position_out_debug(),
+             (double)get_task2_mileage_speed_out_debug(),
+             (double)get_task2_raw_pwm_debug(),
+             (double)get_task2_pwm_out_debug(),
+             (double)HAL_ADC_GetValue(&hadc5),
+             (double)get_task2_pot_angle_debug());
+    PERIODIC_END
     
   }
   /* USER CODE END 3 */

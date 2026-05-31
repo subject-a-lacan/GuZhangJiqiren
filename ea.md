@@ -1,223 +1,144 @@
-# TASK2 LQR 调参顺序
+# TASK2 输出占比目标
 
-当前 TASK2 第二阶段输出：
-
-```c
-pwm = angle_out + position_out;
-
-angle_out = compute_pid(balance_pid, angle_error);
-position_out = -(mileage_pid.kp * task2_car_position
-               + mileage_pid.kd * car_speed);
-```
-
-参数对应关系：
+主循环当前打印：
 
 ```text
-Cd -> balance_pid.kp -> K_angle
-Cf -> balance_pid.kd -> K_angle_diff
-Cx -> balance_pid.ki -> 暂时不用，保持 0
-Cj -> mileage_pid.kp -> K_pos
-Cl -> mileage_pid.kd -> K_vel
+左trust,右trust,balance.out,position_out,mileage.kd*car_speed,balance_D_out,ADC
 ```
 
-## VOFA 建议观察量
+## 1. balance 内部：P 和 D 的比例
 
-优先打印这些量，按逗号分隔：
+近似：
 
 ```text
-task2_state,roll,angle_error,angle_out,task2_car_position,car_speed,position_out,pwm,wheel0_trust,wheel1_trust
+balance_P_out = balance.out - balance_D_out
+balance_D_out = 最后一列中的 balance_D_out
 ```
 
-看波形时重点判断：
-
-- `roll/angle_error` 是否能被拉回 0 附近。
-- `pwm/wheel_trust` 是否经常打满到 `+-3000`。
-- `car_speed` 是否长期同号，长期同号就是小车在匀速跑。
-- `task2_car_position` 是否单方向越积越大。
-- `task2_state` 是否频繁从 2 掉回 1。
-
-## 第 0 步：先关掉位置和速度项
-
-先只调角度环，不要四个参数一起动：
+理想目标：
 
 ```text
-Cx0
-Cj0
-Cl0
+静止或慢速靠近 0 度时：
+D 项应该很小，最好低于 balance.out 的 10%~20%
+
+摆杆快速穿过 0 度时：
+D 项应该占 balance.out 的 30%~60%
+
+摆杆明显快速倒下时：
+D 项可以短时间占到 60%~80%，但不应该长期吃满限幅
 ```
 
-## 第 1 步：调 K_angle，也就是 Cd
-
-目标：第二阶段能明显接杆，杆偏了小车会立刻往正确方向追。
-
-建议范围：
+如果静止时 D 占比很高，甚至吃满限幅：
 
 ```text
-Cd3000 ~ Cd12000
+先不要加 KD
+增大 TASK2_D_DEADBAND
+或减小 TASK2_D_ALPHA
+或减小 KD
 ```
 
-推荐从这里开始：
+如果过 0 后完全刹不住：
 
 ```text
-Cd6000
-Cf0
-Cj0
-Cl0
+增大 KD
+或略微增大 TASK2_D_ALPHA
 ```
 
-现象判断：
+## 2. position_out 内部：位置项和速度项比例
 
-- 杆进入第二阶段后还是软软倒下：`Cd` 太小，往 `8000、10000、12000` 加。
-- 杆一进第二阶段小车方向明显反了：`Cd` 符号反了，先试负值。
-- 小车一进第二阶段就满 PWM 猛抽，而且杆快速反向越过：`Cd` 太大，往 `4000、3000` 降。
-- 能把杆拉住一点，但过冲明显：进入下一步调 `Cf`。
-
-注意：`Cd` 比 `Cf` 数字大是正常的。因为 `compute_pid()` 里 D 项是 `(error - last_error) / T`，当前 `T = 8`，D 项实际输入会被除小。
-
-## 第 2 步：调 K_angle_diff，也就是 Cf
-
-目标：减少角度过冲，让杆过 0 度附近时不要冲太远。
-
-建议范围：
+当前：
 
 ```text
-Cf1000 ~ Cf8000
+position_out = -(mileage.kp * task2_car_position + mileage.kd * car_speed)
 ```
 
-在一个能接杆的 `Cd` 上，从小到大试：
+打印里有：
 
 ```text
-Cf1000
-Cf2000
-Cf3000
-Cf5000
-Cf8000
+speed_out = mileage.kd * car_speed
 ```
 
-现象判断：
-
-- `roll` 大幅越过 0 度，来回摆很大：`Cf` 太小。
-- 加 `Cf` 后过冲变小，波形更钝：方向基本对。
-- 加 `Cf` 后小车变慢、接不住，甚至比不加 D 更软：`Cf` 可能在抵消 P，试负号。
-- 高频抖动、PWM 正负快速跳：`Cf` 太大。
-
-这一阶段的合格标准：杆能在第二阶段被接住一小段时间，即使小车会跑，也先接受。
-
-## 第 3 步：调 K_vel，也就是 Cl
-
-目标：解决第二阶段小车向一个方向匀速跑的问题。
-
-保持 `Cj0`，先只加速度项：
+所以近似：
 
 ```text
-Cj0
+pos_out = -position_out - speed_out
 ```
 
-建议范围：
+理想目标：
 
 ```text
-Cl1 ~ Cl80
+刚进入稳定阶段：
+speed_out 应该是 position_out 的主要部分，占 60%~90%
+pos_out 先很小，占 10%~40%
+
+小车速度明显变大时：
+speed_out 应该明显变大，用来压住匀速逃跑
+
+摆已经比较稳、车离起点较远时：
+pos_out 再慢慢变大，可以占 position_out 的 40%~70%
 ```
 
-从小到大试：
+如果一进入稳定 position_out 主要由 pos_out 贡献：
 
 ```text
-Cl2
-Cl5
-Cl10
-Cl20
-Cl40
-Cl80
+mileage.kp 太大
+先减小 mileage.kp
 ```
 
-现象判断：
-
-- `car_speed` 长时间同号，小车一直溜走：`Cl` 太小。
-- `car_speed` 被压住，速度波形开始回到 0 附近：`Cl` 有效。
-- 一加 `Cl` 小车反向乱冲，或者 `roll` 立刻更难稳：`Cl` 太大。
-- `Cl` 越大车越跑，方向更错：速度项符号反了，需要单独改符号，不能继续硬调。
-
-这一阶段的合格标准：小车速度不会长时间保持同一个方向，能看到明显刹车和回拉。
-
-## 第 4 步：最后调 K_pos，也就是 Cj
-
-目标：让小车不要离起点越来越远，慢慢回到起点附近。
-
-`task2_car_position` 是编码器脉冲累计值，会越积越大，所以 `Cj` 必须很小。
-
-建议范围：
+如果小车越跑越快但 speed_out 很小：
 
 ```text
-Cj0.0005 ~ Cj0.02
+mileage.kd 太小
 ```
 
-从很小开始：
+## 3. balance.out 和 position_out 的比例
+
+这是最关键的总比例。
+
+理想目标：
 
 ```text
-Cj0.0005
-Cj0.001
-Cj0.002
-Cj0.005
-Cj0.01
-Cj0.02
+刚捕获摆杆、角度还不稳：
+|position_out| <= |balance.out| 的 20%~40%
+
+摆杆接近稳定，但小车开始跑远：
+|position_out| 可以到 |balance.out| 的 40%~80%
+
+摆杆已经比较稳、主要在回位置：
+|position_out| 可以接近 |balance.out|
+但不建议长期超过 balance.out
 ```
 
-现象判断：
-
-- 杆能稳，小车位置慢慢漂走：`Cj` 太小。
-- `task2_car_position` 能慢慢往 0 拉：`Cj` 有效。
-- 小车为了回原点大幅冲，反而把杆推倒：`Cj` 太大。
-- 位置越修越远：`Cj` 符号反了。
-
-## 推荐起始流程
-
-第一组：
+如果刚进稳定阶段：
 
 ```text
-Cd6000
-Cx0
-Cf0
-Cj0
-Cl0
+|position_out| >= |balance.out|
 ```
 
-如果软，逐步加：
+通常说明后两项太强，会抢救摆控制权。
+
+如果车明显跑飞：
 
 ```text
-Cd8000
-Cd10000
-Cd12000
+|position_out| 仍然小于 |balance.out| 的 20%
 ```
 
-能接杆后加 D：
+说明速度/位置反馈太弱，优先加 `mileage.kd`。
+
+## 4. 调参顺序
 
 ```text
-Cf2000
-Cf3000
-Cf5000
+1. 先让 D 静止不乱跳
+2. 调 balance.kp / balance.kd，让 balance.out 能救摆
+3. 加 mileage.kd，让小车不匀速跑飞
+4. 最后加 mileage.kp，让车慢慢回中
 ```
 
-能接住但小车跑，再加速度：
+一句话目标：
 
 ```text
-Cl5
-Cl10
-Cl20
-Cl40
+救摆阶段 balance.out 主导；
+刹摆瞬间 D 项明显参与；
+防跑飞阶段 speed_out 主导 position_out；
+回中阶段 pos_out 才慢慢变大。
 ```
-
-最后再加位置：
-
-```text
-Cj0.001
-Cj0.002
-Cj0.005
-```
-
-## 调参原则
-
-- 一次只动一个参数。
-- `Cx` 先保持 0，不要加积分。
-- 先让杆站住，再让小车速度不跑，最后再管位置回零。
-- 如果某个参数越加越坏，先怀疑符号，不要无限加大。
-- 如果 `pwm` 长时间饱和到 `+-3000`，说明参数太大或状态切换太晚，继续加参数没有意义。

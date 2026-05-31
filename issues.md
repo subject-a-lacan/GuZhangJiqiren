@@ -1,181 +1,94 @@
-# TASK2 最小有效 PWM 补偿方案
+就你现在这个场景，我推荐一个最小但靠谱的改法：
 
-这个补偿不是电机刚能空转的死区 PWM，而是：
+不要再用 compute_pid() 算 balance 的 D。
+保留 balance 结构体，但它只存参数：
 
-```text
-让小车在落地、带摆杆负载时产生明显救摆加速度的最小 PWM
-```
+balance.kp = 角度 P
+balance.kd = 手写 D 的系数
+balance.ki = 继续不用
+然后 TASK2 第二阶段手写：
 
-现在的问题是：P 给了以后，车速度会变大，但摆已经倒得很厉害时才有明显动作，加速度不足以救回摆。说明很多时候最终控制输出 `u` 没有跨过“有效救摆加速度阈值”，或者跨得太晚。
+angle_p = task2_update_pot_angle();        // 快角度，用于 P
+d_raw = angle_p - last_angle;              // 每 8ms 角度变化量
+d_deadband(d_raw);
+d_filt += alpha_d * (d_raw - d_filt);      // 只滤 D
+d_out = balance.kd * d_filt;
+d_out = CONFINE(d_out, -D_LIMIT, D_LIMIT);
 
-所以应该加的是最终输出 `u` 的最小有效 PWM 补偿，不是角度前馈。
+balance_out = balance.kp * angle_p + d_out;
+你的代码结构里这样最合适，因为：
 
-## 1. 它和角度前馈的区别
+compute_pid() 的 D 是通用误差差分，太硬了，没法单独加死区、滤波、限幅。
+你的 P 项必须快，不能跟 D 一起被重滤波拖慢。
+你已经有 balance_pid、mileage_pid 两个结构体，继续用它们存参数最省事。
+你主循环已经在打印 balance.out 和 D 输出，占比分析可以继续用。
+我建议第一版具体参数/常量：
 
-不要做：
+D_DEADBAND = 0.05 度/周期
+D_ALPHA = 0.35
+D_LIMIT = 800
+PWM_RATE_LIMIT = 400 / 8ms
+注意：你的 d_raw 不要除以 0.008，先用“每周期角度差”。
+因为你现在的 compute_pid() 其实是除以 T，而 T=8，不是 0.008 秒。你之前调的 KD 量级也是建立在这个奇怪单位上的。为了少引入新变量，先保持“度/周期”的思路。
 
-```text
-angle -> 某个固定 PWM 前馈
-```
+代码结构推荐这样放：
 
-因为后面完整控制会变成：
+在 Defect.c 顶部加：
 
-```text
-u = K1*angle + K2*angle_speed + K3*position + K4*car_speed
-```
+#define TASK2_D_DEADBAND 0.05f
+#define TASK2_D_ALPHA    0.35f
+#define TASK2_D_LIMIT    800.0f
+#define TASK2_PWM_SLEW   400.0f
+加静态变量：
 
-如果前馈只关于角度，会和角速度、位置、车速项打架。
+static float task2_last_angle;
+static float task2_d_filt;
+static float task2_last_pwm;
+task2_enter_back_swing() 或进入稳定阶段时清零：
 
-应该做：
+task2_last_angle = task2_pot_angle;
+task2_d_filt = 0;
+task2_last_pwm = 0;
+第二阶段替换：
 
-```text
-先让 PID/LQR 算出最终输出 u
-再对最终 u 做 deadzone/min_pwm 补偿
-```
+balance_out = compute_pid(balance_param, angle_error);
+为：
 
-这样它只是执行器非线性补偿，可以和 PID、PD、LQR 共存。
+float d_raw = angle_error - task2_last_angle;
+task2_last_angle = angle_error;
 
-## 2. 怎么测 min_pwm
-
-完整装好车和摆杆，不跑 TASK2。用串口直接给两轮同向 PWM，记录 8ms 编码器速度序列。
-
-推荐测：
-
-```text
-正向 PWM: 300, 400, 500, 600, 700, 800
-反向 PWM: -300, -400, -500, -600, -700, -800
-```
-
-每个 PWM 记录：
-
-```text
-PWM: wheel0_speed, wheel1_speed
-连续记录至少 10 个控制周期
-```
-
-更好的是看速度增量：
-
-```text
-accel ~= speed_now - speed_last
-```
-
-判断标准：
-
-```text
-连续 3 个控制周期速度同方向增长
-并且平均增量 >= 2~3 个编码器脉冲/8ms
-```
-
-例子：
-
-```text
-300: 0,1,1,1,2     不算
-400: 0,1,2,2,3     勉强
-500: 0,2,5,8,11    算
-```
-
-如果 500 第一次满足条件，那么：
-
-```text
-task2_balance_min_pwm = 500
-```
-
-正反向可以分开测。如果差别不大，第一版可以先用统一值；如果差别很大，就做正反分开的 min_pwm。
-
-## 3. 第一版代码接入方式
-
-加在最终控制输出之后：
-
-```c
-float u = balance_out + position_out;
-
-if (ABS(u) > 1.0f) {
-    if (u > 0) {
-        u += task2_balance_min_pwm;
-    } else {
-        u -= task2_balance_min_pwm;
-    }
+if (ABS(d_raw) < TASK2_D_DEADBAND) {
+  d_raw = 0.0f;
 }
 
-task2_set_pwm((int16_t)u);
-```
+task2_d_filt += TASK2_D_ALPHA * (d_raw - task2_d_filt);
 
-注意：不要只加在 `balance_out` 上。应该加在最终输出 `u` 上，因为后面位置项、车速项也会一起参与控制。
+task2_debug_balance_d_out = balance_param->kd * task2_d_filt;
+task2_debug_balance_d_out = CONFINE(task2_debug_balance_d_out,
+                                    -TASK2_D_LIMIT,
+                                     TASK2_D_LIMIT);
 
-## 4. 推荐初值
+balance_out = balance_param->kp * angle_error + task2_debug_balance_d_out;
+balance_param->out = balance_out;
+最终输出前加 slew rate：
 
-如果还没有测完，可以先试：
+pwm_out = task2_apply_min_pwm(balance_out + position_out);
 
-```text
-task2_balance_min_pwm = 400
-```
+float delta = pwm_out - task2_last_pwm;
+delta = CONFINE(delta, -TASK2_PWM_SLEW, TASK2_PWM_SLEW);
+pwm_out = task2_last_pwm + delta;
+task2_last_pwm = pwm_out;
+调试方法：
 
-然后按现象调：
-
-```text
-太小：
-摆倒下去时车还是慢半拍，没有明显冲击。
-
-合适：
-摆刚开始倒时，车能立刻给一脚，有明显救摆加速度。
-
-太大：
-角度刚有一点误差就猛冲、抽搐、打滑、原地转圈。
-```
-
-可调范围建议：
-
-```text
-300 ~ 700
-```
-
-## 5. 更平滑的版本
-
-如果硬加 min_pwm 导致 0 附近突跳太明显，可以改成渐进补偿：
-
-```c
-static float task2_apply_min_pwm(float u)
-{
-    float min_pwm = task2_balance_min_pwm;
-    float blend_pwm = 300.0f;
-
-    if (u > 0) {
-        if (u < blend_pwm) {
-            return u + min_pwm * (u / blend_pwm);
-        }
-        return u + min_pwm;
-    }
-
-    if (u < 0) {
-        if (-u < blend_pwm) {
-            return u - min_pwm * ((-u) / blend_pwm);
-        }
-        return u - min_pwm;
-    }
-
-    return 0;
-}
-```
-
-第一版建议先用硬加，方便判断有没有效果。
-
-## 6. 和其他问题的关系
-
-这个补偿解决的是：
-
-```text
-控制器已经判断出方向，但 PWM 太小，没有产生有效加速度
-```
-
-它不能解决：
-
-```text
-控制方向反了
-左右轮严重不同步
-轮胎打滑
-P/D 符号错误
-角度零点错误
-前冲阶段切稳定太晚
-```
-
-如果加了 min_pwm 后仍然原地转圈，优先看左右轮速度差，并考虑加左右轮同步修正。
+先 balance.kd = 0，确认 P 和后两项方向没坏。
+加 balance.kd，看静止时最后一列 D 输出是否压在 ±100 左右。
+如果静止还跳：
+增大 D_DEADBAND 到 0.08 / 0.1
+或减小 D_ALPHA 到 0.25
+如果动态救不住：
+增大 D_LIMIT 到 1000 / 1200
+或增大 D_ALPHA 到 0.45
+如果电机还是发热抖：
+降低 PWM_SLEW 到 250~300
+一句话方案：P 快，D 脏就单独清洗，PWM 再限斜率。
+这比继续在 compute_pid() 上硬调 KD 更适合你现在这台车
