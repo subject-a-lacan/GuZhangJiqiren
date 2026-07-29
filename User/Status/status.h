@@ -69,13 +69,13 @@ typedef struct GW_8BIT {
 } GW_8BIT;
 
   typedef struct GW_ANALOGUE {
-  uint8_t channel[8];                 // 0-7
+  uint16_t channel[8];                // 12-bit ADC values
   uint8_t sta;                        // 0工作模式 1校准模式
-  uint8_t correction_data_w[8];       // 白色校准数据
-  uint8_t correction_data_b[8];       // 黑色校准数据
+  uint16_t correction_data_w[8];      // 白色校准数据
+  uint16_t correction_data_b[8];      // 黑色校准数据
   uint8_t digital_8bit;               // 8bit数字量
-  uint8_t digital_high_threshold[8];  // 8bit高阈值
-  uint8_t digital_low_threshold[8];   // 8bit低阈值
+  uint16_t digital_high_threshold[8]; // 12-bit高阈值
+  uint16_t digital_low_threshold[8];  // 12-bit低阈值
   float diff;
 
 } GW_ANALOGUE;

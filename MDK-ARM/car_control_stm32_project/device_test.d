@@ -1,13 +1,13 @@
-car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
-  ../User/It/uart_it.h ../Core/Inc\usart.h ../Core/Inc/main.h \
-  ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal.h \
+car_control_stm32_project/device_test.o: ../User/Device/device_test.c \
+  ../User/Device/device_test.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h ../Core/Inc\gpio.h \
+  ../Core/Inc/main.h ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal.h \
   ../Core/Inc\stm32g4xx_hal_conf.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_rcc.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include\stm32g4xx.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g474xx.h \
   ../Drivers/CMSIS/Include\core_cm4.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
   ../Drivers/CMSIS/Include/cmsis_version.h \
   ../Drivers/CMSIS/Include/cmsis_compiler.h \
   ../Drivers/CMSIS/Include/cmsis_armclang_ltm.h \
@@ -39,9 +39,8 @@ car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_uart.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
-  ../User/Sensor\uart_gyro.h ../User/Status\status.h \
-  ../User/Device\button.h ../User/Device\buzzer.h \
-  ../User/Status/Defect.h ../User/Sensor\gw_anagloge.h \
-  ../User/Sensor\gy901.h ../User/Tool\pid.h ../User/Device\led.h \
-  ../User/Motor\servo.h ../User/Motor\wheel.h
+  ../Core/Inc\usart.h ../User/Status\status.h ../User/Device\button.h \
+  ../User/Device\buzzer.h ../User/Status/Defect.h \
+  ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h ../User/Tool\pid.h \
+  ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h \
+  ../User/Tool\log.h

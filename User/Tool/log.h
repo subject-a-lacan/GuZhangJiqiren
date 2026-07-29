@@ -4,9 +4,11 @@
 #define __LOG_H__
 
 #include "usart.h"
+#include <stdint.h>
 
 #define LOG_UART &huart1
 void log_uprintf(UART_HandleTypeDef *huart, const char *format, ...);
+void UART_send_justfloat(UART_HandleTypeDef *huart, uint8_t count, ...);
 
 #define PRINTF(fmt, ...) log_uprintf(LOG_UART, fmt, ##__VA_ARGS__);
 #define PRINTLN(fmt, ...) PRINTF(fmt "\r\n", ##__VA_ARGS__)

@@ -2,6 +2,10 @@
 #include "usart.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include "uart_gyro.h"
+#include "status.h"
+
+static UART_GYRO uart_gyro;
 
 void UART_PID_Tune(uint8_t cmd, float val);
 
@@ -54,36 +58,17 @@ static void parse_uart_pid_byte(UART_PID_RX *rx) {
 }
 
 void init_uart_pid_tune_it(void) {
-  HAL_UART_Receive_IT(&huart1, &uart1_pid_rx.byte, 1);
-  HAL_UART_Receive_IT(&huart2, &uart2_pid_rx.byte, 1);
-  HAL_UART_Receive_IT(&huart3, &uart3_pid_rx.byte, 1);
+  uart_gyr_init(&uart_gyro);
+  uart_gyr_start_receive(&uart_gyro);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  if (huart == &huart1) {
-    parse_uart_pid_byte(&uart1_pid_rx);
-    HAL_UART_Receive_IT(&huart1, &uart1_pid_rx.byte, 1);
-  } else if (huart == &huart2) {
-    parse_uart_pid_byte(&uart2_pid_rx);
-    HAL_UART_Receive_IT(&huart2, &uart2_pid_rx.byte, 1);
-  } else if (huart == &huart3) {
-    parse_uart_pid_byte(&uart3_pid_rx);
-    HAL_UART_Receive_IT(&huart3, &uart3_pid_rx.byte, 1);
+  if (huart == &huart2) {
+    uart_gyr_rx_feed(&uart_gyro, uart_gyro.rx_byte, (uint32_t)status.state.time);
+    uart_gyr_start_receive(&uart_gyro);
   }
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
-  if (huart == &huart1) {
-    reset_uart_pid_rx(&uart1_pid_rx);
-    HAL_UART_AbortReceive_IT(&huart1);
-    HAL_UART_Receive_IT(&huart1, &uart1_pid_rx.byte, 1);
-  } else if (huart == &huart2) {
-    reset_uart_pid_rx(&uart2_pid_rx);
-    HAL_UART_AbortReceive_IT(&huart2);
-    HAL_UART_Receive_IT(&huart2, &uart2_pid_rx.byte, 1);
-  } else if (huart == &huart3) {
-    reset_uart_pid_rx(&uart3_pid_rx);
-    HAL_UART_AbortReceive_IT(&huart3);
-    HAL_UART_Receive_IT(&huart3, &uart3_pid_rx.byte, 1);
-  }
+  if (huart == &huart2) uart_gyr_start_receive(&uart_gyro);
 }

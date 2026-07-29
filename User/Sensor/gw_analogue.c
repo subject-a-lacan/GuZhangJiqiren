@@ -246,7 +246,7 @@ void get_gw_analoge_digital_data(GW_ANALOGUE *gw_analogue) {
  * (now - min) / (max - min) * 100
  * 注意：调用方需保证 max != min，否则除零。
  */
-float normalize_gray_data(uint8_t max, uint8_t min, uint8_t now) {
+float normalize_gray_data(uint16_t max, uint16_t min, uint16_t now) {
   return (((float)(now - min) / (float)(max - min)) * 100);
 }
 

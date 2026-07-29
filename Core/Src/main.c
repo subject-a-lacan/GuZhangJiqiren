@@ -138,13 +138,12 @@ int main(void)
   MX_SPI1_Init();
   MX_ADC5_Init();
   /* USER CODE BEGIN 2 */
-  init_status(&status, 1);
-//   get_gyr_raw_data_dma(&hi2c1, &status.sensor.gy901);
-//   HAL_Delay(10);
-//   after_init_state();
+  init_status(&status, 5);
+  iic_gyr_read_dma(&hi2c1, &status.sensor.gy901);
+  after_init_state();
   status.state.motion = STOP;
-  init_uart_pid_tune_it(); // USART1/USART2/USART3 receive PID tune commands.
-  ESP8266_Init("F521F520","f521f520","192.168.112.73","8080");
+  init_uart_pid_tune_it();
+  ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
   HAL_ADC_Start(&hadc5);
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
@@ -153,17 +152,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   while (1) {
+    PERIODIC_START(Gray_ADC_Update, 5)
+      driver_gw_analogue(&status.sensor.gw_analogue);
+    PERIODIC_END
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    PERIODIC_START(Balance_Debug_Print, 80)
-      PID *bp = &status.state.status_pid.balance_pid;
-      printf("%.2f,%.2f,%.2f,%.2f\r\n",
-             (double)bp->out,
-             (double)get_task2_position_out_debug(),
-             (double)get_task2_balance_p_out_debug(),
-             (double)get_task2_mileage_speed_out_debug());
-    PERIODIC_END
+  
     
   }
   /* USER CODE END 3 */
@@ -180,7 +175,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
+  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -191,7 +186,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
-  RCC_OscInitStruct.PLL.PLLN = 75;
+  RCC_OscInitStruct.PLL.PLLN = 85;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -217,84 +212,8 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 void UART_PID_Tune(uint8_t cmd, float val) {
-  switch (cmd) {
-    case 'a': status.state.status_pid.follow_line_pid.kp = val;  break;
-    case 'c': status.state.status_pid.follow_line_pid.ki = val; break;
-    case 'e': status.state.status_pid.follow_line_pid.kd = val; break;
-
-    case 'g': status.state.status_pid.keep_angle_pid.kp = val;  break;
-    case 'i': status.state.status_pid.keep_angle_pid.ki = val; break;
-    case 'k': status.state.status_pid.keep_angle_pid.kd = val;  break;
-
-    case 'm': status.motor.wheel[0].wheel_pid.kp = val;  break;
-    case 'o': status.motor.wheel[0].wheel_pid.ki = val;  break;
-    case 'q': status.motor.wheel[0].wheel_pid.kd = val;  break;
-
-    case 's': status.motor.wheel[1].wheel_pid.kp = val;  break;
-    case 'u': status.motor.wheel[1].wheel_pid.ki = val;  break;
-    case 'w': status.motor.wheel[1].wheel_pid.kd = val;  break;
-    case 'd': status.state.status_pid.balance_pid.kp = val;  break;
-    case 'x': status.state.status_pid.balance_pid.ki = val;  break;
-    case 'f': status.state.status_pid.balance_pid.kd = val;  break;
-    case 'j': status.state.status_pid.mileage_pid.kp = val;  break;
-    case 'l': status.state.status_pid.mileage_pid.kd = val;  break;
-
-    case 'A': task2_back_swing_pwm  = (int16_t)val;     break;
-    case 'B': task2_back_swing_time = (uint32_t)val;    break;
-    case 'M': task2_balance_min_pwm = (int16_t)val;     break;
-    case 'p': task2_front_kick_pwm  = (int16_t)val;     break;
-    case 'r': task2_front_kick_time = (uint32_t)val;    break;
-    case 't': task2_recover_pwm     = (int16_t)val;     break;
-    case 'v': task2_recover_time    = (uint32_t)val;    break;
-
-    case 'b': status.motor.wheel[0].wheel_pid.integral_max = val;  break;
-    case 'n': status.motor.wheel[1].wheel_pid.integral_max = val;  break;
-    case 'z': status.task.task_running = 0;
-              status.task.armed = 0;
-              status.task.start_request = 0;
-              status.task.stop_request = 0;
-              status.task.stop_cmd = 1;
-
-              status.state.motion = STOP;
-              status.state.base_speed = 0;
-
-              status.motor.wheel[0].tar_speed = 0;
-              status.motor.wheel[1].tar_speed = 0;
-              task2_direct_pwm = 0;
-    
-              break;
-    case 'y':
-      status.state.status_pid.follow_line_pid.integral = 0;
-      status.state.status_pid.follow_line_pid.last_error = 0;
-      status.state.status_pid.follow_line_pid.error = 0;
-      status.state.status_pid.follow_line_pid.out = 0;
-      status.state.status_pid.keep_angle_pid.integral = 0;
-      status.state.status_pid.keep_angle_pid.last_error = 0;
-      status.state.status_pid.keep_angle_pid.error = 0;
-      status.state.status_pid.keep_angle_pid.out = 0;
-      status.state.status_pid.balance_pid.integral = 0;
-      status.state.status_pid.balance_pid.last_error = 0;
-      status.state.status_pid.balance_pid.error = 0;
-      status.state.status_pid.balance_pid.out = 0;
-      status.state.status_pid.mileage_pid.integral = 0;
-      status.state.status_pid.mileage_pid.last_error = 0;
-      status.state.status_pid.mileage_pid.error = 0;
-      status.state.status_pid.mileage_pid.out = 0;
-      status.motor.wheel[0].wheel_pid.integral = 0;
-      status.motor.wheel[0].wheel_pid.last_error = 0;
-      status.motor.wheel[0].wheel_pid.error = 0;
-      status.motor.wheel[0].wheel_pid.out = 0;
-      status.motor.wheel[1].wheel_pid.integral = 0;
-      status.motor.wheel[1].wheel_pid.last_error = 0;
-      status.motor.wheel[1].wheel_pid.error = 0;
-      status.motor.wheel[1].wheel_pid.out = 0;
-      status.motor.wheel[0].trust = 0;
-      status.motor.wheel[1].trust = 0;
-      status.task.start_request=1;
-      break;
-    case 'h': cmd_speed = (int16_t)val;  break;
-    default: break;
-  }
+  (void)cmd;
+  (void)val;
 }
 
 /* USER CODE END 4 */

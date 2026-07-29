@@ -24,16 +24,16 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
     if (station == BUTTON_UP) {
       if (status.task.task_running == 0) {
         uint8_t next = status.task.task_id + 1;
-        if (next > 4) next = 1;
+        if (next > 7) next = 1;
         status.task.requested_task_id = next;
         status.task.task_select_request = 1;
       }
     }
     if (station == BUTTON_LONG) {
-      if (status.task.task_running == 0 && (status.task.task_id == TASK_BASIC_2 || status.task.task_id == TASK_ADV_1)) {
-        status.task.pose_switch_request = 1;
+      if (status.task.task_running == 0) {
         status.device.buzzer.on = 1;
-        status.device.buzzer.off_time = status.state.time + 1000;
+        status.device.buzzer.off_time = status.state.time + 1500;
+        status.device.buzzer.on = 1;
       }
     }
   }
@@ -44,11 +44,13 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
       if (status.task.armed == 0 && status.task.task_running == 0) {
         status.task.start_request = 1;
         status.device.buzzer.on = 1;
-        status.device.buzzer.off_time = status.state.time + 200;
+        status.device.buzzer.off_time = status.state.time + 400;
       }
     }
     if (station == BUTTON_LONG) {
-      correct_gw_analogue(&status.sensor.gw_analogue);
+      if (status.task.task_running == 0) {
+        correct_gw_analogue(&status.sensor.gw_analogue);
+      }
     }
   }
 

@@ -10,6 +10,9 @@ typedef enum TASK_ID {
   TASK_BASIC_2 = 2,
   TASK_ADV_1 = 3,
   TASK_ADV_2 = 4,
+  TASK_BASIC_3 = 5,
+  TASK_ADV_3 = 6,
+  TASK_ADV_4 = 7,
 } TASK_ID;
 
 typedef enum START_POSE {
@@ -47,14 +50,4 @@ void task_stop(STATUS *status);
 void task_select(STATUS *status, uint8_t id);
 void update_task(STATUS *status);
 void update_task_led(STATUS *status);
-float get_task2_state_debug(void);
-float get_task2_pot_angle_debug(void);
-float get_task2_control_angle_debug(void);
-float get_task2_position_out_debug(void);
-float get_task2_mileage_speed_out_debug(void);
-float get_task2_balance_d_out_debug(void);
-float get_task2_balance_p_out_debug(void);
-float get_task2_raw_pwm_debug(void);
-float get_task2_pwm_out_debug(void);
-
 #endif

@@ -87,6 +87,8 @@ void Error_Handler(void);
 #define IO5_GPIO_Port GPIOE
 #define BUTTON_B11_Pin GPIO_PIN_11
 #define BUTTON_B11_GPIO_Port GPIOB
+#define HUIDU_AD_Pin GPIO_PIN_14
+#define HUIDU_AD_GPIO_Port GPIOD
 #define M1D2_Pin GPIO_PIN_10
 #define M1D2_GPIO_Port GPIOA
 #define M2D1_Pin GPIO_PIN_11

@@ -1,571 +1,116 @@
 #include "Defect.h"
 #include "status.h"
-#include "math_tool.h"
-#include "tim.h"
-#include "adc.h"
+#include "log.h"
+#include "uart_gyro.h"
 
-extern uint8_t cross_cnt;
-extern uint8_t left_cnt;
-extern uint8_t cross_delay;
-extern Road road_buf;
-
-#define TASK2_BACK_RECOVER_ANGLE  -20.0f
-#define TASK2_POT_ADC_ZERO        3533.578947f
-#define TASK2_POT_DEG_PER_ADC     0.3600993f
-#define TASK2_POT_LPF_ALPHA       0.80f
-#define TASK2_POT_STEP_LIMIT      4.00f
-#define TASK2_D_DEADBAND          0.50f
-#define TASK2_D_ANGLE_ALPHA       0.12f
-#define TASK2_D_ALPHA             0.08f
-#define TASK2_D_LIMIT             2000.0f
-#define TASK2_D_LOOKBACK          4
-#define TASK2_D_HISTORY_SIZE      (TASK2_D_LOOKBACK + 1)
-#define TASK2_PWM_SLEW            1200.0f
-
-int16_t  task2_front_kick_pwm  = 2800;
-uint32_t task2_front_kick_time = 250;
-int16_t  task2_back_swing_pwm  = 1600;
-uint32_t task2_back_swing_time = 800;
-int16_t  task2_balance_min_pwm = 200;
-int16_t  task2_recover_pwm     = 2000;
-uint32_t task2_recover_time    = 100;
-uint8_t  task2_direct_pwm      = 0;
-
-typedef enum {
-  TASK2_BACK_SWING = 0,
-  TASK2_FRONT_KICK,
-  TASK2_BALANCE_LQR,
-  TASK2_BACK_RECOVER,
-} TASK2_STATE;
-
-static TASK2_STATE task2_state;
-static uint32_t task2_last_switch_time;
-static int8_t  task2_square_dir;
-static float task2_car_position;
-static float task2_pot_angle;
-static float task2_debug_position_out;
-static float task2_debug_mileage_speed_out;
-static float task2_debug_balance_d_out;
-static float task2_debug_balance_p_out;
-static float task2_debug_raw_pwm;
-static float task2_debug_pwm_out;
-static float task2_d_angle;
-static float task2_d_filt;
-static float task2_d_angle_hist[TASK2_D_HISTORY_SIZE];
-static float task2_last_pwm;
-static uint8_t task2_d_hist_idx;
-static uint8_t task2_pot_angle_inited;
-
-static float task2_adc_to_angle(float adc) {
-  return (adc - TASK2_POT_ADC_ZERO) * TASK2_POT_DEG_PER_ADC;
-}
-
-static float task2_update_pot_angle(void) {
-  float raw_angle;
-  float angle_delta;
-
-  raw_angle = task2_adc_to_angle((float)HAL_ADC_GetValue(&hadc5));
-
-  if (!task2_pot_angle_inited) {
-    task2_pot_angle = raw_angle;
-    task2_pot_angle_inited = 1;
-  } else {
-    angle_delta = raw_angle - task2_pot_angle;
-    angle_delta = CONFINE(angle_delta, -TASK2_POT_STEP_LIMIT, TASK2_POT_STEP_LIMIT);
-    task2_pot_angle += TASK2_POT_LPF_ALPHA * angle_delta;
-  }
-
-  return task2_pot_angle;
-}
-
-static void task2_reset_d_state(float angle) {
-  uint8_t i;
-
-  task2_d_angle = angle;
-  task2_d_filt = 0.0f;
-  task2_d_hist_idx = 0;
-  for (i = 0; i < TASK2_D_HISTORY_SIZE; i++) {
-    task2_d_angle_hist[i] = angle;
-  }
-}
-
-static float task2_get_angle_delta(float angle) {
-  float old_angle;
-
-  task2_d_hist_idx++;
-  if (task2_d_hist_idx >= TASK2_D_HISTORY_SIZE) {
-    task2_d_hist_idx = 0;
-  }
-
-  old_angle = task2_d_angle_hist[task2_d_hist_idx];
-  task2_d_angle_hist[task2_d_hist_idx] = angle;
-
-  return (angle - old_angle) / (float)TASK2_D_LOOKBACK;
-}
-
-static float task2_soft_limit(float value, float limit) {
-  float abs_value = ABS(value);
-
-  if (limit <= 0.0f) {
-    return 0.0f;
-  }
-
-  return value * limit / (limit + abs_value);
-}
-
-static int16_t task2_compensate_wheel0(int16_t pwm) {
-  float abs_pwm = ABS(pwm);
-  float out;
-
-  if (pwm == 0) return 0;
-
-  if (pwm > 0) {
-    out = 1.0232f * abs_pwm + 71.80f;
-    if (out < 185.0f) out = 185.0f;
-  } else {
-    out = 1.0697f * abs_pwm + 112.40f;
-    if (out < 182.0f) out = 182.0f;
-  }
-  out = CONFINE(out, 0, TRUST_CONFINE);
-
-  return (pwm > 0) ? (int16_t)out : -(int16_t)out;
-}
-
-static int16_t task2_compensate_wheel1(int16_t pwm) {
-  float abs_pwm = ABS(pwm);
-  float out;
-
-  if (pwm == 0) return 0;
-
-  if (pwm > 0) {
-    out = 0.9778f * abs_pwm - 68.61f;
-    if (out < 175.0f) out = 175.0f;
-  } else {
-    out = 0.9388f * abs_pwm - 98.65f;
-    if (out < 173.0f) out = 173.0f;
-  }
-  out = CONFINE(out, 0, TRUST_CONFINE);
-
-  return (pwm > 0) ? (int16_t)out : -(int16_t)out;
-}
-
-static void task2_set_pwm(int16_t pwm) {
-  int16_t wheel0_pwm = task2_compensate_wheel0(pwm);
-  int16_t wheel1_pwm = task2_compensate_wheel1(pwm);
-
-  status.motor.wheel[0].trust = wheel0_pwm;
-  status.motor.wheel[1].trust = wheel1_pwm;
-
-  set_wheel_dir(&status.motor.wheel[0], wheel0_pwm);
-  set_wheel_dir(&status.motor.wheel[1], wheel1_pwm);
-
-  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_1, ABS(wheel0_pwm));
-  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, ABS(wheel1_pwm));
-}
-
-float get_task2_state_debug(void) {
-  return (float)task2_state;
-}
-
-float get_task2_pot_angle_debug(void) {
-  return task2_adc_to_angle((float)HAL_ADC_GetValue(&hadc5));
-}
-
-float get_task2_control_angle_debug(void) {
-  return task2_pot_angle;
-}
-
-float get_task2_position_out_debug(void) {
-  return task2_debug_position_out;
-}
-
-float get_task2_mileage_speed_out_debug(void) {
-  return task2_debug_mileage_speed_out;
-}
-
-float get_task2_balance_d_out_debug(void) {
-  return task2_debug_balance_d_out;
-}
-
-float get_task2_balance_p_out_debug(void) {
-  return task2_debug_balance_p_out;
-}
-
-float get_task2_raw_pwm_debug(void) {
-  return task2_debug_raw_pwm;
-}
-
-float get_task2_pwm_out_debug(void) {
-  return task2_debug_pwm_out;
-}
+static uint32_t task_last_report;
 
 void init_task(TASK *task) {
   task->task_id = TASK_BASIC_1;
   task->start_pose = START_AB;
   task->race_phase = 0;
-
   task->cross_cnt = 0;
   task->cnt_seen = 0;
-
   task->armed = 0;
   task->task_running = 0;
-
   task->task_select_request = 0;
   task->requested_task_id = 0;
   task->pose_switch_request = 0;
-
   task->start_request = 0;
   task->stop_request = 0;
   task->stop_cmd = 1;
-
   task->phase_start_time = 0;
-  task->phase_mileage = 0;
+  task->phase_mileage = 0.0f;
 }
 
-static void task2_enter_back_swing(STATUS *status) {
-  task2_state = TASK2_BACK_SWING;
-  task2_last_switch_time = status->state.time;
-  task2_debug_position_out = 0.0f;
-  task2_debug_mileage_speed_out = 0.0f;
-  task2_debug_balance_d_out = 0.0f;
-  task2_debug_balance_p_out = 0.0f;
-  task2_debug_raw_pwm = 0.0f;
-  task2_debug_pwm_out = 0.0f;
-  task2_reset_d_state(0.0f);
-  task2_last_pwm = 0.0f;
-  task2_direct_pwm = 1;
-  (void)status;
+void update_task_led(STATUS *status) {
+  status->device.led_on_board.on = (status->task.task_id & 4u) != 0u;
+  status->device.led1.on = (status->task.task_id & 2u) != 0u;
+  status->device.led2.on = (status->task.task_id & 1u) != 0u;
+}
+
+void task_select(STATUS *status, uint8_t id) {
+  if (id < TASK_BASIC_1 || id > TASK_ADV_4) return;
+  status->task.task_id = id;
+  update_task_led(status);
 }
 
 void task_start(STATUS *status) {
   status->task.start_request = 0;
   status->task.stop_request = 0;
+  status->task.armed = 1;
+  status->task.task_running = 1;
   status->task.stop_cmd = 0;
-
-  status->task.cross_cnt = 0;
-  status->task.cnt_seen = 0;
-  cross_cnt = 0;
-  left_cnt = 0;
-  cross_delay = 0;
-
-  road_buf = Straight;
-  status->sensor.gw_analogue.cross.integral = 0;
-  status->sensor.gw_analogue.cross.data_buf = 0;
-  status->sensor.gw_analogue.cross.maybe = 0;
-  status->sensor.gw_analogue.cross.cross = Straight;
-  status->sensor.gw_analogue.cross.cross_cnt = 0;
-
-  status->task.phase_mileage = 0;
-
-  status->motor.wheel[0].trust = 0;
-  status->motor.wheel[1].trust = 0;
-
-  status->state.initial_angle = status->state.cur_angle;
-
-  status->motor.wheel[0].tar_speed = 0;
-  status->motor.wheel[1].tar_speed = 0;
-
-  switch (status->task.task_id) {
-    case TASK_BASIC_1:
-      apply_basic_control_param(status);
-      break;
-    case TASK_BASIC_2:
-      apply_basic_control_param(status);
-      task2_car_position = 0;
-      task2_pot_angle_inited = 0;
-      task2_enter_back_swing(status);
-      break;
-    case TASK_ADV_1:   break;
-    case TASK_ADV_2:   break;
-  }
-
   status->task.phase_start_time = status->state.time;
+  status->task.phase_mileage = 0.0f;
+  task_last_report = status->state.time;
 }
 
-void task_finish(STATUS *status) {
-  status->task.task_running = 0;
-  status->task.armed = 0;
-  status->task.start_request = 0;
-  status->task.stop_request = 0;
-  status->task.stop_cmd = 1;
-  status->task.task_select_request = 0;
-  status->task.pose_switch_request = 0;
-  status->state.motion = STOP;
-  status->state.base_speed = 0;
-  status->motor.wheel[0].tar_speed = 0;
-  status->motor.wheel[1].tar_speed = 0;
-  task2_direct_pwm = 0;
-  status->device.buzzer.on = 1;
-  status->device.buzzer.off_time = status->state.time + 200;
-}
+void task_finish(STATUS *status) { task_stop(status); }
 
 void task_stop(STATUS *status) {
   status->task.task_running = 0;
   status->task.armed = 0;
+  status->task.stop_cmd = 1;
   status->task.start_request = 0;
   status->task.stop_request = 0;
-  status->task.stop_cmd = 1;
   status->state.motion = STOP;
   status->state.base_speed = 0;
-  status->motor.wheel[0].tar_speed = 0;
-  status->motor.wheel[1].tar_speed = 0;
-  task2_direct_pwm = 0;
 }
 
-void task_select(STATUS *status, uint8_t id) {
-  if (id < TASK_BASIC_1 || id > TASK_ADV_2) {
-    return;
-  }
-  status->task.task_id = id;
-  if (id == TASK_BASIC_1 || id == TASK_ADV_2) {
-    status->task.start_pose = START_AB;
-  }
-  update_task_led(status);
+static uint8_t every_100ms(STATUS *status) {
+  if (status->state.time - task_last_report < 100) return 0;
+  task_last_report = status->state.time;
+  return 1;
 }
-
-
-static uint8_t t1_black_frames = 0;
-
 static void driver_task1(STATUS *status) {
-  float dist_cm = encoder_pulse_to_cm((int32_t)status->task.phase_mileage);
-
-  status->task.task_running = 1;
-  status->state.motion = FIND_LINE;
-
-  if (dist_cm >= 101.0f) {
-    task_finish(status);
-    return;
-  }
-
-  status->state.base_speed = (dist_cm < 60.0f) ? 14 : 6;
-
-  uint8_t mid4 = status->sensor.gw_analogue.digital_8bit & 0x3C;
-  uint8_t black = ((mid4 & 0x04) != 0)
-                + ((mid4 & 0x08) != 0)
-                + ((mid4 & 0x10) != 0)
-                + ((mid4 & 0x20) != 0);
-
-  if (black >= 3) {
-    t1_black_frames++;
-  } else {
-    t1_black_frames = 0;
-  }
-
-  if (t1_black_frames >= 3 && dist_cm > 99.0f) {
-    task_finish(status);
-  }
+  status->state.motion = STRAIGHT;
+  status->state.base_speed = 3;
 }
-
 static void driver_task2(STATUS *status) {
-  float roll = task2_update_pot_angle();
-  float angle_error = roll;
-  float balance_out;
-  float car_speed;
-  float position_out;
-  float pwm_out;
-  float d_raw;
-  float d_angle_delta;
-  float pwm_delta;
-  int16_t kick_pwm;
-  PID *balance_param = &status->state.status_pid.balance_pid;
-  PID *mileage_param = &status->state.status_pid.mileage_pid;
-
-  status->task.task_running = 1;
-  status->task.stop_cmd = 0;
-  task2_direct_pwm = 1;
-
-  switch (task2_state) {
-    case TASK2_BACK_SWING:
-      if (status->state.time - task2_last_switch_time >= task2_back_swing_time) {
-        task2_state = TASK2_FRONT_KICK;
-        task2_last_switch_time = status->state.time;
-      } else {
-        kick_pwm = -ABS(task2_back_swing_pwm);
-        task2_debug_pwm_out = (float)kick_pwm;
-        status->state.motion = STRAIGHT;
-        status->state.base_speed = 0;
-        task2_set_pwm(kick_pwm);
-        break;
-      }
-
-    case TASK2_FRONT_KICK:
-      if (status->state.time - task2_last_switch_time >= task2_front_kick_time
-          || ABS(roll) < 8.0f) {
-        task2_state = TASK2_BALANCE_LQR;
-        task2_reset_d_state(angle_error);
-        task2_last_pwm = 0.0f;
-        /* fall through to LQR */
-      } else {
-        kick_pwm = ABS(task2_front_kick_pwm);
-        task2_debug_pwm_out = (float)kick_pwm;
-        status->state.motion = STRAIGHT;
-        status->state.base_speed = 0;
-        task2_set_pwm(kick_pwm);
-        break;
-      }
-
-    case TASK2_BALANCE_LQR:
-      // if (roll < TASK2_BACK_RECOVER_ANGLE) {
-      //   task2_state = TASK2_BACK_RECOVER;
-      //   task2_last_switch_time = status->state.time;
-      //   task2_square_dir = 1;
-      //   break;
-      // }
-
-      d_angle_delta = angle_error - task2_d_angle;
-      d_angle_delta = CONFINE(d_angle_delta, -TASK2_POT_STEP_LIMIT, TASK2_POT_STEP_LIMIT);
-      task2_d_angle += TASK2_D_ANGLE_ALPHA * d_angle_delta;
-      d_raw = task2_get_angle_delta(task2_d_angle);
-      if (ABS(d_raw) < TASK2_D_DEADBAND) {
-        d_raw = 0.0f;
-      }
-      task2_d_filt += TASK2_D_ALPHA * (d_raw - task2_d_filt);
-      task2_debug_balance_d_out = balance_param->kd * task2_d_filt;
-      task2_debug_balance_d_out = task2_soft_limit(task2_debug_balance_d_out,
-                                                   TASK2_D_LIMIT);
-      task2_debug_balance_p_out = balance_param->kp * angle_error;
-      balance_out = task2_debug_balance_p_out + task2_debug_balance_d_out;
-      balance_param->error = angle_error;
-      balance_param->derivative = task2_d_filt;
-      balance_param->last_error = angle_error;
-      balance_param->out = balance_out;
-      car_speed = ((float)status->motor.wheel[0].cur_speed
-                 + (float)status->motor.wheel[1].cur_speed) / 2.0f;
-      task2_debug_mileage_speed_out = mileage_param->kd * car_speed;
-      position_out = -(mileage_param->kp * task2_car_position
-                     + task2_debug_mileage_speed_out);
-      task2_debug_position_out = position_out;
-      status->state.motion = STRAIGHT;
-      status->state.base_speed = 0;
-
-      pwm_delta = balance_out + position_out;
-      pwm_delta = CONFINE(pwm_delta, -TASK2_PWM_SLEW, TASK2_PWM_SLEW);
-      task2_debug_raw_pwm = pwm_delta;
-      pwm_out = task2_last_pwm + pwm_delta;
-      pwm_out = CONFINE(pwm_out, -TRUST_CONFINE, TRUST_CONFINE);
-      task2_last_pwm = pwm_out;
-      task2_debug_pwm_out = pwm_out;
-      task2_set_pwm((int16_t)pwm_out);
-      break;
-
-    case TASK2_BACK_RECOVER:
-    default:
-      if (status->state.time - task2_last_switch_time >= task2_recover_time) {
-        task2_last_switch_time = status->state.time;
-        task2_square_dir = -task2_square_dir;
-        if (task2_square_dir == 1) {
-          task2_state = TASK2_BALANCE_LQR;
-          task2_reset_d_state(angle_error);
-          task2_last_pwm = 0.0f;
-        }
-      }
-      kick_pwm = (task2_square_dir == 1) ? task2_recover_pwm : -task2_recover_pwm;
-      task2_debug_pwm_out = (float)kick_pwm;
-      status->state.motion = STRAIGHT;
-      status->state.base_speed = 0;
-      task2_set_pwm(kick_pwm);
-      break;
-  }
+  if (every_100ms(status)) UART_send_justfloat(&huart1, 8,
+    (float)status->sensor.gw_analogue.channel[0], (float)status->sensor.gw_analogue.channel[1],
+    (float)status->sensor.gw_analogue.channel[2], (float)status->sensor.gw_analogue.channel[3],
+    (float)status->sensor.gw_analogue.channel[4], (float)status->sensor.gw_analogue.channel[5],
+    (float)status->sensor.gw_analogue.channel[6], (float)status->sensor.gw_analogue.channel[7]);
 }
-
-
 static void driver_task3(STATUS *status) {
+  if (every_100ms(status)) UART_send_justfloat(&huart1, 8,
+    (float)((status->sensor.gw_analogue.digital_8bit >> 0) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 1) & 1),
+    (float)((status->sensor.gw_analogue.digital_8bit >> 2) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 3) & 1),
+    (float)((status->sensor.gw_analogue.digital_8bit >> 4) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 5) & 1),
+    (float)((status->sensor.gw_analogue.digital_8bit >> 6) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 7) & 1));
 }
-
-static void driver_task4(STATUS *status) {
-}
-
-void update_task_led(STATUS *status) {
-  switch (status->task.task_id) {
-    case TASK_BASIC_1:
-      status->device.led_on_board.on = 1;
-      status->device.led1.on = 0;
-      status->device.led2.on = 1;
-      break;
-    case TASK_BASIC_2:
-      if (status->task.start_pose == START_AB) {
-        status->device.led_on_board.on = 1;
-        status->device.led1.on = 1;
-        status->device.led2.on = 1;
-      } else {
-        status->device.led_on_board.on = 0;
-        status->device.led1.on = 1;
-        status->device.led2.on = 1;
-      }
-      break;
-    case TASK_ADV_1:
-      if (status->task.start_pose == START_AB) {
-        status->device.led_on_board.on = 1;
-        status->device.led1.on = 0;
-        status->device.led2.on = 0;
-      } else {
-        status->device.led_on_board.on = 0;
-        status->device.led1.on = 0;
-        status->device.led2.on = 0;
-      }
-      break;
-    case TASK_ADV_2:
-      status->device.led_on_board.on = 1;
-      status->device.led1.on = 1;
-      status->device.led2.on = 0;
-      break;
+static void driver_task4(STATUS *status) { status->state.motion = FIND_LINE; status->state.base_speed = 3; follow_line(status); }
+static void driver_task5(STATUS *status) { (void)status; if (every_100ms(status)) UART_send_justfloat(&huart1, 2, uart_gyr_get_z(), uart_gyr_get_yaw()); }
+static void driver_task6(STATUS *status) {
+  /* UART4 is reserved for the MaixCAM2 ASCII protocol; responses are handled by its RX path. */
+  if (every_100ms(status)) {
+    static const uint8_t command[] = "CT1#";
+    HAL_UART_Transmit(&huart4, (uint8_t *)command, sizeof(command) - 1, 20);
   }
 }
+static void driver_task7(STATUS *status) { (void)status; }
 
 void update_task(STATUS *status) {
   if (status->task.stop_request) {
     task_stop(status);
     return;
   }
-
-  if (!status->task.task_running && !status->task.armed) {
-    if (status->task.task_select_request) {
-      task_select(status, status->task.requested_task_id);
-      status->task.task_select_request = 0;
-    }
-
-    if (status->task.pose_switch_request) {
-      if (status->task.task_id == TASK_BASIC_2 || status->task.task_id == TASK_ADV_1) {
-        status->task.start_pose = (status->task.start_pose == START_AB) ? START_AD : START_AB;
-        update_task_led(status);
-      }
-      status->task.pose_switch_request = 0;
-    }
+  if (status->task.task_select_request && !status->task.armed) {
+    task_select(status, status->task.requested_task_id);
+    status->task.task_select_request = 0;
   }
-
-  if (status->task.start_request) {
-    if (!status->task.task_running && !status->task.armed) {
-      status->task.armed = 1;
-      task_start(status);
-    }
-    status->task.start_request = 0;
-  }
-
-  if (!status->task.armed) {
-    return;
-  }
-
-  int32_t wheel0_pulse = status->motor.wheel[0].cur_speed;
-  int32_t wheel1_pulse = status->motor.wheel[1].cur_speed;
-  if (status->task.task_id == TASK_BASIC_2) {
-    task2_car_position += ((float)wheel0_pulse + (float)wheel1_pulse) / 2.0f;
-  }
-  if (wheel0_pulse < 0) wheel0_pulse = -wheel0_pulse;
-  if (wheel1_pulse < 0) wheel1_pulse = -wheel1_pulse;
-  status->task.phase_mileage += ((float)wheel0_pulse + (float)wheel1_pulse) / 2.0f;
-
+  if (status->task.start_request && !status->task.armed) task_start(status);
+  if (!status->task.armed) return;
   switch (status->task.task_id) {
-    case TASK_BASIC_1:
-      driver_task1(status);
-      break;
-    case TASK_BASIC_2:
-      driver_task2(status);
-      break;
-    case TASK_ADV_1:
-      driver_task3(status);
-      break;
-    case TASK_ADV_2:
-      driver_task4(status);
-      break;
+    case TASK_BASIC_1: driver_task1(status); break;
+    case TASK_BASIC_2: driver_task2(status); break;
+    case TASK_ADV_1: driver_task3(status); break;
+    case TASK_ADV_2: driver_task4(status); break;
+    case TASK_BASIC_3: driver_task5(status); break;
+    case TASK_ADV_3: driver_task6(status); break;
+    case TASK_ADV_4: driver_task7(status); break;
+    default: task_stop(status); break;
   }
 }

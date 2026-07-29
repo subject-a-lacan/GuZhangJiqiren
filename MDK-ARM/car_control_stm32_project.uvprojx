@@ -665,6 +665,11 @@
               <FileType>5</FileType>
               <FilePath>..\User\Device\buzzer.h</FilePath>
             </File>
+            <File>
+              <FileName>device_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Device\device_test.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -1,6 +1,6 @@
-// @551
+﻿// @551
 
-// 警告 使用该库时需要开启I2C中断
+// 璀﹀憡 浣跨敤璇ュ簱鏃堕渶瑕佸紑鍚疘2C涓柇
 
 #include "gy901.h"
 
@@ -12,7 +12,7 @@
 volatile uint8_t gyro_dma_ready = 0;
 volatile uint8_t gyro_dma_busy = 0;
 
-void init_gyr(GYR *gyr) {
+void iic_gyr_init(GYR *gyr) {
   gyr->device_addr = GYR_ADDR;
   gyr->data_start_addr = 0x34;
   for (int i = 0; i < 24; i++) {
@@ -22,12 +22,12 @@ void init_gyr(GYR *gyr) {
   return;
 }
   /**
-      * @brief  从 GY901 传感器读取原始二进制数据
-      * @param  i2c: 指向 I2C 句柄的指针（如 &hi2c1）
-      * @param  gyr: 指向陀螺仪结构体的指针，用于存放读取到的原始数据
-      * @retval 无
-      * @note   该函数通过 I2C 连续读取 24 字节数据，涵盖了加速度、角速度和欧拉角等核心信息。
-      *         数据存放在 gyr->data_buf 中，等待 get_gyr_value 函数解析。
+      * @brief  浠?GY901 浼犳劅鍣ㄨ鍙栧師濮嬩簩杩涘埗鏁版嵁
+      * @param  i2c: 鎸囧悜 I2C 鍙ユ焺鐨勬寚閽堬紙濡?&hi2c1锛?
+      * @param  gyr: 鎸囧悜闄€铻轰华缁撴瀯浣撶殑鎸囬拡锛岀敤浜庡瓨鏀捐鍙栧埌鐨勫師濮嬫暟鎹?
+      * @retval 鏃?
+      * @note   璇ュ嚱鏁伴€氳繃 I2C 杩炵画璇诲彇 24 瀛楄妭鏁版嵁锛屾兜鐩栦簡鍔犻€熷害銆佽閫熷害鍜屾鎷夎绛夋牳蹇冧俊鎭€?
+      *         鏁版嵁瀛樻斁鍦?gyr->data_buf 涓紝绛夊緟 iic_gyr_get_value 鍑芥暟瑙ｆ瀽銆?
       */
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
   if (hi2c == &hi2c1) {
@@ -42,7 +42,7 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
   }
 }
 
-HAL_StatusTypeDef get_gyr_raw_data_dma(I2C_HandleTypeDef *i2c, GYR *gyr) {
+HAL_StatusTypeDef iic_gyr_read_dma(I2C_HandleTypeDef *i2c, GYR *gyr) {
   HAL_StatusTypeDef ret;
 
   if (gyro_dma_busy) {
@@ -58,13 +58,13 @@ HAL_StatusTypeDef get_gyr_raw_data_dma(I2C_HandleTypeDef *i2c, GYR *gyr) {
   return ret;
 }
  /**
-     * @brief  解析原始数据并转换为实际物理量
-     * @param  gyr: 指向陀螺仪结构体的指针
-     * @param  key: 枚举类型，指定要获取哪种数据（加速度、角速度或角度）
-     * @return 转换后的浮点型物理数值
-     * @note   转换逻辑说明：
+     * @brief  瑙ｆ瀽鍘熷鏁版嵁骞惰浆鎹负瀹為檯鐗╃悊閲?
+     * @param  gyr: 鎸囧悜闄€铻轰华缁撴瀯浣撶殑鎸囬拡
+     * @param  key: 鏋氫妇绫诲瀷锛屾寚瀹氳鑾峰彇鍝鏁版嵁锛堝姞閫熷害銆佽閫熷害鎴栬搴︼級
+     * @return 杞崲鍚庣殑娴偣鍨嬬墿鐞嗘暟鍊?
+     * @note   杞崲閫昏緫璇存槑锛?
      */
-float get_gyr_value(GYR *gyr, enum gyroscope key) {
+float iic_gyr_get_value(GYR *gyr, enum gyroscope key) {
   uint8_t cnt = (key - gyr->data_start_addr) * 2;
   float value = (short)(((short)gyr->data_buf[cnt + 1] << 8) | gyr->data_buf[cnt]);
 
@@ -83,3 +83,4 @@ float get_gyr_value(GYR *gyr, enum gyroscope key) {
       return value * 180 / 32768;
   }
 }
+
