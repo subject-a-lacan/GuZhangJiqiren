@@ -26,12 +26,12 @@ typedef enum BUTTON_STATION {
 
 // 按键服务函数 该函数在driver_button()中已经被调用 请勿在其他地方调用 传入按键以及按键状态 使用时在button.c中修改调用效果
 /*
-使用示例 当编号为1的按钮发生按键按下事件时将wheel[0]的目标速度反向
+使用示例 当编号为1的按钮发生按键按下事件时将后左轮 wheel[0] 的目标速度反向
 
 void server_button(BUTTON *button, BUTTON_STATION station) {
   if (button->which == 1) {                                                      // 判断按键编号 为1
     if (station == BUTTON_DOWN) {                                                // 判断按键事件 为BUTTON_DOWN
-      status.motor.wheel[0].tar_speed = -status.motor.wheel[0].tar_speed;        // 反向wheel[0]tar
+      status.motor.wheel[0].tar_speed = -status.motor.wheel[0].tar_speed;        // 反向后左轮目标速度
     }
   }
   return;

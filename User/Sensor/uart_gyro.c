@@ -24,11 +24,13 @@ void uart_gyr_rx_feed(UART_GYRO *gyro, uint8_t byte, uint32_t now_ms) {
   int16_t raw;
 
   if (gyro->count == 0 && byte != 0x5A) return;
+  if (gyro->count >= sizeof(gyro->frame)) gyro->count = 0;
   gyro->frame[gyro->count++] = byte;
   if (gyro->count < 5) return;
 
   sum = (uint8_t)(gyro->frame[0] + gyro->frame[1] + gyro->frame[2] + gyro->frame[3]);
-  if (sum == gyro->frame[4]) {
+  if (sum == gyro->frame[4] &&
+      (gyro->frame[1] == 0xAA || gyro->frame[1] == 0xBB)) {
     raw = (int16_t)(((uint16_t)gyro->frame[3] << 8) | gyro->frame[2]);
     if (gyro->frame[1] == 0xAA) gyro->gyro_z = (float)raw * (2000.0f / 32768.0f);
     if (gyro->frame[1] == 0xBB) gyro->yaw = (float)raw * (180.0f / 32768.0f);
@@ -41,7 +43,10 @@ void uart_gyr_rx_feed(UART_GYRO *gyro, uint8_t byte, uint32_t now_ms) {
 }
 
 void uart_gyr_start_receive(UART_GYRO *gyro) {
-  HAL_UART_Receive_IT(&huart2, &gyro->rx_byte, 1);
+  if (HAL_UART_Receive_IT(&huart2, &gyro->rx_byte, 1) != HAL_OK) {
+    HAL_UART_AbortReceive(&huart2);
+    HAL_UART_Receive_IT(&huart2, &gyro->rx_byte, 1);
+  }
 }
 
 static void send_command(const uint8_t *cmd) {

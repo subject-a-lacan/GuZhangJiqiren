@@ -736,6 +736,26 @@
               <FilePath>..\User\Sensor\gy901.h</FilePath>
             </File>
             <File>
+              <FileName>uart_gyro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Sensor\uart_gyro.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart_gyro.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\User\Sensor\uart_gyro.h</FilePath>
+            </File>
+            <File>
+              <FileName>maixcam.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Sensor\maixcam.c</FilePath>
+            </File>
+            <File>
+              <FileName>maixcam.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\User\Sensor\maixcam.h</FilePath>
+            </File>
+            <File>
               <FileName>ms_find_line.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Sensor\ms_find_line.c</FilePath>

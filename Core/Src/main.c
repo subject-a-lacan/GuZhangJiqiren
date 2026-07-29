@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include "task.h"
 #include "lora.h"
+#include "maixcam.h"
 
 /* USER CODE END Includes */
 
@@ -142,9 +143,10 @@ int main(void)
   iic_gyr_read_dma(&hi2c1, &status.sensor.gy901);
   after_init_state();
   status.state.motion = STOP;
-  init_uart_pid_tune_it();
+  init_uart_pid_tune();
+  init_uart_gyr();
+  init_maixcam_uart();
   ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
-  HAL_ADC_Start(&hadc5);
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
 
@@ -152,6 +154,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   while (1) {
+    maixcam_poll((uint32_t)status.state.time);
     PERIODIC_START(Gray_ADC_Update, 5)
       driver_gw_analogue(&status.sensor.gw_analogue);
     PERIODIC_END
@@ -211,11 +214,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void UART_PID_Tune(uint8_t cmd, float val) {
-  (void)cmd;
-  (void)val;
-}
-
+/* UART callbacks and PID command handling live in User/It/uart_it.c. */
 /* USER CODE END 4 */
 
 /**

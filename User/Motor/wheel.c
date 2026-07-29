@@ -126,17 +126,9 @@ void driver_wheel(WHEEL *wheel) {
     return;
   }
 
-  // Feedforward uses 8ms encoder-pulse speed calibration.
-  uint8_t ff_index = wheel_ff_index(wheel->which);
-  float ff_abs = wheel_ff_offset[ff_index] + wheel_ff_k[ff_index] * ABS(wheel->tar_speed);
-  if (ff_abs < wheel_ff_min[ff_index]) ff_abs = wheel_ff_min[ff_index];
-  float ff;
-  if (wheel->tar_speed > 0)      ff = ff_abs;
-  else if (wheel->tar_speed < 0) ff = -ff_abs;
-  else                           ff = 0;
-
   float pid_out = compute_pid(&wheel->wheel_pid, wheel->tar_speed - wheel->cur_speed);
-  wheel->trust = (int16_t)(ff + pid_out);
+  /* Feedforward is retained for calibration but disabled from PWM output. */
+  wheel->trust = (int16_t)pid_out;
   wheel->trust = CONFINE(wheel->trust, -TRUST_CONFINE, TRUST_CONFINE);
 
   if (wheel->tar_speed == 0 && ABS(wheel->cur_speed) < 2) {
@@ -174,7 +166,7 @@ void init_wheel(WHEEL *wheel, uint8_t which, int8_t dir) {
   wheel->cur_speed = 0;
   wheel->tar_speed = 0;
   wheel->dir = dir;
-  wheel->wheel_pid = init_pid(8, 0, 0, 5, 100, 0.50f);  // P I D T integral_max InteralCoef
+  wheel->wheel_pid = init_pid(1200, 0, 0, 5, 100, 0.50f);  // P I D T integral_max InteralCoef
   if (wheel->which == 1) {
     HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
   } else if (wheel->which == 2) {

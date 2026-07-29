@@ -38,4 +38,5 @@ car_control_stm32_project/lora.o: ../Core/Src/lora.c ../Core/Inc\lora.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_uart.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h ../Core/Inc\usart.h
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h ../Core/Inc\usart.h \
+  ../User/Tool\log.h

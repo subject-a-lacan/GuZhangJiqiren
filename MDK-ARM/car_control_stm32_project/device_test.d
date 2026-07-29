@@ -42,5 +42,5 @@ car_control_stm32_project/device_test.o: ../User/Device/device_test.c \
   ../Core/Inc\usart.h ../User/Status\status.h ../User/Device\button.h \
   ../User/Device\buzzer.h ../User/Status/Defect.h \
   ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h ../User/Tool\pid.h \
-  ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h \
-  ../User/Tool\log.h
+  ../User/Sensor\uart_gyro.h ../User/Device\led.h ../User/Motor\servo.h \
+  ../User/Motor\wheel.h ../User/Tool\log.h

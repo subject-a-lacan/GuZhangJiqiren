@@ -12,6 +12,20 @@
 
 #ifdef STM32
 
+HAL_StatusTypeDef UART_send_bytes(UART_HandleTypeDef *huart, const uint8_t *data, uint16_t size) {
+  uint16_t i;
+  for (i = 0; i < size; ++i) {
+    HAL_StatusTypeDef ret = HAL_UART_Transmit(huart, (uint8_t *)&data[i], 1, 20);
+    if (ret != HAL_OK) {
+      HAL_UART_AbortTransmit(huart);
+      huart->gState = HAL_UART_STATE_READY;
+      ret = HAL_UART_Transmit(huart, (uint8_t *)&data[i], 1, 20);
+      if (ret != HAL_OK) return ret;
+    }
+  }
+  return HAL_OK;
+}
+
 void log_uprintf(UART_HandleTypeDef *huart, const char *format, ...) {
   static unsigned char abbuf = 0;
   static char buf[2][LOG_FORMAT_BUF_LENGTH];
@@ -24,7 +38,7 @@ void log_uprintf(UART_HandleTypeDef *huart, const char *format, ...) {
       vsnprintf(buf[abbuf], LOG_FORMAT_BUF_LENGTH - 1, format, args);
   va_end(args);
 
-  HAL_UART_Transmit(huart, (uint8_t *)buf[abbuf], len, 100);
+  UART_send_bytes(huart, (const uint8_t *)buf[abbuf], (uint16_t)len);
 }
 
 void UART_send_justfloat(UART_HandleTypeDef *huart, uint8_t count, ...) {
@@ -35,8 +49,8 @@ void UART_send_justfloat(UART_HandleTypeDef *huart, uint8_t count, ...) {
   va_start(args, count);
   for (uint8_t i = 0; i < count; ++i) data[i] = (float)va_arg(args, double);
   va_end(args);
-  HAL_UART_Transmit(huart, (uint8_t *)data, (uint16_t)(count * sizeof(float)), 100);
-  HAL_UART_Transmit(huart, tail, sizeof(tail), 100);
+  UART_send_bytes(huart, (const uint8_t *)data, (uint16_t)(count * sizeof(float)));
+  UART_send_bytes(huart, tail, sizeof(tail));
 }
 
 #endif

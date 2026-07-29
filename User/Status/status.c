@@ -27,10 +27,9 @@ uint8_t speed_show_flag = 0;   // 鏄剧ず閫熷害鏍囧織浣?
  *       鎶?1 鍙疯埖鏈烘寕鍒扮姸鎬佹爲閲岋紝180 鏄繖涓埖鏈虹殑鏈€澶ц搴︼紝鍚庣画鍙寜瀹炵墿淇敼
  *@note 璋冪敤 init_servo(&status.motor.servo[1], 2, 270)
  *       鎶?2 鍙疯埖鏈烘寕鍒扮姸鎬佹爲閲岋紝270 鏄繖涓埖鏈虹殑鏈€澶ц搴︼紝鍚庣画鍙寜瀹炵墿淇敼
- *@note 璋冪敤 init_wheel(&status.motor.wheel[0], 1, -1)
- *       鎶婂乏杞寕鍒扮姸鎬佹爲閲岋紝1 鏄‖浠剁紪鍙凤紝-1 鐢ㄦ潵淇姝ｅ弽杞柟鍚戯紝鍚庣画甯歌皟
- *@note 璋冪敤 init_wheel(&status.motor.wheel[1], 2, 1)
- *       鎶婂彸杞寕鍒扮姸鎬佹爲閲岋紝2 鏄‖浠剁紪鍙凤紝1 琛ㄧず褰撳墠鏂瑰悜瀹氫箟锛屽悗缁父璋?
+ *@note init_wheel(&status.motor.wheel[0], 1, -1): rear-left wheel
+ *@note init_wheel(&status.motor.wheel[1], 2, 1): rear-right wheel
+
  */
 void init_motor() {
   init_servo(&status.motor.servo[0], 1, 180);
@@ -271,10 +270,10 @@ void update_status(STATUS *status) {
   status->motor.wheel[1].cur_speed = get_wheel_speed(&status->motor.wheel[1]);
   status->motor.wheel[2].cur_speed = get_wheel_speed(&status->motor.wheel[2]);
   status->motor.wheel[3].cur_speed = get_wheel_speed(&status->motor.wheel[3]);
-  // if (gyro_dma_ready) {
-  //   gyro_dma_ready = 0;
-  // }
-  // status->state.cur_angle = iic_gyr_get_value(&status->sensor.gy901, gyr_z_yaw);
+  if (gyro_dma_ready) {
+    gyro_dma_ready = 0;
+    status->state.cur_angle = iic_gyr_get_value(&status->sensor.gy901, gyr_z_yaw);
+  }
 
   
 
@@ -330,9 +329,9 @@ void update_status(STATUS *status) {
   driver_wheel(&status->motor.wheel[0]);
   driver_wheel(&status->motor.wheel[1]);
 
-  // if (!gyro_dma_busy) {
-  //   iic_gyr_read_dma(&hi2c1, &status->sensor.gy901);
-  // }
+  if (!gyro_dma_busy) {
+    iic_gyr_read_dma(&hi2c1, &status->sensor.gy901);
+  }
 
   return;
 }

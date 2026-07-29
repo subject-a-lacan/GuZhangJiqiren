@@ -1,4 +1,4 @@
-#include "device_test.h"
+﻿#include "device_test.h"
 #include "gpio.h"
 #include "usart.h"
 #include "status.h"
@@ -60,7 +60,7 @@ void LED_STATUS_TOGGLE_TEST(void) {
 
 void BUZZER_STATUS_TOGGLE_TEST(void) {
   status.device.buzzer.on ^= 1;
-  if (status.device.buzzer.on) status.device.buzzer.off_time = status.state.time + 200;
+  if (status.device.buzzer.on) status.device.buzzer.off_time = status.state.time + 140;
 }
 
 void MOTOR_test(int16_t speed0, int16_t speed1, uint8_t uart_pcb) {
@@ -69,3 +69,4 @@ void MOTOR_test(int16_t speed0, int16_t speed1, uint8_t uart_pcb) {
   status.motor.wheel[1].tar_speed = speed1;
   status.state.motion = MOTOR_TEST;
 }
+

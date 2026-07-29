@@ -2,6 +2,7 @@
 #include "main.h"
 #include <stdio.h>
 #include "usart.h"
+#include "log.h"
 
 /**
  * @brief  Initialize ESP8266
@@ -12,9 +13,7 @@
  * @retval None
  */
 static void uart1_tx(uint8_t *data, uint16_t size) {
-    if (HAL_UART_Transmit(&huart1, data, size, 100) != HAL_OK) {
-        huart1.gState = HAL_UART_STATE_READY;
-    }
+    UART_send_bytes(&huart1, data, size);
 }
 
 void ESP8266_Init(char *ssid, char *pwd, char *ip, char *port) {

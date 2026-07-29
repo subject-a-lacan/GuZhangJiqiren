@@ -1,4 +1,4 @@
-#include "adc.h"
+﻿#include "adc.h"
 #include "gpio.h"
 #include "gw_anagloge.h"
 #include "log.h"
@@ -13,9 +13,9 @@ uint8_t cross_cnt = 0;
 uint8_t left_cnt = 0;
 
 /*
- * 调试用：将 digital_8bit 用 ASCII 字符打印到串口（# = 看到线，. = 没看到）。
- * 数据来源：status.sensor.gw_analogue.digital_8bit（由 get_gw_analoge_digital_data 更新）。
- * 调用时机：仅在调试时手动调用，不参与巡线/路口主链路。
+ * 璋冭瘯鐢細灏?digital_8bit 鐢?ASCII 瀛楃鎵撳嵃鍒颁覆鍙ｏ紙# = 鐪嬪埌绾匡紝. = 娌＄湅鍒帮級銆?
+ * 鏁版嵁鏉ユ簮锛歴tatus.sensor.gw_analogue.digital_8bit锛堢敱 get_gw_analoge_digital_data 鏇存柊锛夈€?
+ * 璋冪敤鏃舵満锛氫粎鍦ㄨ皟璇曟椂鎵嬪姩璋冪敤锛屼笉鍙備笌宸＄嚎/璺彛涓婚摼璺€?
  */
 void gw_analogue_gray_show(GW_ANALOGUE *gw_analogue) {
   uint8_t buf = gw_analogue->digital_8bit;
@@ -29,10 +29,10 @@ void gw_analogue_gray_show(GW_ANALOGUE *gw_analogue) {
 }
 
 /*
- * 初始化路口判定缓存（status.sensor.gw_analogue.cross 中的判定字段）。
- * 将 integral / data_buf / maybe / cross / cross_cnt 置为安全初值，
- * integral_times 设为 70（需连续 70 帧确认路口，详见 get_road_type）。
- * 调用时机：init_gw_analogue() 上电初始化；task_start() 发车复位（Defect.c）。
+ * 鍒濆鍖栬矾鍙ｅ垽瀹氱紦瀛橈紙status.sensor.gw_analogue.cross 涓殑鍒ゅ畾瀛楁锛夈€?
+ * 灏?integral / data_buf / maybe / cross / cross_cnt 缃负瀹夊叏鍒濆€硷紝
+ * integral_times 璁句负 70锛堥渶杩炵画 70 甯х‘璁よ矾鍙ｏ紝璇﹁ get_road_type锛夈€?
+ * 璋冪敤鏃舵満锛歩nit_gw_analogue() 涓婄數鍒濆鍖栵紱task_start() 鍙戣溅澶嶄綅锛圖efect.c锛夈€?
  */
 void init_road_determine(Cross *cross) {
   cross->integral = 0;
@@ -46,10 +46,10 @@ void init_road_determine(Cross *cross) {
 }
 
 /*
- * 清零路口类型调试计数器（CrossRoad_cnt ~ UnknowRoad_cnt）。
- * 这些计数器只记录传感器层观测到的各类型路口次数，仅用于调试/VOFA 打印，
- * 不能替代 status.task.cross_cnt（TASK 状态机确认的有效路口计数）。
- * 调用时机：init_gw_analogue() 上电初始化。
+ * 娓呴浂璺彛绫诲瀷璋冭瘯璁℃暟鍣紙CrossRoad_cnt ~ UnknowRoad_cnt锛夈€?
+ * 杩欎簺璁℃暟鍣ㄥ彧璁板綍浼犳劅鍣ㄥ眰瑙傛祴鍒扮殑鍚勭被鍨嬭矾鍙ｆ鏁帮紝浠呯敤浜庤皟璇?VOFA 鎵撳嵃锛?
+ * 涓嶈兘鏇夸唬 status.task.cross_cnt锛圱ASK 鐘舵€佹満纭鐨勬湁鏁堣矾鍙ｈ鏁帮級銆?
+ * 璋冪敤鏃舵満锛歩nit_gw_analogue() 涓婄數鍒濆鍖栥€?
  */
 void init_road_cnt(Cross *cross) {
   cross->CrossRoad_cnt = 0;
@@ -64,15 +64,15 @@ void init_road_cnt(Cross *cross) {
 }
 
 /*
- * 模拟灰度传感器上电初始化。
- * 操作对象：status.sensor.gw_analogue（整个 GW_ANALOGUE 结构体）。
- * 1. 初始化路口判定缓存和调试计数器（调用 init_road_determine / init_road_cnt）。
- * 2. 清零 channel[] / correction_data_w[] / correction_data_b[]。
- * 3. 写入默认高低阈值（高 46-47 / 低 24-25，实车调出来的经验值）。
- * 4. 用默认阈值推算出校准数据的公式值（作为校准前兜底）。
- * 5. 清零 sta / digital_8bit / diff。
- * 6. 选中通道 0 作为初始 ADC 通道。
- * 调用时机：init_sensor() → status.c 上电初始化链路。
+ * 妯℃嫙鐏板害浼犳劅鍣ㄤ笂鐢靛垵濮嬪寲銆?
+ * 鎿嶄綔瀵硅薄锛歴tatus.sensor.gw_analogue锛堟暣涓?GW_ANALOGUE 缁撴瀯浣擄級銆?
+ * 1. 鍒濆鍖栬矾鍙ｅ垽瀹氱紦瀛樺拰璋冭瘯璁℃暟鍣紙璋冪敤 init_road_determine / init_road_cnt锛夈€?
+ * 2. 娓呴浂 channel[] / correction_data_w[] / correction_data_b[]銆?
+ * 3. 鍐欏叆榛樿楂樹綆闃堝€硷紙楂?46-47 / 浣?24-25锛屽疄杞﹁皟鍑烘潵鐨勭粡楠屽€硷級銆?
+ * 4. 鐢ㄩ粯璁ら槇鍊兼帹绠楀嚭鏍″噯鏁版嵁鐨勫叕寮忓€硷紙浣滀负鏍″噯鍓嶅厹搴曪級銆?
+ * 5. 娓呴浂 sta / digital_8bit / diff銆?
+ * 6. 閫変腑閫氶亾 0 浣滀负鍒濆 ADC 閫氶亾銆?
+ * 璋冪敤鏃舵満锛歩nit_sensor() 鈫?status.c 涓婄數鍒濆鍖栭摼璺€?
  */
 void init_gw_analogue(GW_ANALOGUE *gw_analogue) {
   init_road_determine(&gw_analogue->cross);
@@ -118,10 +118,10 @@ void init_gw_analogue(GW_ANALOGUE *gw_analogue) {
 }
 
 /*
- * 硬件层：通过 IO2/IO3/IO4 三根 GPIO 选择 8 选 1 模拟开关的通道。
- * channel 的低 3 位分别控制三根 IO：
- *   bit0 → IO2,  bit1 → IO3,  bit2 → IO4
- * 调用时机：get_gw_raw_data() 和 correct_gw_analogue() 遍历 8 通道时。
+ * 纭欢灞傦細閫氳繃 IO2/IO3/IO4 涓夋牴 GPIO 閫夋嫨 8 閫?1 妯℃嫙寮€鍏崇殑閫氶亾銆?
+ * channel 鐨勪綆 3 浣嶅垎鍒帶鍒朵笁鏍?IO锛?
+ *   bit0 鈫?IO2,  bit1 鈫?IO3,  bit2 鈫?IO4
+ * 璋冪敤鏃舵満锛歡et_gw_raw_data() 鍜?correct_gw_analogue() 閬嶅巻 8 閫氶亾鏃躲€?
  */
 void select_channel(uint8_t channel) {
   if (channel & 0x01) {
@@ -142,15 +142,15 @@ void select_channel(uint8_t channel) {
 }
 
 /*
- * 遍历 8 个通道，依次选择通道 → 启动 ADC3 → 等转换完成 → 读取 12bit ADC 值。
- * 结果写入 status.sensor.gw_analogue.channel[0..7]（0-4095 原始 ADC 值）。
- * 调用时机：driver_gw_analogue() 每个控制周期调用一次。
+ * 閬嶅巻 8 涓€氶亾锛屼緷娆￠€夋嫨閫氶亾 鈫?鍚姩 ADC3 鈫?绛夎浆鎹㈠畬鎴?鈫?璇诲彇 12bit ADC 鍊笺€?
+ * 缁撴灉鍐欏叆 status.sensor.gw_analogue.channel[0..7]锛?-4095 鍘熷 ADC 鍊硷級銆?
+ * 璋冪敤鏃舵満锛歞river_gw_analogue() 姣忎釜鎺у埗鍛ㄦ湡璋冪敤涓€娆°€?
  */
 void get_gw_raw_data(GW_ANALOGUE *gw_analogue) {
   // Read the ADC value for the selected channel
   for (int i = 0; i < 8; i++) {
     select_channel(i);                                   // Select the channel to read from
-    for (volatile uint32_t _d = 0; _d < 300; _d++);     // ~3μs delay for mux settling
+    for (volatile uint32_t _d = 0; _d < 300; _d++);     // ~3渭s delay for mux settling
     HAL_ADC_Start(&hadc3);                               // Start the ADC conversion
     HAL_ADC_PollForConversion(&hadc3, 1);                // Wait for conversion to complete
     gw_analogue->channel[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
@@ -159,26 +159,26 @@ void get_gw_raw_data(GW_ANALOGUE *gw_analogue) {
 }
 
 /*
- * 两阶段灰度校准，由外部校准流程手动驱动（不在 driver_gw_analogue 内自动调用）。
- * 操作对象：status.sensor.gw_analogue。
- * sta=0（白校准）：读取 8 通道 ADC → correction_data_w[]，点亮板载 LED 提示用户，
- *                  sta 切到 1，return 等下次调用。
- * sta=1（黑校准）：读取 8 通道 ADC → correction_data_b[]，熄灭 LED，
- *                 按白黑差值 ×0.33/0.66 计算 digital_low_threshold / digital_high_threshold，
- *                 sta 切回 0，串口打印校准结果。
- * 注意：校准时操作的 led_on_board 与 TASK LED 编码共享同一硬件，校准时 TASK 不应在运行。
+ * 涓ら樁娈电伆搴︽牎鍑嗭紝鐢卞閮ㄦ牎鍑嗘祦绋嬫墜鍔ㄩ┍鍔紙涓嶅湪 driver_gw_analogue 鍐呰嚜鍔ㄨ皟鐢級銆?
+ * 鎿嶄綔瀵硅薄锛歴tatus.sensor.gw_analogue銆?
+ * sta=0锛堢櫧鏍″噯锛夛細璇诲彇 8 閫氶亾 ADC 鈫?correction_data_w[]锛岀偣浜澘杞?LED 鎻愮ず鐢ㄦ埛锛?
+ *                  sta 鍒囧埌 1锛宺eturn 绛変笅娆¤皟鐢ㄣ€?
+ * sta=1锛堥粦鏍″噯锛夛細璇诲彇 8 閫氶亾 ADC 鈫?correction_data_b[]锛岀唲鐏?LED锛?
+ *                 鎸夌櫧榛戝樊鍊?脳0.33/0.66 璁＄畻 digital_low_threshold / digital_high_threshold锛?
+ *                 sta 鍒囧洖 0锛屼覆鍙ｆ墦鍗版牎鍑嗙粨鏋溿€?
+ * 娉ㄦ剰锛氭牎鍑嗘椂鎿嶄綔鐨?led_on_board 涓?TASK LED 缂栫爜鍏变韩鍚屼竴纭欢锛屾牎鍑嗘椂 TASK 涓嶅簲鍦ㄨ繍琛屻€?
  */
 void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
   if (gw_analogue->sta == 0) {
     for (int i = 0; i < 8; i++) {
       select_channel(i);                                             // Select the channel to read from
-      for (volatile uint32_t _d = 0; _d < 300; _d++);               // ~3μs delay for mux settling
+      for (volatile uint32_t _d = 0; _d < 300; _d++);               // ~3渭s delay for mux settling
       HAL_ADC_Start(&hadc3);                                         // Start the ADC conversion
       HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
       gw_analogue->correction_data_w[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
       HAL_ADC_Stop(&hadc3);                                // Stop the ADC conversion
       status.device.buzzer.on = 1;
-      status.device.buzzer.off_time = status.state.time + 500;
+      status.device.buzzer.off_time = status.state.time + 350;
     }
     status.device.led_on_board.on = 0;
     status.device.led1.on = 0;
@@ -189,13 +189,13 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
   if (gw_analogue->sta == 1) {
     for (int i = 0; i < 8; i++) {
       select_channel(i);                                             // Select the channel to read from
-      for (volatile uint32_t _d = 0; _d < 300; _d++);               // ~3μs delay for mux settling
+      for (volatile uint32_t _d = 0; _d < 300; _d++);               // ~3渭s delay for mux settling
       HAL_ADC_Start(&hadc3);                                         // Start the ADC conversion
       HAL_ADC_PollForConversion(&hadc3, 1);                          // Wait for conversion to complete
       gw_analogue->correction_data_b[i] = HAL_ADC_GetValue(&hadc3);  // Get the ADC value
       HAL_ADC_Stop(&hadc3);                                          // Stop the ADC conversion
       status.device.buzzer.on = 1;
-      status.device.buzzer.off_time = status.state.time + 500;
+      status.device.buzzer.off_time = status.state.time + 350;
     }
     status.device.led_on_board.on = 0;
     status.device.led1.on = 1;
@@ -221,15 +221,15 @@ void correct_gw_analogue(GW_ANALOGUE *gw_analogue) {
 }
 
 /*
- * 迟滞比较器：将 8 路原始 ADC 值转换为 8bit 数字量。
- * 输入：status.sensor.gw_analogue.channel[0..7]（原始 ADC）
- * 输出：status.sensor.gw_analogue.digital_8bit（bit=1 表示该路看到黑线）
- * 规则：
- *   channel[i] > digital_high_threshold[i] → bit 清零（白，没线）
- *   channel[i] < digital_low_threshold[i]  → bit 置 1（黑，有线）
- *   介于两者之间 → 保持上一次的 bit 值（迟滞带，防抖动）
- * digital_8bit 在 init_gw_analogue 时清零一次，之后每帧就地修改，不整体复位。
- * 调用时机：driver_gw_analogue() 每个控制周期调用。
+ * 杩熸粸姣旇緝鍣細灏?8 璺師濮?ADC 鍊艰浆鎹负 8bit 鏁板瓧閲忋€?
+ * 杈撳叆锛歴tatus.sensor.gw_analogue.channel[0..7]锛堝師濮?ADC锛?
+ * 杈撳嚭锛歴tatus.sensor.gw_analogue.digital_8bit锛坆it=1 琛ㄧず璇ヨ矾鐪嬪埌榛戠嚎锛?
+ * 瑙勫垯锛?
+ *   channel[i] > digital_high_threshold[i] 鈫?bit 娓呴浂锛堢櫧锛屾病绾匡級
+ *   channel[i] < digital_low_threshold[i]  鈫?bit 缃?1锛堥粦锛屾湁绾匡級
+ *   浠嬩簬涓よ€呬箣闂?鈫?淇濇寔涓婁竴娆＄殑 bit 鍊硷紙杩熸粸甯︼紝闃叉姈鍔級
+ * digital_8bit 鍦?init_gw_analogue 鏃舵竻闆朵竴娆★紝涔嬪悗姣忓抚灏卞湴淇敼锛屼笉鏁翠綋澶嶄綅銆?
+ * 璋冪敤鏃舵満锛歞river_gw_analogue() 姣忎釜鎺у埗鍛ㄦ湡璋冪敤銆?
  */
 void get_gw_analoge_digital_data(GW_ANALOGUE *gw_analogue) {
   for (int i = 0; i < 8; i++) {
@@ -242,18 +242,18 @@ void get_gw_analoge_digital_data(GW_ANALOGUE *gw_analogue) {
 }
 
 /*
- * 内部工具函数：将单个通道的 ADC 值线性映射到 0-100。
+ * 鍐呴儴宸ュ叿鍑芥暟锛氬皢鍗曚釜閫氶亾鐨?ADC 鍊肩嚎鎬ф槧灏勫埌 0-100銆?
  * (now - min) / (max - min) * 100
- * 注意：调用方需保证 max != min，否则除零。
+ * 娉ㄦ剰锛氳皟鐢ㄦ柟闇€淇濊瘉 max != min锛屽惁鍒欓櫎闆躲€?
  */
 float normalize_gray_data(uint16_t max, uint16_t min, uint16_t now) {
   return (((float)(now - min) / (float)(max - min)) * 100);
 }
 
 /*
- * 内部工具函数：将中间 4 路传感器的归一化值转为权重（4 路权重之和 = 1.0）。
- * 只处理通道 2-5（中间四路），通道 0,1,6,7 不参与循迹 diff 计算。
- * 若 4 路总和为 0（完全没看到线），直接 return 不除零。
+ * 鍐呴儴宸ュ叿鍑芥暟锛氬皢涓棿 4 璺紶鎰熷櫒鐨勫綊涓€鍖栧€艰浆涓烘潈閲嶏紙4 璺潈閲嶄箣鍜?= 1.0锛夈€?
+ * 鍙鐞嗛€氶亾 2-5锛堜腑闂村洓璺級锛岄€氶亾 0,1,6,7 涓嶅弬涓庡惊杩?diff 璁＄畻銆?
+ * 鑻?4 璺€诲拰涓?0锛堝畬鍏ㄦ病鐪嬪埌绾匡級锛岀洿鎺?return 涓嶉櫎闆躲€?
  */
 void normalize_gray_weight(float *raw_data) {
   float total = 0;
@@ -271,13 +271,13 @@ void normalize_gray_weight(float *raw_data) {
 }
 
 /*
- * 计算黑线相对于传感器中心的偏差值（模拟循迹 diff）。
- * 只用中间 4 路（通道 2-5，对应 distance = {-15, -10, 10, 15}）：
- *   1. 对每路 ADC 取反归一化（越黑值越大 → channel 值低 → buff 值高）。
- *   2. 归一化为权重（4 路权重和=1）。
- *   3. 加权求和得到 diff（负值=线偏左，正值=线偏右，0=居中）。
- * 结果写入 status.sensor.gw_analogue.diff → follow_line() 用此值算 PID 差速。
- * 调用时机：driver_gw_analogue() 每个控制周期调用。
+ * 璁＄畻榛戠嚎鐩稿浜庝紶鎰熷櫒涓績鐨勫亸宸€硷紙妯℃嫙寰抗 diff锛夈€?
+ * 鍙敤涓棿 4 璺紙閫氶亾 2-5锛屽搴?distance = {-15, -10, 10, 15}锛夛細
+ *   1. 瀵规瘡璺?ADC 鍙栧弽褰掍竴鍖栵紙瓒婇粦鍊艰秺澶?鈫?channel 鍊间綆 鈫?buff 鍊奸珮锛夈€?
+ *   2. 褰掍竴鍖栦负鏉冮噸锛? 璺潈閲嶅拰=1锛夈€?
+ *   3. 鍔犳潈姹傚拰寰楀埌 diff锛堣礋鍊?绾垮亸宸︼紝姝ｅ€?绾垮亸鍙筹紝0=灞呬腑锛夈€?
+ * 缁撴灉鍐欏叆 status.sensor.gw_analogue.diff 鈫?follow_line() 鐢ㄦ鍊肩畻 PID 宸€熴€?
+ * 璋冪敤鏃舵満锛歞river_gw_analogue() 姣忎釜鎺у埗鍛ㄦ湡璋冪敤銆?
  */
 void get_gw_analogue_analogue_diff(GW_ANALOGUE *gw_analogue) {
   float buff[8] = {0};
@@ -295,10 +295,10 @@ void get_gw_analogue_analogue_diff(GW_ANALOGUE *gw_analogue) {
 }
 
 /*
- * 内部工具函数：将三个布尔方向编码为 Road 枚举值。
- * L → bit2(0b100), F → bit1(0b010), R → bit0(0b001)
- * 注意：由于历史遗留的双 BUG 抵消，L 对应物理右侧传感器、R 对应物理左侧传感器，
- * 枚举值 LeftRoad/RightRoad 也随之交叉。实物路口判断已验证正确，禁止修改。
+ * 鍐呴儴宸ュ叿鍑芥暟锛氬皢涓変釜甯冨皵鏂瑰悜缂栫爜涓?Road 鏋氫妇鍊笺€?
+ * L 鈫?bit2(0b100), F 鈫?bit1(0b010), R 鈫?bit0(0b001)
+ * 娉ㄦ剰锛氱敱浜庡巻鍙查仐鐣欑殑鍙?BUG 鎶垫秷锛孡 瀵瑰簲鐗╃悊鍙充晶浼犳劅鍣ㄣ€丷 瀵瑰簲鐗╃悊宸︿晶浼犳劅鍣紝
+ * 鏋氫妇鍊?LeftRoad/RightRoad 涔熼殢涔嬩氦鍙夈€傚疄鐗╄矾鍙ｅ垽鏂凡楠岃瘉姝ｇ‘锛岀姝慨鏀广€?
  */
 enum Road road_new_from_bit(bool L, bool F, bool R) {
   uint8_t left = L ? 0b100 : 0;
@@ -309,12 +309,12 @@ enum Road road_new_from_bit(bool L, bool F, bool R) {
 }
 
 /*
- * 内部函数：根据累积的多帧积分值 + 当前帧 data_buf 判定路口类型。
- * left  = integral 高 2 位 == 0b11（物理左侧传感器连续看到线）
- * right = integral 低 2 位 == 0b11（物理右侧传感器连续看到线）
- * font  = data_buf 中间 4 位任一为 1（中间传感器当前看到线）
- * 通过 road_new_from_bit() 编码后返回 Road 枚举。
- * 仅由 get_road_type() 在 maybe 倒计时到 1 时调用。
+ * 鍐呴儴鍑芥暟锛氭牴鎹疮绉殑澶氬抚绉垎鍊?+ 褰撳墠甯?data_buf 鍒ゅ畾璺彛绫诲瀷銆?
+ * left  = integral 楂?2 浣?== 0b11锛堢墿鐞嗗乏渚т紶鎰熷櫒杩炵画鐪嬪埌绾匡級
+ * right = integral 浣?2 浣?== 0b11锛堢墿鐞嗗彸渚т紶鎰熷櫒杩炵画鐪嬪埌绾匡級
+ * font  = data_buf 涓棿 4 浣嶄换涓€涓?1锛堜腑闂翠紶鎰熷櫒褰撳墠鐪嬪埌绾匡級
+ * 閫氳繃 road_new_from_bit() 缂栫爜鍚庤繑鍥?Road 鏋氫妇銆?
+ * 浠呯敱 get_road_type() 鍦?maybe 鍊掕鏃跺埌 1 鏃惰皟鐢ㄣ€?
  */
 Road road_decision(Cross *cross) {
   bool left = (cross->integral >> 6) == 0x03;     // 0b1100_0000
@@ -325,13 +325,13 @@ Road road_decision(Cross *cross) {
 }
 
 /*
- * 内部函数：记录一次路口观测结果（传感器层，不决定运动）。
- * 1. 对应 road 类型的调试计数器 +1。
- * 2. 更新 cross->cross = road（写入 status.sensor.gw_analogue.cross.cross）。
- * 3. 若 road 不是 Straight/UnknowRoad，递增 cross->cross_cnt 和全局 cross_cnt。
- * 不会修改 base_speed / motion / wheel.tar_speed / PID / status.task.cross_cnt。
- * 全局 cross_cnt 仅供调试和 follow_line 兜底逻辑使用；正式任务以 TASK 的 cross_cnt 为准。
- * 仅由 get_road_type() 在路口确认或回到 Straight 时调用。
+ * 鍐呴儴鍑芥暟锛氳褰曚竴娆¤矾鍙ｈ娴嬬粨鏋滐紙浼犳劅鍣ㄥ眰锛屼笉鍐冲畾杩愬姩锛夈€?
+ * 1. 瀵瑰簲 road 绫诲瀷鐨勮皟璇曡鏁板櫒 +1銆?
+ * 2. 鏇存柊 cross->cross = road锛堝啓鍏?status.sensor.gw_analogue.cross.cross锛夈€?
+ * 3. 鑻?road 涓嶆槸 Straight/UnknowRoad锛岄€掑 cross->cross_cnt 鍜屽叏灞€ cross_cnt銆?
+ * 涓嶄細淇敼 base_speed / motion / wheel.tar_speed / PID / status.task.cross_cnt銆?
+ * 鍏ㄥ眬 cross_cnt 浠呬緵璋冭瘯鍜?follow_line 鍏滃簳閫昏緫浣跨敤锛涙寮忎换鍔′互 TASK 鐨?cross_cnt 涓哄噯銆?
+ * 浠呯敱 get_road_type() 鍦ㄨ矾鍙ｇ‘璁ゆ垨鍥炲埌 Straight 鏃惰皟鐢ㄣ€?
  */
 void serve_road(Cross *cross, Road road) {
   switch (road) {
@@ -370,21 +370,21 @@ void serve_road(Cross *cross, Road road) {
 }
 
 /*
- * 多帧路口检测状态机，每帧由 driver_gw_analogue() 调用一次。
- * 输入：road_data = status.sensor.gw_analogue.digital_8bit（当前帧二值化结果）
- * 输出：status.sensor.gw_analogue.cross.cross（路口观测结果）
+ * 澶氬抚璺彛妫€娴嬬姸鎬佹満锛屾瘡甯х敱 driver_gw_analogue() 璋冪敤涓€娆°€?
+ * 杈撳叆锛歳oad_data = status.sensor.gw_analogue.digital_8bit锛堝綋鍓嶅抚浜屽€煎寲缁撴灉锛?
+ * 杈撳嚭锛歴tatus.sensor.gw_analogue.cross.cross锛堣矾鍙ｈ娴嬬粨鏋滐級
  *
- * 状态机逻辑：
- * A. 当前为 Straight（正常巡线中）：
- *    - 若外侧传感器（bit7 或 bit0）看到线 → 启动 maybe 计数器（= integral_times=5）。
- *    - 每帧将 digital_8bit 按位 OR 累积到 integral。
- *    - maybe 从 5 减到 1 的过程中持续累积。
- *    - maybe 减到 1 时：调用 road_decision(integral, data_buf) 判定路口类型，
- *      调用 serve_road() 记录结果，清零 maybe 和 integral。
- * B. 当前为非 Straight（已判定在路口内）：
- *    - 检测 digital_8bit 是否为 0x18 / 0x10 / 0x08（中间传感器看到线，外侧横线消失）。
- *    - 满足条件则 serve_road(Straight)，回到正常巡线状态。
- *    - 注意：当前回 Straight 条件偏窄，实测可能需要扩展更多位图（如 0x1C, 0x38 等）。
+ * 鐘舵€佹満閫昏緫锛?
+ * A. 褰撳墠涓?Straight锛堟甯稿贰绾夸腑锛夛細
+ *    - 鑻ュ渚т紶鎰熷櫒锛坆it7 鎴?bit0锛夌湅鍒扮嚎 鈫?鍚姩 maybe 璁℃暟鍣紙= integral_times=5锛夈€?
+ *    - 姣忓抚灏?digital_8bit 鎸変綅 OR 绱Н鍒?integral銆?
+ *    - maybe 浠?5 鍑忓埌 1 鐨勮繃绋嬩腑鎸佺画绱Н銆?
+ *    - maybe 鍑忓埌 1 鏃讹細璋冪敤 road_decision(integral, data_buf) 鍒ゅ畾璺彛绫诲瀷锛?
+ *      璋冪敤 serve_road() 璁板綍缁撴灉锛屾竻闆?maybe 鍜?integral銆?
+ * B. 褰撳墠涓洪潪 Straight锛堝凡鍒ゅ畾鍦ㄨ矾鍙ｅ唴锛夛細
+ *    - 妫€娴?digital_8bit 鏄惁涓?0x18 / 0x10 / 0x08锛堜腑闂翠紶鎰熷櫒鐪嬪埌绾匡紝澶栦晶妯嚎娑堝け锛夈€?
+ *    - 婊¤冻鏉′欢鍒?serve_road(Straight)锛屽洖鍒版甯稿贰绾跨姸鎬併€?
+ *    - 娉ㄦ剰锛氬綋鍓嶅洖 Straight 鏉′欢鍋忕獎锛屽疄娴嬪彲鑳介渶瑕佹墿灞曟洿澶氫綅鍥撅紙濡?0x1C, 0x38 绛夛級銆?
  */
 void get_road_type(Cross *cross, uint8_t road_data) {
   cross->data_buf = road_data;
@@ -435,14 +435,14 @@ void get_road_type(Cross *cross, uint8_t road_data) {
 }
 
 /*
- * 模拟灰度传感器总驱动入口，每个控制周期调用一次。
- * 调用方：update_status() → status.c 主循环。
- * 调用链（按顺序）：
- *   1. get_gw_raw_data()          → channel[0..7] 原始 ADC
- *   2. get_gw_analoge_digital_data() → digital_8bit 二值化
- *   3. get_gw_analogue_analogue_diff() → diff 循迹偏差
- *   4. get_road_type()            → cross.cross 路口观测
- * 调用完成后，外部可读取 status.sensor.gw_analogue 的全部观测结果：
+ * 妯℃嫙鐏板害浼犳劅鍣ㄦ€婚┍鍔ㄥ叆鍙ｏ紝姣忎釜鎺у埗鍛ㄦ湡璋冪敤涓€娆°€?
+ * 璋冪敤鏂癸細update_status() 鈫?status.c 涓诲惊鐜€?
+ * 璋冪敤閾撅紙鎸夐『搴忥級锛?
+ *   1. get_gw_raw_data()          鈫?channel[0..7] 鍘熷 ADC
+ *   2. get_gw_analoge_digital_data() 鈫?digital_8bit 浜屽€煎寲
+ *   3. get_gw_analogue_analogue_diff() 鈫?diff 寰抗鍋忓樊
+ *   4. get_road_type()            鈫?cross.cross 璺彛瑙傛祴
+ * 璋冪敤瀹屾垚鍚庯紝澶栭儴鍙鍙?status.sensor.gw_analogue 鐨勫叏閮ㄨ娴嬬粨鏋滐細
  *   channel[] / digital_8bit / diff / cross.cross
  */
 void driver_gw_analogue(GW_ANALOGUE *gw_analogue) {
@@ -451,3 +451,4 @@ void driver_gw_analogue(GW_ANALOGUE *gw_analogue) {
   get_gw_analogue_analogue_diff(gw_analogue);
   get_road_type(&gw_analogue->cross, gw_analogue->digital_8bit);
 }
+

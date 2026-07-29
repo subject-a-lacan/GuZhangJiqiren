@@ -2,6 +2,7 @@
 #include "status.h"
 #include "log.h"
 #include "uart_gyro.h"
+#include "maixcam.h"
 
 static uint32_t task_last_report;
 
@@ -65,7 +66,14 @@ static uint8_t every_100ms(STATUS *status) {
 }
 static void driver_task1(STATUS *status) {
   status->state.motion = STRAIGHT;
-  status->state.base_speed = 3;
+  status->state.base_speed = 5;
+  status->task.stop_cmd = 0;
+  status->motor.wheel[0].tar_speed = 5.0f;
+  status->motor.wheel[1].tar_speed = 5.0f;
+  if (every_100ms(status))
+    UART_send_justfloat(&huart1, 4,
+      (float)status->motor.wheel[0].cur_speed, status->motor.wheel[0].tar_speed,
+      (float)status->motor.wheel[1].cur_speed, status->motor.wheel[1].tar_speed);
 }
 static void driver_task2(STATUS *status) {
   if (every_100ms(status)) UART_send_justfloat(&huart1, 8,
@@ -81,14 +89,13 @@ static void driver_task3(STATUS *status) {
     (float)((status->sensor.gw_analogue.digital_8bit >> 4) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 5) & 1),
     (float)((status->sensor.gw_analogue.digital_8bit >> 6) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 7) & 1));
 }
-static void driver_task4(STATUS *status) { status->state.motion = FIND_LINE; status->state.base_speed = 3; follow_line(status); }
-static void driver_task5(STATUS *status) { (void)status; if (every_100ms(status)) UART_send_justfloat(&huart1, 2, uart_gyr_get_z(), uart_gyr_get_yaw()); }
+static void driver_task4(STATUS *status) { status->state.motion = FIND_LINE; status->state.base_speed = 3; }
+static void driver_task5(STATUS *status) {
+  if (every_100ms(status)) UART_send_justfloat(&huart1, 2,
+      status->sensor.uart_gyr.gyro_z, status->sensor.uart_gyr.yaw);
+}
 static void driver_task6(STATUS *status) {
-  /* UART4 is reserved for the MaixCAM2 ASCII protocol; responses are handled by its RX path. */
-  if (every_100ms(status)) {
-    static const uint8_t command[] = "CT1#";
-    HAL_UART_Transmit(&huart4, (uint8_t *)command, sizeof(command) - 1, 20);
-  }
+  if (every_100ms(status)) maixcam_cmd_T(1);
 }
 static void driver_task7(STATUS *status) { (void)status; }
 

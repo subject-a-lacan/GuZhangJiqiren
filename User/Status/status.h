@@ -8,6 +8,7 @@
 #include "Defect.h"
 #include "gw_anagloge.h"
 #include "gy901.h"
+#include "uart_gyro.h"
 #include "led.h"
 #include "main.h"
 #include "pid.h"
@@ -82,6 +83,7 @@ typedef struct GW_8BIT {
  */
 typedef struct SENSOR {
   GYR gy901;
+  UART_GYRO uart_gyr;
   GW_ANALOGUE gw_analogue;
 } SENSOR;
 /*

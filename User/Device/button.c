@@ -1,4 +1,4 @@
-#include "button.h"
+﻿#include "button.h"
 
 #include "gpio.h"
 #include "gw_anagloge.h"
@@ -8,15 +8,15 @@ extern PID balance_pid;
 uint8_t is_p = 1;
 
 /*
- * @brief 按键事件业务处理函数（由 driver_button 识别事件后调用）
- * @param button 按键结构体指针，用于区分是哪个按键
- * @param station 按键事件类型（BUTTON_DOWN / BUTTON_UP / BUTTON_LONG）
- * @return 无
- *@note 按键逻辑按 jiegou.md §7：
- *       PB11(B11) 短按 → 轮换 task_id 并置 task_select_request
- *       PB11(B11) 长按 → 仅 TASK2/TASK3 时置 pose_switch_request + 长响
- *       PD2(D2)   短按 → armed 且空闲时置 start_request + 短响
- *       PD2(D2)   长按 → 灰度校准
+ * @brief 鎸夐敭浜嬩欢涓氬姟澶勭悊鍑芥暟锛堢敱 driver_button 璇嗗埆浜嬩欢鍚庤皟鐢級
+ * @param button 鎸夐敭缁撴瀯浣撴寚閽堬紝鐢ㄤ簬鍖哄垎鏄摢涓寜閿?
+ * @param station 鎸夐敭浜嬩欢绫诲瀷锛圔UTTON_DOWN / BUTTON_UP / BUTTON_LONG锛?
+ * @return 鏃?
+ *@note 鎸夐敭閫昏緫鎸?jiegou.md 搂7锛?
+ *       PB11(B11) 鐭寜 鈫?杞崲 task_id 骞剁疆 task_select_request
+ *       PB11(B11) 闀挎寜 鈫?浠?TASK2/TASK3 鏃剁疆 pose_switch_request + 闀垮搷
+ *       PD2(D2)   鐭寜 鈫?armed 涓旂┖闂叉椂缃?start_request + 鐭搷
+ *       PD2(D2)   闀挎寜 鈫?鐏板害鏍″噯
  */
 void server_button(BUTTON *button, BUTTON_STATION station) {
   // PB11 (which == 2)
@@ -27,15 +27,11 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
         if (next > 7) next = 1;
         status.task.requested_task_id = next;
         status.task.task_select_request = 1;
+        status.device.buzzer.on = 1;
+        status.device.buzzer.off_time = status.state.time + 280;
       }
     }
-    if (station == BUTTON_LONG) {
-      if (status.task.task_running == 0) {
-        status.device.buzzer.on = 1;
-        status.device.buzzer.off_time = status.state.time + 1500;
-        status.device.buzzer.on = 1;
-      }
-    }
+    /* PB11 long press has no task meaning; posture switching was removed. */
   }
 
   // PD2 (which == 1)
@@ -44,12 +40,19 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
       if (status.task.armed == 0 && status.task.task_running == 0) {
         status.task.start_request = 1;
         status.device.buzzer.on = 1;
-        status.device.buzzer.off_time = status.state.time + 400;
+        status.device.buzzer.off_time = status.state.time + 280;
+      }
+      else if (status.task.task_running) {
+        status.task.stop_request = 1;
+        status.device.buzzer.on = 1;
+        status.device.buzzer.off_time = status.state.time + 280;
       }
     }
     if (station == BUTTON_LONG) {
       if (status.task.task_running == 0) {
         correct_gw_analogue(&status.sensor.gw_analogue);
+        status.device.buzzer.on = 1;
+        status.device.buzzer.off_time = status.state.time + 1050;
       }
     }
   }
@@ -58,44 +61,44 @@ void server_button(BUTTON *button, BUTTON_STATION station) {
 }
 
 void driver_button(BUTTON *button) {
-  // 1) 按按键编号读取当前引脚电平，写入 now
+  // 1) 鎸夋寜閿紪鍙疯鍙栧綋鍓嶅紩鑴氱數骞筹紝鍐欏叆 now
   if (button->which == 1) {
     button->now = HAL_GPIO_ReadPin(BUTTON_D2_GPIO_Port, BUTTON_D2_Pin);
   } else if (button->which == 2) {
     button->now = HAL_GPIO_ReadPin(BUTTON_B11_GPIO_Port, BUTTON_B11_Pin);
   }
 
-  // 2) 长按检测：先判断“当前是否处于按下态”
-  // Press_is_high_level=1 表示高电平按下；=0 表示低电平按下
-  // 这里的表达式等价于：button->now == button->Press_is_high_level
+  // 2) 闀挎寜妫€娴嬶細鍏堝垽鏂€滃綋鍓嶆槸鍚﹀浜庢寜涓嬫€佲€?
+  // Press_is_high_level=1 琛ㄧず楂樼數骞虫寜涓嬶紱=0 琛ㄧず浣庣數骞虫寜涓?
+  // 杩欓噷鐨勮〃杈惧紡绛変环浜庯細button->now == button->Press_is_high_level
   if (1 ^ (button->now ^ button->Press_is_high_level)) {
-    // 按下持续时，对 long_press_cnt 递减，到 0 触发一次 BUTTON_LONG
+    // 鎸変笅鎸佺画鏃讹紝瀵?long_press_cnt 閫掑噺锛屽埌 0 瑙﹀彂涓€娆?BUTTON_LONG
 
 
-    //注意注意 高电平按下有点问题 不过现在是低电平按下 所以无所谓
+    //娉ㄦ剰娉ㄦ剰 楂樼數骞虫寜涓嬫湁鐐归棶棰?涓嶈繃鐜板湪鏄綆鐢靛钩鎸変笅 鎵€浠ユ棤鎵€璋?
     
     if (button->long_press_cnt > 0) {
       button->long_press_cnt--;
     } else if (button->long_press_cnt == 0) {
       server_button(button, BUTTON_LONG);
-      // 置为 -1，避免在持续按下期间重复触发长按事件
+      // 缃负 -1锛岄伩鍏嶅湪鎸佺画鎸変笅鏈熼棿閲嶅瑙﹀彂闀挎寜浜嬩欢
       button->long_press_cnt = -1;
       button->long_triggered = 1;
     }
   } else {
-    // 未按下时恢复长按计数器
+    // 鏈寜涓嬫椂鎭㈠闀挎寜璁℃暟鍣?
     button->long_press_cnt = LONG_PRESS_CNT;
   }
 
-  // 3) 边沿检测：now 与 last 不同，说明按键状态发生变化
+  // 3) 杈规部妫€娴嬶細now 涓?last 涓嶅悓锛岃鏄庢寜閿姸鎬佸彂鐢熷彉鍖?
   if (button->now != button->last) {
     if (button->Press_is_high_level == 1) {
-      // 高电平按下：now=1 为按下沿，now=0 为释放沿
+      // 楂樼數骞虫寜涓嬶細now=1 涓烘寜涓嬫部锛宯ow=0 涓洪噴鏀炬部
       if (button->now == 1) {
         server_button(button, BUTTON_DOWN);
         button->long_triggered = 0;
-        // 按下沿额外处理：如果长按计数还没到阈值，继续递减
-        // 否则补发一次长按事件（兼容低频调用场景）
+        // 鎸変笅娌块澶栧鐞嗭細濡傛灉闀挎寜璁℃暟杩樻病鍒伴槇鍊硷紝缁х画閫掑噺
+        // 鍚﹀垯琛ュ彂涓€娆￠暱鎸変簨浠讹紙鍏煎浣庨璋冪敤鍦烘櫙锛?
         if (button->long_press_cnt - 1 >= 0) {
           button->long_press_cnt--;
         } else {
@@ -106,11 +109,11 @@ void driver_button(BUTTON *button) {
         if (button->long_triggered == 0) {
           server_button(button, BUTTON_UP);
         }
-        // 释放后恢复长按计数
+        // 閲婃斁鍚庢仮澶嶉暱鎸夎鏁?
         button->long_press_cnt = LONG_PRESS_CNT;
       }
     } else {
-      // 低电平按下：now=0 为按下沿，now=1 为释放沿
+      // 浣庣數骞虫寜涓嬶細now=0 涓烘寜涓嬫部锛宯ow=1 涓洪噴鏀炬部
       if (button->now == 0) {
         server_button(button, BUTTON_DOWN);
         button->long_triggered = 0;
@@ -118,11 +121,11 @@ void driver_button(BUTTON *button) {
         if (button->long_triggered == 0) {
           server_button(button, BUTTON_UP);
         }
-        // 释放后恢复长按计数
+        // 閲婃斁鍚庢仮澶嶉暱鎸夎鏁?
         button->long_press_cnt = LONG_PRESS_CNT;
       }
     }
-    // 4) 本轮处理结束，刷新 last 供下一轮做边沿比较
+    // 4) 鏈疆澶勭悊缁撴潫锛屽埛鏂?last 渚涗笅涓€杞仛杈规部姣旇緝
     button->last = button->now;
   }
 }
@@ -136,3 +139,5 @@ void init_button(BUTTON *button, uint8_t which, uint8_t Press_is_high_level) {
   button->long_triggered = 0;
   return;
 }
+
+
