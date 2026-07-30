@@ -1,176 +1,22 @@
-最典型的错误：接收长度设得太大
-
-例如：
-
-uint8_t rx_buf[64];
-
-HAL_UART_Receive_DMA(&huart4, rx_buf, 64);
-
-这表示：
-
-DMA 连续接收 64 字节，只有收满 64 字节，才产生接收完成回调。
-
-如果通信模块每帧只有 10 字节，而且发完后就停了，那么 DMA 已经把这 10 字节放进内存，但 CPU 不会进入：
-
-HAL_UART_RxCpltCallback()
-
-因为还差 54 字节。
-
-此时表现就是：
-
-数据其实已经进入内存；
-CPU却不知道这一帧已经结束；
-控制器继续使用上一帧旧数据；
-看起来像 DMA 延迟很大。
-
-这就是我之前说的“使用不当会降低实时性”。
-
-二、固定长度帧：长度设成真实帧长就不会延迟
-
-假设陀螺仪每帧固定 11 字节：
-
-HAL_UART_Receive_DMA(&huart2, rx_buf, 11);
-
-DMA收到第11个字节后，马上产生完成中断。
-
-在115200波特率、8N1格式下，每个字节在线路上的时间为：
-
-T
-byte
-	​
-
-=
-115200
-10
-	​
-
-≈86.8 μs
-
-11字节完整传输时间为：
-
-T
-frame
-	​
-
-=11×86.8≈955 μs
-
-这里接近1 ms的延迟是串口把11个字节传完所需的时间，不是DMA造成的。
-
-所以固定长度帧应当使用：
-
-DMA接收长度=一帧的准确字节数
-	​
-
-三、不定长帧：要使用DMA＋IDLE
-
-假设通信模块发送：
-
-有时8字节；
-有时12字节；
-有时20字节。
-
-这时不能固定等待64字节，而应使用：
-
-HAL_UARTEx_ReceiveToIdle_DMA(
-    &huart4,
-    rx_buf,
-    sizeof(rx_buf)
-);
-
-含义是：
-
-DMA不断把字节写进数组；
-UART发现线路空闲后，通知CPU；
-回调中的 Size 表示本次实际收到多少字节。
-
-例如：
-
-void HAL_UARTEx_RxEventCallback(
-    UART_HandleTypeDef *huart,
-    uint16_t Size)
-{
-    if (huart->Instance == UART4) {
-        /* rx_buf[0] 到 rx_buf[Size-1] 是本次数据 */
-    }
-}
-
-IDLE通常要等待大约一个字符时间才能确认空闲。
-
-115200波特率下约为：
-
-86.8 μs
-
-所以额外等待只有不到0.1 ms，通常可以忽略。
-
-四、环形DMA也可能因为缓冲区过大而延迟
-
-例如设置64字节环形缓冲区，只使用：
-
-Half Transfer：半缓冲区中断；
-Transfer Complete：整缓冲区中断。
-
-那么CPU第一次得到通知要等到32字节。
-
-115200波特率下：
-
-T
-32
-	​
-
-=32×86.8≈2.78 ms
-
-整缓冲区64字节则要：
-
-T
-64
-	​
-
-=64×86.8≈5.56 ms
-
-因此：
-
-大环形缓冲区
-＋只等半满/全满
-＝明显的批处理延迟
-
-解决办法有三种：
-
-缩小环形缓冲区；
-使用IDLE事件；
-定期读取DMA当前写入位置。
-五、Normal模式重新启动不及时，也会出问题
-
-Normal DMA流程是：
-
-接满一帧
-→ DMA停止
-→ 进入回调
-→ 软件重新启动DMA
-
-如果发送端下一帧紧跟上一帧，中间没有间隔，而你的回调重新启动得太晚，那么空窗期间到达的字节可能丢失。
-
-这通常表现为：
-
-偶尔错帧；
-帧头错位；
-校验失败；
-后续数据全部混乱。
-
-它主要是丢数据问题，不只是延迟问题。
-
-连续无间隙数据流更适合：
-
-Circular DMA
-	​
-
-
-周期发帧且帧间有明显空隙，更适合：
-
-Normal DMA＋IDLE
-	​
-
-
-固定长度且帧间有空隙，也可以：
-
-Normal DMA＋固定帧长
-	​
+找到了。看 main.c 的主循环——当前只调了 maixcam_poll() 和 task7_flush()，完全没有调用 consume_uart_gyr()。
+
+Read d:\KEIL_CUBE_VS\Episode1\Core\Src\main.c (lines 157-168)
+根因：consume_uart_gyr() 从未被调用。
+
+旧版（中断逐字节，正常）
+
+HAL_UART_RxCpltCallback (每字节)
+  → uart_gyr_rx_feed()        ← 逐字节解析 5 字节帧
+  → gyro->gyro_z = ...         ← 直接写入状态树
+  → gyro->yaw = ...
+TASK5 读 status.sensor.uart_gyr.gyro_z/yaw → 有值。
+
+新版（DMA，数据始终为 0）
+
+HAL_UART_RxCpltCallback (10 字节满)
+  → 解析 10 字节缓冲区
+  → 找到 0x5A 0xAA 帧 + 0x5A 0xBB 帧
+  → 写入 uart_gyr_snapshot[index]
+  → uart_gyr_snapshot_ready = 1
+  → ❌ 到此为止！gyro_z / yaw 从未更新
+consume_uart_gyr() 里有 status.sensor.uart_gyr.gyro_z = ... 和 status.sensor.uart_gyr.yaw = ...，但主循环里没有调用它。main.c 的 while(1) 只有 maixcam_poll + task7_flush，没有 consume_uart_gyr()。中断里攒了快照，主循环从来不消费，gyro_z / yaw 永远是 0。

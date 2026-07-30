@@ -10,20 +10,45 @@
 #define MAIXCAM_DMA_SIZE 128
 static uint8_t maixcam_dma_buf[MAIXCAM_DMA_SIZE];
 static uint16_t maixcam_dma_pos;
-#define UART_GYR_DMA_SIZE 10
+#define UART_GYR_DMA_SIZE 64
 static uint8_t uart_gyr_dma_buf[UART_GYR_DMA_SIZE];
+static uint16_t uart_gyr_dma_pos;
+static volatile uint8_t uart_gyr_dma_running;
+static volatile uint8_t uart_gyr_recover_pending;
 
-typedef struct {
-  uint8_t frame[UART_GYR_DMA_SIZE];
-  uint32_t tick;
-} UART_GYR_SNAPSHOT;
-
-static UART_GYR_SNAPSHOT uart_gyr_snapshot[2];
-static volatile uint8_t uart_gyr_snapshot_index;
-static volatile uint8_t uart_gyr_snapshot_ready;
-static uint8_t uart_gyr_sync_frame[UART_GYR_DMA_SIZE];
-static uint8_t uart_gyr_sync_count;
 volatile uint32_t uart_gyr_dma_error_count;
+volatile uint32_t uart_gyr_dma_start_error_count;
+volatile uint32_t uart_gyr_received_byte_count;
+volatile uint32_t uart_gyr_last_error;
+
+static HAL_StatusTypeDef start_uart_gyr_dma(void) {
+  HAL_StatusTypeDef result =
+      HAL_UART_Receive_DMA(&huart2, uart_gyr_dma_buf, UART_GYR_DMA_SIZE);
+
+  if (result == HAL_OK) {
+    __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+    uart_gyr_dma_running = 1;
+  } else {
+    uart_gyr_dma_running = 0;
+    uart_gyr_dma_start_error_count++;
+  }
+  return result;
+}
+
+static void recover_uart_gyr_dma(void) {
+  HAL_UART_AbortReceive(&huart2);
+  __HAL_UART_CLEAR_OREFLAG(&huart2);
+  __HAL_UART_CLEAR_FEFLAG(&huart2);
+  __HAL_UART_CLEAR_NEFLAG(&huart2);
+  __HAL_UART_CLEAR_PEFLAG(&huart2);
+  __HAL_UART_SEND_REQ(&huart2, UART_RXDATA_FLUSH_REQUEST);
+
+  status.sensor.uart_gyr.count = 0;
+  uart_gyr_dma_pos = 0;
+  if (start_uart_gyr_dma() == HAL_OK) {
+    uart_gyr_recover_pending = 0;
+  }
+}
 
 void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val);
 
@@ -82,37 +107,28 @@ void init_uart_pid_tune(void) {
 
 void init_uart_gyr(void) {
   uart_gyr_init(&status.sensor.uart_gyr);
-  uart_gyr_snapshot_index = 0;
-  uart_gyr_snapshot_ready = 0;
-  uart_gyr_sync_count = 0;
+  uart_gyr_dma_pos = 0;
+  uart_gyr_dma_running = 0;
+  uart_gyr_recover_pending = 0;
   uart_gyr_dma_error_count = 0;
-  HAL_UART_Receive_DMA(&huart2, uart_gyr_dma_buf, UART_GYR_DMA_SIZE);
-  __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+  uart_gyr_dma_start_error_count = 0;
+  uart_gyr_received_byte_count = 0;
+  uart_gyr_last_error = HAL_UART_ERROR_NONE;
+  if (start_uart_gyr_dma() != HAL_OK) uart_gyr_recover_pending = 1;
 }
 
 void consume_uart_gyr(void) {
-  uint8_t frame[UART_GYR_DMA_SIZE];
-  uint32_t tick;
-  uint32_t primask;
-  uint8_t index;
+  if (uart_gyr_recover_pending) recover_uart_gyr_dma();
+  if (!uart_gyr_dma_running) return;
 
-  if (!uart_gyr_snapshot_ready) return;
-  primask = __get_PRIMASK();
-  __disable_irq();
-  index = uart_gyr_snapshot_index;
-  for (uint8_t i = 0; i < UART_GYR_DMA_SIZE; i++) {
-    frame[i] = uart_gyr_snapshot[index].frame[i];
+  uint16_t pos = (uint16_t)(UART_GYR_DMA_SIZE - __HAL_DMA_GET_COUNTER(huart2.hdmarx));
+  pos &= (UART_GYR_DMA_SIZE - 1u);
+  while (uart_gyr_dma_running && uart_gyr_dma_pos != pos) {
+    uart_gyr_rx_feed(&status.sensor.uart_gyr, uart_gyr_dma_buf[uart_gyr_dma_pos],
+                     (uint32_t)status.state.time);
+    uart_gyr_dma_pos = (uint16_t)((uart_gyr_dma_pos + 1u) % UART_GYR_DMA_SIZE);
+    uart_gyr_received_byte_count++;
   }
-  tick = uart_gyr_snapshot[index].tick;
-  uart_gyr_snapshot_ready = 0;
-  if (!primask) __enable_irq();
-
-  status.sensor.uart_gyr.gyro_z =
-      (float)(int16_t)(((uint16_t)frame[3] << 8) | frame[2]) * (2000.0f / 32768.0f);
-  status.sensor.uart_gyr.yaw =
-      (float)(int16_t)(((uint16_t)frame[8] << 8) | frame[7]) * (180.0f / 32768.0f);
-  status.sensor.uart_gyr.update_tick = tick;
-  status.sensor.uart_gyr.valid = 1;
 }
 
 void init_maixcam_uart(void) {
@@ -123,13 +139,12 @@ void init_maixcam_uart(void) {
 }
 
 void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
+  uint8_t handled = 1;
   if (!has_val) {
     if (cmd == 's') status.task.start_request = 1;
     if (cmd == 'p') status.task.stop_request = 1;
     return;
   }
-  status.device.buzzer.on = 1;
-  status.device.buzzer.off_time = status.state.time + 140;
   switch (cmd) {
     case 'a': status.state.status_pid.follow_line_pid.kp = val; break;
     case 'c': status.state.status_pid.follow_line_pid.ki = val; break;
@@ -147,7 +162,11 @@ void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
     case 'n': status.motor.wheel[1].wheel_pid.integral_max = val; break;
     case 'h': status.state.base_speed = (int16_t)val; break;
     case 't': task_select(&status, (uint8_t)val); break;
-    default: break;
+    default: handled = 0; break;
+  }
+  if (handled) {
+    status.device.buzzer.on = 1;
+    status.device.buzzer.off_time = status.state.time + 140;
   }
 }
 
@@ -156,42 +175,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     uart1_pid_rx.byte = uart1_pid_byte;
     if (esp8266_ready) parse_uart_pid_byte(&uart1_pid_rx);
     HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
-  }
-  if (huart == &huart2) {
-    for (uint8_t i = 0; i < UART_GYR_DMA_SIZE; i++) {
-      uint8_t byte = uart_gyr_dma_buf[i];
-      if (uart_gyr_sync_count == 0 && byte != 0x5A) continue;
-      uart_gyr_sync_frame[uart_gyr_sync_count++] = byte;
-
-      if (uart_gyr_sync_count == 5) {
-        uint8_t sum = (uint8_t)(uart_gyr_sync_frame[0] + uart_gyr_sync_frame[1]
-                              + uart_gyr_sync_frame[2] + uart_gyr_sync_frame[3]);
-        if (uart_gyr_sync_frame[0] == 0x5A && uart_gyr_sync_frame[1] == 0xAA
-            && sum == uart_gyr_sync_frame[4]) {
-          continue;
-        }
-        uart_gyr_dma_error_count++;
-        uart_gyr_sync_count = (byte == 0x5A) ? 1u : 0u;
-        if (uart_gyr_sync_count) uart_gyr_sync_frame[0] = byte;
-      } else if (uart_gyr_sync_count == UART_GYR_DMA_SIZE) {
-        uint8_t sum = (uint8_t)(uart_gyr_sync_frame[5] + uart_gyr_sync_frame[6]
-                              + uart_gyr_sync_frame[7] + uart_gyr_sync_frame[8]);
-        if (uart_gyr_sync_frame[5] == 0x5A && uart_gyr_sync_frame[6] == 0xBB
-            && sum == uart_gyr_sync_frame[9]) {
-          uint8_t index = (uint8_t)(uart_gyr_snapshot_index ^ 1u);
-          for (uint8_t j = 0; j < UART_GYR_DMA_SIZE; j++) {
-            uart_gyr_snapshot[index].frame[j] = uart_gyr_sync_frame[j];
-          }
-          uart_gyr_snapshot[index].tick = HAL_GetTick();
-          uart_gyr_snapshot_index = index;
-          uart_gyr_snapshot_ready = 1;
-        } else {
-          uart_gyr_dma_error_count++;
-        }
-        uart_gyr_sync_count = (byte == 0x5A) ? 1u : 0u;
-        if (uart_gyr_sync_count) uart_gyr_sync_frame[0] = byte;
-      }
-    }
   }
 }
 
@@ -214,12 +197,11 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   if (huart == &huart1) HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
   if (huart == &huart2) {
-    HAL_UART_AbortReceive(huart);
+    uart_gyr_last_error = huart->ErrorCode;
+    uart_gyr_dma_error_count++;
+    uart_gyr_dma_running = 0;
+    uart_gyr_recover_pending = 1;
     status.sensor.uart_gyr.count = 0;
-    uart_gyr_snapshot_ready = 0;
-    uart_gyr_sync_count = 0;
-    HAL_UART_Receive_DMA(&huart2, uart_gyr_dma_buf, UART_GYR_DMA_SIZE);
-    __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
   }
   if (huart == &huart4) {
     HAL_UART_AbortReceive(huart);

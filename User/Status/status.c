@@ -271,7 +271,6 @@ void keep_balance(STATUS *status) {
  * @return 鏃?
  */
 void update_status(STATUS *status) {
-  consume_uart_gyr();
   if (gyro_dma_ready) {
     gyro_dma_ready = 0;
     status->state.cur_angle = iic_gyr_get_value(&status->sensor.gy901, gyr_z_yaw);
