@@ -145,7 +145,7 @@ int main(void)
   init_uart_pid_tune();
   init_uart_gyr();
   init_maixcam_uart();
-  ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
+  // ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
   esp8266_ready = 1;
   status.device.buzzer.on = 1;
   status.device.buzzer.off_time = 400;

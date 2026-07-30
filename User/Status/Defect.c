@@ -169,11 +169,11 @@ static void driver_task3(STATUS *status) {
 }
 static void driver_task4(STATUS *status) { status->state.motion = FIND_LINE; status->state.base_speed = 3; }
 static void driver_task5(STATUS *status) {
-  if (every_100ms(status))
-    UART_send_justfloat(&huart1, 3,
-      (float)status->sensor.uart_gyr.count,
-      (float)status->sensor.uart_gyr.gyro_z,
-      (float)status->sensor.uart_gyr.yaw);
+  static uint32_t last;
+  if (status->state.time - last >= 200) {
+    last = status->state.time;
+    UART_send_justfloat(&huart2, 2, 1.0f, 2.0f);
+  }
 }
 static void driver_task6(STATUS *status) {
   if (every_100ms(status))
