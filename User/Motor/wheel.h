@@ -18,7 +18,7 @@ typedef struct WHEEL {
   PID wheel_pid;
 } WHEEL;
 
-// 后左轮速度：status.motor.wheel[0].cur_speed = get_wheel_speed(&status->motor.wheel[0]);
+// 后右轮速度：status.motor.wheel[0].cur_speed = get_wheel_speed(&status->motor.wheel[0]);
 // 设置轮子目标速度至500： status.motor.wheel[0].tar_speed = 500;
 
 // 获取当前轮子速度 放在status_update()中 只能定期调用 返回编码器定时器的当前CNT值于上次CNT值的插值

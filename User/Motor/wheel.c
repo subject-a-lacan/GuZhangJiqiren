@@ -87,7 +87,7 @@ void set_wheel_dir(WHEEL *wheel, int16_t trust) {
       HAL_GPIO_WritePin(M2D2_GPIO_Port, M2D2_Pin, 1);
     }
   } else if (wheel->which == 3) {
-    if (wheel->trust * wheel->dir > 0) {
+    if (wheel->trust * wheel->dir < 0) {
       HAL_GPIO_WritePin(M3D1_GPIO_Port, M3D1_Pin, 1);
       HAL_GPIO_WritePin(M3D2_GPIO_Port, M3D2_Pin, 0);
     } else {
@@ -95,7 +95,7 @@ void set_wheel_dir(WHEEL *wheel, int16_t trust) {
       HAL_GPIO_WritePin(M3D2_GPIO_Port, M3D2_Pin, 1);
     }
   } else if (wheel->which == 4) {
-    if (wheel->trust * wheel->dir > 0) {
+    if (wheel->trust * wheel->dir < 0) {
       HAL_GPIO_WritePin(M4D1_GPIO_Port, M4D1_Pin, 1);
       HAL_GPIO_WritePin(M4D2_GPIO_Port, M4D2_Pin, 0);
     } else {
@@ -136,7 +136,7 @@ void driver_wheel(WHEEL *wheel) {
   }
 
   if (ABS(wheel->cur_speed) < 4 && status.state.motion != KEEP_ANGLE) {
-    wheel->trust = CONFINE(wheel->trust, -1500, 1500);
+    wheel->trust = CONFINE(wheel->trust, -4000, 4000);
   }
 
   set_wheel_dir(wheel, wheel->trust);

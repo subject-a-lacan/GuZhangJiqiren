@@ -3,6 +3,8 @@
 
 void init_uart_pid_tune(void);
 void init_uart_gyr(void);
+void poll_uart_gyr(void);
 void init_maixcam_uart(void);
+void poll_maixcam_uart(void);
 
 #endif

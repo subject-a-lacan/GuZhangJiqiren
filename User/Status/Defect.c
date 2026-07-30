@@ -3,6 +3,76 @@
 #include "log.h"
 #include "uart_gyro.h"
 #include "maixcam.h"
+#include <stdio.h>
+
+enum { T7_MSG_NONE, T7_MSG_RX, T7_MSG_CT1, T7_MSG_CM1, T7_MSG_CD1, T7_MSG_FOUND };
+enum { T7_CMD_NONE, T7_CMD_T, T7_CMD_M, T7_CMD_D };
+
+static volatile uint8_t task7_rx_msg_type;
+static volatile uint8_t task7_dbg_msg_type;
+static volatile uint8_t task7_cmd_type;
+
+/* captured from ISR, consumed in flush */
+static struct {
+  uint8_t found; int32_t x10, y10, d10;
+  char rx_raw[64];
+} task7_cap;
+
+static void task7_tx(const char *s, uint16_t len) {
+  uint32_t deadline = status.state.time + 50;
+  while (huart4.gState != HAL_UART_STATE_READY) {
+    if (status.state.time >= deadline) return;
+  }
+  HAL_UART_Transmit(&huart4, (uint8_t *)s, len, 100);
+}
+
+static void task7_flush_one(uint8_t type) {
+  char buf[128];
+  uint16_t len = 0;
+  switch (type) {
+    case T7_MSG_RX:
+      len = (uint16_t)snprintf(buf, sizeof(buf), "RX:%s\r\n", task7_cap.rx_raw);
+      break;
+    case T7_MSG_CT1:
+      { const char *s = "CT1#\r\n"; while (*s && len < sizeof(buf)-1) buf[len++] = *s++; buf[len] = '\0'; }
+      break;
+    case T7_MSG_CM1:
+      { const char *s = "CM1#\r\n"; while (*s && len < sizeof(buf)-1) buf[len++] = *s++; buf[len] = '\0'; }
+      break;
+    case T7_MSG_CD1:
+      { const char *s = "CD1#\r\n"; while (*s && len < sizeof(buf)-1) buf[len++] = *s++; buf[len] = '\0'; }
+      break;
+    case T7_MSG_FOUND:
+      len = (uint16_t)snprintf(buf, sizeof(buf), "FOUND:%d X:%.1f Y:%.1f DIST:%.1f\r\n",
+              task7_cap.found,
+              (double)(task7_cap.x10 / 10.0), (double)(task7_cap.y10 / 10.0),
+              (double)(task7_cap.d10 / 10.0));
+      break;
+    default: return;
+  }
+  if (len == 0) return;
+  task7_tx(buf, len);
+}
+
+void task7_flush(void) {
+  if (task7_cmd_type != T7_CMD_NONE) {
+    uint8_t c = task7_cmd_type;
+    task7_cmd_type = T7_CMD_NONE;
+    switch (c) {
+      case T7_CMD_T: maixcam_cmd_T(1); break;
+      case T7_CMD_M: maixcam_cmd_M(1); break;
+      case T7_CMD_D: maixcam_cmd_D(1); break;
+    }
+  }
+  {
+    uint8_t m = task7_rx_msg_type;
+    if (m != T7_MSG_NONE) { task7_rx_msg_type = T7_MSG_NONE; task7_flush_one(m); }
+  }
+  {
+    uint8_t m = task7_dbg_msg_type;
+    if (m != T7_MSG_NONE) { task7_dbg_msg_type = T7_MSG_NONE; task7_flush_one(m); }
+  }
+}
 
 static uint32_t task_last_report;
 
@@ -70,10 +140,14 @@ static void driver_task1(STATUS *status) {
   status->task.stop_cmd = 0;
   status->motor.wheel[0].tar_speed = 5.0f;
   status->motor.wheel[1].tar_speed = 5.0f;
+  status->motor.wheel[2].tar_speed = 5.0f;
+  status->motor.wheel[3].tar_speed = 5.0f;
   if (every_100ms(status))
-    UART_send_justfloat(&huart1, 4,
-      (float)status->motor.wheel[0].cur_speed, status->motor.wheel[0].tar_speed,
-      (float)status->motor.wheel[1].cur_speed, status->motor.wheel[1].tar_speed);
+    UART_send_justfloat(&huart1, 12,
+      (float)status->motor.wheel[0].cur_speed, status->motor.wheel[0].tar_speed, (float)status->motor.wheel[0].trust,
+      (float)status->motor.wheel[1].cur_speed, status->motor.wheel[1].tar_speed, (float)status->motor.wheel[1].trust,
+      (float)status->motor.wheel[2].cur_speed, status->motor.wheel[2].tar_speed, (float)status->motor.wheel[2].trust,
+      (float)status->motor.wheel[3].cur_speed, status->motor.wheel[3].tar_speed, (float)status->motor.wheel[3].trust);
 }
 static void driver_task2(STATUS *status) {
   if (every_100ms(status)) UART_send_justfloat(&huart1, 8,
@@ -95,9 +169,85 @@ static void driver_task5(STATUS *status) {
       status->sensor.uart_gyr.gyro_z, status->sensor.uart_gyr.yaw);
 }
 static void driver_task6(STATUS *status) {
-  if (every_100ms(status)) maixcam_cmd_T(1);
+  if (every_100ms(status))
+    UART_send_justfloat(&huart1, 1,
+      iic_gyr_get_value(&status->sensor.gy901, gyr_a_y));
 }
-static void driver_task7(STATUS *status) { (void)status; }
+static void driver_task7(STATUS *status) {
+  typedef enum {
+    Q7_START = 0,
+    Q7_WAIT_TA,
+    Q7_WAIT_MA,
+    Q7_WAIT_VD,
+    Q7_DONE,
+  } Q7_STATE;
+
+  static Q7_STATE q7_state = Q7_START;
+  static uint16_t q7_timer = 0;
+
+  status->task.task_running = 1;
+  status->state.motion = STOP;
+  status->state.base_speed = 0;
+
+  if (status->task.phase_mileage == 0) {
+    q7_state = Q7_START;
+    q7_timer = 0;
+    status->task.phase_mileage = 1;
+  }
+
+  if (maixcam_rx_raw_ready) {
+    maixcam_rx_raw_ready = 0;
+    task7_rx_msg_type = T7_MSG_RX;
+    { uint8_t i = 0; while (maixcam_rx_raw_buf[i] && i < 63) { task7_cap.rx_raw[i] = maixcam_rx_raw_buf[i]; i++; } task7_cap.rx_raw[i] = '\0'; }
+  }
+
+  q7_timer += (uint16_t)status->state.T;
+
+  switch (q7_state) {
+
+  case Q7_START:
+    task7_dbg_msg_type = T7_MSG_CT1; task7_cmd_type = T7_CMD_T;
+    q7_timer = 0; q7_state = Q7_WAIT_TA; break;
+
+  case Q7_WAIT_TA:
+    if (maixcam_cmd.state == MAIXCAM_CMD_OK && maixcam_cmd.cmd_type == 'T') {
+      task7_dbg_msg_type = T7_MSG_CM1; task7_cmd_type = T7_CMD_M;
+      q7_timer = 0; q7_state = Q7_WAIT_MA;
+    }
+    if (q7_timer >= 2000) { q7_timer = 0;
+      task7_dbg_msg_type = T7_MSG_CT1; task7_cmd_type = T7_CMD_T; }
+    break;
+
+  case Q7_WAIT_MA:
+    if (maixcam_cmd.state == MAIXCAM_CMD_OK && maixcam_cmd.cmd_type == 'M') {
+      task7_dbg_msg_type = T7_MSG_CD1; task7_cmd_type = T7_CMD_D;
+      q7_timer = 0; q7_state = Q7_WAIT_VD;
+    }
+    if (q7_timer >= 2000) { q7_timer = 0;
+      task7_dbg_msg_type = T7_MSG_CM1; task7_cmd_type = T7_CMD_M; }
+    break;
+
+  case Q7_WAIT_VD:
+    if (maixcam_det_new) {
+      maixcam_det_new = 0;
+      task7_cap.found = maixcam_det.found;
+      task7_cap.x10 = maixcam_det.x10;
+      task7_cap.y10 = maixcam_det.y10;
+      task7_cap.d10 = maixcam_det.distance10;
+      task7_dbg_msg_type = T7_MSG_FOUND;
+      q7_state = Q7_DONE;
+    }
+    if (maixcam_cmd.state == MAIXCAM_CMD_OK
+        && maixcam_cmd.cmd_type == 'D') {
+      maixcam_cmd.state = MAIXCAM_CMD_WAITING;
+    }
+    if (q7_timer >= 2000) { q7_timer = 0;
+      task7_dbg_msg_type = T7_MSG_CD1; task7_cmd_type = T7_CMD_D; }
+    break;
+
+  case Q7_DONE: break;
+  }
+}
 
 void update_task(STATUS *status) {
   if (status->task.stop_request) {

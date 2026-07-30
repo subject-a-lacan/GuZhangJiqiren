@@ -4,6 +4,8 @@
 #include "usart.h"
 #include "log.h"
 
+uint8_t esp8266_ready = 0;
+
 /**
  * @brief  Initialize ESP8266
  * @param  ssid:WiFi ssid

@@ -5,8 +5,14 @@
 #include "uart_gyro.h"
 #include "status.h"
 #include "maixcam.h"
+#include "lora.h"
 
-static uint8_t maixcam_rx_byte;
+#define MAIXCAM_DMA_SIZE 128
+static uint8_t maixcam_dma_buf[MAIXCAM_DMA_SIZE];
+static uint16_t maixcam_dma_pos;
+#define UART_GYR_DMA_SIZE 64
+static uint8_t uart_gyr_dma_buf[UART_GYR_DMA_SIZE];
+static uint16_t uart_gyr_dma_pos;
 
 void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val);
 
@@ -65,12 +71,34 @@ void init_uart_pid_tune(void) {
 
 void init_uart_gyr(void) {
   uart_gyr_init(&status.sensor.uart_gyr);
-  uart_gyr_start_receive(&status.sensor.uart_gyr);
+  uart_gyr_dma_pos = 0;
+  HAL_UART_Receive_DMA(&huart2, uart_gyr_dma_buf, UART_GYR_DMA_SIZE);
+}
+
+void poll_uart_gyr(void) {
+  uint16_t pos = (uint16_t)(UART_GYR_DMA_SIZE - __HAL_DMA_GET_COUNTER(huart2.hdmarx));
+  pos &= (UART_GYR_DMA_SIZE - 1u);
+  while (uart_gyr_dma_pos != pos) {
+    uart_gyr_rx_feed(&status.sensor.uart_gyr,
+                     uart_gyr_dma_buf[uart_gyr_dma_pos],
+                     (uint32_t)status.state.time);
+    uart_gyr_dma_pos = (uint16_t)((uart_gyr_dma_pos + 1u) % UART_GYR_DMA_SIZE);
+  }
 }
 
 void init_maixcam_uart(void) {
   maixcam_init();
-  HAL_UART_Receive_IT(&huart4, &maixcam_rx_byte, 1);
+  maixcam_dma_pos = 0;
+  HAL_UART_Receive_DMA(&huart4, maixcam_dma_buf, MAIXCAM_DMA_SIZE);
+}
+
+void poll_maixcam_uart(void) {
+  uint16_t pos = (uint16_t)(MAIXCAM_DMA_SIZE - __HAL_DMA_GET_COUNTER(huart4.hdmarx));
+  pos &= (MAIXCAM_DMA_SIZE - 1u);
+  while (maixcam_dma_pos != pos) {
+    maixcam_rx_feed(maixcam_dma_buf[maixcam_dma_pos]);
+    maixcam_dma_pos = (uint16_t)((maixcam_dma_pos + 1u) % MAIXCAM_DMA_SIZE);
+  }
 }
 
 void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
@@ -91,11 +119,11 @@ void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
     case 'm': status.motor.wheel[0].wheel_pid.kp = val; break;
     case 'o': status.motor.wheel[0].wheel_pid.ki = val; break;
     case 'q': status.motor.wheel[0].wheel_pid.kd = val; break;
-    case 's': status.motor.wheel[3].wheel_pid.kp = val; break;
-    case 'u': status.motor.wheel[3].wheel_pid.ki = val; break;
-    case 'w': status.motor.wheel[3].wheel_pid.kd = val; break;
+    case 's': status.motor.wheel[1].wheel_pid.kp = val; break;
+    case 'u': status.motor.wheel[1].wheel_pid.ki = val; break;
+    case 'w': status.motor.wheel[1].wheel_pid.kd = val; break;
     case 'b': status.motor.wheel[0].wheel_pid.integral_max = val; break;
-    case 'n': status.motor.wheel[3].wheel_pid.integral_max = val; break;
+    case 'n': status.motor.wheel[1].wheel_pid.integral_max = val; break;
     case 'h': status.state.base_speed = (int16_t)val; break;
     case 't': task_select(&status, (uint8_t)val); break;
     default: break;
@@ -103,33 +131,22 @@ void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  if (huart == &huart2) {
-    UART_GYRO *gyro = &status.sensor.uart_gyr;
-    uart_gyr_rx_feed(gyro, gyro->rx_byte, (uint32_t)status.state.time);
-    uart_gyr_start_receive(gyro);
-  }
   if (huart == &huart1) {
     uart1_pid_rx.byte = uart1_pid_byte;
-    parse_uart_pid_byte(&uart1_pid_rx);
+    if (esp8266_ready) parse_uart_pid_byte(&uart1_pid_rx);
     HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
-  }
-  if (huart == &huart4) {
-    maixcam_rx_feed(maixcam_rx_byte);
-    HAL_UART_Receive_IT(&huart4, &maixcam_rx_byte, 1);
   }
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   if (huart == &huart1) HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
   if (huart == &huart2) {
-    HAL_UART_AbortReceive(huart);
-    __HAL_UART_CLEAR_OREFLAG(huart);
-    __HAL_UART_CLEAR_FEFLAG(huart);
-    __HAL_UART_CLEAR_NEFLAG(huart);
-    __HAL_UART_CLEAR_PEFLAG(huart);
     status.sensor.uart_gyr.count = 0;
-    uart_gyr_start_receive(&status.sensor.uart_gyr);
+    uart_gyr_dma_pos = 0;
+    HAL_UART_Receive_DMA(&huart2, uart_gyr_dma_buf, UART_GYR_DMA_SIZE);
   }
-  if (huart == &huart4) HAL_UART_Receive_IT(&huart4, &maixcam_rx_byte, 1);
+  if (huart == &huart4) {
+    maixcam_dma_pos = 0;
+    HAL_UART_Receive_DMA(&huart4, maixcam_dma_buf, MAIXCAM_DMA_SIZE);
+  }
 }
-

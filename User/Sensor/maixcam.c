@@ -1,6 +1,7 @@
 ﻿#include "maixcam.h"
 #include "usart.h"
 #include "log.h"
+#include "status.h"
 #include <stdio.h>
 #include <stddef.h>
 
@@ -56,8 +57,21 @@ static uint8_t maixcam_rx_read(uint8_t *out) {
  *  鍛戒护鍙戦€?
  * 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
 
-static void maixcam_send_frame(const char *frame, uint8_t len) {
-  UART_send_bytes(&huart4, (const uint8_t *)frame, len);
+static uint8_t maixcam_tx_dma_buf[MAIXCAM_CMD_FRAME_MAX];
+
+static HAL_StatusTypeDef maixcam_send_frame(const char *frame, uint8_t len) {
+  if (len > sizeof(maixcam_tx_dma_buf)) return HAL_ERROR;
+
+  /* Wait for any in-progress TX to finish (50ms timeout) */
+  uint32_t deadline = status.state.time + 50;
+  while (huart4.gState != HAL_UART_STATE_READY) {
+    if (status.state.time >= deadline) return HAL_BUSY;
+  }
+
+  for (uint8_t i = 0; i < len; i++) {
+    maixcam_tx_dma_buf[i] = (uint8_t)frame[i];
+  }
+  return HAL_UART_Transmit_DMA(&huart4, maixcam_tx_dma_buf, len);
 }
 
 static void maixcam_start_cmd(char cmd_type, const char *frame, uint8_t len) {
@@ -68,7 +82,7 @@ static void maixcam_start_cmd(char cmd_type, const char *frame, uint8_t len) {
 
   maixcam_cmd.state          = MAIXCAM_CMD_WAITING;
   maixcam_cmd.cmd_type       = cmd_type;
-  maixcam_cmd.send_count     = 1;
+  maixcam_cmd.send_count     = 0;
   maixcam_cmd.timeout_cycles = 0;
   maixcam_cmd.frame_len      = copy_len;
   for (uint8_t i = 0; i < copy_len; i++) {
@@ -76,7 +90,9 @@ static void maixcam_start_cmd(char cmd_type, const char *frame, uint8_t len) {
   }
   maixcam_cmd.frame[copy_len] = '\0';
 
-  maixcam_send_frame(maixcam_cmd.frame, copy_len);
+  if (maixcam_send_frame(maixcam_cmd.frame, copy_len) == HAL_OK) {
+    maixcam_cmd.send_count = 1;
+  }
 }
 
 void maixcam_cmd_T(uint8_t on_off) {
@@ -131,9 +147,10 @@ static void maixcam_tick_inner(void) {
   if (maixcam_cmd.timeout_cycles < MAIXCAM_TIMEOUT_CYCLES) return;
 
   if (maixcam_cmd.send_count < MAIXCAM_RETRY_MAX) {
-    maixcam_send_frame(maixcam_cmd.frame, maixcam_cmd.frame_len);
-    maixcam_cmd.send_count++;
-    maixcam_cmd.timeout_cycles = 0;
+    if (maixcam_send_frame(maixcam_cmd.frame, maixcam_cmd.frame_len) == HAL_OK) {
+      maixcam_cmd.send_count++;
+      maixcam_cmd.timeout_cycles = 0;
+    }
   } else {
     maixcam_cmd.state = MAIXCAM_CMD_TIMEOUT;
   }

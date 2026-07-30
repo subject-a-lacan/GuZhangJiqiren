@@ -27,8 +27,10 @@ uint8_t speed_show_flag = 0;   // 鏄剧ず閫熷害鏍囧織浣?
  *       鎶?1 鍙疯埖鏈烘寕鍒扮姸鎬佹爲閲岋紝180 鏄繖涓埖鏈虹殑鏈€澶ц搴︼紝鍚庣画鍙寜瀹炵墿淇敼
  *@note 璋冪敤 init_servo(&status.motor.servo[1], 2, 270)
  *       鎶?2 鍙疯埖鏈烘寕鍒扮姸鎬佹爲閲岋紝270 鏄繖涓埖鏈虹殑鏈€澶ц搴︼紝鍚庣画鍙寜瀹炵墿淇敼
- *@note init_wheel(&status.motor.wheel[0], 1, -1): rear-left wheel
- *@note init_wheel(&status.motor.wheel[1], 2, 1): rear-right wheel
+ *@note init_wheel(&status.motor.wheel[0], 1, -1): MOTOR0 front-right wheel
+ *@note init_wheel(&status.motor.wheel[1], 2, 1):  MOTOR1 front-left wheel
+ *@note init_wheel(&status.motor.wheel[2], 3, 1):  MOTOR2 rear-right wheel
+ *@note init_wheel(&status.motor.wheel[3], 4, 1):  MOTOR3 rear-left wheel
 
  */
 void init_motor() {
@@ -37,6 +39,8 @@ void init_motor() {
 
   init_wheel(&status.motor.wheel[0], 1, -1);
   init_wheel(&status.motor.wheel[1], 2, 1);
+  init_wheel(&status.motor.wheel[2], 3, 1);
+  init_wheel(&status.motor.wheel[3], 4, 1);
 
   return;
 }
@@ -133,8 +137,8 @@ void init_status_pid(STATUS *status) {
 static void apply_control_param(STATUS *status, CONTROL_PARAM p) {
   status->state.status_pid.follow_line_pid = p.follow_line_pid;
   status->state.status_pid.keep_angle_pid = p.keep_angle_pid;
-  status->motor.wheel[0].wheel_pid = p.wheel_left_pid;
-  status->motor.wheel[1].wheel_pid = p.wheel_right_pid;
+  status->motor.wheel[0].wheel_pid = p.wheel_right_pid;
+  status->motor.wheel[1].wheel_pid = p.wheel_left_pid;
   set_wheel_ff_param_by_which(1, p.ff_offset, p.ff_k, p.ff_min);
   set_wheel_ff_param_by_which(2, p.ff_offset_r, p.ff_k_r, p.ff_min_r);
   status->state.status_pid.angle_output_limit = 25.0f;
@@ -328,6 +332,8 @@ void update_status(STATUS *status) {
 
   driver_wheel(&status->motor.wheel[0]);
   driver_wheel(&status->motor.wheel[1]);
+  driver_wheel(&status->motor.wheel[2]);
+  driver_wheel(&status->motor.wheel[3]);
 
   if (!gyro_dma_busy) {
     iic_gyr_read_dma(&hi2c1, &status->sensor.gy901);
