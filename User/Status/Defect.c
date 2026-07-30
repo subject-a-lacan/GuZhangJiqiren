@@ -3,6 +3,7 @@
 #include "log.h"
 #include "uart_gyro.h"
 #include "maixcam.h"
+#include "lq_step.h"
 #include <stdio.h>
 
 enum { T7_MSG_NONE, T7_MSG_RX, T7_MSG_CT1, T7_MSG_CM1, T7_MSG_CD1, T7_MSG_FOUND };
@@ -144,6 +145,13 @@ static void driver_task1(STATUS *status) {
       (float)status->motor.wheel[1].cur_speed, status->motor.wheel[1].tar_speed, (float)status->motor.wheel[1].trust,
       (float)status->motor.wheel[2].cur_speed, status->motor.wheel[2].tar_speed, (float)status->motor.wheel[2].trust,
       (float)status->motor.wheel[3].cur_speed, status->motor.wheel[3].tar_speed, (float)status->motor.wheel[3].trust);
+  /* raw TIM3 CNT debug */
+  static uint32_t last_debug;
+  if (status->state.time - last_debug >= 100) {
+    last_debug = status->state.time;
+    UART_send_justfloat(&huart1, 2,
+      (float)(TIM3->CNT - 30000), (float)TIM3->CNT);
+  }
 }
 static void driver_task2(STATUS *status) {
   if (every_100ms(status)) UART_send_justfloat(&huart1, 8,
@@ -173,78 +181,26 @@ static void driver_task6(STATUS *status) {
       iic_gyr_get_value(&status->sensor.gy901, gyr_a_y));
 }
 static void driver_task7(STATUS *status) {
-  typedef enum {
-    Q7_START = 0,
-    Q7_WAIT_TA,
-    Q7_WAIT_MA,
-    Q7_WAIT_VD,
-    Q7_DONE,
-  } Q7_STATE;
-
-  static Q7_STATE q7_state = Q7_START;
-  static uint16_t q7_timer = 0;
+  static uint8_t q7_dir;
+  static uint16_t q7_timer;
 
   status->task.task_running = 1;
   status->state.motion = STOP;
   status->state.base_speed = 0;
 
   if (status->task.phase_mileage == 0) {
-    q7_state = Q7_START;
+    q7_dir = 0;
     q7_timer = 0;
     status->task.phase_mileage = 1;
-  }
-
-  if (maixcam_rx_raw_ready) {
-    maixcam_rx_raw_ready = 0;
-    task7_rx_msg_type = T7_MSG_RX;
-    { uint8_t i = 0; while (maixcam_rx_raw_buf[i] && i < 63) { task7_cap.rx_raw[i] = maixcam_rx_raw_buf[i]; i++; } task7_cap.rx_raw[i] = '\0'; }
+    trun_lq_step_angle(&huart3, 10.0f, q7_dir, 50.0f);
   }
 
   q7_timer += (uint16_t)status->state.T;
 
-  switch (q7_state) {
-
-  case Q7_START:
-    task7_dbg_msg_type = T7_MSG_CT1; task7_cmd_type = T7_CMD_T;
-    q7_timer = 0; q7_state = Q7_WAIT_TA; break;
-
-  case Q7_WAIT_TA:
-    if (maixcam_cmd.state == MAIXCAM_CMD_OK && maixcam_cmd.cmd_type == 'T') {
-      task7_dbg_msg_type = T7_MSG_CM1; task7_cmd_type = T7_CMD_M;
-      q7_timer = 0; q7_state = Q7_WAIT_MA;
-    }
-    if (q7_timer >= 2000) { q7_timer = 0;
-      task7_dbg_msg_type = T7_MSG_CT1; task7_cmd_type = T7_CMD_T; }
-    break;
-
-  case Q7_WAIT_MA:
-    if (maixcam_cmd.state == MAIXCAM_CMD_OK && maixcam_cmd.cmd_type == 'M') {
-      task7_dbg_msg_type = T7_MSG_CD1; task7_cmd_type = T7_CMD_D;
-      q7_timer = 0; q7_state = Q7_WAIT_VD;
-    }
-    if (q7_timer >= 2000) { q7_timer = 0;
-      task7_dbg_msg_type = T7_MSG_CM1; task7_cmd_type = T7_CMD_M; }
-    break;
-
-  case Q7_WAIT_VD:
-    if (maixcam_det_new) {
-      maixcam_det_new = 0;
-      task7_cap.found = maixcam_det.found;
-      task7_cap.x10 = maixcam_det.x10;
-      task7_cap.y10 = maixcam_det.y10;
-      task7_cap.d10 = maixcam_det.distance10;
-      task7_dbg_msg_type = T7_MSG_FOUND;
-      q7_state = Q7_DONE;
-    }
-    if (maixcam_cmd.state == MAIXCAM_CMD_OK
-        && maixcam_cmd.cmd_type == 'D') {
-      maixcam_cmd.state = MAIXCAM_CMD_WAITING;
-    }
-    if (q7_timer >= 2000) { q7_timer = 0;
-      task7_dbg_msg_type = T7_MSG_CD1; task7_cmd_type = T7_CMD_D; }
-    break;
-
-  case Q7_DONE: break;
+  if (q7_timer >= 100) {
+    q7_timer = 0;
+    q7_dir = (uint8_t)(q7_dir ^ 1u);
+    trun_lq_step_angle(&huart3, 10.0f, q7_dir, 50.0f);
   }
 }
 

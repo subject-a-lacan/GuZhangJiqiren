@@ -109,6 +109,12 @@ void Error_Handler(void);
 #define M4D1_GPIO_Port GPIOD
 #define M4D2_Pin GPIO_PIN_3
 #define M4D2_GPIO_Port GPIOB
+#define TIM3_CH2_Pin GPIO_PIN_5
+#define TIM3_CH2_GPIO_Port GPIOB
+#define TIM4_CH1_Pin GPIO_PIN_6
+#define TIM4_CH1_GPIO_Port GPIOB
+#define TIM4_CH2_Pin GPIO_PIN_7
+#define TIM4_CH2_GPIO_Port GPIOB
 #define IO3_Pin GPIO_PIN_0
 #define IO3_GPIO_Port GPIOE
 #define IO2_Pin GPIO_PIN_1
