@@ -145,7 +145,7 @@ int main(void)
   init_uart_pid_tune();
   init_uart_gyr();
   init_maixcam_uart();
-  // ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
+  ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
   esp8266_ready = 1;
   status.device.buzzer.on = 1;
   status.device.buzzer.off_time = 400;
@@ -156,6 +156,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   while (1) {
+    uart_gyr_ensure_receive(&status.sensor.uart_gyr);
     {
       static uint32_t maixcam_poll_next;
       if (status.state.time >= maixcam_poll_next) {

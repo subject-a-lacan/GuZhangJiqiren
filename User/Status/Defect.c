@@ -172,7 +172,9 @@ static void driver_task5(STATUS *status) {
   static uint32_t last;
   if (status->state.time - last >= 200) {
     last = status->state.time;
-    UART_send_justfloat(&huart2, 2, 1.0f, 2.0f);
+    UART_send_justfloat(&huart1, 2,
+      status->sensor.uart_gyr.gyro_z,
+      status->sensor.uart_gyr.yaw);
   }
 }
 static void driver_task6(STATUS *status) {

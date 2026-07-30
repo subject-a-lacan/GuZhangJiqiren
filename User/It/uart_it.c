@@ -113,6 +113,7 @@ void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
   if (huart == &huart2) {
     UART_GYRO *gyro = &status.sensor.uart_gyr;
+    gyro->rx_cb_cnt++;
     uart_gyr_rx_feed(gyro, gyro->rx_byte, (uint32_t)status.state.time);
     uart_gyr_start_receive(gyro);
   }

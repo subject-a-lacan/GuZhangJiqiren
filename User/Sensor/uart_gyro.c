@@ -49,6 +49,12 @@ void uart_gyr_start_receive(UART_GYRO *gyro) {
   }
 }
 
+void uart_gyr_ensure_receive(UART_GYRO *gyro) {
+  if (huart2.RxState == HAL_UART_STATE_READY) {
+    uart_gyr_start_receive(gyro);
+  }
+}
+
 static void send_command(const uint8_t *cmd) {
   HAL_UART_Transmit(&huart2, (uint8_t *)cmd, 5, 20);
 }
