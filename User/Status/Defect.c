@@ -3,7 +3,7 @@
 #include "log.h"
 #include "uart_gyro.h"
 #include "maixcam.h"
-#include "lq_step.h"
+#include "Emm_v5.h"
 #include <stdio.h>
 
 enum { T7_MSG_NONE, T7_MSG_RX, T7_MSG_CT1, T7_MSG_CM1, T7_MSG_CD1, T7_MSG_FOUND };
@@ -183,6 +183,7 @@ static void driver_task6(STATUS *status) {
 static void driver_task7(STATUS *status) {
   static uint8_t q7_dir;
   static uint16_t q7_timer;
+  const uint32_t q7_angle_clk = 6400u; /* 90 degrees at 25600 pulses/rev (128-step) */
 
   status->task.task_running = 1;
   status->state.motion = STOP;
@@ -192,15 +193,17 @@ static void driver_task7(STATUS *status) {
     q7_dir = 0;
     q7_timer = 0;
     status->task.phase_mileage = 1;
-    trun_lq_step_angle(&huart3, 10.0f, q7_dir, 50.0f);
+    Emm_V5_En_Control(1, true, false);
+    Emm_V5_Reset_CurPos_To_Zero(1);
+    Emm_V5_Pos_Control(1, q7_dir, 20, 0, q7_angle_clk, false, false);
   }
 
   q7_timer += (uint16_t)status->state.T;
 
-  if (q7_timer >= 100) {
+  if (q7_timer >= 5000) {
     q7_timer = 0;
     q7_dir = (uint8_t)(q7_dir ^ 1u);
-    trun_lq_step_angle(&huart3, 10.0f, q7_dir, 50.0f);
+    Emm_V5_Pos_Control(1, q7_dir, 20, 0, q7_angle_clk, false, false);
   }
 }
 

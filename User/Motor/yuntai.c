@@ -1,4 +1,5 @@
 #include "yuntai.h"
+#include "math_tool.h"
 #include "math.h"
 void init_yuntai(YUNTAI*y,uint8_t ya,uint8_t pa,uint16_t ys,uint16_t ps,uint16_t bs,uint8_t yaa,uint8_t paa,uint8_t yd,uint8_t pd,uint8_t ym,uint8_t pm){init_datou(&y->yaw_datou,ya,ym,ys,yaa,yd);init_datou(&y->pitch_datou,pa,pm,ps,paa,pd);y->yuntai_sta=0;y->temp_x=y->temp_y=0;y->yuntai_speed=bs;}
 void point_calculation(YUNTAI*y,float x,float p){y->yaw_datou.angle=atanf(x/sqrtf(BASE_LINE*BASE_LINE+p*p));y->pitch_datou.angle=atanf(p/sqrtf(BASE_LINE*BASE_LINE+x*x));}
