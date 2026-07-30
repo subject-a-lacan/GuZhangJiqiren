@@ -43,14 +43,25 @@ void uart_gyr_rx_feed(UART_GYRO *gyro, uint8_t byte, uint32_t now_ms) {
 }
 
 void uart_gyr_start_receive(UART_GYRO *gyro) {
-  if (HAL_UART_Receive_IT(&huart2, &gyro->rx_byte, 1) != HAL_OK) {
+  for (uint8_t retry = 0; retry < 3; retry++) {
+    if (HAL_UART_Receive_IT(&huart2, &gyro->rx_byte, 1) == HAL_OK) return;
     HAL_UART_AbortReceive(&huart2);
-    HAL_UART_Receive_IT(&huart2, &gyro->rx_byte, 1);
+    __HAL_UART_CLEAR_OREFLAG(&huart2);
+    __HAL_UART_CLEAR_FEFLAG(&huart2);
+    __HAL_UART_CLEAR_NEFLAG(&huart2);
+    __HAL_UART_CLEAR_PEFLAG(&huart2);
   }
 }
 
 void uart_gyr_ensure_receive(UART_GYRO *gyro) {
-  if (huart2.RxState == HAL_UART_STATE_READY) {
+  if (huart2.RxState == HAL_UART_STATE_READY || huart2.ErrorCode != HAL_UART_ERROR_NONE) {
+    if (huart2.RxState != HAL_UART_STATE_READY) HAL_UART_AbortReceive(&huart2);
+    __HAL_UART_CLEAR_OREFLAG(&huart2);
+    __HAL_UART_CLEAR_FEFLAG(&huart2);
+    __HAL_UART_CLEAR_NEFLAG(&huart2);
+    __HAL_UART_CLEAR_PEFLAG(&huart2);
+    gyro->count = 0;
+    huart2.ErrorCode = HAL_UART_ERROR_NONE;
     uart_gyr_start_receive(gyro);
   }
 }

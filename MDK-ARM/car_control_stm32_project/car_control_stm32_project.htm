@@ -3,7 +3,7 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Thu Jul 30 22:20:28 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Thu Jul 30 22:46:38 2026
 <BR><P>
 <H3>Maximum Stack Usage =        448 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1582,7 +1582,8 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[12f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_Abort
 <LI><a href="#[130]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_GetError
 </UL>
-<BR>[Called By]<UL><LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
+<BR>[Called By]<UL><LI><a href="#[1bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_ensure_receive
+<LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
 <LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_ErrorCallback
 </UL>
 
@@ -1595,8 +1596,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[181]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_send_bytes
 </UL>
 
-<P><STRONG><a name="[132]"></a>HAL_UART_ErrorCallback</STRONG> (Thumb, 174 bytes, Stack size 16 bytes, uart_it.o(.text.HAL_UART_ErrorCallback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = HAL_UART_ErrorCallback &rArr; HAL_UARTEx_ReceiveToIdle_DMA &rArr; UART_Start_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
+<P><STRONG><a name="[132]"></a>HAL_UART_ErrorCallback</STRONG> (Thumb, 178 bytes, Stack size 16 bytes, uart_it.o(.text.HAL_UART_ErrorCallback))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = HAL_UART_ErrorCallback &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
 <LI><a href="#[127]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UARTEx_ReceiveToIdle_DMA
@@ -1611,7 +1612,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[135]"></a>HAL_UART_IRQHandler</STRONG> (Thumb, 806 bytes, Stack size 16 bytes, stm32g4xx_hal_uart.o(.text.HAL_UART_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = HAL_UART_IRQHandler &rArr; HAL_UART_ErrorCallback &rArr; HAL_UARTEx_ReceiveToIdle_DMA &rArr; UART_Start_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = HAL_UART_IRQHandler &rArr; HAL_UART_ErrorCallback &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[12f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_Abort
 <LI><a href="#[137]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_Abort_IT
@@ -2018,7 +2019,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[3e]"></a>UART4_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.UART4_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = UART4_IRQHandler &rArr; HAL_UART_IRQHandler &rArr; HAL_UART_ErrorCallback &rArr; HAL_UARTEx_ReceiveToIdle_DMA &rArr; UART_Start_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = UART4_IRQHandler &rArr; HAL_UART_IRQHandler &rArr; HAL_UART_ErrorCallback &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[135]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_IRQHandler
 </UL>
@@ -2101,14 +2102,14 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[2f]"></a>USART1_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.USART1_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = USART1_IRQHandler &rArr; HAL_UART_IRQHandler &rArr; HAL_UART_ErrorCallback &rArr; HAL_UARTEx_ReceiveToIdle_DMA &rArr; UART_Start_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = USART1_IRQHandler &rArr; HAL_UART_IRQHandler &rArr; HAL_UART_ErrorCallback &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[135]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_IRQHandler
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
 </UL>
 <P><STRONG><a name="[30]"></a>USART2_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.USART2_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = USART2_IRQHandler &rArr; HAL_UART_IRQHandler &rArr; HAL_UART_ErrorCallback &rArr; HAL_UARTEx_ReceiveToIdle_DMA &rArr; UART_Start_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = USART2_IRQHandler &rArr; HAL_UART_IRQHandler &rArr; HAL_UART_ErrorCallback &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[135]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_IRQHandler
 </UL>
@@ -2373,7 +2374,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[1b5]"></a>init_uart_gyr</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, uart_it.o(.text.init_uart_gyr))
-<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = init_uart_gyr &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = init_uart_gyr &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
 <LI><a href="#[1b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_init
@@ -2589,10 +2590,11 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[1d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1bb]"></a>uart_gyr_ensure_receive</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, uart_gyro.o(.text.uart_gyr_ensure_receive))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = uart_gyr_ensure_receive &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
+<P><STRONG><a name="[1bb]"></a>uart_gyr_ensure_receive</STRONG> (Thumb, 92 bytes, Stack size 16 bytes, uart_gyro.o(.text.uart_gyr_ensure_receive))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = uart_gyr_ensure_receive &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
+<LI><a href="#[12e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_AbortReceive
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -2607,8 +2609,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[142]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_RxCpltCallback
 </UL>
 
-<P><STRONG><a name="[134]"></a>uart_gyr_start_receive</STRONG> (Thumb, 56 bytes, Stack size 16 bytes, uart_gyro.o(.text.uart_gyr_start_receive))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
+<P><STRONG><a name="[134]"></a>uart_gyr_start_receive</STRONG> (Thumb, 92 bytes, Stack size 32 bytes, uart_gyro.o(.text.uart_gyr_start_receive))
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[133]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Receive_IT
 <LI><a href="#[12e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_AbortReceive
@@ -3181,14 +3183,14 @@ Local Symbols
 </UL>
 
 <P><STRONG><a name="[78]"></a>UART_DMAAbortOnError</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, stm32g4xx_hal_uart.o(.text.UART_DMAAbortOnError))
-<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = UART_DMAAbortOnError &rArr; HAL_UART_ErrorCallback &rArr; HAL_UARTEx_ReceiveToIdle_DMA &rArr; UART_Start_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = UART_DMAAbortOnError &rArr; HAL_UART_ErrorCallback &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_ErrorCallback
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> stm32g4xx_hal_uart.o(.text.HAL_UART_IRQHandler)
 </UL>
 <P><STRONG><a name="[7b]"></a>UART_DMAError</STRONG> (Thumb, 86 bytes, Stack size 16 bytes, stm32g4xx_hal_uart.o(.text.UART_DMAError))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = UART_DMAError &rArr; HAL_UART_ErrorCallback &rArr; HAL_UARTEx_ReceiveToIdle_DMA &rArr; UART_Start_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = UART_DMAError &rArr; HAL_UART_ErrorCallback &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_ErrorCallback
 <LI><a href="#[17c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EndTxTransfer

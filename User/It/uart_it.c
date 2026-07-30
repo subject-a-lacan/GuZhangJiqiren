@@ -149,6 +149,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     __HAL_UART_CLEAR_NEFLAG(huart);
     __HAL_UART_CLEAR_PEFLAG(huart);
     status.sensor.uart_gyr.count = 0;
+    huart->ErrorCode = HAL_UART_ERROR_NONE;
     uart_gyr_start_receive(&status.sensor.uart_gyr);
   }
   if (huart == &huart4) {
