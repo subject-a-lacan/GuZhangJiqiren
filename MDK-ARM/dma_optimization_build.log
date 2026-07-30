@@ -1,0 +1,109 @@
+*** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
+Build target 'car_control_stm32_project'
+assembling startup_stm32g474xx.s...
+startup_stm32g474xx.s: Error: A1051E: Cannot open --depend file 'car_control_stm32_project\startup_stm32g474xx.d': Permission denied
+compiling dma.c...
+compiling stm32g4xx_it.c...
+../User/Device/device_test.c(4): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling device_test.c...
+../User/It/timer_it.c(6): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling timer_it.c...
+../Core/Src/main.c(32): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling main.c...
+compiling maixcam.c...
+../User/Tool/pid.c(7): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling pid.c...
+compiling usart.c...
+../User/Status/status.c(1): warning: In file included from...../User/Status/status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling status.c...
+../User/Device/led.c(5): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling led.c...
+compiling gy901.c...
+compiling i2c.c...
+../User/Status/Defect.c(2): warning: In file included from...../User/Status/status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling Defect.c...
+../User/Motor/servo.c(6): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling servo.c...
+../User/Device/button.c(5): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling button.c...
+../User/Motor/wheel.c(6): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling wheel.c...
+../User/Sensor/gw_analogue.c(6): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling gw_analogue.c...
+../User/It/uart_it.c(6): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling uart_it.c...
+"car_control_stm32_project\car_control_stm32_project.axf" - 1 Error(s), 12 Warning(s).
+Target not created.
+Build Time Elapsed:  00:00:06

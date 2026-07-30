@@ -8,9 +8,9 @@
 
 typedef struct {
   uint8_t buf[MAIXCAM_RX_BUF_SIZE];
-  uint16_t head;
-  uint16_t tail;
-  uint8_t  overflow;
+  volatile uint16_t head;
+  volatile uint16_t tail;
+  volatile uint8_t  overflow;
 } MaixcamRxRing;
 
 /* ── 视觉检测数据 ── */
@@ -61,6 +61,8 @@ void maixcam_cmd_T(uint8_t on_off);            /* CT0# / CT1# */
 void maixcam_cmd_D(uint8_t on_off);            /* CD0# / CD1# */
 void maixcam_cmd_M(uint8_t mode);              /* CM<mode># */
 void maixcam_cmd_send_val(char type, float v); /* C<type><1位小数># 通用 */
+uint8_t maixcam_uart_tx_enqueue(const uint8_t *data, uint16_t len);
+void maixcam_uart_tx_complete(void);
 
 /* ── UART ISR 中调用：喂入一个接收字节到环形缓冲 ── */
 void maixcam_rx_feed(uint8_t byte);

@@ -1,9 +1,21 @@
 ﻿#include "maixcam.h"
 #include "usart.h"
 #include "log.h"
-#include "status.h"
 #include <stdio.h>
 #include <stddef.h>
+
+#define MAIXCAM_TX_QUEUE_DEPTH 8
+#define MAIXCAM_TX_FRAME_MAX 128
+
+typedef struct {
+  uint8_t data[MAIXCAM_TX_FRAME_MAX];
+  uint16_t len;
+} MaixcamTxItem;
+
+static MaixcamTxItem maixcam_tx_queue[MAIXCAM_TX_QUEUE_DEPTH];
+static volatile uint8_t maixcam_tx_head;
+static volatile uint8_t maixcam_tx_tail;
+static volatile uint8_t maixcam_tx_busy;
 
 /* 鈹€鈹€ 妯″潡鍏ㄥ眬鍙橀噺 鈹€鈹€ */
 MaixcamRxRing        maixcam_rx;
@@ -34,6 +46,9 @@ void maixcam_init(void) {
   maixcam_cmd.frame_len     = 0;
   maixcam_cmd.send_count    = 0;
   maixcam_cmd.timeout_cycles = 0;
+  maixcam_tx_head = 0;
+  maixcam_tx_tail = 0;
+  maixcam_tx_busy = 0;
 }
 
 void maixcam_rx_feed(uint8_t byte) {
@@ -57,21 +72,48 @@ static uint8_t maixcam_rx_read(uint8_t *out) {
  *  鍛戒护鍙戦€?
  * 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
 
-static uint8_t maixcam_tx_dma_buf[MAIXCAM_CMD_FRAME_MAX];
+static void maixcam_tx_start_next(void) {
+  if (maixcam_tx_busy || maixcam_tx_head == maixcam_tx_tail) return;
+  maixcam_tx_busy = 1;
+  if (HAL_UART_Transmit_DMA(&huart4,
+                            maixcam_tx_queue[maixcam_tx_tail].data,
+                            maixcam_tx_queue[maixcam_tx_tail].len) != HAL_OK) {
+    maixcam_tx_busy = 0;
+  }
+}
+
+uint8_t maixcam_uart_tx_enqueue(const uint8_t *data, uint16_t len) {
+  uint8_t next;
+  uint32_t primask;
+  if (data == NULL || len == 0 || len > MAIXCAM_TX_FRAME_MAX) return 0;
+
+  primask = __get_PRIMASK();
+  __disable_irq();
+  next = (uint8_t)((maixcam_tx_head + 1u) % MAIXCAM_TX_QUEUE_DEPTH);
+  if (next == maixcam_tx_tail) {
+    if (!primask) __enable_irq();
+    return 0;
+  }
+  for (uint16_t i = 0; i < len; i++) {
+    maixcam_tx_queue[maixcam_tx_head].data[i] = data[i];
+  }
+  maixcam_tx_queue[maixcam_tx_head].len = len;
+  maixcam_tx_head = next;
+  maixcam_tx_start_next();
+  if (!primask) __enable_irq();
+  return 1;
+}
+
+void maixcam_uart_tx_complete(void) {
+  if (maixcam_tx_busy) {
+    maixcam_tx_tail = (uint8_t)((maixcam_tx_tail + 1u) % MAIXCAM_TX_QUEUE_DEPTH);
+    maixcam_tx_busy = 0;
+  }
+  maixcam_tx_start_next();
+}
 
 static HAL_StatusTypeDef maixcam_send_frame(const char *frame, uint8_t len) {
-  if (len > sizeof(maixcam_tx_dma_buf)) return HAL_ERROR;
-
-  /* Wait for any in-progress TX to finish (50ms timeout) */
-  uint32_t deadline = status.state.time + 50;
-  while (huart4.gState != HAL_UART_STATE_READY) {
-    if (status.state.time >= deadline) return HAL_BUSY;
-  }
-
-  for (uint8_t i = 0; i < len; i++) {
-    maixcam_tx_dma_buf[i] = (uint8_t)frame[i];
-  }
-  return HAL_UART_Transmit_DMA(&huart4, maixcam_tx_dma_buf, len);
+  return maixcam_uart_tx_enqueue((const uint8_t *)frame, len) ? HAL_OK : HAL_BUSY;
 }
 
 static void maixcam_start_cmd(char cmd_type, const char *frame, uint8_t len) {

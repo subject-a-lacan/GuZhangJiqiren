@@ -9,6 +9,7 @@
 #include "math_tool.h"
 #include "servo.h"
 #include "wheel.h"
+#include "uart_it.h"
 
 STATUS status;
 
@@ -270,14 +271,19 @@ void keep_balance(STATUS *status) {
  * @return 鏃?
  */
 void update_status(STATUS *status) {
+  consume_uart_gyr();
+  if (gyro_dma_ready) {
+    gyro_dma_ready = 0;
+    status->state.cur_angle = iic_gyr_get_value(&status->sensor.gy901, gyr_z_yaw);
+    if (!iic_gyr_initial_ready) {
+      status->state.initial_angle = status->state.cur_angle;
+      iic_gyr_initial_ready = 1;
+    }
+  }
   status->motor.wheel[0].cur_speed = get_wheel_speed(&status->motor.wheel[0]);
   status->motor.wheel[1].cur_speed = get_wheel_speed(&status->motor.wheel[1]);
   status->motor.wheel[2].cur_speed = get_wheel_speed(&status->motor.wheel[2]);
   status->motor.wheel[3].cur_speed = get_wheel_speed(&status->motor.wheel[3]);
-  if (gyro_dma_ready) {
-    gyro_dma_ready = 0;
-    status->state.cur_angle = iic_gyr_get_value(&status->sensor.gy901, gyr_z_yaw);
-  }
 
   
 

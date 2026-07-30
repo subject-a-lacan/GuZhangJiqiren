@@ -11,6 +11,9 @@
 
 volatile uint8_t gyro_dma_ready = 0;
 volatile uint8_t gyro_dma_busy = 0;
+volatile uint8_t iic_gyr_initial_ready = 0;
+volatile uint32_t iic_gyr_dma_complete_tick = 0;
+volatile uint32_t iic_gyr_dma_error_count = 0;
 
 void iic_gyr_init(GYR *gyr) {
   gyr->device_addr = GYR_ADDR;
@@ -19,6 +22,11 @@ void iic_gyr_init(GYR *gyr) {
     gyr->data_buf[i] = 0;
   }
   gyr->gy901_keep_angle_pid = init_pid(50, 0, 0, 50, 500, 0.0f);
+  gyro_dma_ready = 0;
+  gyro_dma_busy = 0;
+  iic_gyr_initial_ready = 0;
+  iic_gyr_dma_complete_tick = 0;
+  iic_gyr_dma_error_count = 0;
   return;
 }
   /**
@@ -32,6 +40,7 @@ void iic_gyr_init(GYR *gyr) {
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
   if (hi2c == &hi2c1) {
     gyro_dma_busy = 0;
+    iic_gyr_dma_complete_tick = HAL_GetTick();
     gyro_dma_ready = 1;
   }
 }
@@ -39,6 +48,7 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
   if (hi2c == &hi2c1) {
     gyro_dma_busy = 0;
+    iic_gyr_dma_error_count++;
   }
 }
 

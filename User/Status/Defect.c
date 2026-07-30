@@ -18,15 +18,11 @@ static struct {
   char rx_raw[64];
 } task7_cap;
 
-static void task7_tx(const char *s, uint16_t len) {
-  uint32_t deadline = status.state.time + 50;
-  while (huart4.gState != HAL_UART_STATE_READY) {
-    if (status.state.time >= deadline) return;
-  }
-  HAL_UART_Transmit(&huart4, (uint8_t *)s, len, 100);
+static uint8_t task7_tx(const char *s, uint16_t len) {
+  return maixcam_uart_tx_enqueue((const uint8_t *)s, len);
 }
 
-static void task7_flush_one(uint8_t type) {
+static uint8_t task7_flush_one(uint8_t type) {
   char buf[128];
   uint16_t len = 0;
   switch (type) {
@@ -48,10 +44,10 @@ static void task7_flush_one(uint8_t type) {
               (double)(task7_cap.x10 / 10.0), (double)(task7_cap.y10 / 10.0),
               (double)(task7_cap.d10 / 10.0));
       break;
-    default: return;
+    default: return 1;
   }
-  if (len == 0) return;
-  task7_tx(buf, len);
+  if (len == 0) return 1;
+  return task7_tx(buf, len);
 }
 
 void task7_flush(void) {
@@ -66,11 +62,11 @@ void task7_flush(void) {
   }
   {
     uint8_t m = task7_rx_msg_type;
-    if (m != T7_MSG_NONE) { task7_rx_msg_type = T7_MSG_NONE; task7_flush_one(m); }
+    if (m != T7_MSG_NONE && task7_flush_one(m)) task7_rx_msg_type = T7_MSG_NONE;
   }
   {
     uint8_t m = task7_dbg_msg_type;
-    if (m != T7_MSG_NONE) { task7_dbg_msg_type = T7_MSG_NONE; task7_flush_one(m); }
+    if (m != T7_MSG_NONE && task7_flush_one(m)) task7_dbg_msg_type = T7_MSG_NONE;
   }
 }
 

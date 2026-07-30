@@ -141,12 +141,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
   init_status(&status, 5);
   iic_gyr_read_dma(&hi2c1, &status.sensor.gy901);
-  after_init_state();
   status.state.motion = STOP;
   init_uart_pid_tune();
   init_uart_gyr();
   init_maixcam_uart();
-  // ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
+  ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
   esp8266_ready = 1;
   HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
@@ -155,8 +154,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   while (1) {
-    poll_uart_gyr();
-    poll_maixcam_uart();
     {
       static uint32_t maixcam_poll_next;
       if (status.state.time >= maixcam_poll_next) {

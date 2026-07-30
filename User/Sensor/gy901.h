@@ -25,6 +25,9 @@ enum gyroscope {
 
 extern volatile uint8_t gyro_dma_ready;
 extern volatile uint8_t gyro_dma_busy;
+extern volatile uint8_t iic_gyr_initial_ready;
+extern volatile uint32_t iic_gyr_dma_complete_tick;
+extern volatile uint32_t iic_gyr_dma_error_count;
 
 HAL_StatusTypeDef iic_gyr_read_dma(I2C_HandleTypeDef *i2c, GYR *gyr);
 float iic_gyr_get_value(GYR *gyr, enum gyroscope key);

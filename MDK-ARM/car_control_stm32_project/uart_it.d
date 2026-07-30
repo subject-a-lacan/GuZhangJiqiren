@@ -1,5 +1,6 @@
 car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
-  ../User/It/uart_it.h ../Core/Inc\usart.h ../Core/Inc/main.h \
+  ../User/It/uart_it.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
+  ../Core/Inc\usart.h ../Core/Inc/main.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal.h \
   ../Core/Inc\stm32g4xx_hal_conf.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_rcc.h \
@@ -7,7 +8,6 @@ car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include\stm32g4xx.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g474xx.h \
   ../Drivers/CMSIS/Include\core_cm4.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
   ../Drivers/CMSIS/Include/cmsis_version.h \
   ../Drivers/CMSIS/Include/cmsis_compiler.h \
   ../Drivers/CMSIS/Include/cmsis_armclang_ltm.h \

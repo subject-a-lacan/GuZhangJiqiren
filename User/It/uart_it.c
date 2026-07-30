@@ -10,9 +10,20 @@
 #define MAIXCAM_DMA_SIZE 128
 static uint8_t maixcam_dma_buf[MAIXCAM_DMA_SIZE];
 static uint16_t maixcam_dma_pos;
-#define UART_GYR_DMA_SIZE 64
+#define UART_GYR_DMA_SIZE 10
 static uint8_t uart_gyr_dma_buf[UART_GYR_DMA_SIZE];
-static uint16_t uart_gyr_dma_pos;
+
+typedef struct {
+  uint8_t frame[UART_GYR_DMA_SIZE];
+  uint32_t tick;
+} UART_GYR_SNAPSHOT;
+
+static UART_GYR_SNAPSHOT uart_gyr_snapshot[2];
+static volatile uint8_t uart_gyr_snapshot_index;
+static volatile uint8_t uart_gyr_snapshot_ready;
+static uint8_t uart_gyr_sync_frame[UART_GYR_DMA_SIZE];
+static uint8_t uart_gyr_sync_count;
+volatile uint32_t uart_gyr_dma_error_count;
 
 void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val);
 
@@ -71,34 +82,44 @@ void init_uart_pid_tune(void) {
 
 void init_uart_gyr(void) {
   uart_gyr_init(&status.sensor.uart_gyr);
-  uart_gyr_dma_pos = 0;
+  uart_gyr_snapshot_index = 0;
+  uart_gyr_snapshot_ready = 0;
+  uart_gyr_sync_count = 0;
+  uart_gyr_dma_error_count = 0;
   HAL_UART_Receive_DMA(&huart2, uart_gyr_dma_buf, UART_GYR_DMA_SIZE);
+  __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
 }
 
-void poll_uart_gyr(void) {
-  uint16_t pos = (uint16_t)(UART_GYR_DMA_SIZE - __HAL_DMA_GET_COUNTER(huart2.hdmarx));
-  pos &= (UART_GYR_DMA_SIZE - 1u);
-  while (uart_gyr_dma_pos != pos) {
-    uart_gyr_rx_feed(&status.sensor.uart_gyr,
-                     uart_gyr_dma_buf[uart_gyr_dma_pos],
-                     (uint32_t)status.state.time);
-    uart_gyr_dma_pos = (uint16_t)((uart_gyr_dma_pos + 1u) % UART_GYR_DMA_SIZE);
+void consume_uart_gyr(void) {
+  uint8_t frame[UART_GYR_DMA_SIZE];
+  uint32_t tick;
+  uint32_t primask;
+  uint8_t index;
+
+  if (!uart_gyr_snapshot_ready) return;
+  primask = __get_PRIMASK();
+  __disable_irq();
+  index = uart_gyr_snapshot_index;
+  for (uint8_t i = 0; i < UART_GYR_DMA_SIZE; i++) {
+    frame[i] = uart_gyr_snapshot[index].frame[i];
   }
+  tick = uart_gyr_snapshot[index].tick;
+  uart_gyr_snapshot_ready = 0;
+  if (!primask) __enable_irq();
+
+  status.sensor.uart_gyr.gyro_z =
+      (float)(int16_t)(((uint16_t)frame[3] << 8) | frame[2]) * (2000.0f / 32768.0f);
+  status.sensor.uart_gyr.yaw =
+      (float)(int16_t)(((uint16_t)frame[8] << 8) | frame[7]) * (180.0f / 32768.0f);
+  status.sensor.uart_gyr.update_tick = tick;
+  status.sensor.uart_gyr.valid = 1;
 }
 
 void init_maixcam_uart(void) {
   maixcam_init();
   maixcam_dma_pos = 0;
-  HAL_UART_Receive_DMA(&huart4, maixcam_dma_buf, MAIXCAM_DMA_SIZE);
-}
-
-void poll_maixcam_uart(void) {
-  uint16_t pos = (uint16_t)(MAIXCAM_DMA_SIZE - __HAL_DMA_GET_COUNTER(huart4.hdmarx));
-  pos &= (MAIXCAM_DMA_SIZE - 1u);
-  while (maixcam_dma_pos != pos) {
-    maixcam_rx_feed(maixcam_dma_buf[maixcam_dma_pos]);
-    maixcam_dma_pos = (uint16_t)((maixcam_dma_pos + 1u) % MAIXCAM_DMA_SIZE);
-  }
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart4, maixcam_dma_buf, MAIXCAM_DMA_SIZE);
+  __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);
 }
 
 void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
@@ -136,17 +157,74 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (esp8266_ready) parse_uart_pid_byte(&uart1_pid_rx);
     HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
   }
+  if (huart == &huart2) {
+    for (uint8_t i = 0; i < UART_GYR_DMA_SIZE; i++) {
+      uint8_t byte = uart_gyr_dma_buf[i];
+      if (uart_gyr_sync_count == 0 && byte != 0x5A) continue;
+      uart_gyr_sync_frame[uart_gyr_sync_count++] = byte;
+
+      if (uart_gyr_sync_count == 5) {
+        uint8_t sum = (uint8_t)(uart_gyr_sync_frame[0] + uart_gyr_sync_frame[1]
+                              + uart_gyr_sync_frame[2] + uart_gyr_sync_frame[3]);
+        if (uart_gyr_sync_frame[0] == 0x5A && uart_gyr_sync_frame[1] == 0xAA
+            && sum == uart_gyr_sync_frame[4]) {
+          continue;
+        }
+        uart_gyr_dma_error_count++;
+        uart_gyr_sync_count = (byte == 0x5A) ? 1u : 0u;
+        if (uart_gyr_sync_count) uart_gyr_sync_frame[0] = byte;
+      } else if (uart_gyr_sync_count == UART_GYR_DMA_SIZE) {
+        uint8_t sum = (uint8_t)(uart_gyr_sync_frame[5] + uart_gyr_sync_frame[6]
+                              + uart_gyr_sync_frame[7] + uart_gyr_sync_frame[8]);
+        if (uart_gyr_sync_frame[5] == 0x5A && uart_gyr_sync_frame[6] == 0xBB
+            && sum == uart_gyr_sync_frame[9]) {
+          uint8_t index = (uint8_t)(uart_gyr_snapshot_index ^ 1u);
+          for (uint8_t j = 0; j < UART_GYR_DMA_SIZE; j++) {
+            uart_gyr_snapshot[index].frame[j] = uart_gyr_sync_frame[j];
+          }
+          uart_gyr_snapshot[index].tick = HAL_GetTick();
+          uart_gyr_snapshot_index = index;
+          uart_gyr_snapshot_ready = 1;
+        } else {
+          uart_gyr_dma_error_count++;
+        }
+        uart_gyr_sync_count = (byte == 0x5A) ? 1u : 0u;
+        if (uart_gyr_sync_count) uart_gyr_sync_frame[0] = byte;
+      }
+    }
+  }
+}
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+  if (huart != &huart4 || size > MAIXCAM_DMA_SIZE) return;
+
+  if (size >= maixcam_dma_pos) {
+    for (uint16_t i = maixcam_dma_pos; i < size; i++) maixcam_rx_feed(maixcam_dma_buf[i]);
+  } else {
+    for (uint16_t i = maixcam_dma_pos; i < MAIXCAM_DMA_SIZE; i++) maixcam_rx_feed(maixcam_dma_buf[i]);
+    for (uint16_t i = 0; i < size; i++) maixcam_rx_feed(maixcam_dma_buf[i]);
+  }
+  maixcam_dma_pos = (size == MAIXCAM_DMA_SIZE) ? 0 : size;
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart == &huart4) maixcam_uart_tx_complete();
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   if (huart == &huart1) HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
   if (huart == &huart2) {
+    HAL_UART_AbortReceive(huart);
     status.sensor.uart_gyr.count = 0;
-    uart_gyr_dma_pos = 0;
+    uart_gyr_snapshot_ready = 0;
+    uart_gyr_sync_count = 0;
     HAL_UART_Receive_DMA(&huart2, uart_gyr_dma_buf, UART_GYR_DMA_SIZE);
+    __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
   }
   if (huart == &huart4) {
+    HAL_UART_AbortReceive(huart);
     maixcam_dma_pos = 0;
-    HAL_UART_Receive_DMA(&huart4, maixcam_dma_buf, MAIXCAM_DMA_SIZE);
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart4, maixcam_dma_buf, MAIXCAM_DMA_SIZE);
+    __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);
   }
 }
