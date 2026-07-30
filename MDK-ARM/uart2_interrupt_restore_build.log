@@ -1,0 +1,35 @@
+*** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
+Build target 'car_control_stm32_project'
+compiling uart_gyro.c...
+compiling stm32g4xx_it.c...
+../Core/Src/main.c(32): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling main.c...
+compiling dma.c...
+compiling usart.c...
+../User/It/uart_it.c(6): warning: In file included from...../User/Status\status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling uart_it.c...
+../User/Status/status.c(1): warning: In file included from...../User/Status/status.h(134): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling status.c...
+linking...
+Program Size: Code=45018 RO-data=686 RW-data=52 ZI-data=5316  
+FromELF: creating hex file...
+"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 3 Warning(s).
+Build Time Elapsed:  00:00:02

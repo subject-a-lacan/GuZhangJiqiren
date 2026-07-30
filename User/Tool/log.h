@@ -9,7 +9,7 @@
 #define LOG_UART &huart1
 void log_uprintf(UART_HandleTypeDef *huart, const char *format, ...);
 HAL_StatusTypeDef UART_send_bytes(UART_HandleTypeDef *huart, const uint8_t *data, uint16_t size);
-void UART_send_justfloat(UART_HandleTypeDef *huart, uint8_t count, ...);
+void UART_send_justfloat(UART_HandleTypeDef *huart, unsigned int count, ...);
 
 #define PRINTF(fmt, ...) log_uprintf(LOG_UART, fmt, ##__VA_ARGS__);
 #define PRINTLN(fmt, ...) PRINTF(fmt "\r\n", ##__VA_ARGS__)

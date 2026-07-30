@@ -3,14 +3,8 @@
 
 #include <stdint.h>
 
-extern volatile uint32_t uart_gyr_dma_error_count;
-extern volatile uint32_t uart_gyr_dma_start_error_count;
-extern volatile uint32_t uart_gyr_received_byte_count;
-extern volatile uint32_t uart_gyr_last_error;
-
 void init_uart_pid_tune(void);
 void init_uart_gyr(void);
-void consume_uart_gyr(void);
 void init_maixcam_uart(void);
 
 #endif

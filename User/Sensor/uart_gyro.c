@@ -43,7 +43,10 @@ void uart_gyr_rx_feed(UART_GYRO *gyro, uint8_t byte, uint32_t now_ms) {
 }
 
 void uart_gyr_start_receive(UART_GYRO *gyro) {
-  (void)gyro;
+  if (HAL_UART_Receive_IT(&huart2, &gyro->rx_byte, 1) != HAL_OK) {
+    HAL_UART_AbortReceive(&huart2);
+    HAL_UART_Receive_IT(&huart2, &gyro->rx_byte, 1);
+  }
 }
 
 static void send_command(const uint8_t *cmd) {

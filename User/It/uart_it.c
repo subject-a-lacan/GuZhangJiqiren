@@ -10,45 +10,6 @@
 #define MAIXCAM_DMA_SIZE 128
 static uint8_t maixcam_dma_buf[MAIXCAM_DMA_SIZE];
 static uint16_t maixcam_dma_pos;
-#define UART_GYR_DMA_SIZE 64
-static uint8_t uart_gyr_dma_buf[UART_GYR_DMA_SIZE];
-static uint16_t uart_gyr_dma_pos;
-static volatile uint8_t uart_gyr_dma_running;
-static volatile uint8_t uart_gyr_recover_pending;
-
-volatile uint32_t uart_gyr_dma_error_count;
-volatile uint32_t uart_gyr_dma_start_error_count;
-volatile uint32_t uart_gyr_received_byte_count;
-volatile uint32_t uart_gyr_last_error;
-
-static HAL_StatusTypeDef start_uart_gyr_dma(void) {
-  HAL_StatusTypeDef result =
-      HAL_UART_Receive_DMA(&huart2, uart_gyr_dma_buf, UART_GYR_DMA_SIZE);
-
-  if (result == HAL_OK) {
-    __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
-    uart_gyr_dma_running = 1;
-  } else {
-    uart_gyr_dma_running = 0;
-    uart_gyr_dma_start_error_count++;
-  }
-  return result;
-}
-
-static void recover_uart_gyr_dma(void) {
-  HAL_UART_AbortReceive(&huart2);
-  __HAL_UART_CLEAR_OREFLAG(&huart2);
-  __HAL_UART_CLEAR_FEFLAG(&huart2);
-  __HAL_UART_CLEAR_NEFLAG(&huart2);
-  __HAL_UART_CLEAR_PEFLAG(&huart2);
-  __HAL_UART_SEND_REQ(&huart2, UART_RXDATA_FLUSH_REQUEST);
-
-  status.sensor.uart_gyr.count = 0;
-  uart_gyr_dma_pos = 0;
-  if (start_uart_gyr_dma() == HAL_OK) {
-    uart_gyr_recover_pending = 0;
-  }
-}
 
 void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val);
 
@@ -107,28 +68,7 @@ void init_uart_pid_tune(void) {
 
 void init_uart_gyr(void) {
   uart_gyr_init(&status.sensor.uart_gyr);
-  uart_gyr_dma_pos = 0;
-  uart_gyr_dma_running = 0;
-  uart_gyr_recover_pending = 0;
-  uart_gyr_dma_error_count = 0;
-  uart_gyr_dma_start_error_count = 0;
-  uart_gyr_received_byte_count = 0;
-  uart_gyr_last_error = HAL_UART_ERROR_NONE;
-  if (start_uart_gyr_dma() != HAL_OK) uart_gyr_recover_pending = 1;
-}
-
-void consume_uart_gyr(void) {
-  if (uart_gyr_recover_pending) recover_uart_gyr_dma();
-  if (!uart_gyr_dma_running) return;
-
-  uint16_t pos = (uint16_t)(UART_GYR_DMA_SIZE - __HAL_DMA_GET_COUNTER(huart2.hdmarx));
-  pos &= (UART_GYR_DMA_SIZE - 1u);
-  while (uart_gyr_dma_running && uart_gyr_dma_pos != pos) {
-    uart_gyr_rx_feed(&status.sensor.uart_gyr, uart_gyr_dma_buf[uart_gyr_dma_pos],
-                     (uint32_t)status.state.time);
-    uart_gyr_dma_pos = (uint16_t)((uart_gyr_dma_pos + 1u) % UART_GYR_DMA_SIZE);
-    uart_gyr_received_byte_count++;
-  }
+  uart_gyr_start_receive(&status.sensor.uart_gyr);
 }
 
 void init_maixcam_uart(void) {
@@ -171,6 +111,11 @@ void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart == &huart2) {
+    UART_GYRO *gyro = &status.sensor.uart_gyr;
+    uart_gyr_rx_feed(gyro, gyro->rx_byte, (uint32_t)status.state.time);
+    uart_gyr_start_receive(gyro);
+  }
   if (huart == &huart1) {
     uart1_pid_rx.byte = uart1_pid_byte;
     if (esp8266_ready) parse_uart_pid_byte(&uart1_pid_rx);
@@ -197,11 +142,13 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   if (huart == &huart1) HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
   if (huart == &huart2) {
-    uart_gyr_last_error = huart->ErrorCode;
-    uart_gyr_dma_error_count++;
-    uart_gyr_dma_running = 0;
-    uart_gyr_recover_pending = 1;
+    HAL_UART_AbortReceive(huart);
+    __HAL_UART_CLEAR_OREFLAG(huart);
+    __HAL_UART_CLEAR_FEFLAG(huart);
+    __HAL_UART_CLEAR_NEFLAG(huart);
+    __HAL_UART_CLEAR_PEFLAG(huart);
     status.sensor.uart_gyr.count = 0;
+    uart_gyr_start_receive(&status.sensor.uart_gyr);
   }
   if (huart == &huart4) {
     HAL_UART_AbortReceive(huart);

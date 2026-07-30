@@ -41,13 +41,13 @@ void log_uprintf(UART_HandleTypeDef *huart, const char *format, ...) {
   UART_send_bytes(huart, (const uint8_t *)buf[abbuf], (uint16_t)len);
 }
 
-void UART_send_justfloat(UART_HandleTypeDef *huart, uint8_t count, ...) {
+void UART_send_justfloat(UART_HandleTypeDef *huart, unsigned int count, ...) {
   float data[16];
   uint8_t tail[4] = {0x00, 0x00, 0x80, 0x7f};
   va_list args;
-  unsigned int n = (count > 16) ? 16 : (unsigned int)count;
-  va_start(args, n);
-  for (unsigned int i = 0; i < n; ++i) data[i] = (float)va_arg(args, double);
+  if (count > 16) count = 16;
+  va_start(args, count);
+  for (unsigned int i = 0; i < count; ++i) data[i] = (float)va_arg(args, double);
   va_end(args);
   UART_send_bytes(huart, (const uint8_t *)data, (uint16_t)(count * sizeof(float)));
   UART_send_bytes(huart, tail, sizeof(tail));

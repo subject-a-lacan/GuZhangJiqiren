@@ -156,7 +156,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   while (1) {
-    consume_uart_gyr();
     {
       static uint32_t maixcam_poll_next;
       if (status.state.time >= maixcam_poll_next) {
