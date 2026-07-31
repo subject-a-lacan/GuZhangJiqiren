@@ -30,12 +30,6 @@ typedef struct CONTROL_PARAM {
   PID keep_angle_pid;
   PID wheel_left_pid;
   PID wheel_right_pid;
-  float ff_offset;
-  float ff_k;
-  float ff_min;
-  float ff_offset_r;
-  float ff_k_r;
-  float ff_min_r;
 } CONTROL_PARAM;
 
 typedef enum MOTION_STATION {

@@ -132,40 +132,43 @@ static uint8_t every_100ms(STATUS *status) {
   return 1;
 }
 static void driver_task1(STATUS *status) {
+  int16_t base = status->state.base_speed;
   status->state.motion = STRAIGHT;
-  status->state.base_speed = 5;
   status->task.stop_cmd = 0;
-  status->motor.wheel[0].tar_speed = 5.0f;
-  status->motor.wheel[1].tar_speed = 5.0f;
-  status->motor.wheel[2].tar_speed = 5.0f;
-  status->motor.wheel[3].tar_speed = 5.0f;
-  if (every_100ms(status))
+  status->motor.wheel[0].tar_speed = (float)base;
+  status->motor.wheel[1].tar_speed = (float)base;
+  status->motor.wheel[2].tar_speed = (float)base;
+  status->motor.wheel[3].tar_speed = (float)base;
+  static uint32_t last_print;
+  if (status->state.time - last_print >= 80) {
+    last_print = status->state.time;
     UART_send_justfloat(&huart1, 12,
       (float)status->motor.wheel[0].cur_speed, status->motor.wheel[0].tar_speed, (float)status->motor.wheel[0].trust,
       (float)status->motor.wheel[1].cur_speed, status->motor.wheel[1].tar_speed, (float)status->motor.wheel[1].trust,
       (float)status->motor.wheel[2].cur_speed, status->motor.wheel[2].tar_speed, (float)status->motor.wheel[2].trust,
       (float)status->motor.wheel[3].cur_speed, status->motor.wheel[3].tar_speed, (float)status->motor.wheel[3].trust);
-  /* raw TIM3 CNT debug */
-  static uint32_t last_debug;
-  if (status->state.time - last_debug >= 100) {
-    last_debug = status->state.time;
-    UART_send_justfloat(&huart1, 2,
-      (float)(TIM3->CNT - 30000), (float)TIM3->CNT);
   }
 }
 static void driver_task2(STATUS *status) {
-  if (every_100ms(status)) UART_send_justfloat(&huart1, 8,
-    (float)status->sensor.gw_analogue.channel[0], (float)status->sensor.gw_analogue.channel[1],
-    (float)status->sensor.gw_analogue.channel[2], (float)status->sensor.gw_analogue.channel[3],
-    (float)status->sensor.gw_analogue.channel[4], (float)status->sensor.gw_analogue.channel[5],
-    (float)status->sensor.gw_analogue.channel[6], (float)status->sensor.gw_analogue.channel[7]);
+  static uint32_t last;
+  if (status->state.time - last >= 80) {
+    last = status->state.time;
+    UART_send_justfloat(&huart1, 1, status->sensor.gw_analogue.diff);
+  }
 }
 static void driver_task3(STATUS *status) {
-  if (every_100ms(status)) UART_send_justfloat(&huart1, 8,
-    (float)((status->sensor.gw_analogue.digital_8bit >> 0) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 1) & 1),
-    (float)((status->sensor.gw_analogue.digital_8bit >> 2) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 3) & 1),
-    (float)((status->sensor.gw_analogue.digital_8bit >> 4) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 5) & 1),
-    (float)((status->sensor.gw_analogue.digital_8bit >> 6) & 1), (float)((status->sensor.gw_analogue.digital_8bit >> 7) & 1));
+  static uint8_t inited;
+  static uint32_t last;
+  if (!inited) { status->state.base_speed = 8; inited = 1; }
+  status->state.motion = FIND_LINE;
+  status->task.stop_cmd = 0;
+  if (status->state.time - last >= 100) {
+    last = status->state.time;
+    UART_send_justfloat(&huart1, 3,
+      status->sensor.gw_analogue.diff,
+      status->state.status_pid.follow_line_pid.error,
+      status->state.status_pid.follow_line_pid.out);
+  }
 }
 static void driver_task4(STATUS *status) { status->state.motion = FIND_LINE; status->state.base_speed = 3; }
 static void driver_task5(STATUS *status) {

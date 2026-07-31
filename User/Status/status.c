@@ -128,7 +128,7 @@ void init_state(STATUS *status, uint8_t T) {
  *       鍒濆鍖栦繚瑙?PID锛岃繖鍑犱釜鏁板瓧鍐冲畾杞悜绾犲亸鍔涘害鍜岀ǔ瀹氭€э紝鍚庣画閮藉彲璋?
  */
 void init_status_pid(STATUS *status) {
-  status->state.status_pid.follow_line_pid = init_pid(1.8, 0.006, 0.4, 5,1, 0.0f);
+  status->state.status_pid.follow_line_pid = init_pid(0.4, 0, 0.3, 5,1, 0.0f);
   status->state.status_pid.keep_angle_pid = init_pid(1.2, 0.4, 0, 5,1, 0.0f);
   status->state.status_pid.balance_pid = init_pid(0.1, 0, 180, 5,1, 0.0f);
   status->state.status_pid.mileage_pid = init_pid(0.00035, 0, 6, 5,1, 0.0f);
@@ -140,8 +140,6 @@ static void apply_control_param(STATUS *status, CONTROL_PARAM p) {
   status->state.status_pid.keep_angle_pid = p.keep_angle_pid;
   status->motor.wheel[0].wheel_pid = p.wheel_right_pid;
   status->motor.wheel[1].wheel_pid = p.wheel_left_pid;
-  set_wheel_ff_param_by_which(1, p.ff_offset, p.ff_k, p.ff_min);
-  set_wheel_ff_param_by_which(2, p.ff_offset_r, p.ff_k_r, p.ff_min_r);
   status->state.status_pid.angle_output_limit = 25.0f;
 }
 
@@ -151,23 +149,12 @@ void apply_basic_control_param(STATUS *status) {
   p.keep_angle_pid  = init_pid(1, 0, 0, 5,1, 0.0f);
   p.wheel_left_pid  = init_pid(8, 0, 0, 5,100, 0.50f);
   p.wheel_right_pid = init_pid(8, 0, 0, 5,100, 0.50f);
-  p.ff_offset = 200.68f;
-  p.ff_k = 47.24f;
-  p.ff_min = 250.0f;
-  p.ff_offset_r = 107.12f;
-  p.ff_k_r = 46.27f;
-  p.ff_min_r = 260.0f;
   apply_control_param(status, p);
 }
 
 void apply_adv_control_param(STATUS *status) {
   CONTROL_PARAM p;
   p.follow_line_pid = init_pid(1, 0.03, 0, 5,1, 0.0f);   // TODO: 璐熼噸鍚庡疄杞︽爣瀹?  p.keep_angle_pid  = init_pid(1, 0, 0, 5,1, 0.0f);       // TODO: 璐熼噸鍚庡疄杞︽爣瀹?  p.wheel_left_pid  = init_pid(8, 0, 0, 5,100, 0.50f);    // TODO: 璐熼噸鍚庡疄杞︽爣瀹?  p.wheel_right_pid = init_pid(8, 0, 0, 5,100, 0.50f);    // TODO: 璐熼噸鍚庡疄杞︽爣瀹?  p.ff_offset = 200.68f;   // TODO: 璐熼噸鍚庡疄杞︽爣瀹?
-  p.ff_k = 47.24f;         // TODO: 璐熼噸鍚庡疄杞︽爣瀹?
-  p.ff_min = 250.0f;       // TODO: 璐熼噸鍚庡疄杞︽爣瀹?
-  p.ff_offset_r = 107.12f; // TODO: 璐熼噸鍚庡疄杞︽爣瀹?
-  p.ff_k_r = 46.27f;       // TODO: 璐熼噸鍚庡疄杞︽爣瀹?
-  p.ff_min_r = 260.0f;     // TODO: 璐熼噸鍚庡疄杞︽爣瀹?
   apply_control_param(status, p);
 }
 
@@ -236,6 +223,8 @@ void follow_line(STATUS *status) {
   float diff = compute_pid(&status->state.status_pid.follow_line_pid, status->sensor.gw_analogue.diff);
   status->motor.wheel[0].tar_speed = (float)status->state.base_speed - diff;
   status->motor.wheel[1].tar_speed = (float)status->state.base_speed + diff;
+  status->motor.wheel[2].tar_speed = (float)status->state.base_speed - diff;
+  status->motor.wheel[3].tar_speed = (float)status->state.base_speed + diff;
 }
 
 void keep_angle(STATUS *status) {

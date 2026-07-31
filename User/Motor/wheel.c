@@ -6,40 +6,15 @@
 #include "status.h"
 #include "tim.h"
 
-static float wheel_ff_offset[4] = {200.68f, 107.12f, 200.68f, 107.12f};
-static float wheel_ff_k[4] = {47.24f, 46.27f, 47.24f, 46.27f};
-static float wheel_ff_min[4] = {250.0f, 260.0f, 250.0f, 260.0f};
+/* MOTOR0..MOTOR3 feedforward, calibrated in encoder counts per 5 ms. */
+static const float wheel_ff_pos_offset[4] = {177.22f, 103.30f, 190.02f, 140.97f};
+static const float wheel_ff_pos_k[4] = {269.201f, 273.283f, 264.356f, 273.663f};
+static const float wheel_ff_neg_offset[4] = {346.94f, 344.87f, 349.67f, 363.22f};
+static const float wheel_ff_neg_k[4] = {248.732f, 251.032f, 247.041f, 248.213f};
 
 static uint8_t wheel_ff_index(uint8_t which) {
   if (which < 1 || which > 4) return 0;
   return which - 1;
-}
-
-void set_wheel_ff_param(float offset, float k, float min_pwm) {
-  for (uint8_t i = 0; i < 4; i++) {
-    wheel_ff_offset[i] = offset;
-    wheel_ff_k[i] = k;
-    wheel_ff_min[i] = min_pwm;
-  }
-}
-
-void set_wheel_ff_param_by_which(uint8_t which, float offset, float k, float min_pwm) {
-  uint8_t index = wheel_ff_index(which);
-  wheel_ff_offset[index] = offset;
-  wheel_ff_k[index] = k;
-  wheel_ff_min[index] = min_pwm;
-}
-
-void set_wheel_ff_offset_by_which(uint8_t which, float offset) {
-  wheel_ff_offset[wheel_ff_index(which)] = offset;
-}
-
-void set_wheel_ff_k_by_which(uint8_t which, float k) {
-  wheel_ff_k[wheel_ff_index(which)] = k;
-}
-
-void set_wheel_ff_min_by_which(uint8_t which, float min_pwm) {
-  wheel_ff_min[wheel_ff_index(which)] = min_pwm;
 }
 
 int16_t get_wheel_speed(WHEEL *wheel) {
@@ -126,10 +101,17 @@ void driver_wheel(WHEEL *wheel) {
     return;
   }
 
+  uint8_t ff_index = wheel_ff_index(wheel->which);
+  float ff = 0.0f;
+  if (wheel->tar_speed > 0.0f) {
+    ff = wheel_ff_pos_offset[ff_index] + wheel_ff_pos_k[ff_index] * wheel->tar_speed;
+  } else if (wheel->tar_speed < 0.0f) {
+    ff = -(wheel_ff_neg_offset[ff_index] + wheel_ff_neg_k[ff_index] * -wheel->tar_speed);
+  }
+
   float pid_out = compute_pid(&wheel->wheel_pid, wheel->tar_speed - wheel->cur_speed);
-  /* Feedforward is retained for calibration but disabled from PWM output. */
-  wheel->trust = (int16_t)pid_out;
-  wheel->trust = CONFINE(wheel->trust, -TRUST_CONFINE, TRUST_CONFINE);
+  float output = CONFINE(ff + pid_out, -TRUST_CONFINE, TRUST_CONFINE);
+  wheel->trust = (int16_t)output;
 
   if (wheel->tar_speed == 0 && ABS(wheel->cur_speed) < 2) {
     wheel->trust = 0;
@@ -166,7 +148,13 @@ void init_wheel(WHEEL *wheel, uint8_t which, int8_t dir) {
   wheel->cur_speed = 0;
   wheel->tar_speed = 0;
   wheel->dir = dir;
-  wheel->wheel_pid = init_pid(1200, 0, 0, 5, 100, 0.50f);  // P I D T integral_max InteralCoef
+  switch (which) {
+    case 1: wheel->wheel_pid = init_pid(120, 0.5, 0, 5, 100, 0.50f); break;
+    case 2: wheel->wheel_pid = init_pid(120, 0.5, 0, 5, 100, 0.50f); break;
+    case 3: wheel->wheel_pid = init_pid(120, 0.5, 0, 5, 100, 0.50f); break;
+    case 4: wheel->wheel_pid = init_pid(120, 0.5, 0, 5, 100, 0.50f); break;
+    default: wheel->wheel_pid = init_pid(120, 0.5, 0, 5, 100, 0.50f); break;
+  }
   if (wheel->which == 1) {
     HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
   } else if (wheel->which == 2) {
