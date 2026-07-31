@@ -3,7 +3,7 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Fri Jul 31 10:31:05 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Fri Jul 31 11:46:53 2026
 <BR><P>
 <H3>Maximum Stack Usage =        448 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -35,7 +35,7 @@ Function Pointers
  <LI><a href="#[4c]">COMP7_IRQHandler</a> from startup_stm32g474xx.o(.text) referenced from startup_stm32g474xx.o(RESET)
  <LI><a href="#[6d]">CORDIC_IRQHandler</a> from startup_stm32g474xx.o(.text) referenced from startup_stm32g474xx.o(RESET)
  <LI><a href="#[55]">CRS_IRQHandler</a> from startup_stm32g474xx.o(.text) referenced from startup_stm32g474xx.o(RESET)
- <LI><a href="#[15]">DMA1_Channel1_IRQHandler</a> from startup_stm32g474xx.o(.text) referenced from startup_stm32g474xx.o(RESET)
+ <LI><a href="#[15]">DMA1_Channel1_IRQHandler</a> from stm32g4xx_it.o(.text.DMA1_Channel1_IRQHandler) referenced from startup_stm32g474xx.o(RESET)
  <LI><a href="#[16]">DMA1_Channel2_IRQHandler</a> from stm32g4xx_it.o(.text.DMA1_Channel2_IRQHandler) referenced from startup_stm32g474xx.o(RESET)
  <LI><a href="#[17]">DMA1_Channel3_IRQHandler</a> from startup_stm32g474xx.o(.text) referenced from startup_stm32g474xx.o(RESET)
  <LI><a href="#[18]">DMA1_Channel4_IRQHandler</a> from startup_stm32g474xx.o(.text) referenced from startup_stm32g474xx.o(RESET)
@@ -224,9 +224,6 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
 </UL>
 <P><STRONG><a name="[55]"></a>CRS_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_stm32g474xx.o(.text))
-<BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
-</UL>
-<P><STRONG><a name="[15]"></a>DMA1_Channel1_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_stm32g474xx.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
 </UL>
 <P><STRONG><a name="[17]"></a>DMA1_Channel3_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_stm32g474xx.o(.text))
@@ -764,6 +761,13 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
 </UL>
+<P><STRONG><a name="[15]"></a>DMA1_Channel1_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.DMA1_Channel1_IRQHandler))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = DMA1_Channel1_IRQHandler &rArr; HAL_DMA_IRQHandler
+</UL>
+<BR>[Calls]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
+</UL>
+<BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
+</UL>
 <P><STRONG><a name="[16]"></a>DMA1_Channel2_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.DMA1_Channel2_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = DMA1_Channel2_IRQHandler &rArr; HAL_DMA_IRQHandler
 </UL>
@@ -800,7 +804,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[b8]"></a>Emm_V5_En_Control</STRONG> (Thumb, 48 bytes, Stack size 16 bytes, emm_v5.o(.text.Emm_V5_En_Control))
-<BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = Emm_V5_En_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = Emm_V5_En_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
 </UL>
@@ -809,7 +813,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[ba]"></a>Emm_V5_Pos_Control</STRONG> (Thumb, 88 bytes, Stack size 24 bytes, emm_v5.o(.text.Emm_V5_Pos_Control))
-<BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = Emm_V5_Pos_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = Emm_V5_Pos_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
 </UL>
@@ -818,7 +822,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[bb]"></a>Emm_V5_Reset_CurPos_To_Zero</STRONG> (Thumb, 38 bytes, Stack size 16 bytes, emm_v5.o(.text.Emm_V5_Reset_CurPos_To_Zero))
-<BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = Emm_V5_Reset_CurPos_To_Zero &rArr; gimbal_send &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = Emm_V5_Reset_CurPos_To_Zero &rArr; gimbal_send &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
 </UL>
@@ -975,6 +979,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA2_Channel1_IRQHandler
 <LI><a href="#[1b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA1_Channel7_IRQHandler
 <LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA1_Channel2_IRQHandler
+<LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA1_Channel1_IRQHandler
 </UL>
 
 <P><STRONG><a name="[dd]"></a>HAL_DMA_Init</STRONG> (Thumb, 240 bytes, Stack size 24 bytes, stm32g4xx_hal_dma.o(.text.HAL_DMA_Init))
@@ -1634,7 +1639,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[13c]"></a>HAL_UART_Init</STRONG> (Thumb, 106 bytes, Stack size 8 bytes, stm32g4xx_hal_uart.o(.text.HAL_UART_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 188<LI>Call Chain = HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
+<BR><BR>[Stack]<UL><LI>Max Depth = 196<LI>Call Chain = HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[13d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
 <LI><a href="#[13e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_SetConfig
@@ -1647,8 +1652,8 @@ Global Symbols
 <LI><a href="#[174]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_UART4_Init
 </UL>
 
-<P><STRONG><a name="[13d]"></a>HAL_UART_MspInit</STRONG> (Thumb, 726 bytes, Stack size 136 bytes, usart.o(.text.HAL_UART_MspInit))
-<BR><BR>[Stack]<UL><LI>Max Depth = 180<LI>Call Chain = HAL_UART_MspInit &rArr; HAL_GPIO_Init
+<P><STRONG><a name="[13d]"></a>HAL_UART_MspInit</STRONG> (Thumb, 784 bytes, Stack size 144 bytes, usart.o(.text.HAL_UART_MspInit))
+<BR><BR>[Stack]<UL><LI>Max Depth = 188<LI>Call Chain = HAL_UART_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_NVIC_SetPriority
 <LI><a href="#[ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_NVIC_EnableIRQ
@@ -1698,7 +1703,6 @@ Global Symbols
 <LI><a href="#[146]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
 </UL>
 <BR>[Called By]<UL><LI><a href="#[181]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_send_bytes
-<LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
 </UL>
 
 <P><STRONG><a name="[147]"></a>HAL_UART_Transmit_DMA</STRONG> (Thumb, 174 bytes, Stack size 16 bytes, stm32g4xx_hal_uart.o(.text.HAL_UART_Transmit_DMA))
@@ -1707,6 +1711,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_Start_IT
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tx_start_next
+<LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
 </UL>
 
 <P><STRONG><a name="[148]"></a>HAL_UART_TxCpltCallback</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, uart_it.o(.text.HAL_UART_TxCpltCallback))
@@ -1764,7 +1769,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[163]"></a>MX_DMA_Init</STRONG> (Thumb, 120 bytes, Stack size 24 bytes, dma.o(.text.MX_DMA_Init))
+<P><STRONG><a name="[163]"></a>MX_DMA_Init</STRONG> (Thumb, 136 bytes, Stack size 24 bytes, dma.o(.text.MX_DMA_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = MX_DMA_Init &rArr; HAL_NVIC_SetPriority
 </UL>
 <BR>[Calls]<UL><LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_NVIC_SetPriority
@@ -1894,7 +1899,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[174]"></a>MX_UART4_Init</STRONG> (Thumb, 134 bytes, Stack size 8 bytes, usart.o(.text.MX_UART4_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 196<LI>Call Chain = MX_UART4_Init &rArr; HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
+<BR><BR>[Stack]<UL><LI>Max Depth = 204<LI>Call Chain = MX_UART4_Init &rArr; HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Handler
 <LI><a href="#[13c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Init
@@ -1906,7 +1911,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[176]"></a>MX_USART1_UART_Init</STRONG> (Thumb, 134 bytes, Stack size 8 bytes, usart.o(.text.MX_USART1_UART_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 196<LI>Call Chain = MX_USART1_UART_Init &rArr; HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
+<BR><BR>[Stack]<UL><LI>Max Depth = 204<LI>Call Chain = MX_USART1_UART_Init &rArr; HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Handler
 <LI><a href="#[13c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Init
@@ -1918,7 +1923,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[177]"></a>MX_USART2_UART_Init</STRONG> (Thumb, 134 bytes, Stack size 8 bytes, usart.o(.text.MX_USART2_UART_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 196<LI>Call Chain = MX_USART2_UART_Init &rArr; HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
+<BR><BR>[Stack]<UL><LI>Max Depth = 204<LI>Call Chain = MX_USART2_UART_Init &rArr; HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Handler
 <LI><a href="#[13c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Init
@@ -1930,7 +1935,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[178]"></a>MX_USART3_UART_Init</STRONG> (Thumb, 134 bytes, Stack size 8 bytes, usart.o(.text.MX_USART3_UART_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 196<LI>Call Chain = MX_USART3_UART_Init &rArr; HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
+<BR><BR>[Stack]<UL><LI>Max Depth = 204<LI>Call Chain = MX_USART3_UART_Init &rArr; HAL_UART_Init &rArr; HAL_UART_MspInit &rArr; HAL_GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Handler
 <LI><a href="#[13c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Init
@@ -2202,7 +2207,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[19e]"></a>gan_init</STRONG> (Thumb, 54 bytes, Stack size 24 bytes, main.o(.text.gan_init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = gan_init &rArr; Emm_V5_Pos_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = gan_init &rArr; Emm_V5_Pos_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Reset_CurPos_To_Zero
 <LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Control
@@ -3375,7 +3380,7 @@ Local Symbols
 </UL>
 
 <P><STRONG><a name="[198]"></a>driver_task7</STRONG> (Thumb, 176 bytes, Stack size 32 bytes, defect.o(.text.driver_task7))
-<BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = driver_task7 &rArr; Emm_V5_Pos_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = driver_task7 &rArr; Emm_V5_Pos_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Reset_CurPos_To_Zero
 <LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Control
@@ -3484,10 +3489,10 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[1cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
 </UL>
 
-<P><STRONG><a name="[b9]"></a>gimbal_send</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, emm_v5.o(.text.gimbal_send))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = gimbal_send &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+<P><STRONG><a name="[b9]"></a>gimbal_send</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, emm_v5.o(.text.gimbal_send))
+<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = gimbal_send &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[145]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
+<BR>[Calls]<UL><LI><a href="#[147]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit_DMA
 </UL>
 <BR>[Called By]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Reset_CurPos_To_Zero
 <LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Control

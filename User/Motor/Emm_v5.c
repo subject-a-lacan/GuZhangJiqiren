@@ -1,5 +1,8 @@
 #include "Emm_v5.h"
-static void gimbal_send(const uint8_t *cmd, uint16_t len) { HAL_UART_Transmit(GIMBAL_UART, (uint8_t *)cmd, len, 20); }
+static void gimbal_send(const uint8_t *cmd, uint16_t len) {
+  while (huart3.gState != HAL_UART_STATE_READY) {}
+  HAL_UART_Transmit_DMA(GIMBAL_UART, (uint8_t *)cmd, len);
+}
 #define SEND(a) gimbal_send((a), sizeof(a))
 void Emm_V5_Reset_CurPos_To_Zero(uint8_t a){uint8_t c[]={a,0x0A,0x6D,0x6B};SEND(c);}
 void Emm_V5_Reset_Clog_Pro(uint8_t a){uint8_t c[]={a,0x0E,0x52,0x6B};SEND(c);}

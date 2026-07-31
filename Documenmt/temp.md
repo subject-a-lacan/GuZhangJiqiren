@@ -1,177 +1,216 @@
-*** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
-Rebuild target 'car_control_stm32_project'
-assembling startup_stm32g474xx.s...
-compiling gpio.c...
-compiling adc.c...
-compiling stm32g4xx_hal_adc.c...
-../Core/Src/lora.c(31): warning: implicitly declaring library function 'strlen' with type 'unsigned int (const char *)' [-Wimplicit-function-declaration]
-    uart1_tx((uint8_t*)buf, strlen(buf));
-                            ^
-../Core/Src/lora.c(31): note: include the header <string.h> or explicitly provide a declaration for 'strlen'
-1 warning generated.
-compiling lora.c...
-compiling spi.c...
-compiling i2c.c...
-compiling stm32g4xx_hal_msp.c...
-compiling dma.c...
-compiling stm32g4xx_hal.c...
-compiling usart.c...
-compiling tim.c...
-compiling stm32g4xx_it.c...
-compiling stm32g4xx_hal_adc_ex.c...
-compiling stm32g4xx_hal_flash.c...
-compiling stm32g4xx_hal_flash_ramfunc.c...
-compiling stm32g4xx_hal_pwr.c...
-compiling stm32g4xx_hal_rcc.c...
-compiling stm32g4xx_hal_rcc_ex.c...
-../Core/Src/main.c(32): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-../Core/Src/main.c(151): warning: implicit declaration of function 'gan_init' is invalid in C99 [-Wimplicit-function-declaration]
-  gan_init();
-  ^
-../Core/Src/main.c(229): error: conflicting types for 'gan_init'
-void gan_init(void) {
-     ^
-../Core/Src/main.c(151): note: previous implicit declaration is here
-  gan_init();
-  ^
-2 warnings and 1 error generated.
-compiling main.c...
-compiling stm32g4xx_hal_i2c_ex.c...
-compiling stm32g4xx_hal_exti.c...
-compiling stm32g4xx_ll_adc.c...
-compiling stm32g4xx_hal_cortex.c...
-compiling stm32g4xx_hal_dma_ex.c...
-compiling stm32g4xx_hal_dma.c...
-compiling stm32g4xx_hal_gpio.c...
-compiling stm32g4xx_hal_pwr_ex.c...
-compiling stm32g4xx_hal_spi_ex.c...
-compiling stm32g4xx_hal_flash_ex.c...
-compiling stm32g4xx_hal_i2c.c...
-compiling system_stm32g4xx.c...
-../User/Device/led.c(5): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling led.c...
-../User/Device/button.c(5): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling button.c...
-../User/It/timer_it.c(6): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling timer_it.c...
-compiling buzzer.c...
-../User/Device/device_test.c(4): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling device_test.c...
-../User/It/uart_it.c(6): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling uart_it.c...
-compiling stm32g4xx_hal_uart_ex.c...
-../User/Status/status.c(1): warning: In file included from...
-../User/Status/status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling status.c...
-compiling stm32g4xx_hal_tim.c...
-compiling stm32g4xx_hal_tim_ex.c...
-compiling stm32g4xx_hal_spi.c...
-compiling ms_find_line.c...
-compiling abslute_angle_sensor.c...
-compiling gy901.c...
-compiling stm32g4xx_hal_uart.c...
-compiling uart_gyro.c...
-../User/Status/Defect.c(2): warning: In file included from...
-../User/Status/status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling Defect.c...
-compiling maixcam.c...
-compiling radar.c...
-compiling lq_step.c...
-../User/Sensor/gw_analogue.c(6): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling gw_analogue.c...
-compiling Emm_v5.c...
-../User/Motor/servo.c(6): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling servo.c...
-compiling datou.c...
-../User/Motor/wheel.c(6): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling wheel.c...
-compiling yuntai.c...
-compiling eeprom.c...
-compiling log.c...
-../User/Tool/pid.c(7): warning: In file included from...
-../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
-} STATUS;
-  ^
-../User/Status/Defect.h(6): note: previous definition is here
-typedef struct STATUS STATUS;
-                      ^
-1 warning generated.
-compiling pid.c...
-compiling array.c...
-"car_control_stm32_project\car_control_stm32_project.axf" - 1 Error(s), 14 Warning(s).
-Target not created.
-Build Time Elapsed:  00:00:04
+
+Codex 配置教程
+Codex 安装与配置教程
+Windows 版本教程
+系统要求
+Windows 10 或 Windows 11
+Node.js 22+
+npm 10+
+网络连接
+安装步骤
+前置步骤！！！
+安装 Git Bash，请访问 Git - Downloads 下载对应您电脑系统的版本，之后一直点击“下一步”即可完成安装。
+1. 安装 Node.js
+访问 Node.js 官网 下载并安装最新 LTS 版本。
+2. 安装 codex
+打开命令提示符 (CMD) 或 PowerShell，运行：
+npm install -g @openai/codex
+3. 验证安装
+打开命令提示符 (CMD) 或 PowerShell，运行：
+codex --version
+配置 API
+1. 获取 Auth Token
+访问 yunwu.ai 站点页面进行以下操作：
+点击 控制台 → API令牌 页面
+点击 添加令牌
+令牌分组请选择：codex专属（务必选择此分组，否则无法使用）
+令牌名称随意
+额度建议：设置为 无限额度
+其他选项保持默认
+image.png
+2. 配置文件
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+1.
+进入当前用户的用户目录下的 .codex 文件夹中，例如：C:\Users\testuser\.codex。
+（注意：如果看不到该目录，说明您没有打开 Windows 的“显示隐藏的项目”，请先在文件资源管理器中开启。）
+image.png
+2.
+如果没有 .codex 文件夹，请手动创建该文件夹，然后在其中创建 config.toml 以及 auth.json 两个文件。
+image.png
+3. 填写配置 (需要将 sk-xxx 替换成您自己创建的真实 SK)。
+a. auth.json 中的配置：
+{"OPENAI_API_KEY": "sk-xxx"}
+b. config.toml 中的配置（直接粘贴下面的内容即可）：
+model_reasoning_effort 可选值为 high, medium, low，分别代表模型思考的努力程度（高、中、低）。
+model_provider = "api111"
+model = "gpt-5-codex"
+model_reasoning_effort = "high"
+disable_response_storage = true
+preferred_auth_method = "apikey"
+
+[model_providers.api111]
+name = "api111"
+base_url = "https://yunwu.ai/v1"
+wire_api = "responses"
+启动 codex
+重启终端！重启终端！重启终端！
+然后进入到您的工程目录：
+cd your-project-folder
+运行以下命令启动：
+codex
+image.png
+VSCode 插件 codex
+以上配置完成后，在 VSCode 扩展商店中搜索并安装 codex 即可。
+image.png
+安装完成后会出现在侧边栏。
+image.png
+Mac 版本教程
+系统要求
+macOS 12 或更高版本
+Node.js 22+
+npm 10+
+网络连接
+安装步骤
+1. 安装 Node.js
+方式一：直接访问 Node.js 官网 下载并安装最新 LTS 版本。
+方式二：使用 Homebrew（推荐）
+# 如果尚未安装 Homebrew，请先运行此命令
+/bin/bash -c "$(curl -fsSL [https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh](https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh))"
+
+# 安装 Node.js
+brew install node
+2. 安装 codex
+打开终端 (Terminal)，运行（可能需要加 sudo）：
+npm install -g @openai/codex
+3. 验证安装
+打开终端 (Terminal)，运行：
+codex --version
+配置 API
+1. 获取 Auth Token
+访问 yunwu.ai 站点页面进行以下操作：
+点击 控制台 → API令牌 页面
+点击 添加令牌
+令牌分组请选择：codex特供（务必选择此分组，否则无法使用）
+令牌名称随意
+额度建议：设置为 无限额度
+其他选项保持默认
+image.png
+2. 配置文件
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+1.
+创建目录和文件：
+mkdir -p ~/.codex
+touch ~/.codex/auth.json
+touch ~/.codex/config.toml
+2.
+编辑 auth.json 文件：
+vi ~/.codex/auth.json
+按 i 进入插入模式，粘贴以下内容（将 sk-xxx 替换为您的密钥），然后按 ESC 键，输入 :wq 并回车保存退出。
+{"OPENAI_API_KEY": "sk-xxx"}
+3.
+编辑 config.toml 文件：
+vi ~/.codex/config.toml
+按 i 进入插入模式，粘贴以下内容，然后按 ESC 键，输入 :wq 并回车保存退出。
+model_provider = "api111"
+model = "gpt-5-codex"
+model_reasoning_effort = "high"
+disable_response_storage = true
+preferred_auth_method = "apikey"
+
+[model_providers.api111]
+name = "api111"
+base_url = "https://yunwu.ai/v1"
+wire_api = "responses"
+启动 codex
+重启终端！重启终端！重启终端！
+然后进入到您的工程目录：
+cd your-project-folder
+运行以下命令启动：
+codex
+[图片]
+VSCode 插件 codex
+以上配置完成后，在 VSCode 扩展商店中搜索并安装 codex 即可。
+[图片]
+安装完成后会出现在侧边栏。
+[图片]
+Linux 版本教程
+系统要求
+主流 Linux 发行版 (Ubuntu 20.04+, Debian 10+, CentOS 7+, etc.)
+Node.js 22+
+npm 10+
+网络连接
+安装步骤
+1. 安装 Node.js
+Ubuntu/Debian
+sudo apt update
+curl -fsSL https://deb.nodesource.com/setup_lts.x  | 
+sudo -E bash -
+sudo apt-get install -y nodejs
+CentOS/RHEL/Fedora
+# 使用 dnf (Fedora) 或 yum (CentOS/RHEL)
+sudo dnf install nodejs npm
+# 或
+sudo yum install nodejs npm
+Arch Linux
+sudo pacman -S nodejs npm
+2. 安装 codex
+打开终端 (Terminal)，运行：
+sudo npm install -g @openai/codex
+3. 验证安装
+打开终端 (Terminal)，运行：
+codex --version
+配置 API
+1. 获取 Auth Token
+访问 yunwu.ai 站点页面进行以下操作：
+点击 控制台 → API令牌 页面
+点击 添加令牌
+令牌分组请选择：codex渠道-gpt（务必选择此分组，否则无法使用）
+令牌名称随意
+额度建议：设置为 无限额度
+其他选项保持默认
+[图片]
+2. 配置文件
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+重要提示：请将下方的 sk-xxx 替换为您在 yunwu.ai 生成的实际 API 密钥！
+1.
+创建目录和文件：
+mkdir -p ~/.codex
+touch ~/.codex/auth.json
+touch ~/.codex/config.toml
+2.
+编辑 auth.json 文件：
+vi ~/.codex/auth.json
+按 i 进入插入模式，粘贴以下内容（将 sk-xxx 替换为您的密钥），然后按 ESC 键，输入 :wq 并回车保存退出。
+{"OPENAI_API_KEY": "sk-xxx"}
+3.
+编辑 config.toml 文件：
+vi ~/.codex/config.toml
+按 i 进入插入模式，粘贴以下内容，然后按 ESC 键，输入 :wq 并回车保存退出。
+model_provider = "api111"
+model = "gpt-5-codex"
+model_reasoning_effort = "high"
+disable_response_storage = true
+preferred_auth_method = "apikey"
+
+[model_providers.api111]
+name = "api111"
+base_url = "https://yunwu.ai/v1"
+wire_api = "responses"
+启动 codex
+重启终端！重启终端！重启终端！
+然后进入到您的工程目录：
+cd your-project-folder
+运行以下命令启动：
+codex
+image.png
+VSCode 插件 codex
+以上配置完成后，在 VSCode 扩展商店中搜索并安装 codex 即可。
+image.png
+安装完成后会出现在侧边栏。
+image.png
+常见问题
