@@ -115,7 +115,7 @@ I (..\Core\Inc\lora.h)(0x6A6AF4CD)
 I (..\User\Sensor\maixcam.h)(0x6A6C4F53)
 I (..\User\Motor\Emm_v5.h)(0x6A6C9887)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x588CAFD2)
-I (..\User\Status\ball_control.h)(0x6A6CF152)
+I (..\User\Status\ball_control.h)(0x6A6CF4AA)
 F (../Core/Src/gpio.c)(0x6A6998C0)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__MICROLIB -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ../User/Device -I ../User/It -I ../User/Motor -I ../User/Sensor -I ../User/Status -I ../User/Tool-I./RTE/_car_control_stm32_project-IC:/Keil_v5/ARM/PACK/ARM/CMSIS/5.0.1/CMSIS/Include-IC:/Keil_v5/ARM/PACK/Keil/STM32G4xx_DFP/1.4.0/Drivers/CMSIS/Device/ST/STM32G4xx/Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32G474xx -DUSE_HAL_DRIVER -DSTM32G474xx-o car_control_stm32_project/gpio.o -MD)
 I (..\Core\Inc\gpio.h)(0x69EA35AD)
 I (..\Core\Inc\main.h)(0x6A6B551E)
@@ -1846,7 +1846,7 @@ I (..\User\Tool\log.h)(0x6A6AF4CD)
 I (..\Core\Inc\usart.h)(0x69EA35B9)
 I (..\User\Tool\math_tool.h)(0x69EF899D)
 I (..\User\It\uart_it.h)(0x6A6C98B6)
-I (..\User\Status\ball_control.h)(0x6A6CF152)
+I (..\User\Status\ball_control.h)(0x6A6CF4AA)
 F (..\User\Status\status.h)(0x6A6CEFFC)()
 F (..\User\Status\Defect.c)(0x6A6CF1D9)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__MICROLIB -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ../User/Device -I ../User/It -I ../User/Motor -I ../User/Sensor -I ../User/Status -I ../User/Tool-I./RTE/_car_control_stm32_project-IC:/Keil_v5/ARM/PACK/ARM/CMSIS/5.0.1/CMSIS/Include-IC:/Keil_v5/ARM/PACK/Keil/STM32G4xx_DFP/1.4.0/Drivers/CMSIS/Device/ST/STM32G4xx/Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32G474xx -DUSE_HAL_DRIVER -DSTM32G474xx-o car_control_stm32_project/defect.o -MD)
 I (..\User\Status\Defect.h)(0x6A6CE98A)
@@ -1907,11 +1907,11 @@ I (..\User\Sensor\maixcam.h)(0x6A6C4F53)
 I (..\User\Motor\Emm_v5.h)(0x6A6C9887)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x588CAFD2)
 I (..\User\It\uart_it.h)(0x6A6C98B6)
-I (..\User\Status\ball_control.h)(0x6A6CF152)
+I (..\User\Status\ball_control.h)(0x6A6CF4AA)
 I (C:\Keil_v5\ARM\ARMCLANG\include\math.h)(0x58A47FFE)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdio.h)(0x588CAFD2)
 F (..\User\Status\ball_control.c)(0x6A6CEA3C)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__MICROLIB -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ../User/Device -I ../User/It -I ../User/Motor -I ../User/Sensor -I ../User/Status -I ../User/Tool-I./RTE/_car_control_stm32_project-IC:/Keil_v5/ARM/PACK/ARM/CMSIS/5.0.1/CMSIS/Include-IC:/Keil_v5/ARM/PACK/Keil/STM32G4xx_DFP/1.4.0/Drivers/CMSIS/Device/ST/STM32G4xx/Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32G474xx -DUSE_HAL_DRIVER -DSTM32G474xx-o car_control_stm32_project/ball_control.o -MD)
-I (..\User\Status\ball_control.h)(0x6A6CF152)
+I (..\User\Status\ball_control.h)(0x6A6CF4AA)
 I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x588CAFD2)
 I (..\User\Motor\ball_mechanism_lut.h)(0x6A6C959D)
 I (..\User\Status\status.h)(0x6A6CEFFC)
@@ -1967,7 +1967,7 @@ I (..\User\Motor\wheel.h)(0x6A6B8CA6)
 I (..\User\Tool\car_speed_profile.h)(0x6A6CE98A)
 I (..\User\It\uart_it.h)(0x6A6C98B6)
 I (C:\Keil_v5\ARM\ARMCLANG\include\math.h)(0x58A47FFE)
-F (..\User\Status\ball_control.h)(0x6A6CF152)()
+F (..\User\Status\ball_control.h)(0x6A6CF4AA)()
 F (..\User\Sensor\abslute_angle_sensor.c)(0x6819CEAC)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__MICROLIB -gdwarf-3 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../Core/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include -I ../User/Device -I ../User/It -I ../User/Motor -I ../User/Sensor -I ../User/Status -I ../User/Tool-I./RTE/_car_control_stm32_project-IC:/Keil_v5/ARM/PACK/ARM/CMSIS/5.0.1/CMSIS/Include-IC:/Keil_v5/ARM/PACK/Keil/STM32G4xx_DFP/1.4.0/Drivers/CMSIS/Device/ST/STM32G4xx/Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32G474xx -DUSE_HAL_DRIVER -DSTM32G474xx-o car_control_stm32_project/abslute_angle_sensor.o -MD)
 I (..\User\Sensor\abslute_angle_sensor.h)(0x6819CEAC)
 I (..\Core\Inc\main.h)(0x6A6B551E)

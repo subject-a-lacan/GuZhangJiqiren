@@ -15,8 +15,8 @@ struct STATUS;
 #define BALL_STEPPER_ACCEL_PARAM (0u)
 
 #define BALL_CONTROL_KP (4.0f)
-#define BALL_CONTROL_KD (4.0f)
-#define BALL_CONTROL_KI (1.0f)
+#define BALL_CONTROL_KD (5.0f)
+#define BALL_CONTROL_KI (15.0f)
 #define BALL_I_MAX_MM_S2  (200.0f)
 #define BALL_ESTIMATOR_ALPHA (0.6f)
 #define BALL_ESTIMATOR_BETA (0.1f)
