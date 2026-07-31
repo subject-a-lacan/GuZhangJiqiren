@@ -3,11 +3,11 @@
 <title>Static Call Graph - [car_control_stm32_project\car_control_stm32_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image car_control_stm32_project\car_control_stm32_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sat Aug  1 03:17:12 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6070001: Last Updated: Sat Aug  1 04:27:21 2026
 <BR><P>
-<H3>Maximum Stack Usage =        360 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        384 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-main &rArr; task4_debug_flush &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+main &rArr; task3_debug_flush &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 <P>
 <H3>
 Mutually Recursive functions
@@ -172,7 +172,7 @@ Global Symbols
 <P><STRONG><a name="[71]"></a>__main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry.o(.ARM.Collect$$$$00000000))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(.text)
 </UL>
-<P><STRONG><a name="[204]"></a>_main_stk</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry2.o(.ARM.Collect$$$$00000001))
+<P><STRONG><a name="[207]"></a>_main_stk</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry2.o(.ARM.Collect$$$$00000001))
 
 <P><STRONG><a name="[87]"></a>_main_scatterload</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry5.o(.ARM.Collect$$$$00000004))
 <BR><BR>[Calls]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
@@ -182,15 +182,15 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
 </UL>
 
-<P><STRONG><a name="[205]"></a>_main_clock</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry7b.o(.ARM.Collect$$$$00000008))
+<P><STRONG><a name="[208]"></a>_main_clock</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry7b.o(.ARM.Collect$$$$00000008))
 
-<P><STRONG><a name="[206]"></a>_main_cpp_init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry8b.o(.ARM.Collect$$$$0000000A))
+<P><STRONG><a name="[209]"></a>_main_cpp_init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry8b.o(.ARM.Collect$$$$0000000A))
 
-<P><STRONG><a name="[207]"></a>_main_init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry9a.o(.ARM.Collect$$$$0000000B))
+<P><STRONG><a name="[20a]"></a>_main_init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry9a.o(.ARM.Collect$$$$0000000B))
 
-<P><STRONG><a name="[208]"></a>__rt_final_cpp</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry10a.o(.ARM.Collect$$$$0000000D))
+<P><STRONG><a name="[20b]"></a>__rt_final_cpp</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry10a.o(.ARM.Collect$$$$0000000D))
 
-<P><STRONG><a name="[209]"></a>__rt_final_exit</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry11a.o(.ARM.Collect$$$$0000000F))
+<P><STRONG><a name="[20c]"></a>__rt_final_exit</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, entry11a.o(.ARM.Collect$$$$0000000F))
 
 <P><STRONG><a name="[0]"></a>Reset_Handler</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, startup_stm32g474xx.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
@@ -471,8 +471,8 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[116]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 <LI><a href="#[142]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_SetConfig
-<LI><a href="#[1fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
-<LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<LI><a href="#[202]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[8d]"></a>__aeabi_memset</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
@@ -480,9 +480,9 @@ Global Symbols
 <LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr
 </UL>
 
-<P><STRONG><a name="[20a]"></a>__aeabi_memset4</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
+<P><STRONG><a name="[20d]"></a>__aeabi_memset4</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
 
-<P><STRONG><a name="[20b]"></a>__aeabi_memset8</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
+<P><STRONG><a name="[20e]"></a>__aeabi_memset8</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
 
 <P><STRONG><a name="[8c]"></a>__aeabi_memclr</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, memseta.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memset
@@ -496,8 +496,8 @@ Global Symbols
 <LI><a href="#[141]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
 </UL>
 
-<P><STRONG><a name="[191]"></a>__aeabi_memclr8</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, memseta.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_init
+<P><STRONG><a name="[193]"></a>__aeabi_memclr8</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, memseta.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_init
 </UL>
 
 <P><STRONG><a name="[8e]"></a>_memset$wrapper</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, memseta.o(.text), UNUSED)
@@ -516,11 +516,11 @@ Global Symbols
 <LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
 <LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
-<LI><a href="#[1cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
+<BR>[Called By]<UL><LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
 <LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_drsub
 <LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dsub
-<LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<LI><a href="#[202]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[93]"></a>__aeabi_dsub</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, dadd.o(.text), UNUSED)
@@ -536,10 +536,10 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
-<LI><a href="#[1cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
+<BR>[Called By]<UL><LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
 <LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_value
-<LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<LI><a href="#[202]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[96]"></a>__aeabi_ddiv</STRONG> (Thumb, 222 bytes, Stack size 32 bytes, ddiv.o(.text))
@@ -547,9 +547,9 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
+<BR>[Called By]<UL><LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
 <LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_value
-<LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<LI><a href="#[202]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[97]"></a>__aeabi_l2f</STRONG> (Thumb, 44 bytes, Stack size 16 bytes, ffltl.o(.text))
@@ -557,7 +557,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_float_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[196]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_update_measurement
+<BR>[Called By]<UL><LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_update_measurement
 </UL>
 
 <P><STRONG><a name="[99]"></a>__aeabi_i2d</STRONG> (Thumb, 34 bytes, Stack size 16 bytes, dflti.o(.text))
@@ -565,8 +565,8 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
-<LI><a href="#[1f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
+<BR>[Called By]<UL><LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
 </UL>
 
 <P><STRONG><a name="[9a]"></a>__aeabi_ui2d</STRONG> (Thumb, 26 bytes, Stack size 16 bytes, dfltui.o(.text))
@@ -574,7 +574,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
 <P><STRONG><a name="[9b]"></a>__aeabi_d2iz</STRONG> (Thumb, 62 bytes, Stack size 16 bytes, dfixi.o(.text))
@@ -582,15 +582,16 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsr
 </UL>
-<BR>[Called By]<UL><LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
-<LI><a href="#[1cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
+<BR>[Called By]<UL><LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
 </UL>
 
-<P><STRONG><a name="[1a6]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[1df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task4_debug_flush
-<LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task1
-<LI><a href="#[1cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
-<LI><a href="#[1b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line_task4
+<P><STRONG><a name="[1a8]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[1e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task4_debug_flush
+<LI><a href="#[1e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task3_debug_flush
+<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task1
+<LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
+<LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line_task4
 </UL>
 
 <P><STRONG><a name="[9c]"></a>__aeabi_d2f</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, d2f.o(.text))
@@ -603,10 +604,10 @@ Global Symbols
 <LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_scanf_really_real
 </UL>
 
-<P><STRONG><a name="[20c]"></a>__aeabi_uidiv</STRONG> (Thumb, 0 bytes, Stack size 12 bytes, uidiv.o(.text), UNUSED)
+<P><STRONG><a name="[20f]"></a>__aeabi_uidiv</STRONG> (Thumb, 0 bytes, Stack size 12 bytes, uidiv.o(.text), UNUSED)
 
-<P><STRONG><a name="[203]"></a>__aeabi_uidivmod</STRONG> (Thumb, 44 bytes, Stack size 12 bytes, uidiv.o(.text), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[1fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<P><STRONG><a name="[206]"></a>__aeabi_uidivmod</STRONG> (Thumb, 44 bytes, Stack size 12 bytes, uidiv.o(.text), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
 <P><STRONG><a name="[8b]"></a>__aeabi_llsl</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, llshl.o(.text))
@@ -616,7 +617,7 @@ Global Symbols
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2ulz
 </UL>
 
-<P><STRONG><a name="[20d]"></a>_ll_shift_l</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, llshl.o(.text), UNUSED)
+<P><STRONG><a name="[210]"></a>_ll_shift_l</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, llshl.o(.text), UNUSED)
 
 <P><STRONG><a name="[8a]"></a>__aeabi_llsr</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, llushr.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2iz
@@ -625,23 +626,23 @@ Global Symbols
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2ulz
 </UL>
 
-<P><STRONG><a name="[20e]"></a>_ll_ushift_r</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, llushr.o(.text), UNUSED)
+<P><STRONG><a name="[211]"></a>_ll_ushift_r</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, llushr.o(.text), UNUSED)
 
 <P><STRONG><a name="[90]"></a>__aeabi_lasr</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, llsshr.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 </UL>
 
-<P><STRONG><a name="[20f]"></a>_ll_sshift_r</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, llsshr.o(.text), UNUSED)
+<P><STRONG><a name="[212]"></a>_ll_sshift_r</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, llsshr.o(.text), UNUSED)
 
 <P><STRONG><a name="[a0]"></a>__strtod_int</STRONG> (Thumb, 88 bytes, Stack size 40 bytes, strtod.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = __strtod_int &rArr; _local_sscanf &rArr; _scanf_real
 </UL>
 <BR>[Calls]<UL><LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_local_sscanf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atof
+<BR>[Called By]<UL><LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atof
 </UL>
 
-<P><STRONG><a name="[210]"></a>__I$use$fp</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, iusefp.o(.text), UNUSED)
+<P><STRONG><a name="[213]"></a>__I$use$fp</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, iusefp.o(.text), UNUSED)
 
 <P><STRONG><a name="[9d]"></a>_float_round</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, fepilogue.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
@@ -679,11 +680,11 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsr
 <LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<BR>[Called By]<UL><LI><a href="#[202]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
-<P><STRONG><a name="[200]"></a>__aeabi_cdrcmple</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, cdrcmple.o(.text), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<P><STRONG><a name="[203]"></a>__aeabi_cdrcmple</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, cdrcmple.o(.text), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[202]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[88]"></a>__scatterload</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, init.o(.text))
@@ -692,7 +693,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_main_scatterload
 </UL>
 
-<P><STRONG><a name="[211]"></a>__scatterload_rt2</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, init.o(.text), UNUSED)
+<P><STRONG><a name="[214]"></a>__scatterload_rt2</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, init.o(.text), UNUSED)
 
 <P><STRONG><a name="[a3]"></a>__rt_ctype_table</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, ctype_o.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;isspace
@@ -817,7 +818,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
+<BR>[Called By]<UL><LI><a href="#[1bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
 </UL>
 
 <P><STRONG><a name="[bc]"></a>Emm_V5_Pos_Absolute_Try</STRONG> (Thumb, 158 bytes, Stack size 16 bytes, emm_v5.o(.text.Emm_V5_Pos_Absolute_Try))
@@ -825,7 +826,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit_DMA
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_service
+<BR>[Called By]<UL><LI><a href="#[1df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_service
 </UL>
 
 <P><STRONG><a name="[be]"></a>Emm_V5_Pos_Control</STRONG> (Thumb, 88 bytes, Stack size 24 bytes, emm_v5.o(.text.Emm_V5_Pos_Control))
@@ -833,8 +834,8 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
-<LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task5
+<BR>[Called By]<UL><LI><a href="#[1bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
+<LI><a href="#[1af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task5
 </UL>
 
 <P><STRONG><a name="[bf]"></a>Emm_V5_Reset_CurPos_To_Zero</STRONG> (Thumb, 38 bytes, Stack size 16 bytes, emm_v5.o(.text.Emm_V5_Reset_CurPos_To_Zero))
@@ -842,7 +843,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
+<BR>[Called By]<UL><LI><a href="#[1bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
 </UL>
 
 <P><STRONG><a name="[d8]"></a>Error_Handler</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, main.o(.text.Error_Handler))
@@ -899,9 +900,9 @@ Global Symbols
 <LI><a href="#[164]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_ADC3_Init
 </UL>
 
-<P><STRONG><a name="[199]"></a>HAL_ADC_GetValue</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, stm32g4xx_hal_adc.o(.text.HAL_ADC_GetValue))
-<BR><BR>[Called By]<UL><LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
-<LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<P><STRONG><a name="[19b]"></a>HAL_ADC_GetValue</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, stm32g4xx_hal_adc.o(.text.HAL_ADC_GetValue))
+<BR><BR>[Called By]<UL><LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
+<LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
 <P><STRONG><a name="[cf]"></a>HAL_ADC_Init</STRONG> (Thumb, 562 bytes, Stack size 24 bytes, stm32g4xx_hal_adc.o(.text.HAL_ADC_Init))
@@ -940,8 +941,8 @@ Global Symbols
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LL_ADC_GetMultimode
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LL_ADC_GetMultiDMATransfer
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
-<LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
+<LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
 <P><STRONG><a name="[de]"></a>HAL_ADC_Start</STRONG> (Thumb, 332 bytes, Stack size 16 bytes, stm32g4xx_hal_adc.o(.text.HAL_ADC_Start))
@@ -952,8 +953,8 @@ Global Symbols
 <LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LL_ADC_REG_IsConversionOngoing
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LL_ADC_GetMultimode
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
-<LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
+<LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
 <P><STRONG><a name="[e0]"></a>HAL_ADC_Stop</STRONG> (Thumb, 68 bytes, Stack size 8 bytes, stm32g4xx_hal_adc.o(.text.HAL_ADC_Stop))
@@ -962,8 +963,8 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Disable
 <LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_ConversionStop
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
-<LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
+<LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
 
 <P><STRONG><a name="[133]"></a>HAL_DMA_Abort</STRONG> (Thumb, 108 bytes, Stack size 0 bytes, stm32g4xx_hal_dma.o(.text.HAL_DMA_Abort))
@@ -1023,7 +1024,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
+<BR>[Called By]<UL><LI><a href="#[1bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
 <LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Init
 </UL>
 
@@ -1039,16 +1040,16 @@ Global Symbols
 <LI><a href="#[141]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
 </UL>
 
-<P><STRONG><a name="[19d]"></a>HAL_GPIO_ReadPin</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, stm32g4xx_hal_gpio.o(.text.HAL_GPIO_ReadPin))
-<BR><BR>[Called By]<UL><LI><a href="#[19c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_button
+<P><STRONG><a name="[19f]"></a>HAL_GPIO_ReadPin</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, stm32g4xx_hal_gpio.o(.text.HAL_GPIO_ReadPin))
+<BR><BR>[Called By]<UL><LI><a href="#[19e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_button
 </UL>
 
 <P><STRONG><a name="[168]"></a>HAL_GPIO_WritePin</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, stm32g4xx_hal_gpio.o(.text.HAL_GPIO_WritePin))
 <BR><BR>[Called By]<UL><LI><a href="#[167]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_GPIO_Init
-<LI><a href="#[19a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_BUZZER
-<LI><a href="#[19b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_LED
-<LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
-<LI><a href="#[1b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_wheel_dir
+<LI><a href="#[19c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_BUZZER
+<LI><a href="#[19d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_LED
+<LI><a href="#[19a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
+<LI><a href="#[1b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_wheel_dir
 </UL>
 
 <P><STRONG><a name="[ae]"></a>HAL_GetTick</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_hal.o(.text.HAL_GetTick))
@@ -1150,7 +1151,7 @@ Global Symbols
 <LI><a href="#[ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2C_RequestMemoryRead
 <LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2C_Enable_IRQ
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_read_dma
+<BR>[Called By]<UL><LI><a href="#[1c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_read_dma
 </UL>
 
 <P><STRONG><a name="[e9]"></a>HAL_I2C_MspInit</STRONG> (Thumb, 318 bytes, Stack size 136 bytes, i2c.o(.text.HAL_I2C_MspInit))
@@ -1397,7 +1398,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[106]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Init
 </UL>
 
-<P><STRONG><a name="[1da]"></a>HAL_TIM_Base_Start_IT</STRONG> (Thumb, 190 bytes, Stack size 0 bytes, stm32g4xx_hal_tim.o(.text.HAL_TIM_Base_Start_IT))
+<P><STRONG><a name="[1dc]"></a>HAL_TIM_Base_Start_IT</STRONG> (Thumb, 190 bytes, Stack size 0 bytes, stm32g4xx_hal_tim.o(.text.HAL_TIM_Base_Start_IT))
 <BR><BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -1440,7 +1441,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM_CCxChannelCmd
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
+<BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
 </UL>
 
 <P><STRONG><a name="[113]"></a>HAL_TIM_IC_CaptureCallback</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32g4xx_hal_tim.o(.text.HAL_TIM_IC_CaptureCallback))
@@ -1520,8 +1521,8 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM_CCxChannelCmd
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
-<LI><a href="#[1cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
+<BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
+<LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
 </UL>
 
 <P><STRONG><a name="[116]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 70 bytes, Stack size 8 bytes, timer_it.o(.text.HAL_TIM_PeriodElapsedCallback))
@@ -1549,7 +1550,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[12c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Start_Receive_DMA
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_maixcam_uart
+<BR>[Called By]<UL><LI><a href="#[1ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_maixcam_uart
 <LI><a href="#[136]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_ErrorCallback
 </UL>
 
@@ -1607,7 +1608,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[133]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_Abort
 <LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_GetError
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_ensure_receive
+<BR>[Called By]<UL><LI><a href="#[1dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_ensure_receive
 <LI><a href="#[137]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
 <LI><a href="#[136]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_ErrorCallback
 </UL>
@@ -1689,8 +1690,8 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[145]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Start_Receive_IT
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_pid_tune
-<LI><a href="#[1d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_stepper_uart
+<BR>[Called By]<UL><LI><a href="#[1d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_pid_tune
+<LI><a href="#[1d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_stepper_uart
 <LI><a href="#[137]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
 <LI><a href="#[146]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_RxCpltCallback
 <LI><a href="#[136]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_ErrorCallback
@@ -1731,7 +1732,7 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Absolute_Try
 <LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gimbal_send
-<LI><a href="#[1ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tx_start_next
+<LI><a href="#[1ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tx_start_next
 </UL>
 
 <P><STRONG><a name="[14b]"></a>HAL_UART_TxCpltCallback</STRONG> (Thumb, 46 bytes, Stack size 0 bytes, uart_it.o(.text.HAL_UART_TxCpltCallback))
@@ -2123,8 +2124,9 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[184]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_send_bytes
 <LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task4_debug_flush
-<LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task1
+<BR>[Called By]<UL><LI><a href="#[1e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task4_debug_flush
+<LI><a href="#[1e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task3_debug_flush
+<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task1
 </UL>
 
 <P><STRONG><a name="[2f]"></a>USART1_IRQHandler</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, stm32g4xx_it.o(.text.USART1_IRQHandler))
@@ -2158,62 +2160,64 @@ Global Symbols
 <P><STRONG><a name="[186]"></a>ball_control_disable</STRONG> (Thumb, 50 bytes, Stack size 0 bytes, ball_control.o(.text.ball_control_disable))
 <BR><BR>[Calls]<UL><LI><a href="#[187]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_target_disable
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
+<BR>[Called By]<UL><LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
 </UL>
 
-<P><STRONG><a name="[1d1]"></a>ball_control_init</STRONG> (Thumb, 124 bytes, Stack size 0 bytes, ball_control.o(.text.ball_control_init))
-<BR><BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
+<P><STRONG><a name="[1d3]"></a>ball_control_init</STRONG> (Thumb, 124 bytes, Stack size 0 bytes, ball_control.o(.text.ball_control_init))
+<BR><BR>[Called By]<UL><LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[1ab]"></a>ball_control_request</STRONG> (Thumb, 104 bytes, Stack size 0 bytes, ball_control.o(.text.ball_control_request))
-<BR><BR>[Called By]<UL><LI><a href="#[1af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task7
-<LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task6
-<LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task4
-<LI><a href="#[1aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
+<P><STRONG><a name="[1ad]"></a>ball_control_request</STRONG> (Thumb, 104 bytes, Stack size 0 bytes, ball_control.o(.text.ball_control_request))
+<BR><BR>[Called By]<UL><LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task7
+<LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task6
+<LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task4
+<LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
 </UL>
 
-<P><STRONG><a name="[188]"></a>ball_control_service</STRONG> (Thumb, 684 bytes, Stack size 40 bytes, ball_control.o(.text.ball_control_service))
-<BR><BR>[Stack]<UL><LI>Max Depth = 144<LI>Call Chain = ball_control_service &rArr; ball_find_relative_pulse &rArr; ball_model_accel &rArr; __hardfp_sqrtf
+<P><STRONG><a name="[188]"></a>ball_control_service</STRONG> (Thumb, 1024 bytes, Stack size 72 bytes, ball_control.o(.text.ball_control_service))
+<BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = ball_control_service &rArr; ball_find_relative_pulse &rArr; ball_model_accel &rArr; __hardfp_sqrtf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[187]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_target_disable
-<LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_publish_absolute
+<LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_publish_absolute
+<LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fabsf
 <LI><a href="#[189]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_request_snapshot
-<LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_find_relative_pulse
+<LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_find_relative_pulse
+<LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_fall_ratio
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[190]"></a>car_speed_profile_init</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, car_speed_profile.o(.text.car_speed_profile_init))
+<P><STRONG><a name="[192]"></a>car_speed_profile_init</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, car_speed_profile.o(.text.car_speed_profile_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = car_speed_profile_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[191]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr8
+<BR>[Calls]<UL><LI><a href="#[193]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr8
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
-<LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_reset
+<BR>[Called By]<UL><LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
+<LI><a href="#[194]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_reset
 </UL>
 
-<P><STRONG><a name="[192]"></a>car_speed_profile_reset</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, car_speed_profile.o(.text.car_speed_profile_reset))
+<P><STRONG><a name="[194]"></a>car_speed_profile_reset</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, car_speed_profile.o(.text.car_speed_profile_reset))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = car_speed_profile_reset &rArr; car_speed_profile_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_init
+<BR>[Calls]<UL><LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_init
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
-</UL>
-
-<P><STRONG><a name="[1f7]"></a>car_speed_profile_start</STRONG> (Thumb, 132 bytes, Stack size 0 bytes, car_speed_profile.o(.text.car_speed_profile_start))
-<BR><BR>[Called By]<UL><LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
+<BR>[Called By]<UL><LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
 </UL>
 
-<P><STRONG><a name="[193]"></a>car_speed_profile_step</STRONG> (Thumb, 224 bytes, Stack size 24 bytes, car_speed_profile.o(.text.car_speed_profile_step))
+<P><STRONG><a name="[1fa]"></a>car_speed_profile_start</STRONG> (Thumb, 132 bytes, Stack size 0 bytes, car_speed_profile.o(.text.car_speed_profile_start))
+<BR><BR>[Called By]<UL><LI><a href="#[1f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
+</UL>
+
+<P><STRONG><a name="[195]"></a>car_speed_profile_step</STRONG> (Thumb, 224 bytes, Stack size 24 bytes, car_speed_profile.o(.text.car_speed_profile_step))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = car_speed_profile_step
 </UL>
-<BR>[Calls]<UL><LI><a href="#[194]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;scurve_q
-<LI><a href="#[195]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;scurve_dq
+<BR>[Calls]<UL><LI><a href="#[196]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;scurve_q
+<LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;scurve_dq
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task7
+<BR>[Called By]<UL><LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task7
 </UL>
 
-<P><STRONG><a name="[196]"></a>car_speed_profile_update_measurement</STRONG> (Thumb, 158 bytes, Stack size 32 bytes, car_speed_profile.o(.text.car_speed_profile_update_measurement))
+<P><STRONG><a name="[198]"></a>car_speed_profile_update_measurement</STRONG> (Thumb, 158 bytes, Stack size 32 bytes, car_speed_profile.o(.text.car_speed_profile_update_measurement))
 <BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = car_speed_profile_update_measurement &rArr; __aeabi_l2f &rArr; _float_epilogue
 </UL>
 <BR>[Calls]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_l2f
@@ -2221,37 +2225,37 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[1b3]"></a>compute_pid</STRONG> (Thumb, 224 bytes, Stack size 0 bytes, pid.o(.text.compute_pid))
-<BR><BR>[Called By]<UL><LI><a href="#[1d7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_angle
-<LI><a href="#[1b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line_task4
-<LI><a href="#[1b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line
-<LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
+<P><STRONG><a name="[1b5]"></a>compute_pid</STRONG> (Thumb, 224 bytes, Stack size 0 bytes, pid.o(.text.compute_pid))
+<BR><BR>[Called By]<UL><LI><a href="#[1d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_angle
+<LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line_task4
+<LI><a href="#[1b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line
+<LI><a href="#[1b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
 </UL>
 
-<P><STRONG><a name="[197]"></a>correct_gw_analogue</STRONG> (Thumb, 448 bytes, Stack size 64 bytes, gw_analogue.o(.text.correct_gw_analogue))
+<P><STRONG><a name="[199]"></a>correct_gw_analogue</STRONG> (Thumb, 448 bytes, Stack size 64 bytes, gw_analogue.o(.text.correct_gw_analogue))
 <BR><BR>[Stack]<UL><LI>Max Depth = 152<LI>Call Chain = correct_gw_analogue &rArr; __aeabi_dmul &rArr; _double_epilogue &rArr; _double_round
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_Stop
 <LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_Start
 <LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_PollForConversion
-<LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_GetValue
+<LI><a href="#[19b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_GetValue
 <LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
-<LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
+<LI><a href="#[19a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2iz
 </UL>
-<BR>[Called By]<UL><LI><a href="#[19e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;server_button
+<BR>[Called By]<UL><LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;server_button
 </UL>
 
-<P><STRONG><a name="[19a]"></a>driver_BUZZER</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, buzzer.o(.text.driver_BUZZER))
+<P><STRONG><a name="[19c]"></a>driver_BUZZER</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, buzzer.o(.text.driver_BUZZER))
 <BR><BR>[Calls]<UL><LI><a href="#[168]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[19b]"></a>driver_LED</STRONG> (Thumb, 128 bytes, Stack size 16 bytes, led.o(.text.driver_LED))
+<P><STRONG><a name="[19d]"></a>driver_LED</STRONG> (Thumb, 128 bytes, Stack size 16 bytes, led.o(.text.driver_LED))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = driver_LED
 </UL>
 <BR>[Calls]<UL><LI><a href="#[168]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
@@ -2259,55 +2263,55 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[19c]"></a>driver_button</STRONG> (Thumb, 188 bytes, Stack size 16 bytes, button.o(.text.driver_button))
+<P><STRONG><a name="[19e]"></a>driver_button</STRONG> (Thumb, 188 bytes, Stack size 16 bytes, button.o(.text.driver_button))
 <BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = driver_button &rArr; server_button &rArr; correct_gw_analogue &rArr; __aeabi_dmul &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[19d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_ReadPin
-<LI><a href="#[19e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;server_button
+<BR>[Calls]<UL><LI><a href="#[19f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_ReadPin
+<LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;server_button
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[19f]"></a>driver_gw_analogue</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, gw_analogue.o(.text.driver_gw_analogue))
+<P><STRONG><a name="[1a1]"></a>driver_gw_analogue</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, gw_analogue.o(.text.driver_gw_analogue))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = driver_gw_analogue &rArr; get_gw_analogue_analogue_diff
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
-<LI><a href="#[1a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_road_type
-<LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_analogue_analogue_diff
-<LI><a href="#[1a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_analoge_digital_data
+<BR>[Calls]<UL><LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
+<LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_road_type
+<LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_analogue_analogue_diff
+<LI><a href="#[1a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_analoge_digital_data
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1b1]"></a>driver_wheel</STRONG> (Thumb, 544 bytes, Stack size 24 bytes, wheel.o(.text.driver_wheel))
+<P><STRONG><a name="[1b3]"></a>driver_wheel</STRONG> (Thumb, 544 bytes, Stack size 24 bytes, wheel.o(.text.driver_wheel))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = driver_wheel &rArr; set_wheel_dir
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
-<LI><a href="#[1b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_wheel_dir
-<LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;wheel_ff_index
+<BR>[Calls]<UL><LI><a href="#[1b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
+<LI><a href="#[1b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_wheel_dir
+<LI><a href="#[1b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;wheel_ff_index
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[1b6]"></a>follow_line</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, status.o(.text.follow_line))
+<P><STRONG><a name="[1b8]"></a>follow_line</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, status.o(.text.follow_line))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = follow_line
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
+<BR>[Calls]<UL><LI><a href="#[1b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[1b7]"></a>follow_line_task4</STRONG> (Thumb, 118 bytes, Stack size 24 bytes, status.o(.text.follow_line_task4))
+<P><STRONG><a name="[1b9]"></a>follow_line_task4</STRONG> (Thumb, 118 bytes, Stack size 24 bytes, status.o(.text.follow_line_task4))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = follow_line_task4
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
-<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
-<LI><a href="#[1b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_fabsf
+<BR>[Calls]<UL><LI><a href="#[1b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
+<LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[1ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_fabsf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[1b9]"></a>gan_init</STRONG> (Thumb, 72 bytes, Stack size 32 bytes, main.o(.text.gan_init))
+<P><STRONG><a name="[1bb]"></a>gan_init</STRONG> (Thumb, 72 bytes, Stack size 32 bytes, main.o(.text.gan_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = gan_init &rArr; Emm_V5_Pos_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Reset_CurPos_To_Zero
@@ -2318,60 +2322,60 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1a1]"></a>get_gw_analoge_digital_data</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, gw_analogue.o(.text.get_gw_analoge_digital_data))
+<P><STRONG><a name="[1a3]"></a>get_gw_analoge_digital_data</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, gw_analogue.o(.text.get_gw_analoge_digital_data))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = get_gw_analoge_digital_data
 </UL>
-<BR>[Called By]<UL><LI><a href="#[19f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[1a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
 </UL>
 
-<P><STRONG><a name="[1a2]"></a>get_gw_analogue_analogue_diff</STRONG> (Thumb, 144 bytes, Stack size 64 bytes, gw_analogue.o(.text.get_gw_analogue_analogue_diff))
+<P><STRONG><a name="[1a4]"></a>get_gw_analogue_analogue_diff</STRONG> (Thumb, 144 bytes, Stack size 64 bytes, gw_analogue.o(.text.get_gw_analogue_analogue_diff))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = get_gw_analogue_analogue_diff
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;normalize_gray_weight
-<LI><a href="#[1ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;normalize_gray_data
+<BR>[Calls]<UL><LI><a href="#[1bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;normalize_gray_weight
+<LI><a href="#[1bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;normalize_gray_data
 </UL>
-<BR>[Called By]<UL><LI><a href="#[19f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[1a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
 </UL>
 
-<P><STRONG><a name="[1a0]"></a>get_gw_raw_data</STRONG> (Thumb, 92 bytes, Stack size 24 bytes, gw_analogue.o(.text.get_gw_raw_data))
+<P><STRONG><a name="[1a2]"></a>get_gw_raw_data</STRONG> (Thumb, 92 bytes, Stack size 24 bytes, gw_analogue.o(.text.get_gw_raw_data))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = get_gw_raw_data &rArr; HAL_ADC_Start &rArr; ADC_Enable
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_Stop
 <LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_Start
 <LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_PollForConversion
-<LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_GetValue
-<LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
+<LI><a href="#[19b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_ADC_GetValue
+<LI><a href="#[19a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
 </UL>
-<BR>[Called By]<UL><LI><a href="#[19f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[1a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
 </UL>
 
-<P><STRONG><a name="[1a3]"></a>get_road_type</STRONG> (Thumb, 166 bytes, Stack size 8 bytes, gw_analogue.o(.text.get_road_type))
+<P><STRONG><a name="[1a5]"></a>get_road_type</STRONG> (Thumb, 166 bytes, Stack size 8 bytes, gw_analogue.o(.text.get_road_type))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = get_road_type
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;serve_road
-<LI><a href="#[1bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;road_decision
+<BR>[Calls]<UL><LI><a href="#[1be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;serve_road
+<LI><a href="#[1bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;road_decision
 </UL>
-<BR>[Called By]<UL><LI><a href="#[19f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[1a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
 </UL>
 
-<P><STRONG><a name="[1f8]"></a>get_wheel_speed</STRONG> (Thumb, 78 bytes, Stack size 0 bytes, wheel.o(.text.get_wheel_speed))
+<P><STRONG><a name="[1fb]"></a>get_wheel_speed</STRONG> (Thumb, 78 bytes, Stack size 0 bytes, wheel.o(.text.get_wheel_speed))
 <BR><BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[1d9]"></a>iic_gyr_get_value</STRONG> (Thumb, 136 bytes, Stack size 0 bytes, gy901.o(.text.iic_gyr_get_value))
+<P><STRONG><a name="[1db]"></a>iic_gyr_get_value</STRONG> (Thumb, 136 bytes, Stack size 0 bytes, gy901.o(.text.iic_gyr_get_value))
 <BR><BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
-<LI><a href="#[1d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_balance
+<LI><a href="#[1da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_balance
 </UL>
 
-<P><STRONG><a name="[1be]"></a>iic_gyr_init</STRONG> (Thumb, 172 bytes, Stack size 64 bytes, gy901.o(.text.iic_gyr_init))
+<P><STRONG><a name="[1c0]"></a>iic_gyr_init</STRONG> (Thumb, 172 bytes, Stack size 64 bytes, gy901.o(.text.iic_gyr_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = iic_gyr_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
+<BR>[Calls]<UL><LI><a href="#[1c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
+<BR>[Called By]<UL><LI><a href="#[1cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
 </UL>
 
-<P><STRONG><a name="[1c0]"></a>iic_gyr_read_dma</STRONG> (Thumb, 74 bytes, Stack size 24 bytes, gy901.o(.text.iic_gyr_read_dma))
+<P><STRONG><a name="[1c2]"></a>iic_gyr_read_dma</STRONG> (Thumb, 74 bytes, Stack size 24 bytes, gy901.o(.text.iic_gyr_read_dma))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = iic_gyr_read_dma &rArr; HAL_I2C_Mem_Read_DMA &rArr; I2C_RequestMemoryRead &rArr; I2C_WaitOnTXISFlagUntilTimeout &rArr; I2C_IsErrorOccurred
 </UL>
 <BR>[Calls]<UL><LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_I2C_Mem_Read_DMA
@@ -2380,119 +2384,119 @@ Global Symbols
 <LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[1c4]"></a>init_BUZZER</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, buzzer.o(.text.init_BUZZER))
-<BR><BR>[Called By]<UL><LI><a href="#[1c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_device
+<P><STRONG><a name="[1c6]"></a>init_BUZZER</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, buzzer.o(.text.init_BUZZER))
+<BR><BR>[Called By]<UL><LI><a href="#[1c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_device
 </UL>
 
-<P><STRONG><a name="[1c3]"></a>init_LED</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, led.o(.text.init_LED))
-<BR><BR>[Called By]<UL><LI><a href="#[1c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_device
+<P><STRONG><a name="[1c5]"></a>init_LED</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, led.o(.text.init_LED))
+<BR><BR>[Called By]<UL><LI><a href="#[1c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_device
 </UL>
 
-<P><STRONG><a name="[1c2]"></a>init_button</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, button.o(.text.init_button))
-<BR><BR>[Called By]<UL><LI><a href="#[1c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_device
+<P><STRONG><a name="[1c4]"></a>init_button</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, button.o(.text.init_button))
+<BR><BR>[Called By]<UL><LI><a href="#[1c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_device
 </UL>
 
-<P><STRONG><a name="[1c1]"></a>init_device</STRONG> (Thumb, 86 bytes, Stack size 8 bytes, status.o(.text.init_device))
+<P><STRONG><a name="[1c3]"></a>init_device</STRONG> (Thumb, 86 bytes, Stack size 8 bytes, status.o(.text.init_device))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = init_device
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_BUZZER
-<LI><a href="#[1c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_LED
-<LI><a href="#[1c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_button
+<BR>[Calls]<UL><LI><a href="#[1c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_BUZZER
+<LI><a href="#[1c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_LED
+<LI><a href="#[1c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_button
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
+<BR>[Called By]<UL><LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[1c5]"></a>init_gw_analogue</STRONG> (Thumb, 142 bytes, Stack size 16 bytes, gw_analogue.o(.text.init_gw_analogue))
+<P><STRONG><a name="[1c7]"></a>init_gw_analogue</STRONG> (Thumb, 142 bytes, Stack size 16 bytes, gw_analogue.o(.text.init_gw_analogue))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = init_gw_analogue &rArr; select_channel
 </UL>
-<BR>[Calls]<UL><LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
-<LI><a href="#[1c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_road_determine
-<LI><a href="#[1c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_road_cnt
+<BR>[Calls]<UL><LI><a href="#[19a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;select_channel
+<LI><a href="#[1c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_road_determine
+<LI><a href="#[1c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_road_cnt
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
+<BR>[Called By]<UL><LI><a href="#[1cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
 </UL>
 
-<P><STRONG><a name="[1c8]"></a>init_maixcam_uart</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, uart_it.o(.text.init_maixcam_uart))
+<P><STRONG><a name="[1ca]"></a>init_maixcam_uart</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, uart_it.o(.text.init_maixcam_uart))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = init_maixcam_uart &rArr; HAL_UARTEx_ReceiveToIdle_DMA &rArr; UART_Start_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_init
+<BR>[Calls]<UL><LI><a href="#[1cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_init
 <LI><a href="#[12b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UARTEx_ReceiveToIdle_DMA
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1ca]"></a>init_motor</STRONG> (Thumb, 100 bytes, Stack size 8 bytes, status.o(.text.init_motor))
+<P><STRONG><a name="[1cc]"></a>init_motor</STRONG> (Thumb, 100 bytes, Stack size 8 bytes, status.o(.text.init_motor))
 <BR><BR>[Stack]<UL><LI>Max Depth = 272<LI>Call Chain = init_motor &rArr; init_wheel &rArr; HAL_TIM_PWM_Start
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
-<LI><a href="#[1cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
+<BR>[Calls]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
+<LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_servo
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
-</UL>
-
-<P><STRONG><a name="[1bf]"></a>init_pid</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, pid.o(.text.init_pid))
-<BR><BR>[Called By]<UL><LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
-<LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status_pid
-<LI><a href="#[1be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_init
+<BR>[Called By]<UL><LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[1c7]"></a>init_road_cnt</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gw_analogue.o(.text.init_road_cnt))
-<BR><BR>[Called By]<UL><LI><a href="#[1c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
+<P><STRONG><a name="[1c1]"></a>init_pid</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, pid.o(.text.init_pid))
+<BR><BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_wheel
+<LI><a href="#[1d2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status_pid
+<LI><a href="#[1c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_init
 </UL>
 
-<P><STRONG><a name="[1c6]"></a>init_road_determine</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, gw_analogue.o(.text.init_road_determine))
-<BR><BR>[Called By]<UL><LI><a href="#[1c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
+<P><STRONG><a name="[1c9]"></a>init_road_cnt</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, gw_analogue.o(.text.init_road_cnt))
+<BR><BR>[Called By]<UL><LI><a href="#[1c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
 </UL>
 
-<P><STRONG><a name="[1cd]"></a>init_sensor</STRONG> (Thumb, 24 bytes, Stack size 8 bytes, status.o(.text.init_sensor))
+<P><STRONG><a name="[1c8]"></a>init_road_determine</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, gw_analogue.o(.text.init_road_determine))
+<BR><BR>[Called By]<UL><LI><a href="#[1c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
+</UL>
+
+<P><STRONG><a name="[1cf]"></a>init_sensor</STRONG> (Thumb, 24 bytes, Stack size 8 bytes, status.o(.text.init_sensor))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = init_sensor &rArr; iic_gyr_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
-<LI><a href="#[1be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_init
+<BR>[Calls]<UL><LI><a href="#[1c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
+<LI><a href="#[1c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_init
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
+<BR>[Called By]<UL><LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[1cb]"></a>init_servo</STRONG> (Thumb, 224 bytes, Stack size 24 bytes, servo.o(.text.init_servo))
+<P><STRONG><a name="[1cd]"></a>init_servo</STRONG> (Thumb, 224 bytes, Stack size 24 bytes, servo.o(.text.init_servo))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = init_servo &rArr; __aeabi_dmul &rArr; _double_epilogue &rArr; _double_round
 </UL>
 <BR>[Calls]<UL><LI><a href="#[129]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
-<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2iz
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_motor
+<BR>[Called By]<UL><LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_motor
 </UL>
 
-<P><STRONG><a name="[1cf]"></a>init_state</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, status.o(.text.init_state))
-<BR><BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
+<P><STRONG><a name="[1d1]"></a>init_state</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, status.o(.text.init_state))
+<BR><BR>[Called By]<UL><LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[1ce]"></a>init_status</STRONG> (Thumb, 84 bytes, Stack size 16 bytes, status.o(.text.init_status))
+<P><STRONG><a name="[1d0]"></a>init_status</STRONG> (Thumb, 84 bytes, Stack size 16 bytes, status.o(.text.init_status))
 <BR><BR>[Stack]<UL><LI>Max Depth = 288<LI>Call Chain = init_status &rArr; init_motor &rArr; init_wheel &rArr; HAL_TIM_PWM_Start
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1d2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_task
-<LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status_pid
-<LI><a href="#[1cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_state
-<LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
-<LI><a href="#[1ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_motor
-<LI><a href="#[1c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_device
-<LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_init
-<LI><a href="#[1d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_init
+<BR>[Calls]<UL><LI><a href="#[1d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_task
+<LI><a href="#[1d2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status_pid
+<LI><a href="#[1d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_state
+<LI><a href="#[1cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sensor
+<LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_motor
+<LI><a href="#[1c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_device
+<LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_init
+<LI><a href="#[1d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_init
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1d0]"></a>init_status_pid</STRONG> (Thumb, 384 bytes, Stack size 232 bytes, status.o(.text.init_status_pid))
+<P><STRONG><a name="[1d2]"></a>init_status_pid</STRONG> (Thumb, 384 bytes, Stack size 232 bytes, status.o(.text.init_status_pid))
 <BR><BR>[Stack]<UL><LI>Max Depth = 232<LI>Call Chain = init_status_pid
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
+<BR>[Calls]<UL><LI><a href="#[1c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
+<BR>[Called By]<UL><LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[1d3]"></a>init_stepper_uart</STRONG> (Thumb, 72 bytes, Stack size 0 bytes, uart_it.o(.text.init_stepper_uart))
+<P><STRONG><a name="[1d5]"></a>init_stepper_uart</STRONG> (Thumb, 72 bytes, Stack size 0 bytes, uart_it.o(.text.init_stepper_uart))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = init_stepper_uart &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[138]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Receive_IT
@@ -2500,20 +2504,20 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1d2]"></a>init_task</STRONG> (Thumb, 34 bytes, Stack size 0 bytes, defect.o(.text.init_task))
-<BR><BR>[Called By]<UL><LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
+<P><STRONG><a name="[1d4]"></a>init_task</STRONG> (Thumb, 34 bytes, Stack size 0 bytes, defect.o(.text.init_task))
+<BR><BR>[Called By]<UL><LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
 </UL>
 
-<P><STRONG><a name="[1d4]"></a>init_uart_gyr</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, uart_it.o(.text.init_uart_gyr))
+<P><STRONG><a name="[1d6]"></a>init_uart_gyr</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, uart_it.o(.text.init_uart_gyr))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = init_uart_gyr &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[137]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
-<LI><a href="#[1d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_init
+<LI><a href="#[1d7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_init
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1d6]"></a>init_uart_pid_tune</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, uart_it.o(.text.init_uart_pid_tune))
+<P><STRONG><a name="[1d8]"></a>init_uart_pid_tune</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, uart_it.o(.text.init_uart_pid_tune))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = init_uart_pid_tune &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[138]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Receive_IT
@@ -2521,48 +2525,49 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1cc]"></a>init_wheel</STRONG> (Thumb, 572 bytes, Stack size 248 bytes, wheel.o(.text.init_wheel))
+<P><STRONG><a name="[1ce]"></a>init_wheel</STRONG> (Thumb, 572 bytes, Stack size 248 bytes, wheel.o(.text.init_wheel))
 <BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = init_wheel &rArr; HAL_TIM_PWM_Start
 </UL>
 <BR>[Calls]<UL><LI><a href="#[129]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
 <LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Encoder_Start
-<LI><a href="#[1bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
+<LI><a href="#[1c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_pid
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_motor
+<BR>[Called By]<UL><LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_motor
 </UL>
 
-<P><STRONG><a name="[1d7]"></a>keep_angle</STRONG> (Thumb, 164 bytes, Stack size 8 bytes, status.o(.text.keep_angle))
+<P><STRONG><a name="[1d9]"></a>keep_angle</STRONG> (Thumb, 164 bytes, Stack size 8 bytes, status.o(.text.keep_angle))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = keep_angle
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
+<BR>[Calls]<UL><LI><a href="#[1b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;compute_pid
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[1d8]"></a>keep_balance</STRONG> (Thumb, 76 bytes, Stack size 24 bytes, status.o(.text.keep_balance))
+<P><STRONG><a name="[1da]"></a>keep_balance</STRONG> (Thumb, 76 bytes, Stack size 24 bytes, status.o(.text.keep_balance))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = keep_balance
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_get_value
+<BR>[Calls]<UL><LI><a href="#[1db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_get_value
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 336 bytes, Stack size 24 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 360<LI>Call Chain = main &rArr; task4_debug_flush &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+<P><STRONG><a name="[6f]"></a>main</STRONG> (Thumb, 340 bytes, Stack size 24 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 384<LI>Call Chain = main &rArr; task3_debug_flush &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_ensure_receive
-<LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
-<LI><a href="#[1df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task4_debug_flush
-<LI><a href="#[1dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_service
-<LI><a href="#[1dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_poll
-<LI><a href="#[1d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_pid_tune
-<LI><a href="#[1d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_gyr
-<LI><a href="#[1d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_stepper_uart
-<LI><a href="#[1ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
-<LI><a href="#[1c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_maixcam_uart
-<LI><a href="#[1c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_read_dma
-<LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
-<LI><a href="#[19f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
+<BR>[Calls]<UL><LI><a href="#[1dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_ensure_receive
+<LI><a href="#[1e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
+<LI><a href="#[1e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task4_debug_flush
+<LI><a href="#[1e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task3_debug_flush
+<LI><a href="#[1df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;stepper_service
+<LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_poll
+<LI><a href="#[1d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_pid_tune
+<LI><a href="#[1d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_gyr
+<LI><a href="#[1d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_stepper_uart
+<LI><a href="#[1d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_status
+<LI><a href="#[1ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_maixcam_uart
+<LI><a href="#[1c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_read_dma
+<LI><a href="#[1bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gan_init
+<LI><a href="#[1a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_gw_analogue
 <LI><a href="#[188]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_service
 <LI><a href="#[17d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 <LI><a href="#[17b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_USART3_UART_Init
@@ -2583,66 +2588,66 @@ Global Symbols
 <LI><a href="#[166]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_DMA_Init
 <LI><a href="#[165]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_ADC5_Init
 <LI><a href="#[164]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_ADC3_Init
-<LI><a href="#[1da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Start_IT
+<LI><a href="#[1dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Start_IT
 <LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
 <LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 <LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Init
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
 </UL>
-<P><STRONG><a name="[1e0]"></a>maixcam_cmd_CDA</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_cmd_CDA))
+<P><STRONG><a name="[1e3]"></a>maixcam_cmd_CDA</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_cmd_CDA))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = maixcam_cmd_CDA &rArr; maixcam_start_cmd &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
+<BR>[Calls]<UL><LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
+<BR>[Called By]<UL><LI><a href="#[1e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
 </UL>
 
-<P><STRONG><a name="[1a5]"></a>maixcam_cmd_D</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, maixcam.o(.text.maixcam_cmd_D))
+<P><STRONG><a name="[1a7]"></a>maixcam_cmd_D</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, maixcam.o(.text.maixcam_cmd_D))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = maixcam_cmd_D &rArr; maixcam_start_cmd &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
-<LI><a href="#[1e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
+<BR>[Calls]<UL><LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
+<LI><a href="#[1e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
-<LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task6
-<LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task4
-<LI><a href="#[1aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
-<LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task1
+<BR>[Called By]<UL><LI><a href="#[1e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
+<LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task6
+<LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task4
+<LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
+<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task1
 </UL>
 
-<P><STRONG><a name="[1e3]"></a>maixcam_cmd_M</STRONG> (Thumb, 44 bytes, Stack size 16 bytes, maixcam.o(.text.maixcam_cmd_M))
+<P><STRONG><a name="[1e6]"></a>maixcam_cmd_M</STRONG> (Thumb, 44 bytes, Stack size 16 bytes, maixcam.o(.text.maixcam_cmd_M))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = maixcam_cmd_M &rArr; maixcam_start_cmd &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
-<LI><a href="#[1e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
+<BR>[Calls]<UL><LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
+<LI><a href="#[1e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
+<BR>[Called By]<UL><LI><a href="#[1e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
 </UL>
 
-<P><STRONG><a name="[1e4]"></a>maixcam_cmd_T</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, maixcam.o(.text.maixcam_cmd_T))
+<P><STRONG><a name="[1e7]"></a>maixcam_cmd_T</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, maixcam.o(.text.maixcam_cmd_T))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = maixcam_cmd_T &rArr; maixcam_start_cmd &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
-<LI><a href="#[1e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
+<BR>[Calls]<UL><LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
+<LI><a href="#[1e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
-</UL>
-
-<P><STRONG><a name="[1ef]"></a>maixcam_cmd_done</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_cmd_done))
-<BR><BR>[Called By]<UL><LI><a href="#[1ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_ack_frame
+<BR>[Called By]<UL><LI><a href="#[1e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
 </UL>
 
-<P><STRONG><a name="[1c9]"></a>maixcam_init</STRONG> (Thumb, 120 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_init))
-<BR><BR>[Called By]<UL><LI><a href="#[1c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_maixcam_uart
+<P><STRONG><a name="[1f2]"></a>maixcam_cmd_done</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_cmd_done))
+<BR><BR>[Called By]<UL><LI><a href="#[1f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_ack_frame
 </UL>
 
-<P><STRONG><a name="[1dc]"></a>maixcam_poll</STRONG> (Thumb, 74 bytes, Stack size 24 bytes, maixcam.o(.text.maixcam_poll))
+<P><STRONG><a name="[1cb]"></a>maixcam_init</STRONG> (Thumb, 120 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_init))
+<BR><BR>[Called By]<UL><LI><a href="#[1ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_maixcam_uart
+</UL>
+
+<P><STRONG><a name="[1de]"></a>maixcam_poll</STRONG> (Thumb, 74 bytes, Stack size 24 bytes, maixcam.o(.text.maixcam_poll))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = maixcam_poll &rArr; maixcam_tick_inner &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_feed_byte
-<LI><a href="#[1e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tick_inner
-<LI><a href="#[1e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_rx_read
+<BR>[Calls]<UL><LI><a href="#[1e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_feed_byte
+<LI><a href="#[1ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tick_inner
+<LI><a href="#[1e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_rx_read
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -2654,76 +2659,76 @@ Global Symbols
 <P><STRONG><a name="[14c]"></a>maixcam_uart_tx_complete</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_uart_tx_complete))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = maixcam_uart_tx_complete &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tx_start_next
+<BR>[Calls]<UL><LI><a href="#[1ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tx_start_next
 </UL>
 <BR>[Called By]<UL><LI><a href="#[14b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_TxCpltCallback
 </UL>
 
-<P><STRONG><a name="[1e9]"></a>maixcam_uart_tx_enqueue</STRONG> (Thumb, 164 bytes, Stack size 24 bytes, maixcam.o(.text.maixcam_uart_tx_enqueue))
+<P><STRONG><a name="[1ec]"></a>maixcam_uart_tx_enqueue</STRONG> (Thumb, 164 bytes, Stack size 24 bytes, maixcam.o(.text.maixcam_uart_tx_enqueue))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tx_start_next
+<BR>[Calls]<UL><LI><a href="#[1ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tx_start_next
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_tx
-<LI><a href="#[1e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_send_frame
-</UL>
-
-<P><STRONG><a name="[1ba]"></a>normalize_gray_data</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, gw_analogue.o(.text.normalize_gray_data))
-<BR><BR>[Called By]<UL><LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_analogue_analogue_diff
+<BR>[Called By]<UL><LI><a href="#[1f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_tx
+<LI><a href="#[1eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_send_frame
 </UL>
 
-<P><STRONG><a name="[1bb]"></a>normalize_gray_weight</STRONG> (Thumb, 68 bytes, Stack size 0 bytes, gw_analogue.o(.text.normalize_gray_weight))
-<BR><BR>[Called By]<UL><LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_analogue_analogue_diff
+<P><STRONG><a name="[1bc]"></a>normalize_gray_data</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, gw_analogue.o(.text.normalize_gray_data))
+<BR><BR>[Called By]<UL><LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_analogue_analogue_diff
 </UL>
 
-<P><STRONG><a name="[1f6]"></a>pid_reset_state</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, pid.o(.text.pid_reset_state))
-<BR><BR>[Called By]<UL><LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
-<LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
+<P><STRONG><a name="[1bd]"></a>normalize_gray_weight</STRONG> (Thumb, 68 bytes, Stack size 0 bytes, gw_analogue.o(.text.normalize_gray_weight))
+<BR><BR>[Called By]<UL><LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_analogue_analogue_diff
 </UL>
 
-<P><STRONG><a name="[1bd]"></a>road_decision</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, gw_analogue.o(.text.road_decision))
-<BR><BR>[Called By]<UL><LI><a href="#[1a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_road_type
+<P><STRONG><a name="[1f9]"></a>pid_reset_state</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, pid.o(.text.pid_reset_state))
+<BR><BR>[Called By]<UL><LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
+<LI><a href="#[1f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
 </UL>
 
-<P><STRONG><a name="[212]"></a>road_new_from_bit</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, gw_analogue.o(.text.road_new_from_bit), UNUSED)
+<P><STRONG><a name="[1bf]"></a>road_decision</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, gw_analogue.o(.text.road_decision))
+<BR><BR>[Called By]<UL><LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_road_type
+</UL>
 
-<P><STRONG><a name="[198]"></a>select_channel</STRONG> (Thumb, 76 bytes, Stack size 16 bytes, gw_analogue.o(.text.select_channel))
+<P><STRONG><a name="[215]"></a>road_new_from_bit</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, gw_analogue.o(.text.road_new_from_bit), UNUSED)
+
+<P><STRONG><a name="[19a]"></a>select_channel</STRONG> (Thumb, 76 bytes, Stack size 16 bytes, gw_analogue.o(.text.select_channel))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = select_channel
 </UL>
 <BR>[Calls]<UL><LI><a href="#[168]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
-<LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
-<LI><a href="#[1c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
+<BR>[Called By]<UL><LI><a href="#[1a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_gw_raw_data
+<LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<LI><a href="#[1c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_gw_analogue
 </UL>
 
-<P><STRONG><a name="[1bc]"></a>serve_road</STRONG> (Thumb, 102 bytes, Stack size 0 bytes, gw_analogue.o(.text.serve_road))
-<BR><BR>[Called By]<UL><LI><a href="#[1a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_road_type
+<P><STRONG><a name="[1be]"></a>serve_road</STRONG> (Thumb, 102 bytes, Stack size 0 bytes, gw_analogue.o(.text.serve_road))
+<BR><BR>[Called By]<UL><LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_road_type
 </UL>
 
-<P><STRONG><a name="[19e]"></a>server_button</STRONG> (Thumb, 150 bytes, Stack size 8 bytes, button.o(.text.server_button))
+<P><STRONG><a name="[1a0]"></a>server_button</STRONG> (Thumb, 150 bytes, Stack size 8 bytes, button.o(.text.server_button))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = server_button &rArr; correct_gw_analogue &rArr; __aeabi_dmul &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
+<BR>[Calls]<UL><LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;correct_gw_analogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[19c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_button
+<BR>[Called By]<UL><LI><a href="#[19e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_button
 </UL>
 
-<P><STRONG><a name="[1b4]"></a>set_wheel_dir</STRONG> (Thumb, 278 bytes, Stack size 8 bytes, wheel.o(.text.set_wheel_dir))
+<P><STRONG><a name="[1b6]"></a>set_wheel_dir</STRONG> (Thumb, 278 bytes, Stack size 8 bytes, wheel.o(.text.set_wheel_dir))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = set_wheel_dir
 </UL>
 <BR>[Calls]<UL><LI><a href="#[168]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
+<BR>[Called By]<UL><LI><a href="#[1b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
 </UL>
 
-<P><STRONG><a name="[18b]"></a>stepper_publish_absolute</STRONG> (Thumb, 94 bytes, Stack size 8 bytes, uart_it.o(.text.stepper_publish_absolute))
+<P><STRONG><a name="[18c]"></a>stepper_publish_absolute</STRONG> (Thumb, 94 bytes, Stack size 8 bytes, uart_it.o(.text.stepper_publish_absolute))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = stepper_publish_absolute
 </UL>
 <BR>[Called By]<UL><LI><a href="#[188]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_service
 </UL>
 
-<P><STRONG><a name="[1dd]"></a>stepper_service</STRONG> (Thumb, 166 bytes, Stack size 32 bytes, uart_it.o(.text.stepper_service))
+<P><STRONG><a name="[1df]"></a>stepper_service</STRONG> (Thumb, 166 bytes, Stack size 32 bytes, uart_it.o(.text.stepper_service))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = stepper_service &rArr; Emm_V5_Pos_Absolute_Try &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Absolute_Try
@@ -2736,66 +2741,75 @@ Global Symbols
 <LI><a href="#[186]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_disable
 </UL>
 
-<P><STRONG><a name="[1df]"></a>task4_debug_flush</STRONG> (Thumb, 218 bytes, Stack size 128 bytes, defect.o(.text.task4_debug_flush))
+<P><STRONG><a name="[1e1]"></a>task3_debug_flush</STRONG> (Thumb, 234 bytes, Stack size 152 bytes, defect.o(.text.task3_debug_flush))
+<BR><BR>[Stack]<UL><LI>Max Depth = 360<LI>Call Chain = task3_debug_flush &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
+</UL>
+<BR>[Calls]<UL><LI><a href="#[185]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_send_justfloat
+<LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+</UL>
+<BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+</UL>
+
+<P><STRONG><a name="[1e2]"></a>task4_debug_flush</STRONG> (Thumb, 218 bytes, Stack size 128 bytes, defect.o(.text.task4_debug_flush))
 <BR><BR>[Stack]<UL><LI>Max Depth = 336<LI>Call Chain = task4_debug_flush &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[185]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_send_justfloat
-<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1de]"></a>task7_flush</STRONG> (Thumb, 116 bytes, Stack size 8 bytes, defect.o(.text.task7_flush))
+<P><STRONG><a name="[1e0]"></a>task7_flush</STRONG> (Thumb, 116 bytes, Stack size 8 bytes, defect.o(.text.task7_flush))
 <BR><BR>[Stack]<UL><LI>Max Depth = 256<LI>Call Chain = task7_flush &rArr; task7_flush_one &rArr; task7_tx &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_T
-<LI><a href="#[1e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_M
-<LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
-<LI><a href="#[1e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_CDA
-<LI><a href="#[1f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
+<BR>[Calls]<UL><LI><a href="#[1e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_T
+<LI><a href="#[1e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_M
+<LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
+<LI><a href="#[1e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_CDA
+<LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1a8]"></a>task_finish</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, defect.o(.text.task_finish))
+<P><STRONG><a name="[1aa]"></a>task_finish</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, defect.o(.text.task_finish))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = task_finish &rArr; task_stop &rArr; car_speed_profile_reset &rArr; car_speed_profile_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
+<BR>[Calls]<UL><LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task2
+<BR>[Called By]<UL><LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task2
 </UL>
 
 <P><STRONG><a name="[183]"></a>task_select</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, defect.o(.text.task_select))
-<BR><BR>[Calls]<UL><LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task_led
+<BR><BR>[Calls]<UL><LI><a href="#[1f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task_led
 </UL>
 <BR>[Called By]<UL><LI><a href="#[182]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_PID_Tune
-<LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1f5]"></a>task_start</STRONG> (Thumb, 164 bytes, Stack size 24 bytes, defect.o(.text.task_start))
+<P><STRONG><a name="[1f8]"></a>task_start</STRONG> (Thumb, 164 bytes, Stack size 24 bytes, defect.o(.text.task_start))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = task_start &rArr; task_stop &rArr; car_speed_profile_reset &rArr; car_speed_profile_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
-<LI><a href="#[1f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_reset_state
-<LI><a href="#[1f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_start
+<BR>[Calls]<UL><LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
+<LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_reset_state
+<LI><a href="#[1fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_start
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1b0]"></a>task_stop</STRONG> (Thumb, 102 bytes, Stack size 24 bytes, defect.o(.text.task_stop))
+<P><STRONG><a name="[1b2]"></a>task_stop</STRONG> (Thumb, 102 bytes, Stack size 24 bytes, defect.o(.text.task_stop))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = task_stop &rArr; car_speed_profile_reset &rArr; car_speed_profile_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_reset_state
-<LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_reset
+<BR>[Calls]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_reset_state
+<LI><a href="#[194]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_reset
 <LI><a href="#[186]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_disable
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
-<LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
-<LI><a href="#[1af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task7
-<LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[1f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
+<LI><a href="#[1aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
+<LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task7
+<LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1db]"></a>uart_gyr_ensure_receive</STRONG> (Thumb, 92 bytes, Stack size 16 bytes, uart_gyro.o(.text.uart_gyr_ensure_receive))
+<P><STRONG><a name="[1dd]"></a>uart_gyr_ensure_receive</STRONG> (Thumb, 92 bytes, Stack size 16 bytes, uart_gyro.o(.text.uart_gyr_ensure_receive))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = uart_gyr_ensure_receive &rArr; uart_gyr_start_receive &rArr; HAL_UART_Receive_IT
 </UL>
 <BR>[Calls]<UL><LI><a href="#[137]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_start_receive
@@ -2804,8 +2818,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[1d5]"></a>uart_gyr_init</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, uart_gyro.o(.text.uart_gyr_init))
-<BR><BR>[Called By]<UL><LI><a href="#[1d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_gyr
+<P><STRONG><a name="[1d7]"></a>uart_gyr_init</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, uart_gyro.o(.text.uart_gyr_init))
+<BR><BR>[Called By]<UL><LI><a href="#[1d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_gyr
 </UL>
 
 <P><STRONG><a name="[147]"></a>uart_gyr_rx_feed</STRONG> (Thumb, 164 bytes, Stack size 8 bytes, uart_gyro.o(.text.uart_gyr_rx_feed))
@@ -2820,8 +2834,8 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[138]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Receive_IT
 <LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_AbortReceive
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_ensure_receive
-<LI><a href="#[1d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_gyr
+<BR>[Called By]<UL><LI><a href="#[1dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gyr_ensure_receive
+<LI><a href="#[1d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_uart_gyr
 <LI><a href="#[146]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_RxCpltCallback
 <LI><a href="#[136]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_ErrorCallback
 </UL>
@@ -2829,69 +2843,69 @@ Global Symbols
 <P><STRONG><a name="[12a]"></a>update_status</STRONG> (Thumb, 508 bytes, Stack size 32 bytes, status.o(.text.update_status))
 <BR><BR>[Stack]<UL><LI>Max Depth = 288<LI>Call Chain = update_status &rArr; update_task &rArr; driver_task1 &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_read_dma
-<LI><a href="#[19a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_BUZZER
-<LI><a href="#[19b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_LED
-<LI><a href="#[19c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_button
-<LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
-<LI><a href="#[1d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_balance
-<LI><a href="#[1d7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_angle
-<LI><a href="#[1d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_get_value
-<LI><a href="#[1f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_wheel_speed
-<LI><a href="#[1b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line_task4
-<LI><a href="#[1b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line
-<LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
-<LI><a href="#[196]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_update_measurement
+<BR>[Calls]<UL><LI><a href="#[1c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_read_dma
+<LI><a href="#[19c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_BUZZER
+<LI><a href="#[19d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_LED
+<LI><a href="#[19e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_button
+<LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<LI><a href="#[1da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_balance
+<LI><a href="#[1d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keep_angle
+<LI><a href="#[1db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iic_gyr_get_value
+<LI><a href="#[1fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_wheel_speed
+<LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line_task4
+<LI><a href="#[1b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line
+<LI><a href="#[1b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
+<LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_update_measurement
 </UL>
 <BR>[Called By]<UL><LI><a href="#[116]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 </UL>
 
-<P><STRONG><a name="[1f9]"></a>update_task</STRONG> (Thumb, 170 bytes, Stack size 8 bytes, defect.o(.text.update_task))
+<P><STRONG><a name="[1fc]"></a>update_task</STRONG> (Thumb, 170 bytes, Stack size 8 bytes, defect.o(.text.update_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 256<LI>Call Chain = update_task &rArr; driver_task1 &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[183]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_select
-<LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
-<LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
-<LI><a href="#[1af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task7
-<LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task6
-<LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task5
-<LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task4
-<LI><a href="#[1aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
-<LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task2
-<LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task1
+<LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
+<LI><a href="#[1f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_start
+<LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task7
+<LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task6
+<LI><a href="#[1af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task5
+<LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task4
+<LI><a href="#[1ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task3
+<LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task2
+<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task1
 </UL>
 <BR>[Called By]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_status
 </UL>
 
-<P><STRONG><a name="[1f4]"></a>update_task_led</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, defect.o(.text.update_task_led))
+<P><STRONG><a name="[1f7]"></a>update_task_led</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, defect.o(.text.update_task_led))
 <BR><BR>[Called By]<UL><LI><a href="#[183]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_select
 </UL>
 
-<P><STRONG><a name="[1fa]"></a>__0snprintf</STRONG> (Thumb, 44 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
-<BR><BR>[Calls]<UL><LI><a href="#[1fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<P><STRONG><a name="[1fd]"></a>__0snprintf</STRONG> (Thumb, 44 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
-<P><STRONG><a name="[213]"></a>__1snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
+<P><STRONG><a name="[216]"></a>__1snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
 
-<P><STRONG><a name="[1e2]"></a>__2snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf))
+<P><STRONG><a name="[1e5]"></a>__2snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = __2snprintf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_T
-<LI><a href="#[1e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_M
-<LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
-<LI><a href="#[1f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
+<BR>[Called By]<UL><LI><a href="#[1e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_T
+<LI><a href="#[1e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_M
+<LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
+<LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
 </UL>
 
-<P><STRONG><a name="[214]"></a>__c89snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
+<P><STRONG><a name="[217]"></a>__c89snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
 
-<P><STRONG><a name="[215]"></a>snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
+<P><STRONG><a name="[218]"></a>snprintf</STRONG> (Thumb, 0 bytes, Stack size 32 bytes, printfa.o(i.__0snprintf), UNUSED)
 
-<P><STRONG><a name="[1fc]"></a>__0sprintf</STRONG> (Thumb, 34 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
+<P><STRONG><a name="[1ff]"></a>__0sprintf</STRONG> (Thumb, 34 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_sputc
-<LI><a href="#[1fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
-<P><STRONG><a name="[216]"></a>__1sprintf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
+<P><STRONG><a name="[219]"></a>__1sprintf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
 
 <P><STRONG><a name="[b8]"></a>__2sprintf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = __2sprintf
@@ -2899,49 +2913,50 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESP8266_Init
 </UL>
 
-<P><STRONG><a name="[217]"></a>__c89sprintf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
+<P><STRONG><a name="[21a]"></a>__c89sprintf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
 
-<P><STRONG><a name="[218]"></a>sprintf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
+<P><STRONG><a name="[21b]"></a>sprintf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0sprintf), UNUSED)
 
-<P><STRONG><a name="[1b5]"></a>__hardfp__fabsf</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, fabsf.o(i.__hardfp__fabsf))
-<BR><BR>[Called By]<UL><LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fabsf
+<P><STRONG><a name="[1b7]"></a>__hardfp__fabsf</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, fabsf.o(i.__hardfp__fabsf))
+<BR><BR>[Called By]<UL><LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fabsf
+<LI><a href="#[1ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fabsf
 </UL>
 
-<P><STRONG><a name="[1f0]"></a>__hardfp_atof</STRONG> (Thumb, 44 bytes, Stack size 24 bytes, atof.o(i.__hardfp_atof))
+<P><STRONG><a name="[1f3]"></a>__hardfp_atof</STRONG> (Thumb, 44 bytes, Stack size 24 bytes, atof.o(i.__hardfp_atof))
 <BR><BR>[Stack]<UL><LI>Max Depth = 224<LI>Call Chain = __hardfp_atof &rArr; __strtod_int &rArr; _local_sscanf &rArr; _scanf_real
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__strtod_int
-<LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__set_errno
-<LI><a href="#[1fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__read_errno
+<LI><a href="#[201]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__set_errno
+<LI><a href="#[200]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__read_errno
 </UL>
 <BR>[Called By]<UL><LI><a href="#[148]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_uart_pid_byte
 </UL>
 
-<P><STRONG><a name="[1b8]"></a>__hardfp_fabsf</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, fabsfc99.o(i.__hardfp_fabsf))
-<BR><BR>[Called By]<UL><LI><a href="#[1b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line_task4
+<P><STRONG><a name="[1ba]"></a>__hardfp_fabsf</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, fabsfc99.o(i.__hardfp_fabsf))
+<BR><BR>[Called By]<UL><LI><a href="#[1b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;follow_line_task4
 </UL>
 
-<P><STRONG><a name="[18f]"></a>__hardfp_sqrtf</STRONG> (Thumb, 58 bytes, Stack size 16 bytes, sqrtf.o(i.__hardfp_sqrtf))
+<P><STRONG><a name="[191]"></a>__hardfp_sqrtf</STRONG> (Thumb, 58 bytes, Stack size 16 bytes, sqrtf.o(i.__hardfp_sqrtf))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = __hardfp_sqrtf
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__set_errno
+<BR>[Calls]<UL><LI><a href="#[201]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__set_errno
 </UL>
-<BR>[Called By]<UL><LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_model_accel
-</UL>
-
-<P><STRONG><a name="[1fd]"></a>__read_errno</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, errno.o(i.__read_errno))
-<BR><BR>[Called By]<UL><LI><a href="#[1f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atof
+<BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_model_accel
 </UL>
 
-<P><STRONG><a name="[219]"></a>__scatterload_copy</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_copy), UNUSED)
+<P><STRONG><a name="[200]"></a>__read_errno</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, errno.o(i.__read_errno))
+<BR><BR>[Called By]<UL><LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atof
+</UL>
 
-<P><STRONG><a name="[21a]"></a>__scatterload_null</STRONG> (Thumb, 2 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_null), UNUSED)
+<P><STRONG><a name="[21c]"></a>__scatterload_copy</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_copy), UNUSED)
 
-<P><STRONG><a name="[21b]"></a>__scatterload_zeroinit</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_zeroinit), UNUSED)
+<P><STRONG><a name="[21d]"></a>__scatterload_null</STRONG> (Thumb, 2 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_null), UNUSED)
 
-<P><STRONG><a name="[1fe]"></a>__set_errno</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, errno.o(i.__set_errno))
-<BR><BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_sqrtf
-<LI><a href="#[1f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atof
+<P><STRONG><a name="[21e]"></a>__scatterload_zeroinit</STRONG> (Thumb, 14 bytes, Stack size unknown bytes, handlers.o(i.__scatterload_zeroinit), UNUSED)
+
+<P><STRONG><a name="[201]"></a>__set_errno</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, errno.o(i.__set_errno))
+<BR><BR>[Called By]<UL><LI><a href="#[191]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_sqrtf
+<LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atof
 </UL>
 
 <P><STRONG><a name="[a7]"></a>_is_digit</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, scanf_fp.o(i._is_digit), UNUSED)
@@ -3525,124 +3540,128 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
 <LI><a href="#[182]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_PID_Tune
-<LI><a href="#[1f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atof
+<LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atof
 </UL>
 <BR>[Called By]<UL><LI><a href="#[146]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_RxCpltCallback
 </UL>
 
-<P><STRONG><a name="[1a4]"></a>driver_task1</STRONG> (Thumb, 256 bytes, Stack size 40 bytes, defect.o(.text.driver_task1))
+<P><STRONG><a name="[1a6]"></a>driver_task1</STRONG> (Thumb, 256 bytes, Stack size 40 bytes, defect.o(.text.driver_task1))
 <BR><BR>[Stack]<UL><LI>Max Depth = 248<LI>Call Chain = driver_task1 &rArr; UART_send_justfloat &rArr; UART_send_bytes &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
+<BR>[Calls]<UL><LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
 <LI><a href="#[185]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_send_justfloat
-<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1a7]"></a>driver_task2</STRONG> (Thumb, 456 bytes, Stack size 32 bytes, defect.o(.text.driver_task2))
+<P><STRONG><a name="[1a9]"></a>driver_task2</STRONG> (Thumb, 456 bytes, Stack size 32 bytes, defect.o(.text.driver_task2))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = driver_task2 &rArr; task_finish &rArr; task_stop &rArr; car_speed_profile_reset &rArr; car_speed_profile_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
-<LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fabsf
+<BR>[Calls]<UL><LI><a href="#[1aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_finish
+<LI><a href="#[1ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fabsf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1aa]"></a>driver_task3</STRONG> (Thumb, 212 bytes, Stack size 16 bytes, defect.o(.text.driver_task3))
+<P><STRONG><a name="[1ac]"></a>driver_task3</STRONG> (Thumb, 380 bytes, Stack size 16 bytes, defect.o(.text.driver_task3))
 <BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = driver_task3 &rArr; maixcam_cmd_D &rArr; maixcam_start_cmd &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
-<LI><a href="#[1ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_request
+<BR>[Calls]<UL><LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
+<LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_request
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1ac]"></a>driver_task4</STRONG> (Thumb, 184 bytes, Stack size 8 bytes, defect.o(.text.driver_task4))
+<P><STRONG><a name="[1ae]"></a>driver_task4</STRONG> (Thumb, 196 bytes, Stack size 8 bytes, defect.o(.text.driver_task4))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = driver_task4 &rArr; maixcam_cmd_D &rArr; maixcam_start_cmd &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
-<LI><a href="#[1ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_request
+<BR>[Calls]<UL><LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
+<LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_request
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1ad]"></a>driver_task5</STRONG> (Thumb, 258 bytes, Stack size 32 bytes, defect.o(.text.driver_task5))
+<P><STRONG><a name="[1af]"></a>driver_task5</STRONG> (Thumb, 258 bytes, Stack size 32 bytes, defect.o(.text.driver_task5))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = driver_task5 &rArr; Emm_V5_Pos_Control &rArr; gimbal_send &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_Pos_Control
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1ae]"></a>driver_task6</STRONG> (Thumb, 64 bytes, Stack size 8 bytes, defect.o(.text.driver_task6))
+<P><STRONG><a name="[1b0]"></a>driver_task6</STRONG> (Thumb, 64 bytes, Stack size 8 bytes, defect.o(.text.driver_task6))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = driver_task6 &rArr; maixcam_cmd_D &rArr; maixcam_start_cmd &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
-<LI><a href="#[1ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_request
+<BR>[Calls]<UL><LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
+<LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_request
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
+<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1af]"></a>driver_task7</STRONG> (Thumb, 116 bytes, Stack size 8 bytes, defect.o(.text.driver_task7))
+<P><STRONG><a name="[1b1]"></a>driver_task7</STRONG> (Thumb, 116 bytes, Stack size 8 bytes, defect.o(.text.driver_task7))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = driver_task7 &rArr; task_stop &rArr; car_speed_profile_reset &rArr; car_speed_profile_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
-<LI><a href="#[193]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_step
-<LI><a href="#[1ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_request
+<BR>[Calls]<UL><LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task_stop
+<LI><a href="#[195]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_step
+<LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_request
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
-</UL>
-
-<P><STRONG><a name="[1a9]"></a>fabsf</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, defect.o(.text.fabsf))
-<BR><BR>[Calls]<UL><LI><a href="#[1b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp__fabsf
-</UL>
-<BR>[Called By]<UL><LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task2
+<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_task
 </UL>
 
-<P><STRONG><a name="[1f2]"></a>task7_flush_one</STRONG> (Thumb, 340 bytes, Stack size 184 bytes, defect.o(.text.task7_flush_one))
+<P><STRONG><a name="[1ab]"></a>fabsf</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, defect.o(.text.fabsf))
+<BR><BR>[Calls]<UL><LI><a href="#[1b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp__fabsf
+</UL>
+<BR>[Called By]<UL><LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_task2
+</UL>
+
+<P><STRONG><a name="[1f5]"></a>task7_flush_one</STRONG> (Thumb, 340 bytes, Stack size 184 bytes, defect.o(.text.task7_flush_one))
 <BR><BR>[Stack]<UL><LI>Max Depth = 248<LI>Call Chain = task7_flush_one &rArr; task7_tx &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
 <LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
-<LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_tx
-<LI><a href="#[1e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
+<LI><a href="#[1f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_tx
+<LI><a href="#[1e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2snprintf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
+<BR>[Called By]<UL><LI><a href="#[1e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush
 </UL>
 
-<P><STRONG><a name="[1f3]"></a>task7_tx</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, defect.o(.text.task7_tx))
+<P><STRONG><a name="[1f6]"></a>task7_tx</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, defect.o(.text.task7_tx))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = task7_tx &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_uart_tx_enqueue
+<BR>[Calls]<UL><LI><a href="#[1ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_uart_tx_enqueue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
-</UL>
-
-<P><STRONG><a name="[18c]"></a>BallMechanismLut_IndexFromRelative</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, ball_control.o(.text.BallMechanismLut_IndexFromRelative))
-<BR><BR>[Called By]<UL><LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_find_relative_pulse
+<BR>[Called By]<UL><LI><a href="#[1f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task7_flush_one
 </UL>
 
-<P><STRONG><a name="[18e]"></a>BallMechanismLut_RelativeFromIndex</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, ball_control.o(.text.BallMechanismLut_RelativeFromIndex))
-<BR><BR>[Called By]<UL><LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_find_relative_pulse
+<P><STRONG><a name="[18e]"></a>BallMechanismLut_IndexFromRelative</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, ball_control.o(.text.BallMechanismLut_IndexFromRelative))
+<BR><BR>[Called By]<UL><LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_find_relative_pulse
 </UL>
 
-<P><STRONG><a name="[18a]"></a>ball_find_relative_pulse</STRONG> (Thumb, 224 bytes, Stack size 56 bytes, ball_control.o(.text.ball_find_relative_pulse))
+<P><STRONG><a name="[190]"></a>BallMechanismLut_RelativeFromIndex</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, ball_control.o(.text.BallMechanismLut_RelativeFromIndex))
+<BR><BR>[Called By]<UL><LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_find_relative_pulse
+</UL>
+
+<P><STRONG><a name="[18d]"></a>ball_fall_ratio</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, ball_control.o(.text.ball_fall_ratio))
+<BR><BR>[Called By]<UL><LI><a href="#[188]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_service
+</UL>
+
+<P><STRONG><a name="[18b]"></a>ball_find_relative_pulse</STRONG> (Thumb, 224 bytes, Stack size 56 bytes, ball_control.o(.text.ball_find_relative_pulse))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = ball_find_relative_pulse &rArr; ball_model_accel &rArr; __hardfp_sqrtf
 </UL>
-<BR>[Calls]<UL><LI><a href="#[18d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_model_accel
-<LI><a href="#[18e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BallMechanismLut_RelativeFromIndex
-<LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BallMechanismLut_IndexFromRelative
+<BR>[Calls]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_model_accel
+<LI><a href="#[190]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BallMechanismLut_RelativeFromIndex
+<LI><a href="#[18e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BallMechanismLut_IndexFromRelative
 </UL>
 <BR>[Called By]<UL><LI><a href="#[188]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_service
 </UL>
 
-<P><STRONG><a name="[18d]"></a>ball_model_accel</STRONG> (Thumb, 144 bytes, Stack size 32 bytes, ball_control.o(.text.ball_model_accel))
+<P><STRONG><a name="[18f]"></a>ball_model_accel</STRONG> (Thumb, 144 bytes, Stack size 32 bytes, ball_control.o(.text.ball_model_accel))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = ball_model_accel &rArr; __hardfp_sqrtf
 </UL>
-<BR>[Calls]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_sqrtf
+<BR>[Calls]<UL><LI><a href="#[191]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_sqrtf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[18a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_find_relative_pulse
+<BR>[Called By]<UL><LI><a href="#[18b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_find_relative_pulse
 </UL>
 
 <P><STRONG><a name="[189]"></a>ball_request_snapshot</STRONG> (Thumb, 68 bytes, Stack size 4 bytes, ball_control.o(.text.ball_request_snapshot))
@@ -3651,92 +3670,98 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[188]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_service
 </UL>
 
-<P><STRONG><a name="[1e5]"></a>maixcam_rx_read</STRONG> (Thumb, 54 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_rx_read))
-<BR><BR>[Called By]<UL><LI><a href="#[1dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_poll
+<P><STRONG><a name="[18a]"></a>fabsf</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, ball_control.o(.text.fabsf))
+<BR><BR>[Calls]<UL><LI><a href="#[1b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp__fabsf
+</UL>
+<BR>[Called By]<UL><LI><a href="#[188]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ball_control_service
 </UL>
 
-<P><STRONG><a name="[1e8]"></a>maixcam_send_frame</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, maixcam.o(.text.maixcam_send_frame))
+<P><STRONG><a name="[1e8]"></a>maixcam_rx_read</STRONG> (Thumb, 54 bytes, Stack size 0 bytes, maixcam.o(.text.maixcam_rx_read))
+<BR><BR>[Called By]<UL><LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_poll
+</UL>
+
+<P><STRONG><a name="[1eb]"></a>maixcam_send_frame</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, maixcam.o(.text.maixcam_send_frame))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_uart_tx_enqueue
+<BR>[Calls]<UL><LI><a href="#[1ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_uart_tx_enqueue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tick_inner
-<LI><a href="#[1e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
+<BR>[Called By]<UL><LI><a href="#[1ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_tick_inner
+<LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_start_cmd
 </UL>
 
-<P><STRONG><a name="[1e1]"></a>maixcam_start_cmd</STRONG> (Thumb, 74 bytes, Stack size 16 bytes, maixcam.o(.text.maixcam_start_cmd))
+<P><STRONG><a name="[1e4]"></a>maixcam_start_cmd</STRONG> (Thumb, 74 bytes, Stack size 16 bytes, maixcam.o(.text.maixcam_start_cmd))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = maixcam_start_cmd &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_send_frame
+<BR>[Calls]<UL><LI><a href="#[1eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_send_frame
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_T
-<LI><a href="#[1e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_M
-<LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
-<LI><a href="#[1e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_CDA
+<BR>[Called By]<UL><LI><a href="#[1e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_T
+<LI><a href="#[1e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_M
+<LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_D
+<LI><a href="#[1e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_CDA
 </UL>
 
-<P><STRONG><a name="[1e7]"></a>maixcam_tick_inner</STRONG> (Thumb, 68 bytes, Stack size 8 bytes, maixcam.o(.text.maixcam_tick_inner))
+<P><STRONG><a name="[1ea]"></a>maixcam_tick_inner</STRONG> (Thumb, 68 bytes, Stack size 8 bytes, maixcam.o(.text.maixcam_tick_inner))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = maixcam_tick_inner &rArr; maixcam_send_frame &rArr; maixcam_uart_tx_enqueue &rArr; maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_send_frame
+<BR>[Calls]<UL><LI><a href="#[1eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_send_frame
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_poll
+<BR>[Called By]<UL><LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_poll
 </UL>
 
-<P><STRONG><a name="[1ea]"></a>maixcam_tx_start_next</STRONG> (Thumb, 100 bytes, Stack size 8 bytes, maixcam.o(.text.maixcam_tx_start_next))
+<P><STRONG><a name="[1ed]"></a>maixcam_tx_start_next</STRONG> (Thumb, 100 bytes, Stack size 8 bytes, maixcam.o(.text.maixcam_tx_start_next))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = maixcam_tx_start_next &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit_DMA
 </UL>
 <BR>[Called By]<UL><LI><a href="#[14c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_uart_tx_complete
-<LI><a href="#[1e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_uart_tx_enqueue
+<LI><a href="#[1ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_uart_tx_enqueue
 </UL>
 
-<P><STRONG><a name="[1e6]"></a>mc_feed_byte</STRONG> (Thumb, 138 bytes, Stack size 16 bytes, maixcam.o(.text.mc_feed_byte))
+<P><STRONG><a name="[1e9]"></a>mc_feed_byte</STRONG> (Thumb, 138 bytes, Stack size 16 bytes, maixcam.o(.text.mc_feed_byte))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = mc_feed_byte &rArr; mc_frame_ready &rArr; parse_vd_frame &rArr; parse_fixed1
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
+<BR>[Calls]<UL><LI><a href="#[1ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_poll
+<BR>[Called By]<UL><LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_poll
 </UL>
 
-<P><STRONG><a name="[1eb]"></a>mc_frame_ready</STRONG> (Thumb, 120 bytes, Stack size 0 bytes, maixcam.o(.text.mc_frame_ready))
+<P><STRONG><a name="[1ee]"></a>mc_frame_ready</STRONG> (Thumb, 120 bytes, Stack size 0 bytes, maixcam.o(.text.mc_frame_ready))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = mc_frame_ready &rArr; parse_vd_frame &rArr; parse_fixed1
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_vl_frame
-<LI><a href="#[1ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_vd_frame
-<LI><a href="#[1ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_ack_frame
+<BR>[Calls]<UL><LI><a href="#[1f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_vl_frame
+<LI><a href="#[1ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_vd_frame
+<LI><a href="#[1f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_ack_frame
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_feed_byte
-</UL>
-
-<P><STRONG><a name="[1ee]"></a>parse_ack_frame</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, maixcam.o(.text.parse_ack_frame))
-<BR><BR>[Calls]<UL><LI><a href="#[1ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_done
-</UL>
-<BR>[Called By]<UL><LI><a href="#[1eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
+<BR>[Called By]<UL><LI><a href="#[1e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_feed_byte
 </UL>
 
-<P><STRONG><a name="[1f1]"></a>parse_fixed1</STRONG> (Thumb, 134 bytes, Stack size 8 bytes, maixcam.o(.text.parse_fixed1))
+<P><STRONG><a name="[1f1]"></a>parse_ack_frame</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, maixcam.o(.text.parse_ack_frame))
+<BR><BR>[Calls]<UL><LI><a href="#[1f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;maixcam_cmd_done
+</UL>
+<BR>[Called By]<UL><LI><a href="#[1ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
+</UL>
+
+<P><STRONG><a name="[1f4]"></a>parse_fixed1</STRONG> (Thumb, 134 bytes, Stack size 8 bytes, maixcam.o(.text.parse_fixed1))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = parse_fixed1
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_vl_frame
-<LI><a href="#[1ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_vd_frame
+<BR>[Called By]<UL><LI><a href="#[1f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_vl_frame
+<LI><a href="#[1ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_vd_frame
 </UL>
 
-<P><STRONG><a name="[1ec]"></a>parse_vd_frame</STRONG> (Thumb, 166 bytes, Stack size 24 bytes, maixcam.o(.text.parse_vd_frame))
+<P><STRONG><a name="[1ef]"></a>parse_vd_frame</STRONG> (Thumb, 166 bytes, Stack size 24 bytes, maixcam.o(.text.parse_vd_frame))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = parse_vd_frame &rArr; parse_fixed1
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_fixed1
+<BR>[Calls]<UL><LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_fixed1
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
+<BR>[Called By]<UL><LI><a href="#[1ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
 </UL>
 
-<P><STRONG><a name="[1ed]"></a>parse_vl_frame</STRONG> (Thumb, 182 bytes, Stack size 16 bytes, maixcam.o(.text.parse_vl_frame))
+<P><STRONG><a name="[1f0]"></a>parse_vl_frame</STRONG> (Thumb, 182 bytes, Stack size 16 bytes, maixcam.o(.text.parse_vl_frame))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = parse_vl_frame &rArr; parse_fixed1
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_fixed1
+<BR>[Calls]<UL><LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_fixed1
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
+<BR>[Called By]<UL><LI><a href="#[1ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;mc_frame_ready
 </UL>
 
 <P><STRONG><a name="[bb]"></a>gimbal_send</STRONG> (Thumb, 212 bytes, Stack size 24 bytes, emm_v5.o(.text.gimbal_send))
@@ -3751,53 +3776,53 @@ Local Symbols
 <LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Emm_V5_En_Control
 </UL>
 
-<P><STRONG><a name="[1b2]"></a>wheel_ff_index</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, wheel.o(.text.wheel_ff_index))
-<BR><BR>[Called By]<UL><LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
+<P><STRONG><a name="[1b4]"></a>wheel_ff_index</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, wheel.o(.text.wheel_ff_index))
+<BR><BR>[Called By]<UL><LI><a href="#[1b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;driver_wheel
 </UL>
 
-<P><STRONG><a name="[195]"></a>scurve_dq</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, car_speed_profile.o(.text.scurve_dq))
-<BR><BR>[Called By]<UL><LI><a href="#[193]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_step
+<P><STRONG><a name="[197]"></a>scurve_dq</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, car_speed_profile.o(.text.scurve_dq))
+<BR><BR>[Called By]<UL><LI><a href="#[195]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_step
 </UL>
 
-<P><STRONG><a name="[194]"></a>scurve_q</STRONG> (Thumb, 46 bytes, Stack size 0 bytes, car_speed_profile.o(.text.scurve_q))
-<BR><BR>[Called By]<UL><LI><a href="#[193]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_step
+<P><STRONG><a name="[196]"></a>scurve_q</STRONG> (Thumb, 46 bytes, Stack size 0 bytes, car_speed_profile.o(.text.scurve_q))
+<BR><BR>[Called By]<UL><LI><a href="#[195]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;car_speed_profile_step
 </UL>
 
-<P><STRONG><a name="[1ff]"></a>_fp_digits</STRONG> (Thumb, 366 bytes, Stack size 64 bytes, printfa.o(i._fp_digits), UNUSED)
+<P><STRONG><a name="[202]"></a>_fp_digits</STRONG> (Thumb, 366 bytes, Stack size 64 bytes, printfa.o(i._fp_digits), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uldivmod
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2ulz
-<LI><a href="#[200]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cdrcmple
+<LI><a href="#[203]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cdrcmple
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<BR>[Called By]<UL><LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
-<P><STRONG><a name="[1fb]"></a>_printf_core</STRONG> (Thumb, 1744 bytes, Stack size 136 bytes, printfa.o(i._printf_core), UNUSED)
+<P><STRONG><a name="[1fe]"></a>_printf_core</STRONG> (Thumb, 1744 bytes, Stack size 136 bytes, printfa.o(i._printf_core), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uldivmod
-<LI><a href="#[203]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
-<LI><a href="#[201]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_pre_padding
-<LI><a href="#[202]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_post_padding
-<LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<LI><a href="#[206]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
+<LI><a href="#[204]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_pre_padding
+<LI><a href="#[205]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_post_padding
+<LI><a href="#[202]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sprintf
-<LI><a href="#[1fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0snprintf
-</UL>
-
-<P><STRONG><a name="[202]"></a>_printf_post_padding</STRONG> (Thumb, 36 bytes, Stack size 24 bytes, printfa.o(i._printf_post_padding), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[1fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<BR>[Called By]<UL><LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sprintf
+<LI><a href="#[1fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0snprintf
 </UL>
 
-<P><STRONG><a name="[201]"></a>_printf_pre_padding</STRONG> (Thumb, 46 bytes, Stack size 24 bytes, printfa.o(i._printf_pre_padding), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[1fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<P><STRONG><a name="[205]"></a>_printf_post_padding</STRONG> (Thumb, 36 bytes, Stack size 24 bytes, printfa.o(i._printf_post_padding), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+</UL>
+
+<P><STRONG><a name="[204]"></a>_printf_pre_padding</STRONG> (Thumb, 46 bytes, Stack size 24 bytes, printfa.o(i._printf_pre_padding), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[1fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
 <P><STRONG><a name="[85]"></a>_snputc</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, printfa.o(i._snputc))
 <BR>[Address Reference Count : 1]<UL><LI> printfa.o(i.__0snprintf)
 </UL>
 <P><STRONG><a name="[86]"></a>_sputc</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, printfa.o(i._sputc))
-<BR><BR>[Called By]<UL><LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sprintf
+<BR><BR>[Called By]<UL><LI><a href="#[1ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sprintf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> printfa.o(i.__0sprintf)
 </UL>

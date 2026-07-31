@@ -98,6 +98,13 @@ static int32_t ball_find_relative_pulse(float requested_accel_mm_s2,
   return BallMechanismLut_RelativeFromIndex(lo);
 }
 
+/* value <= full → 1, value >= off → 0, linear in between */
+static float ball_fall_ratio(float value, float full, float off) {
+  if (value <= full) return 1.0f;
+  if (value >= off)  return 0.0f;
+  return (off - value) / (off - full);
+}
+
 void ball_control_init(STATUS *status) {
   status->sensor.vision.ball.x10 = 0;
   status->sensor.vision.ball.timestamp_ms = 0;
@@ -237,50 +244,87 @@ void ball_control_service(STATUS *status) {
   }
 
   ball->position_error_mm = request.target_mm - ball->estimator.position_mm;
-  ball->requested_accel_mm_s2 = ball->kp * ball->position_error_mm -
-                                ball->kd * ball->estimator.velocity_mm_s;
 
-  /* Stuck integral: only when ball is stuck away from target */
   {
-    float e_abs = ball->position_error_mm;
-    if (e_abs < 0.0f) e_abs = -e_abs;
-    float v_abs = ball->estimator.velocity_mm_s;
-    if (v_abs < 0.0f) v_abs = -v_abs;
+    float e_abs = fabsf(ball->position_error_mm);
+    float v_abs = fabsf(ball->estimator.velocity_mm_s);
 
-    if (!ball->hold_active &&
-        e_abs > BALL_STUCK_ERROR_MM &&
-        v_abs < BALL_STUCK_SPEED_MM_S) {
-      ball->stuck_timer_s += dt_s;
+    /* ── Deadband with hysteresis ── */
+    if (ball->hold_active) {
+      if (e_abs >= BALL_DEAD_EXIT_ERROR_MM ||
+          v_abs >= BALL_DEAD_EXIT_SPEED_MM_S) {
+        ball->hold_active = 0;
+        ball->hold_timer_s = 0.0f;
+      }
     } else {
+      if (e_abs <= BALL_DEAD_ENTER_ERROR_MM &&
+          v_abs <= BALL_DEAD_ENTER_SPEED_MM_S) {
+        ball->hold_timer_s += dt_s;
+      } else {
+        /* Slowly decrease timer instead of resetting to zero */
+        ball->hold_timer_s -= 2.0f * dt_s;
+        if (ball->hold_timer_s < 0.0f)
+          ball->hold_timer_s = 0.0f;
+      }
+      if (ball->hold_timer_s >= BALL_DEAD_CONFIRM_S) {
+        ball->hold_active = 1;
+        ball->integral_accel_mm_s2 = 0.0f;
+      }
+    }
+
+    if (ball->hold_active) {
+      /* In deadband: zero ball accel, clear integral */
       ball->stuck_timer_s = 0.0f;
-    }
-
-    if (ball->stuck_timer_s >= BALL_STUCK_CONFIRM_S) {
-      ball->integral_accel_mm_s2 += ball->ki * ball->position_error_mm * dt_s;
-      if (ball->integral_accel_mm_s2 > BALL_I_MAX_MM_S2)
-        ball->integral_accel_mm_s2 = BALL_I_MAX_MM_S2;
-      else if (ball->integral_accel_mm_s2 < -BALL_I_MAX_MM_S2)
-        ball->integral_accel_mm_s2 = -BALL_I_MAX_MM_S2;
-    }
-
-    ball->requested_accel_mm_s2 += ball->integral_accel_mm_s2;
-  }
-
-  /* Center hold: freeze stepper when ball is settled */
-  {
-    float e_abs = ball->position_error_mm;
-    if (e_abs < 0.0f) e_abs = -e_abs;
-    float v_abs = ball->estimator.velocity_mm_s;
-    if (v_abs < 0.0f) v_abs = -v_abs;
-
-    if (e_abs <= BALL_HOLD_ERROR_MM && v_abs <= BALL_HOLD_SPEED_MM_S) {
-      ball->hold_timer_s += dt_s;
+      ball->requested_accel_mm_s2 = 0.0f;
     } else {
-      ball->hold_timer_s = 0.0f;
-      ball->hold_active = 0;
-    }
-    if (ball->hold_timer_s >= BALL_HOLD_CONFIRM_S) {
-      ball->hold_active = 1;
+      float pd_accel = ball->kp * ball->position_error_mm -
+                       ball->kd * ball->estimator.velocity_mm_s;
+
+      uint8_t moving_toward =
+          (ball->position_error_mm * ball->estimator.velocity_mm_s) > 0.0f;
+
+      if (e_abs <= BALL_DEAD_ENTER_ERROR_MM) {
+        /* Already inside allowed range, release integral */
+        ball->stuck_timer_s = 0.0f;
+        ball->integral_accel_mm_s2 = 0.0f;
+      } else if (moving_toward &&
+                 v_abs >= BALL_I_RELEASE_SPEED_MM_S &&
+                 dt_s > 0.0f) {
+        /* Ball moving toward target: fast decay, integral done its job */
+        float keep = 1.0f - BALL_I_DECAY_PER_S * dt_s;
+        if (keep < 0.0f) keep = 0.0f;
+        ball->stuck_timer_s = 0.0f;
+        ball->integral_accel_mm_s2 *= keep;
+      } else {
+        /* Ball slow or stuck: conditional integral */
+        float error_scale = ball_fall_ratio(e_abs, BALL_I_FULL_ERROR_MM,
+                                            BALL_I_OFF_ERROR_MM);
+        float speed_scale = ball_fall_ratio(v_abs, BALL_I_FULL_SPEED_MM_S,
+                                            BALL_I_OFF_SPEED_MM_S);
+        float integral_scale = error_scale * speed_scale;
+
+        if (integral_scale > 0.0f && dt_s > 0.0f) {
+          ball->stuck_timer_s += dt_s;
+          if (ball->stuck_timer_s >= BALL_I_CONFIRM_S) {
+            ball->integral_accel_mm_s2 += ball->ki * integral_scale *
+                                          ball->position_error_mm * dt_s;
+            if (ball->integral_accel_mm_s2 > BALL_I_MAX_MM_S2)
+              ball->integral_accel_mm_s2 = BALL_I_MAX_MM_S2;
+            else if (ball->integral_accel_mm_s2 < -BALL_I_MAX_MM_S2)
+              ball->integral_accel_mm_s2 = -BALL_I_MAX_MM_S2;
+          }
+        } else if (dt_s > 0.0f) {
+          /* Not integrating: slowly decay old integral */
+          float keep = 1.0f - BALL_I_DECAY_PER_S * dt_s;
+          if (keep < 0.0f) keep = 0.0f;
+          ball->stuck_timer_s = 0.0f;
+          ball->integral_accel_mm_s2 *= keep;
+          if (fabsf(ball->integral_accel_mm_s2) < 0.05f)
+            ball->integral_accel_mm_s2 = 0.0f;
+        }
+      }
+
+      ball->requested_accel_mm_s2 = pd_accel + ball->integral_accel_mm_s2;
     }
   }
 
@@ -294,8 +338,7 @@ void ball_control_service(STATUS *status) {
   {
     uint32_t primask = __get_PRIMASK();
     __disable_irq();
-    if (!ball->hold_active &&
-        status->control.ball.request.enabled &&
+    if (status->control.ball.request.enabled &&
         status->control.ball.request.publish_seq == request.publish_seq &&
         status->control.ball.request.session_seq == request.session_seq) {
       stepper_publish_absolute(ball->absolute_target_pulse,

@@ -80,6 +80,7 @@ Section Cross References
     main.o(.text.main) refers to ball_control.o(.text.ball_control_service) for ball_control_service
     main.o(.text.main) refers to uart_it.o(.text.stepper_service) for stepper_service
     main.o(.text.main) refers to defect.o(.text.task7_flush) for task7_flush
+    main.o(.text.main) refers to defect.o(.text.task3_debug_flush) for task3_debug_flush
     main.o(.text.main) refers to defect.o(.text.task4_debug_flush) for task4_debug_flush
     main.o(.text.main) refers to stm32g4xx_hal.o(.text.HAL_GetTick) for HAL_GetTick
     main.o(.ARM.exidx.text.main) refers to main.o(.text.main) for [Anonymous Symbol]
@@ -2276,6 +2277,12 @@ Section Cross References
     status.o(.text.after_init_state) refers to status.o(.bss.status) for status
     status.o(.text.after_init_state) refers to gy901.o(.text.iic_gyr_get_value) for iic_gyr_get_value
     status.o(.ARM.exidx.text.after_init_state) refers to status.o(.text.after_init_state) for [Anonymous Symbol]
+    defect.o(.text.task3_debug_flush) refers to defect.o(.bss.task3_dbg_ready) for task3_dbg_ready
+    defect.o(.text.task3_debug_flush) refers to defect.o(.bss.task3_dbg_buf) for task3_dbg_buf
+    defect.o(.text.task3_debug_flush) refers to f2d.o(.text) for __aeabi_f2d
+    defect.o(.text.task3_debug_flush) refers to usart.o(.bss.huart1) for huart1
+    defect.o(.text.task3_debug_flush) refers to log.o(.text.UART_send_justfloat) for UART_send_justfloat
+    defect.o(.ARM.exidx.text.task3_debug_flush) refers to defect.o(.text.task3_debug_flush) for [Anonymous Symbol]
     defect.o(.text.task4_debug_flush) refers to defect.o(.bss.task4_dbg_ready) for task4_dbg_ready
     defect.o(.text.task4_debug_flush) refers to defect.o(.bss.task4_dbg_buf) for task4_dbg_buf
     defect.o(.text.task4_debug_flush) refers to f2d.o(.text) for __aeabi_f2d
@@ -2338,6 +2345,9 @@ Section Cross References
     defect.o(.text.driver_task3) refers to defect.o(.bss.driver_task3.q3_state) for driver_task3.q3_state
     defect.o(.text.driver_task3) refers to maixcam.o(.text.maixcam_cmd_D) for maixcam_cmd_D
     defect.o(.text.driver_task3) refers to ball_control.o(.text.ball_control_request) for ball_control_request
+    defect.o(.text.driver_task3) refers to defect.o(.bss.driver_task3.last_dbg_seq) for driver_task3.last_dbg_seq
+    defect.o(.text.driver_task3) refers to defect.o(.bss.task3_dbg_buf) for task3_dbg_buf
+    defect.o(.text.driver_task3) refers to defect.o(.bss.task3_dbg_ready) for task3_dbg_ready
     defect.o(.ARM.exidx.text.driver_task3) refers to defect.o(.text.driver_task3) for [Anonymous Symbol]
     defect.o(.text.driver_task4) refers to maixcam.o(.text.maixcam_cmd_D) for maixcam_cmd_D
     defect.o(.text.driver_task4) refers to ball_control.o(.text.ball_control_request) for ball_control_request
@@ -2366,10 +2376,15 @@ Section Cross References
     ball_control.o(.ARM.exidx.text.ball_control_disable) refers to ball_control.o(.text.ball_control_disable) for [Anonymous Symbol]
     ball_control.o(.text.ball_control_service) refers to ball_control.o(.text.ball_request_snapshot) for ball_request_snapshot
     ball_control.o(.text.ball_control_service) refers to uart_it.o(.text.stepper_target_disable) for stepper_target_disable
+    ball_control.o(.text.ball_control_service) refers to ball_control.o(.text.fabsf) for fabsf
     ball_control.o(.text.ball_control_service) refers to ball_control.o(.text.ball_find_relative_pulse) for ball_find_relative_pulse
     ball_control.o(.text.ball_control_service) refers to uart_it.o(.text.stepper_publish_absolute) for stepper_publish_absolute
+    ball_control.o(.text.ball_control_service) refers to ball_control.o(.text.ball_fall_ratio) for ball_fall_ratio
     ball_control.o(.ARM.exidx.text.ball_control_service) refers to ball_control.o(.text.ball_control_service) for [Anonymous Symbol]
     ball_control.o(.ARM.exidx.text.ball_request_snapshot) refers to ball_control.o(.text.ball_request_snapshot) for [Anonymous Symbol]
+    ball_control.o(.text.fabsf) refers to fabsf.o(i.__hardfp__fabsf) for __hardfp__fabsf
+    ball_control.o(.ARM.exidx.text.fabsf) refers to ball_control.o(.text.fabsf) for [Anonymous Symbol]
+    ball_control.o(.ARM.exidx.text.ball_fall_ratio) refers to ball_control.o(.text.ball_fall_ratio) for [Anonymous Symbol]
     ball_control.o(.text.ball_find_relative_pulse) refers to ball_control.o(.text.BallMechanismLut_IndexFromRelative) for BallMechanismLut_IndexFromRelative
     ball_control.o(.text.ball_find_relative_pulse) refers to ball_control.o(.text.ball_model_accel) for ball_model_accel
     ball_control.o(.text.ball_find_relative_pulse) refers to ball_control.o(.text.BallMechanismLut_RelativeFromIndex) for BallMechanismLut_RelativeFromIndex
@@ -4722,6 +4737,7 @@ Removing Unused input sections from the image.
     Removing status.o(.bss.speed_show_flag), (1 bytes).
     Removing status.o(.data.road_buf), (1 bytes).
     Removing defect.o(.text), (0 bytes).
+    Removing defect.o(.ARM.exidx.text.task3_debug_flush), (8 bytes).
     Removing defect.o(.ARM.exidx.text.task4_debug_flush), (8 bytes).
     Removing defect.o(.ARM.exidx.text.task7_flush), (8 bytes).
     Removing defect.o(.ARM.exidx.text.task7_flush_one), (8 bytes).
@@ -4747,6 +4763,8 @@ Removing Unused input sections from the image.
     Removing ball_control.o(.ARM.exidx.text.ball_control_disable), (8 bytes).
     Removing ball_control.o(.ARM.exidx.text.ball_control_service), (8 bytes).
     Removing ball_control.o(.ARM.exidx.text.ball_request_snapshot), (8 bytes).
+    Removing ball_control.o(.ARM.exidx.text.fabsf), (8 bytes).
+    Removing ball_control.o(.ARM.exidx.text.ball_fall_ratio), (8 bytes).
     Removing ball_control.o(.ARM.exidx.text.ball_find_relative_pulse), (8 bytes).
     Removing ball_control.o(.ARM.exidx.text.BallMechanismLut_IndexFromRelative), (8 bytes).
     Removing ball_control.o(.ARM.exidx.text.ball_model_accel), (8 bytes).
@@ -4998,7 +5016,7 @@ Removing Unused input sections from the image.
     Removing car_speed_profile.o(.ARM.exidx.text.scurve_q), (8 bytes).
     Removing car_speed_profile.o(.ARM.exidx.text.scurve_dq), (8 bytes).
 
-1840 unused section(s) (total 98001 bytes) removed from the image.
+1843 unused section(s) (total 98025 bytes) removed from the image.
 
 ==============================================================================
 
@@ -5072,81 +5090,81 @@ Image Symbol Table
     ../User/Tool/eeprom.c                    0x00000000   Number         0  eeprom.o ABSOLUTE
     ../User/Tool/log.c                       0x00000000   Number         0  log.o ABSOLUTE
     ../User/Tool/pid.c                       0x00000000   Number         0  pid.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isdigit_o.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isgraph_o.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  islower_o.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isprint_o.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  ispunct_o.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isspace_o.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isupper_o.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isxdigit_o.o ABSOLUTE
-    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  ctype_c.o ABSOLUTE
     ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isspace_c.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isxdigit_o.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isupper_o.o ABSOLUTE
     ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  ctype_o.o ABSOLUTE
     ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isalnum_o.o ABSOLUTE
     ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isalpha_o.o ABSOLUTE
     ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isblank_o.o ABSOLUTE
     ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  iscntrl_o.o ABSOLUTE
-    ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isspace_o.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isprint_o.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  ispunct_o.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  islower_o.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isdigit_o.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  isgraph_o.o ABSOLUTE
+    ../clib/microlib/ctype/ctype.c           0x00000000   Number         0  ctype_c.o ABSOLUTE
     ../clib/microlib/division.c              0x00000000   Number         0  uldiv.o ABSOLUTE
+    ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
     ../clib/microlib/errno.c                 0x00000000   Number         0  errno.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
+    ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
-    ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf1.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf0.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf8.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf5.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfa.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf4.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf7.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf3.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf2.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf6.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf4.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf8.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfb.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf5.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf3.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf1.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf7.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf0.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf6.o ABSOLUTE
     ../clib/microlib/printf/stubs.s          0x00000000   Number         0  stubs.o ABSOLUTE
     ../clib/microlib/stdio/streams.c         0x00000000   Number         0  stdout.o ABSOLUTE
     ../clib/microlib/string/memset.c         0x00000000   Number         0  memseta.o ABSOLUTE
     ../clib/microlib/string/strlen.c         0x00000000   Number         0  strlen.o ABSOLUTE
     ../clib/microlib/stubs.s                 0x00000000   Number         0  iusefp.o ABSOLUTE
+    ../clib/scanf.c                          0x00000000   Number         0  _chval.o ABSOLUTE
+    ../clib/scanf.c                          0x00000000   Number         0  atoi.o ABSOLUTE
     ../clib/scanf.c                          0x00000000   Number         0  _strtoul.o ABSOLUTE
-    ../clib/scanf.c                          0x00000000   Number         0  _sgetc.o ABSOLUTE
+    ../clib/scanf.c                          0x00000000   Number         0  strtol.o ABSOLUTE
     ../clib/scanf.c                          0x00000000   Number         0  scanf_fp.o ABSOLUTE
     ../clib/scanf.c                          0x00000000   Number         0  strtod.o ABSOLUTE
-    ../clib/scanf.c                          0x00000000   Number         0  _chval.o ABSOLUTE
-    ../clib/scanf.c                          0x00000000   Number         0  strtol.o ABSOLUTE
-    ../clib/scanf.c                          0x00000000   Number         0  atoi.o ABSOLUTE
+    ../clib/scanf.c                          0x00000000   Number         0  _sgetc.o ABSOLUTE
     ../fplib/microlib/d2f.c                  0x00000000   Number         0  d2f.o ABSOLUTE
     ../fplib/microlib/f2d.c                  0x00000000   Number         0  f2d.o ABSOLUTE
     ../fplib/microlib/fpadd.c                0x00000000   Number         0  dadd.o ABSOLUTE
     ../fplib/microlib/fpdiv.c                0x00000000   Number         0  ddiv.o ABSOLUTE
-    ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  depilogue.o ABSOLUTE
     ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  fepilogue.o ABSOLUTE
+    ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  depilogue.o ABSOLUTE
     ../fplib/microlib/fpfix.c                0x00000000   Number         0  dfixi.o ABSOLUTE
     ../fplib/microlib/fpfix.c                0x00000000   Number         0  dfixul.o ABSOLUTE
-    ../fplib/microlib/fpflt.c                0x00000000   Number         0  dflti.o ABSOLUTE
-    ../fplib/microlib/fpflt.c                0x00000000   Number         0  dfltul.o ABSOLUTE
     ../fplib/microlib/fpflt.c                0x00000000   Number         0  ffltl.o ABSOLUTE
+    ../fplib/microlib/fpflt.c                0x00000000   Number         0  dfltul.o ABSOLUTE
+    ../fplib/microlib/fpflt.c                0x00000000   Number         0  dflti.o ABSOLUTE
     ../fplib/microlib/fpflt.c                0x00000000   Number         0  dfltui.o ABSOLUTE
     ../fplib/microlib/fpmul.c                0x00000000   Number         0  dmul.o ABSOLUTE
     ../mathlib/atanf.c                       0x00000000   Number         0  atanf_x.o ABSOLUTE
     ../mathlib/atanf.c                       0x00000000   Number         0  atanf.o ABSOLUTE
     ../mathlib/atof.c                        0x00000000   Number         0  atof.o ABSOLUTE
-    ../mathlib/fabsf.c                       0x00000000   Number         0  fabsfc99.o ABSOLUTE
     ../mathlib/fabsf.c                       0x00000000   Number         0  fabsf.o ABSOLUTE
+    ../mathlib/fabsf.c                       0x00000000   Number         0  fabsfc99.o ABSOLUTE
     ../mathlib/fpclassifyf.c                 0x00000000   Number         0  fpclassifyf.o ABSOLUTE
     ../mathlib/funder.c                      0x00000000   Number         0  funder.o ABSOLUTE
     ../mathlib/sqrtf.c                       0x00000000   Number         0  sqrtf_x.o ABSOLUTE
@@ -5546,178 +5564,183 @@ Image Symbol Table
     [Anonymous Symbol]                       0x08008500   Section        0  ball_control.o(.text.ball_control_init)
     [Anonymous Symbol]                       0x0800857c   Section        0  ball_control.o(.text.ball_control_request)
     [Anonymous Symbol]                       0x080085e4   Section        0  ball_control.o(.text.ball_control_service)
-    [Anonymous Symbol]                       0x08008890   Section        0  ball_control.o(.text.ball_find_relative_pulse)
-    ball_find_relative_pulse                 0x08008891   Thumb Code   224  ball_control.o(.text.ball_find_relative_pulse)
-    [Anonymous Symbol]                       0x08008970   Section        0  ball_control.o(.text.ball_model_accel)
-    ball_model_accel                         0x08008971   Thumb Code   144  ball_control.o(.text.ball_model_accel)
-    [Anonymous Symbol]                       0x08008a00   Section        0  ball_control.o(.text.ball_request_snapshot)
-    ball_request_snapshot                    0x08008a01   Thumb Code    68  ball_control.o(.text.ball_request_snapshot)
-    [Anonymous Symbol]                       0x08008a44   Section        0  car_speed_profile.o(.text.car_speed_profile_init)
-    [Anonymous Symbol]                       0x08008a70   Section        0  car_speed_profile.o(.text.car_speed_profile_reset)
-    [Anonymous Symbol]                       0x08008a84   Section        0  car_speed_profile.o(.text.car_speed_profile_start)
-    [Anonymous Symbol]                       0x08008b08   Section        0  car_speed_profile.o(.text.car_speed_profile_step)
-    [Anonymous Symbol]                       0x08008be8   Section        0  car_speed_profile.o(.text.car_speed_profile_update_measurement)
-    [Anonymous Symbol]                       0x08008c88   Section        0  pid.o(.text.compute_pid)
-    [Anonymous Symbol]                       0x08008d68   Section        0  gw_analogue.o(.text.correct_gw_analogue)
-    [Anonymous Symbol]                       0x08008f28   Section        0  buzzer.o(.text.driver_BUZZER)
-    [Anonymous Symbol]                       0x08008f54   Section        0  led.o(.text.driver_LED)
-    [Anonymous Symbol]                       0x08008fd4   Section        0  button.o(.text.driver_button)
-    [Anonymous Symbol]                       0x08009090   Section        0  gw_analogue.o(.text.driver_gw_analogue)
-    [Anonymous Symbol]                       0x080090b8   Section        0  defect.o(.text.driver_task1)
-    driver_task1                             0x080090b9   Thumb Code   256  defect.o(.text.driver_task1)
-    [Anonymous Symbol]                       0x080091b8   Section        0  defect.o(.text.driver_task2)
-    driver_task2                             0x080091b9   Thumb Code   456  defect.o(.text.driver_task2)
-    [Anonymous Symbol]                       0x08009380   Section        0  defect.o(.text.driver_task3)
-    driver_task3                             0x08009381   Thumb Code   212  defect.o(.text.driver_task3)
-    [Anonymous Symbol]                       0x08009454   Section        0  defect.o(.text.driver_task4)
-    driver_task4                             0x08009455   Thumb Code   184  defect.o(.text.driver_task4)
-    [Anonymous Symbol]                       0x0800950c   Section        0  defect.o(.text.driver_task5)
-    driver_task5                             0x0800950d   Thumb Code   258  defect.o(.text.driver_task5)
-    [Anonymous Symbol]                       0x08009610   Section        0  defect.o(.text.driver_task6)
-    driver_task6                             0x08009611   Thumb Code    64  defect.o(.text.driver_task6)
-    [Anonymous Symbol]                       0x08009650   Section        0  defect.o(.text.driver_task7)
-    driver_task7                             0x08009651   Thumb Code   116  defect.o(.text.driver_task7)
-    [Anonymous Symbol]                       0x080096c4   Section        0  wheel.o(.text.driver_wheel)
-    wheel_ff_neg_offset                      0x0800989c   Number         0  wheel.o(.text.driver_wheel)
-    wheel_ff_neg_k                           0x080098ac   Number         0  wheel.o(.text.driver_wheel)
-    wheel_ff_pos_offset                      0x080098bc   Number         0  wheel.o(.text.driver_wheel)
-    wheel_ff_pos_k                           0x080098cc   Number         0  wheel.o(.text.driver_wheel)
-    [Anonymous Symbol]                       0x080098e4   Section        0  defect.o(.text.fabsf)
-    fabsf                                    0x080098e5   Thumb Code     4  defect.o(.text.fabsf)
-    [Anonymous Symbol]                       0x080098e8   Section        0  status.o(.text.follow_line)
-    [Anonymous Symbol]                       0x08009934   Section        0  status.o(.text.follow_line_task4)
-    [Anonymous Symbol]                       0x080099ac   Section        0  main.o(.text.gan_init)
-    [Anonymous Symbol]                       0x080099f4   Section        0  gw_analogue.o(.text.get_gw_analoge_digital_data)
-    [Anonymous Symbol]                       0x08009a40   Section        0  gw_analogue.o(.text.get_gw_analogue_analogue_diff)
-    [Anonymous Symbol]                       0x08009ad0   Section        0  gw_analogue.o(.text.get_gw_raw_data)
-    [Anonymous Symbol]                       0x08009b2c   Section        0  gw_analogue.o(.text.get_road_type)
-    [Anonymous Symbol]                       0x08009bd4   Section        0  wheel.o(.text.get_wheel_speed)
-    [Anonymous Symbol]                       0x08009c24   Section        0  emm_v5.o(.text.gimbal_send)
-    gimbal_send                              0x08009c25   Thumb Code   212  emm_v5.o(.text.gimbal_send)
-    [Anonymous Symbol]                       0x08009cf8   Section        0  gy901.o(.text.iic_gyr_get_value)
-    [Anonymous Symbol]                       0x08009d80   Section        0  gy901.o(.text.iic_gyr_init)
-    [Anonymous Symbol]                       0x08009e2c   Section        0  gy901.o(.text.iic_gyr_read_dma)
-    [Anonymous Symbol]                       0x08009e78   Section        0  buzzer.o(.text.init_BUZZER)
-    [Anonymous Symbol]                       0x08009e84   Section        0  led.o(.text.init_LED)
-    [Anonymous Symbol]                       0x08009e90   Section        0  button.o(.text.init_button)
-    [Anonymous Symbol]                       0x08009ea8   Section        0  status.o(.text.init_device)
-    [Anonymous Symbol]                       0x08009f00   Section        0  gw_analogue.o(.text.init_gw_analogue)
-    [Anonymous Symbol]                       0x08009f90   Section        0  uart_it.o(.text.init_maixcam_uart)
-    [Anonymous Symbol]                       0x08009fc8   Section        0  status.o(.text.init_motor)
-    [Anonymous Symbol]                       0x0800a02c   Section        0  pid.o(.text.init_pid)
-    [Anonymous Symbol]                       0x0800a04c   Section        0  gw_analogue.o(.text.init_road_cnt)
-    [Anonymous Symbol]                       0x0800a058   Section        0  gw_analogue.o(.text.init_road_determine)
-    [Anonymous Symbol]                       0x0800a068   Section        0  status.o(.text.init_sensor)
-    [Anonymous Symbol]                       0x0800a080   Section        0  servo.o(.text.init_servo)
-    [Anonymous Symbol]                       0x0800a160   Section        0  status.o(.text.init_state)
-    [Anonymous Symbol]                       0x0800a17c   Section        0  status.o(.text.init_status)
-    [Anonymous Symbol]                       0x0800a1d0   Section        0  status.o(.text.init_status_pid)
-    [Anonymous Symbol]                       0x0800a350   Section        0  uart_it.o(.text.init_stepper_uart)
-    [Anonymous Symbol]                       0x0800a398   Section        0  defect.o(.text.init_task)
-    [Anonymous Symbol]                       0x0800a3bc   Section        0  uart_it.o(.text.init_uart_gyr)
-    [Anonymous Symbol]                       0x0800a3dc   Section        0  uart_it.o(.text.init_uart_pid_tune)
-    [Anonymous Symbol]                       0x0800a3f4   Section        0  wheel.o(.text.init_wheel)
-    [Anonymous Symbol]                       0x0800a630   Section        0  status.o(.text.keep_angle)
-    [Anonymous Symbol]                       0x0800a6d4   Section        0  status.o(.text.keep_balance)
-    [Anonymous Symbol]                       0x0800a720   Section        0  main.o(.text.main)
-    [Anonymous Symbol]                       0x0800a870   Section        0  maixcam.o(.text.maixcam_cmd_CDA)
-    [Anonymous Symbol]                       0x0800a884   Section        0  maixcam.o(.text.maixcam_cmd_D)
-    [Anonymous Symbol]                       0x0800a8b8   Section        0  maixcam.o(.text.maixcam_cmd_M)
-    [Anonymous Symbol]                       0x0800a8e4   Section        0  maixcam.o(.text.maixcam_cmd_T)
-    [Anonymous Symbol]                       0x0800a918   Section        0  maixcam.o(.text.maixcam_cmd_done)
-    [Anonymous Symbol]                       0x0800a938   Section        0  maixcam.o(.text.maixcam_init)
-    [Anonymous Symbol]                       0x0800a9b0   Section        0  maixcam.o(.text.maixcam_poll)
-    [Anonymous Symbol]                       0x0800a9fc   Section        0  maixcam.o(.text.maixcam_rx_feed)
-    [Anonymous Symbol]                       0x0800aa2c   Section        0  maixcam.o(.text.maixcam_rx_read)
-    maixcam_rx_read                          0x0800aa2d   Thumb Code    54  maixcam.o(.text.maixcam_rx_read)
-    [Anonymous Symbol]                       0x0800aa64   Section        0  maixcam.o(.text.maixcam_send_frame)
-    maixcam_send_frame                       0x0800aa65   Thumb Code    30  maixcam.o(.text.maixcam_send_frame)
-    [Anonymous Symbol]                       0x0800aa84   Section        0  maixcam.o(.text.maixcam_start_cmd)
-    maixcam_start_cmd                        0x0800aa85   Thumb Code    74  maixcam.o(.text.maixcam_start_cmd)
-    [Anonymous Symbol]                       0x0800aad0   Section        0  maixcam.o(.text.maixcam_tick_inner)
-    maixcam_tick_inner                       0x0800aad1   Thumb Code    68  maixcam.o(.text.maixcam_tick_inner)
-    [Anonymous Symbol]                       0x0800ab14   Section        0  maixcam.o(.text.maixcam_tx_start_next)
-    maixcam_tx_start_next                    0x0800ab15   Thumb Code   100  maixcam.o(.text.maixcam_tx_start_next)
-    [Anonymous Symbol]                       0x0800ab78   Section        0  maixcam.o(.text.maixcam_uart_tx_complete)
-    [Anonymous Symbol]                       0x0800aba8   Section        0  maixcam.o(.text.maixcam_uart_tx_enqueue)
-    [Anonymous Symbol]                       0x0800ac4c   Section        0  maixcam.o(.text.mc_feed_byte)
-    mc_feed_byte                             0x0800ac4d   Thumb Code   138  maixcam.o(.text.mc_feed_byte)
-    [Anonymous Symbol]                       0x0800acd8   Section        0  maixcam.o(.text.mc_frame_ready)
-    mc_frame_ready                           0x0800acd9   Thumb Code   120  maixcam.o(.text.mc_frame_ready)
-    [Anonymous Symbol]                       0x0800ad50   Section        0  gw_analogue.o(.text.normalize_gray_data)
-    [Anonymous Symbol]                       0x0800ad78   Section        0  gw_analogue.o(.text.normalize_gray_weight)
-    [Anonymous Symbol]                       0x0800adbc   Section        0  maixcam.o(.text.parse_ack_frame)
-    parse_ack_frame                          0x0800adbd   Thumb Code    44  maixcam.o(.text.parse_ack_frame)
-    [Anonymous Symbol]                       0x0800ade8   Section        0  maixcam.o(.text.parse_fixed1)
-    parse_fixed1                             0x0800ade9   Thumb Code   134  maixcam.o(.text.parse_fixed1)
-    [Anonymous Symbol]                       0x0800ae70   Section        0  uart_it.o(.text.parse_uart_pid_byte)
-    parse_uart_pid_byte                      0x0800ae71   Thumb Code   128  uart_it.o(.text.parse_uart_pid_byte)
-    [Anonymous Symbol]                       0x0800aef0   Section        0  maixcam.o(.text.parse_vd_frame)
-    parse_vd_frame                           0x0800aef1   Thumb Code   166  maixcam.o(.text.parse_vd_frame)
-    [Anonymous Symbol]                       0x0800af98   Section        0  maixcam.o(.text.parse_vl_frame)
-    parse_vl_frame                           0x0800af99   Thumb Code   182  maixcam.o(.text.parse_vl_frame)
-    [Anonymous Symbol]                       0x0800b050   Section        0  pid.o(.text.pid_reset_state)
-    [Anonymous Symbol]                       0x0800b070   Section        0  gw_analogue.o(.text.road_decision)
-    [Anonymous Symbol]                       0x0800b098   Section        0  gw_analogue.o(.text.road_new_from_bit)
-    [Anonymous Symbol]                       0x0800b0a8   Section        0  car_speed_profile.o(.text.scurve_dq)
-    scurve_dq                                0x0800b0a9   Thumb Code    44  car_speed_profile.o(.text.scurve_dq)
-    [Anonymous Symbol]                       0x0800b0d4   Section        0  car_speed_profile.o(.text.scurve_q)
-    scurve_q                                 0x0800b0d5   Thumb Code    46  car_speed_profile.o(.text.scurve_q)
-    [Anonymous Symbol]                       0x0800b104   Section        0  gw_analogue.o(.text.select_channel)
-    [Anonymous Symbol]                       0x0800b150   Section        0  gw_analogue.o(.text.serve_road)
-    [Anonymous Symbol]                       0x0800b1b8   Section        0  button.o(.text.server_button)
-    [Anonymous Symbol]                       0x0800b250   Section        0  wheel.o(.text.set_wheel_dir)
-    [Anonymous Symbol]                       0x0800b368   Section        0  uart_it.o(.text.stepper_publish_absolute)
-    [Anonymous Symbol]                       0x0800b3c8   Section        0  uart_it.o(.text.stepper_service)
-    [Anonymous Symbol]                       0x0800b470   Section        0  uart_it.o(.text.stepper_target_disable)
-    [Anonymous Symbol]                       0x0800b4a8   Section        0  defect.o(.text.task4_debug_flush)
-    [Anonymous Symbol]                       0x0800b584   Section        0  defect.o(.text.task7_flush)
-    [Anonymous Symbol]                       0x0800b5f8   Section        0  defect.o(.text.task7_flush_one)
-    task7_flush_one                          0x0800b5f9   Thumb Code   340  defect.o(.text.task7_flush_one)
-    [Anonymous Symbol]                       0x0800b74c   Section        0  defect.o(.text.task7_tx)
-    task7_tx                                 0x0800b74d   Thumb Code     4  defect.o(.text.task7_tx)
-    [Anonymous Symbol]                       0x0800b750   Section        0  defect.o(.text.task_finish)
-    [Anonymous Symbol]                       0x0800b754   Section        0  defect.o(.text.task_select)
-    [Anonymous Symbol]                       0x0800b768   Section        0  defect.o(.text.task_start)
-    [Anonymous Symbol]                       0x0800b80c   Section        0  defect.o(.text.task_stop)
-    [Anonymous Symbol]                       0x0800b874   Section        0  lora.o(.text.uart1_tx)
-    uart1_tx                                 0x0800b875   Thumb Code    16  lora.o(.text.uart1_tx)
-    [Anonymous Symbol]                       0x0800b884   Section        0  uart_gyro.o(.text.uart_gyr_ensure_receive)
-    [Anonymous Symbol]                       0x0800b8e0   Section        0  uart_gyro.o(.text.uart_gyr_init)
-    [Anonymous Symbol]                       0x0800b8f8   Section        0  uart_gyro.o(.text.uart_gyr_rx_feed)
-    [Anonymous Symbol]                       0x0800b99c   Section        0  uart_gyro.o(.text.uart_gyr_start_receive)
-    [Anonymous Symbol]                       0x0800b9f8   Section        0  status.o(.text.update_status)
-    [Anonymous Symbol]                       0x0800bbf4   Section        0  defect.o(.text.update_task)
-    [Anonymous Symbol]                       0x0800bca0   Section        0  defect.o(.text.update_task_led)
-    [Anonymous Symbol]                       0x0800bcc0   Section        0  wheel.o(.text.wheel_ff_index)
-    wheel_ff_index                           0x0800bcc1   Thumb Code    18  wheel.o(.text.wheel_ff_index)
-    i.__0snprintf                            0x0800bcd4   Section        0  printfa.o(i.__0snprintf)
-    i.__0sprintf                             0x0800bd04   Section        0  printfa.o(i.__0sprintf)
-    i.__hardfp__fabsf                        0x0800bd2c   Section        0  fabsf.o(i.__hardfp__fabsf)
-    i.__hardfp_atof                          0x0800bd40   Section        0  atof.o(i.__hardfp_atof)
-    i.__hardfp_fabsf                         0x0800bd78   Section        0  fabsfc99.o(i.__hardfp_fabsf)
-    i.__hardfp_sqrtf                         0x0800bd86   Section        0  sqrtf.o(i.__hardfp_sqrtf)
-    i.__read_errno                           0x0800bdc0   Section        0  errno.o(i.__read_errno)
-    i.__scatterload_copy                     0x0800bdcc   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_null                     0x0800bdda   Section        2  handlers.o(i.__scatterload_null)
-    i.__scatterload_zeroinit                 0x0800bddc   Section       14  handlers.o(i.__scatterload_zeroinit)
-    i.__set_errno                            0x0800bdec   Section        0  errno.o(i.__set_errno)
-    i._fp_digits                             0x0800bdf8   Section        0  printfa.o(i._fp_digits)
-    _fp_digits                               0x0800bdf9   Thumb Code   366  printfa.o(i._fp_digits)
-    i._is_digit                              0x0800bf7c   Section        0  scanf_fp.o(i._is_digit)
-    i._printf_core                           0x0800bf8c   Section        0  printfa.o(i._printf_core)
-    _printf_core                             0x0800bf8d   Thumb Code  1744  printfa.o(i._printf_core)
-    i._printf_post_padding                   0x0800c668   Section        0  printfa.o(i._printf_post_padding)
-    _printf_post_padding                     0x0800c669   Thumb Code    36  printfa.o(i._printf_post_padding)
-    i._printf_pre_padding                    0x0800c68c   Section        0  printfa.o(i._printf_pre_padding)
-    _printf_pre_padding                      0x0800c68d   Thumb Code    46  printfa.o(i._printf_pre_padding)
-    i._snputc                                0x0800c6ba   Section        0  printfa.o(i._snputc)
-    _snputc                                  0x0800c6bb   Thumb Code    22  printfa.o(i._snputc)
-    i._sputc                                 0x0800c6d0   Section        0  printfa.o(i._sputc)
-    _sputc                                   0x0800c6d1   Thumb Code    10  printfa.o(i._sputc)
-    .constdata                               0x0800c6da   Section      129  ctype_o.o(.constdata)
-    .constdata                               0x0800c75c   Section        4  ctype_o.o(.constdata)
-    table                                    0x0800c75c   Data           4  ctype_o.o(.constdata)
+    [Anonymous Symbol]                       0x080089e4   Section        0  ball_control.o(.text.ball_fall_ratio)
+    ball_fall_ratio                          0x080089e5   Thumb Code    48  ball_control.o(.text.ball_fall_ratio)
+    [Anonymous Symbol]                       0x08008a14   Section        0  ball_control.o(.text.ball_find_relative_pulse)
+    ball_find_relative_pulse                 0x08008a15   Thumb Code   224  ball_control.o(.text.ball_find_relative_pulse)
+    [Anonymous Symbol]                       0x08008af4   Section        0  ball_control.o(.text.ball_model_accel)
+    ball_model_accel                         0x08008af5   Thumb Code   144  ball_control.o(.text.ball_model_accel)
+    [Anonymous Symbol]                       0x08008b84   Section        0  ball_control.o(.text.ball_request_snapshot)
+    ball_request_snapshot                    0x08008b85   Thumb Code    68  ball_control.o(.text.ball_request_snapshot)
+    [Anonymous Symbol]                       0x08008bc8   Section        0  car_speed_profile.o(.text.car_speed_profile_init)
+    [Anonymous Symbol]                       0x08008bf4   Section        0  car_speed_profile.o(.text.car_speed_profile_reset)
+    [Anonymous Symbol]                       0x08008c08   Section        0  car_speed_profile.o(.text.car_speed_profile_start)
+    [Anonymous Symbol]                       0x08008c8c   Section        0  car_speed_profile.o(.text.car_speed_profile_step)
+    [Anonymous Symbol]                       0x08008d6c   Section        0  car_speed_profile.o(.text.car_speed_profile_update_measurement)
+    [Anonymous Symbol]                       0x08008e0c   Section        0  pid.o(.text.compute_pid)
+    [Anonymous Symbol]                       0x08008ef0   Section        0  gw_analogue.o(.text.correct_gw_analogue)
+    [Anonymous Symbol]                       0x080090b0   Section        0  buzzer.o(.text.driver_BUZZER)
+    [Anonymous Symbol]                       0x080090dc   Section        0  led.o(.text.driver_LED)
+    [Anonymous Symbol]                       0x0800915c   Section        0  button.o(.text.driver_button)
+    [Anonymous Symbol]                       0x08009218   Section        0  gw_analogue.o(.text.driver_gw_analogue)
+    [Anonymous Symbol]                       0x08009240   Section        0  defect.o(.text.driver_task1)
+    driver_task1                             0x08009241   Thumb Code   256  defect.o(.text.driver_task1)
+    [Anonymous Symbol]                       0x08009340   Section        0  defect.o(.text.driver_task2)
+    driver_task2                             0x08009341   Thumb Code   456  defect.o(.text.driver_task2)
+    [Anonymous Symbol]                       0x08009508   Section        0  defect.o(.text.driver_task3)
+    driver_task3                             0x08009509   Thumb Code   380  defect.o(.text.driver_task3)
+    [Anonymous Symbol]                       0x08009684   Section        0  defect.o(.text.driver_task4)
+    driver_task4                             0x08009685   Thumb Code   196  defect.o(.text.driver_task4)
+    [Anonymous Symbol]                       0x08009748   Section        0  defect.o(.text.driver_task5)
+    driver_task5                             0x08009749   Thumb Code   258  defect.o(.text.driver_task5)
+    [Anonymous Symbol]                       0x0800984c   Section        0  defect.o(.text.driver_task6)
+    driver_task6                             0x0800984d   Thumb Code    64  defect.o(.text.driver_task6)
+    [Anonymous Symbol]                       0x0800988c   Section        0  defect.o(.text.driver_task7)
+    driver_task7                             0x0800988d   Thumb Code   116  defect.o(.text.driver_task7)
+    [Anonymous Symbol]                       0x08009900   Section        0  wheel.o(.text.driver_wheel)
+    wheel_ff_neg_offset                      0x08009ad8   Number         0  wheel.o(.text.driver_wheel)
+    wheel_ff_neg_k                           0x08009ae8   Number         0  wheel.o(.text.driver_wheel)
+    wheel_ff_pos_offset                      0x08009af8   Number         0  wheel.o(.text.driver_wheel)
+    wheel_ff_pos_k                           0x08009b08   Number         0  wheel.o(.text.driver_wheel)
+    [Anonymous Symbol]                       0x08009b20   Section        0  defect.o(.text.fabsf)
+    fabsf                                    0x08009b21   Thumb Code     4  defect.o(.text.fabsf)
+    [Anonymous Symbol]                       0x08009b24   Section        0  ball_control.o(.text.fabsf)
+    fabsf                                    0x08009b25   Thumb Code     4  ball_control.o(.text.fabsf)
+    [Anonymous Symbol]                       0x08009b28   Section        0  status.o(.text.follow_line)
+    [Anonymous Symbol]                       0x08009b74   Section        0  status.o(.text.follow_line_task4)
+    [Anonymous Symbol]                       0x08009bec   Section        0  main.o(.text.gan_init)
+    [Anonymous Symbol]                       0x08009c34   Section        0  gw_analogue.o(.text.get_gw_analoge_digital_data)
+    [Anonymous Symbol]                       0x08009c80   Section        0  gw_analogue.o(.text.get_gw_analogue_analogue_diff)
+    [Anonymous Symbol]                       0x08009d10   Section        0  gw_analogue.o(.text.get_gw_raw_data)
+    [Anonymous Symbol]                       0x08009d6c   Section        0  gw_analogue.o(.text.get_road_type)
+    [Anonymous Symbol]                       0x08009e14   Section        0  wheel.o(.text.get_wheel_speed)
+    [Anonymous Symbol]                       0x08009e64   Section        0  emm_v5.o(.text.gimbal_send)
+    gimbal_send                              0x08009e65   Thumb Code   212  emm_v5.o(.text.gimbal_send)
+    [Anonymous Symbol]                       0x08009f38   Section        0  gy901.o(.text.iic_gyr_get_value)
+    [Anonymous Symbol]                       0x08009fc0   Section        0  gy901.o(.text.iic_gyr_init)
+    [Anonymous Symbol]                       0x0800a06c   Section        0  gy901.o(.text.iic_gyr_read_dma)
+    [Anonymous Symbol]                       0x0800a0b8   Section        0  buzzer.o(.text.init_BUZZER)
+    [Anonymous Symbol]                       0x0800a0c4   Section        0  led.o(.text.init_LED)
+    [Anonymous Symbol]                       0x0800a0d0   Section        0  button.o(.text.init_button)
+    [Anonymous Symbol]                       0x0800a0e8   Section        0  status.o(.text.init_device)
+    [Anonymous Symbol]                       0x0800a140   Section        0  gw_analogue.o(.text.init_gw_analogue)
+    [Anonymous Symbol]                       0x0800a1d0   Section        0  uart_it.o(.text.init_maixcam_uart)
+    [Anonymous Symbol]                       0x0800a208   Section        0  status.o(.text.init_motor)
+    [Anonymous Symbol]                       0x0800a26c   Section        0  pid.o(.text.init_pid)
+    [Anonymous Symbol]                       0x0800a28c   Section        0  gw_analogue.o(.text.init_road_cnt)
+    [Anonymous Symbol]                       0x0800a298   Section        0  gw_analogue.o(.text.init_road_determine)
+    [Anonymous Symbol]                       0x0800a2a8   Section        0  status.o(.text.init_sensor)
+    [Anonymous Symbol]                       0x0800a2c0   Section        0  servo.o(.text.init_servo)
+    [Anonymous Symbol]                       0x0800a3a0   Section        0  status.o(.text.init_state)
+    [Anonymous Symbol]                       0x0800a3bc   Section        0  status.o(.text.init_status)
+    [Anonymous Symbol]                       0x0800a410   Section        0  status.o(.text.init_status_pid)
+    [Anonymous Symbol]                       0x0800a590   Section        0  uart_it.o(.text.init_stepper_uart)
+    [Anonymous Symbol]                       0x0800a5d8   Section        0  defect.o(.text.init_task)
+    [Anonymous Symbol]                       0x0800a5fc   Section        0  uart_it.o(.text.init_uart_gyr)
+    [Anonymous Symbol]                       0x0800a61c   Section        0  uart_it.o(.text.init_uart_pid_tune)
+    [Anonymous Symbol]                       0x0800a634   Section        0  wheel.o(.text.init_wheel)
+    [Anonymous Symbol]                       0x0800a870   Section        0  status.o(.text.keep_angle)
+    [Anonymous Symbol]                       0x0800a914   Section        0  status.o(.text.keep_balance)
+    [Anonymous Symbol]                       0x0800a960   Section        0  main.o(.text.main)
+    [Anonymous Symbol]                       0x0800aab4   Section        0  maixcam.o(.text.maixcam_cmd_CDA)
+    [Anonymous Symbol]                       0x0800aac8   Section        0  maixcam.o(.text.maixcam_cmd_D)
+    [Anonymous Symbol]                       0x0800aafc   Section        0  maixcam.o(.text.maixcam_cmd_M)
+    [Anonymous Symbol]                       0x0800ab28   Section        0  maixcam.o(.text.maixcam_cmd_T)
+    [Anonymous Symbol]                       0x0800ab5c   Section        0  maixcam.o(.text.maixcam_cmd_done)
+    [Anonymous Symbol]                       0x0800ab7c   Section        0  maixcam.o(.text.maixcam_init)
+    [Anonymous Symbol]                       0x0800abf4   Section        0  maixcam.o(.text.maixcam_poll)
+    [Anonymous Symbol]                       0x0800ac40   Section        0  maixcam.o(.text.maixcam_rx_feed)
+    [Anonymous Symbol]                       0x0800ac70   Section        0  maixcam.o(.text.maixcam_rx_read)
+    maixcam_rx_read                          0x0800ac71   Thumb Code    54  maixcam.o(.text.maixcam_rx_read)
+    [Anonymous Symbol]                       0x0800aca8   Section        0  maixcam.o(.text.maixcam_send_frame)
+    maixcam_send_frame                       0x0800aca9   Thumb Code    30  maixcam.o(.text.maixcam_send_frame)
+    [Anonymous Symbol]                       0x0800acc8   Section        0  maixcam.o(.text.maixcam_start_cmd)
+    maixcam_start_cmd                        0x0800acc9   Thumb Code    74  maixcam.o(.text.maixcam_start_cmd)
+    [Anonymous Symbol]                       0x0800ad14   Section        0  maixcam.o(.text.maixcam_tick_inner)
+    maixcam_tick_inner                       0x0800ad15   Thumb Code    68  maixcam.o(.text.maixcam_tick_inner)
+    [Anonymous Symbol]                       0x0800ad58   Section        0  maixcam.o(.text.maixcam_tx_start_next)
+    maixcam_tx_start_next                    0x0800ad59   Thumb Code   100  maixcam.o(.text.maixcam_tx_start_next)
+    [Anonymous Symbol]                       0x0800adbc   Section        0  maixcam.o(.text.maixcam_uart_tx_complete)
+    [Anonymous Symbol]                       0x0800adec   Section        0  maixcam.o(.text.maixcam_uart_tx_enqueue)
+    [Anonymous Symbol]                       0x0800ae90   Section        0  maixcam.o(.text.mc_feed_byte)
+    mc_feed_byte                             0x0800ae91   Thumb Code   138  maixcam.o(.text.mc_feed_byte)
+    [Anonymous Symbol]                       0x0800af1c   Section        0  maixcam.o(.text.mc_frame_ready)
+    mc_frame_ready                           0x0800af1d   Thumb Code   120  maixcam.o(.text.mc_frame_ready)
+    [Anonymous Symbol]                       0x0800af94   Section        0  gw_analogue.o(.text.normalize_gray_data)
+    [Anonymous Symbol]                       0x0800afbc   Section        0  gw_analogue.o(.text.normalize_gray_weight)
+    [Anonymous Symbol]                       0x0800b000   Section        0  maixcam.o(.text.parse_ack_frame)
+    parse_ack_frame                          0x0800b001   Thumb Code    44  maixcam.o(.text.parse_ack_frame)
+    [Anonymous Symbol]                       0x0800b02c   Section        0  maixcam.o(.text.parse_fixed1)
+    parse_fixed1                             0x0800b02d   Thumb Code   134  maixcam.o(.text.parse_fixed1)
+    [Anonymous Symbol]                       0x0800b0b4   Section        0  uart_it.o(.text.parse_uart_pid_byte)
+    parse_uart_pid_byte                      0x0800b0b5   Thumb Code   128  uart_it.o(.text.parse_uart_pid_byte)
+    [Anonymous Symbol]                       0x0800b134   Section        0  maixcam.o(.text.parse_vd_frame)
+    parse_vd_frame                           0x0800b135   Thumb Code   166  maixcam.o(.text.parse_vd_frame)
+    [Anonymous Symbol]                       0x0800b1dc   Section        0  maixcam.o(.text.parse_vl_frame)
+    parse_vl_frame                           0x0800b1dd   Thumb Code   182  maixcam.o(.text.parse_vl_frame)
+    [Anonymous Symbol]                       0x0800b294   Section        0  pid.o(.text.pid_reset_state)
+    [Anonymous Symbol]                       0x0800b2b4   Section        0  gw_analogue.o(.text.road_decision)
+    [Anonymous Symbol]                       0x0800b2dc   Section        0  gw_analogue.o(.text.road_new_from_bit)
+    [Anonymous Symbol]                       0x0800b2ec   Section        0  car_speed_profile.o(.text.scurve_dq)
+    scurve_dq                                0x0800b2ed   Thumb Code    44  car_speed_profile.o(.text.scurve_dq)
+    [Anonymous Symbol]                       0x0800b318   Section        0  car_speed_profile.o(.text.scurve_q)
+    scurve_q                                 0x0800b319   Thumb Code    46  car_speed_profile.o(.text.scurve_q)
+    [Anonymous Symbol]                       0x0800b348   Section        0  gw_analogue.o(.text.select_channel)
+    [Anonymous Symbol]                       0x0800b394   Section        0  gw_analogue.o(.text.serve_road)
+    [Anonymous Symbol]                       0x0800b3fc   Section        0  button.o(.text.server_button)
+    [Anonymous Symbol]                       0x0800b494   Section        0  wheel.o(.text.set_wheel_dir)
+    [Anonymous Symbol]                       0x0800b5ac   Section        0  uart_it.o(.text.stepper_publish_absolute)
+    [Anonymous Symbol]                       0x0800b60c   Section        0  uart_it.o(.text.stepper_service)
+    [Anonymous Symbol]                       0x0800b6b4   Section        0  uart_it.o(.text.stepper_target_disable)
+    [Anonymous Symbol]                       0x0800b6ec   Section        0  defect.o(.text.task3_debug_flush)
+    [Anonymous Symbol]                       0x0800b7d8   Section        0  defect.o(.text.task4_debug_flush)
+    [Anonymous Symbol]                       0x0800b8b4   Section        0  defect.o(.text.task7_flush)
+    [Anonymous Symbol]                       0x0800b928   Section        0  defect.o(.text.task7_flush_one)
+    task7_flush_one                          0x0800b929   Thumb Code   340  defect.o(.text.task7_flush_one)
+    [Anonymous Symbol]                       0x0800ba7c   Section        0  defect.o(.text.task7_tx)
+    task7_tx                                 0x0800ba7d   Thumb Code     4  defect.o(.text.task7_tx)
+    [Anonymous Symbol]                       0x0800ba80   Section        0  defect.o(.text.task_finish)
+    [Anonymous Symbol]                       0x0800ba84   Section        0  defect.o(.text.task_select)
+    [Anonymous Symbol]                       0x0800ba98   Section        0  defect.o(.text.task_start)
+    [Anonymous Symbol]                       0x0800bb3c   Section        0  defect.o(.text.task_stop)
+    [Anonymous Symbol]                       0x0800bba4   Section        0  lora.o(.text.uart1_tx)
+    uart1_tx                                 0x0800bba5   Thumb Code    16  lora.o(.text.uart1_tx)
+    [Anonymous Symbol]                       0x0800bbb4   Section        0  uart_gyro.o(.text.uart_gyr_ensure_receive)
+    [Anonymous Symbol]                       0x0800bc10   Section        0  uart_gyro.o(.text.uart_gyr_init)
+    [Anonymous Symbol]                       0x0800bc28   Section        0  uart_gyro.o(.text.uart_gyr_rx_feed)
+    [Anonymous Symbol]                       0x0800bccc   Section        0  uart_gyro.o(.text.uart_gyr_start_receive)
+    [Anonymous Symbol]                       0x0800bd28   Section        0  status.o(.text.update_status)
+    [Anonymous Symbol]                       0x0800bf24   Section        0  defect.o(.text.update_task)
+    [Anonymous Symbol]                       0x0800bfd0   Section        0  defect.o(.text.update_task_led)
+    [Anonymous Symbol]                       0x0800bff0   Section        0  wheel.o(.text.wheel_ff_index)
+    wheel_ff_index                           0x0800bff1   Thumb Code    18  wheel.o(.text.wheel_ff_index)
+    i.__0snprintf                            0x0800c004   Section        0  printfa.o(i.__0snprintf)
+    i.__0sprintf                             0x0800c034   Section        0  printfa.o(i.__0sprintf)
+    i.__hardfp__fabsf                        0x0800c05c   Section        0  fabsf.o(i.__hardfp__fabsf)
+    i.__hardfp_atof                          0x0800c070   Section        0  atof.o(i.__hardfp_atof)
+    i.__hardfp_fabsf                         0x0800c0a8   Section        0  fabsfc99.o(i.__hardfp_fabsf)
+    i.__hardfp_sqrtf                         0x0800c0b6   Section        0  sqrtf.o(i.__hardfp_sqrtf)
+    i.__read_errno                           0x0800c0f0   Section        0  errno.o(i.__read_errno)
+    i.__scatterload_copy                     0x0800c0fc   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x0800c10a   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x0800c10c   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i.__set_errno                            0x0800c11c   Section        0  errno.o(i.__set_errno)
+    i._fp_digits                             0x0800c128   Section        0  printfa.o(i._fp_digits)
+    _fp_digits                               0x0800c129   Thumb Code   366  printfa.o(i._fp_digits)
+    i._is_digit                              0x0800c2ac   Section        0  scanf_fp.o(i._is_digit)
+    i._printf_core                           0x0800c2bc   Section        0  printfa.o(i._printf_core)
+    _printf_core                             0x0800c2bd   Thumb Code  1744  printfa.o(i._printf_core)
+    i._printf_post_padding                   0x0800c998   Section        0  printfa.o(i._printf_post_padding)
+    _printf_post_padding                     0x0800c999   Thumb Code    36  printfa.o(i._printf_post_padding)
+    i._printf_pre_padding                    0x0800c9bc   Section        0  printfa.o(i._printf_pre_padding)
+    _printf_pre_padding                      0x0800c9bd   Thumb Code    46  printfa.o(i._printf_pre_padding)
+    i._snputc                                0x0800c9ea   Section        0  printfa.o(i._snputc)
+    _snputc                                  0x0800c9eb   Thumb Code    22  printfa.o(i._snputc)
+    i._sputc                                 0x0800ca00   Section        0  printfa.o(i._sputc)
+    _sputc                                   0x0800ca01   Thumb Code    10  printfa.o(i._sputc)
+    .constdata                               0x0800ca0a   Section      129  ctype_o.o(.constdata)
+    .constdata                               0x0800ca8c   Section        4  ctype_o.o(.constdata)
+    table                                    0x0800ca8c   Data           4  ctype_o.o(.constdata)
     .data                                    0x20000000   Section        4  errno.o(.data)
     _errno                                   0x20000000   Data           4  errno.o(.data)
     [Anonymous Symbol]                       0x20000038   Section        0  adc.o(.bss.HAL_RCC_ADC345_CLK_ENABLED)
@@ -5734,59 +5757,65 @@ Image Symbol Table
     driver_task1.last_print                  0x20000050   Data           4  defect.o(.bss.driver_task1.last_print)
     [Anonymous Symbol]                       0x20000054   Section        0  defect.o(.bss.driver_task1.last_ts_ms)
     driver_task1.last_ts_ms                  0x20000054   Data           4  defect.o(.bss.driver_task1.last_ts_ms)
-    [Anonymous Symbol]                       0x20000058   Section        0  defect.o(.bss.driver_task3.q3_state)
-    driver_task3.q3_state                    0x20000058   Data           1  defect.o(.bss.driver_task3.q3_state)
-    [Anonymous Symbol]                       0x2000005c   Section        0  defect.o(.bss.driver_task4.last)
-    driver_task4.last                        0x2000005c   Data           4  defect.o(.bss.driver_task4.last)
-    [Anonymous Symbol]                       0x20000060   Section        0  defect.o(.bss.driver_task5.q5_state)
-    driver_task5.q5_state                    0x20000060   Data           1  defect.o(.bss.driver_task5.q5_state)
-    [Anonymous Symbol]                       0x20000064   Section        0  defect.o(.bss.driver_task5.q5_t0)
-    driver_task5.q5_t0                       0x20000064   Data           4  defect.o(.bss.driver_task5.q5_t0)
-    [Anonymous Symbol]                       0x20000069   Section        0  emm_v5.o(.bss.gimbal_abs_tx_buf)
-    gimbal_abs_tx_buf                        0x20000069   Data          13  emm_v5.o(.bss.gimbal_abs_tx_buf)
-    [Anonymous Symbol]                       0x20000076   Section        0  emm_v5.o(.bss.gimbal_tx_buf)
-    gimbal_tx_buf                            0x20000076   Data          20  emm_v5.o(.bss.gimbal_tx_buf)
-    [Anonymous Symbol]                       0x20000840   Section        0  main.o(.bss.main.Gray_ADC_Update_nxt)
-    main.Gray_ADC_Update_nxt                 0x20000840   Data           4  main.o(.bss.main.Gray_ADC_Update_nxt)
-    [Anonymous Symbol]                       0x20000844   Section        0  main.o(.bss.main.maixcam_poll_next)
-    main.maixcam_poll_next                   0x20000844   Data           4  main.o(.bss.main.maixcam_poll_next)
-    [Anonymous Symbol]                       0x20000879   Section        0  uart_it.o(.bss.maixcam_dma_buf)
-    maixcam_dma_buf                          0x20000879   Data         128  uart_it.o(.bss.maixcam_dma_buf)
-    [Anonymous Symbol]                       0x200008fa   Section        0  uart_it.o(.bss.maixcam_dma_pos)
-    maixcam_dma_pos                          0x200008fa   Data           2  uart_it.o(.bss.maixcam_dma_pos)
-    [Anonymous Symbol]                       0x200009d5   Section        0  maixcam.o(.bss.maixcam_tx_busy)
-    maixcam_tx_busy                          0x200009d5   Data           1  maixcam.o(.bss.maixcam_tx_busy)
-    [Anonymous Symbol]                       0x200009d6   Section        0  maixcam.o(.bss.maixcam_tx_head)
-    maixcam_tx_head                          0x200009d6   Data           1  maixcam.o(.bss.maixcam_tx_head)
-    [Anonymous Symbol]                       0x200009d8   Section        0  maixcam.o(.bss.maixcam_tx_queue)
-    maixcam_tx_queue                         0x200009d8   Data        1040  maixcam.o(.bss.maixcam_tx_queue)
-    [Anonymous Symbol]                       0x20000de8   Section        0  maixcam.o(.bss.maixcam_tx_tail)
-    maixcam_tx_tail                          0x20000de8   Data           1  maixcam.o(.bss.maixcam_tx_tail)
-    [Anonymous Symbol]                       0x20000de9   Section        0  maixcam.o(.bss.mc_buf)
-    mc_buf                                   0x20000de9   Data          64  maixcam.o(.bss.mc_buf)
-    [Anonymous Symbol]                       0x20000e29   Section        0  maixcam.o(.bss.mc_idx)
-    mc_idx                                   0x20000e29   Data           1  maixcam.o(.bss.mc_idx)
-    mc_new_detection                         0x20000e2a   Data           1  maixcam.o(.bss.mc_new_detection)
-    mc_ps                                    0x20000e2b   Data           1  maixcam.o(.bss.mc_ps)
+    [Anonymous Symbol]                       0x20000058   Section        0  defect.o(.bss.driver_task3.last_dbg_seq)
+    driver_task3.last_dbg_seq                0x20000058   Data           4  defect.o(.bss.driver_task3.last_dbg_seq)
+    [Anonymous Symbol]                       0x2000005c   Section        0  defect.o(.bss.driver_task3.q3_state)
+    driver_task3.q3_state                    0x2000005c   Data           1  defect.o(.bss.driver_task3.q3_state)
+    [Anonymous Symbol]                       0x20000060   Section        0  defect.o(.bss.driver_task4.last)
+    driver_task4.last                        0x20000060   Data           4  defect.o(.bss.driver_task4.last)
+    [Anonymous Symbol]                       0x20000064   Section        0  defect.o(.bss.driver_task5.q5_state)
+    driver_task5.q5_state                    0x20000064   Data           1  defect.o(.bss.driver_task5.q5_state)
+    [Anonymous Symbol]                       0x20000068   Section        0  defect.o(.bss.driver_task5.q5_t0)
+    driver_task5.q5_t0                       0x20000068   Data           4  defect.o(.bss.driver_task5.q5_t0)
+    [Anonymous Symbol]                       0x2000006d   Section        0  emm_v5.o(.bss.gimbal_abs_tx_buf)
+    gimbal_abs_tx_buf                        0x2000006d   Data          13  emm_v5.o(.bss.gimbal_abs_tx_buf)
+    [Anonymous Symbol]                       0x2000007a   Section        0  emm_v5.o(.bss.gimbal_tx_buf)
+    gimbal_tx_buf                            0x2000007a   Data          20  emm_v5.o(.bss.gimbal_tx_buf)
+    [Anonymous Symbol]                       0x20000844   Section        0  main.o(.bss.main.Gray_ADC_Update_nxt)
+    main.Gray_ADC_Update_nxt                 0x20000844   Data           4  main.o(.bss.main.Gray_ADC_Update_nxt)
+    [Anonymous Symbol]                       0x20000848   Section        0  main.o(.bss.main.maixcam_poll_next)
+    main.maixcam_poll_next                   0x20000848   Data           4  main.o(.bss.main.maixcam_poll_next)
+    [Anonymous Symbol]                       0x2000087d   Section        0  uart_it.o(.bss.maixcam_dma_buf)
+    maixcam_dma_buf                          0x2000087d   Data         128  uart_it.o(.bss.maixcam_dma_buf)
+    [Anonymous Symbol]                       0x200008fe   Section        0  uart_it.o(.bss.maixcam_dma_pos)
+    maixcam_dma_pos                          0x200008fe   Data           2  uart_it.o(.bss.maixcam_dma_pos)
+    [Anonymous Symbol]                       0x200009d9   Section        0  maixcam.o(.bss.maixcam_tx_busy)
+    maixcam_tx_busy                          0x200009d9   Data           1  maixcam.o(.bss.maixcam_tx_busy)
+    [Anonymous Symbol]                       0x200009da   Section        0  maixcam.o(.bss.maixcam_tx_head)
+    maixcam_tx_head                          0x200009da   Data           1  maixcam.o(.bss.maixcam_tx_head)
+    [Anonymous Symbol]                       0x200009dc   Section        0  maixcam.o(.bss.maixcam_tx_queue)
+    maixcam_tx_queue                         0x200009dc   Data        1040  maixcam.o(.bss.maixcam_tx_queue)
+    [Anonymous Symbol]                       0x20000dec   Section        0  maixcam.o(.bss.maixcam_tx_tail)
+    maixcam_tx_tail                          0x20000dec   Data           1  maixcam.o(.bss.maixcam_tx_tail)
+    [Anonymous Symbol]                       0x20000ded   Section        0  maixcam.o(.bss.mc_buf)
+    mc_buf                                   0x20000ded   Data          64  maixcam.o(.bss.mc_buf)
+    [Anonymous Symbol]                       0x20000e2d   Section        0  maixcam.o(.bss.mc_idx)
+    mc_idx                                   0x20000e2d   Data           1  maixcam.o(.bss.mc_idx)
+    mc_new_detection                         0x20000e2e   Data           1  maixcam.o(.bss.mc_new_detection)
+    mc_ps                                    0x20000e2f   Data           1  maixcam.o(.bss.mc_ps)
     [Anonymous Symbol]                       0x20001230   Section        0  uart_it.o(.bss.stepper_rx_byte)
     stepper_rx_byte                          0x20001230   Data           1  uart_it.o(.bss.stepper_rx_byte)
-    [Anonymous Symbol]                       0x20001234   Section        0  defect.o(.bss.task4_dbg_buf)
-    task4_dbg_buf                            0x20001234   Data          24  defect.o(.bss.task4_dbg_buf)
-    [Anonymous Symbol]                       0x2000124c   Section        0  defect.o(.bss.task4_dbg_ready)
-    task4_dbg_ready                          0x2000124c   Data           1  defect.o(.bss.task4_dbg_ready)
-    [Anonymous Symbol]                       0x20001250   Section        0  defect.o(.bss.task7_cap)
-    task7_cap                                0x20001250   Data          80  defect.o(.bss.task7_cap)
-    [Anonymous Symbol]                       0x200012a0   Section        0  defect.o(.bss.task7_cmd_type)
-    task7_cmd_type                           0x200012a0   Data           1  defect.o(.bss.task7_cmd_type)
-    [Anonymous Symbol]                       0x200012a1   Section        0  defect.o(.bss.task7_dbg_msg_type)
-    task7_dbg_msg_type                       0x200012a1   Data           1  defect.o(.bss.task7_dbg_msg_type)
-    [Anonymous Symbol]                       0x200012a2   Section        0  defect.o(.bss.task7_rx_msg_type)
-    task7_rx_msg_type                        0x200012a2   Data           1  defect.o(.bss.task7_rx_msg_type)
-    [Anonymous Symbol]                       0x200012a3   Section        0  uart_it.o(.bss.uart1_pid_byte)
-    uart1_pid_byte                           0x200012a3   Data           1  uart_it.o(.bss.uart1_pid_byte)
-    [Anonymous Symbol]                       0x200012a4   Section        0  uart_it.o(.bss.uart1_pid_rx)
-    uart1_pid_rx                             0x200012a4   Data          24  uart_it.o(.bss.uart1_pid_rx)
-    STACK                                    0x200012c0   Section     1024  startup_stm32g474xx.o(STACK)
+    [Anonymous Symbol]                       0x20001234   Section        0  defect.o(.bss.task3_dbg_buf)
+    task3_dbg_buf                            0x20001234   Data          32  defect.o(.bss.task3_dbg_buf)
+    [Anonymous Symbol]                       0x20001254   Section        0  defect.o(.bss.task3_dbg_ready)
+    task3_dbg_ready                          0x20001254   Data           1  defect.o(.bss.task3_dbg_ready)
+    [Anonymous Symbol]                       0x20001258   Section        0  defect.o(.bss.task4_dbg_buf)
+    task4_dbg_buf                            0x20001258   Data          24  defect.o(.bss.task4_dbg_buf)
+    [Anonymous Symbol]                       0x20001270   Section        0  defect.o(.bss.task4_dbg_ready)
+    task4_dbg_ready                          0x20001270   Data           1  defect.o(.bss.task4_dbg_ready)
+    [Anonymous Symbol]                       0x20001274   Section        0  defect.o(.bss.task7_cap)
+    task7_cap                                0x20001274   Data          80  defect.o(.bss.task7_cap)
+    [Anonymous Symbol]                       0x200012c4   Section        0  defect.o(.bss.task7_cmd_type)
+    task7_cmd_type                           0x200012c4   Data           1  defect.o(.bss.task7_cmd_type)
+    [Anonymous Symbol]                       0x200012c5   Section        0  defect.o(.bss.task7_dbg_msg_type)
+    task7_dbg_msg_type                       0x200012c5   Data           1  defect.o(.bss.task7_dbg_msg_type)
+    [Anonymous Symbol]                       0x200012c6   Section        0  defect.o(.bss.task7_rx_msg_type)
+    task7_rx_msg_type                        0x200012c6   Data           1  defect.o(.bss.task7_rx_msg_type)
+    [Anonymous Symbol]                       0x200012c7   Section        0  uart_it.o(.bss.uart1_pid_byte)
+    uart1_pid_byte                           0x200012c7   Data           1  uart_it.o(.bss.uart1_pid_byte)
+    [Anonymous Symbol]                       0x200012c8   Section        0  uart_it.o(.bss.uart1_pid_rx)
+    uart1_pid_rx                             0x200012c8   Data          24  uart_it.o(.bss.uart1_pid_rx)
+    STACK                                    0x200012e8   Section     1024  startup_stm32g474xx.o(STACK)
 
     Global Symbols
 
@@ -6156,158 +6185,159 @@ Image Symbol Table
     ball_control_disable                     0x080084cd   Thumb Code    50  ball_control.o(.text.ball_control_disable)
     ball_control_init                        0x08008501   Thumb Code   124  ball_control.o(.text.ball_control_init)
     ball_control_request                     0x0800857d   Thumb Code   104  ball_control.o(.text.ball_control_request)
-    ball_control_service                     0x080085e5   Thumb Code   684  ball_control.o(.text.ball_control_service)
-    car_speed_profile_init                   0x08008a45   Thumb Code    44  car_speed_profile.o(.text.car_speed_profile_init)
-    car_speed_profile_reset                  0x08008a71   Thumb Code    18  car_speed_profile.o(.text.car_speed_profile_reset)
-    car_speed_profile_start                  0x08008a85   Thumb Code   132  car_speed_profile.o(.text.car_speed_profile_start)
-    car_speed_profile_step                   0x08008b09   Thumb Code   224  car_speed_profile.o(.text.car_speed_profile_step)
-    car_speed_profile_update_measurement     0x08008be9   Thumb Code   158  car_speed_profile.o(.text.car_speed_profile_update_measurement)
-    compute_pid                              0x08008c89   Thumb Code   224  pid.o(.text.compute_pid)
-    correct_gw_analogue                      0x08008d69   Thumb Code   448  gw_analogue.o(.text.correct_gw_analogue)
-    driver_BUZZER                            0x08008f29   Thumb Code    44  buzzer.o(.text.driver_BUZZER)
-    driver_LED                               0x08008f55   Thumb Code   128  led.o(.text.driver_LED)
-    driver_button                            0x08008fd5   Thumb Code   188  button.o(.text.driver_button)
-    driver_gw_analogue                       0x08009091   Thumb Code    36  gw_analogue.o(.text.driver_gw_analogue)
-    driver_wheel                             0x080096c5   Thumb Code   544  wheel.o(.text.driver_wheel)
-    follow_line                              0x080098e9   Thumb Code    74  status.o(.text.follow_line)
-    follow_line_task4                        0x08009935   Thumb Code   118  status.o(.text.follow_line_task4)
-    gan_init                                 0x080099ad   Thumb Code    72  main.o(.text.gan_init)
-    get_gw_analoge_digital_data              0x080099f5   Thumb Code    76  gw_analogue.o(.text.get_gw_analoge_digital_data)
-    get_gw_analogue_analogue_diff            0x08009a41   Thumb Code   144  gw_analogue.o(.text.get_gw_analogue_analogue_diff)
-    get_gw_raw_data                          0x08009ad1   Thumb Code    92  gw_analogue.o(.text.get_gw_raw_data)
-    get_road_type                            0x08009b2d   Thumb Code   166  gw_analogue.o(.text.get_road_type)
-    get_wheel_speed                          0x08009bd5   Thumb Code    78  wheel.o(.text.get_wheel_speed)
-    iic_gyr_get_value                        0x08009cf9   Thumb Code   136  gy901.o(.text.iic_gyr_get_value)
-    iic_gyr_init                             0x08009d81   Thumb Code   172  gy901.o(.text.iic_gyr_init)
-    iic_gyr_read_dma                         0x08009e2d   Thumb Code    74  gy901.o(.text.iic_gyr_read_dma)
-    init_BUZZER                              0x08009e79   Thumb Code    12  buzzer.o(.text.init_BUZZER)
-    init_LED                                 0x08009e85   Thumb Code    10  led.o(.text.init_LED)
-    init_button                              0x08009e91   Thumb Code    24  button.o(.text.init_button)
-    init_device                              0x08009ea9   Thumb Code    86  status.o(.text.init_device)
-    init_gw_analogue                         0x08009f01   Thumb Code   142  gw_analogue.o(.text.init_gw_analogue)
-    init_maixcam_uart                        0x08009f91   Thumb Code    56  uart_it.o(.text.init_maixcam_uart)
-    init_motor                               0x08009fc9   Thumb Code   100  status.o(.text.init_motor)
-    init_pid                                 0x0800a02d   Thumb Code    32  pid.o(.text.init_pid)
-    init_road_cnt                            0x0800a04d   Thumb Code    12  gw_analogue.o(.text.init_road_cnt)
-    init_road_determine                      0x0800a059   Thumb Code    14  gw_analogue.o(.text.init_road_determine)
-    init_sensor                              0x0800a069   Thumb Code    24  status.o(.text.init_sensor)
-    init_servo                               0x0800a081   Thumb Code   224  servo.o(.text.init_servo)
-    init_state                               0x0800a161   Thumb Code    28  status.o(.text.init_state)
-    init_status                              0x0800a17d   Thumb Code    84  status.o(.text.init_status)
-    init_status_pid                          0x0800a1d1   Thumb Code   384  status.o(.text.init_status_pid)
-    init_stepper_uart                        0x0800a351   Thumb Code    72  uart_it.o(.text.init_stepper_uart)
-    init_task                                0x0800a399   Thumb Code    34  defect.o(.text.init_task)
-    init_uart_gyr                            0x0800a3bd   Thumb Code    30  uart_it.o(.text.init_uart_gyr)
-    init_uart_pid_tune                       0x0800a3dd   Thumb Code    22  uart_it.o(.text.init_uart_pid_tune)
-    init_wheel                               0x0800a3f5   Thumb Code   572  wheel.o(.text.init_wheel)
-    keep_angle                               0x0800a631   Thumb Code   164  status.o(.text.keep_angle)
-    keep_balance                             0x0800a6d5   Thumb Code    76  status.o(.text.keep_balance)
-    main                                     0x0800a721   Thumb Code   336  main.o(.text.main)
-    maixcam_cmd_CDA                          0x0800a871   Thumb Code    20  maixcam.o(.text.maixcam_cmd_CDA)
-    maixcam_cmd_D                            0x0800a885   Thumb Code    52  maixcam.o(.text.maixcam_cmd_D)
-    maixcam_cmd_M                            0x0800a8b9   Thumb Code    44  maixcam.o(.text.maixcam_cmd_M)
-    maixcam_cmd_T                            0x0800a8e5   Thumb Code    52  maixcam.o(.text.maixcam_cmd_T)
-    maixcam_cmd_done                         0x0800a919   Thumb Code    32  maixcam.o(.text.maixcam_cmd_done)
-    maixcam_init                             0x0800a939   Thumb Code   120  maixcam.o(.text.maixcam_init)
-    maixcam_poll                             0x0800a9b1   Thumb Code    74  maixcam.o(.text.maixcam_poll)
-    maixcam_rx_feed                          0x0800a9fd   Thumb Code    48  maixcam.o(.text.maixcam_rx_feed)
-    maixcam_uart_tx_complete                 0x0800ab79   Thumb Code    48  maixcam.o(.text.maixcam_uart_tx_complete)
-    maixcam_uart_tx_enqueue                  0x0800aba9   Thumb Code   164  maixcam.o(.text.maixcam_uart_tx_enqueue)
-    normalize_gray_data                      0x0800ad51   Thumb Code    40  gw_analogue.o(.text.normalize_gray_data)
-    normalize_gray_weight                    0x0800ad79   Thumb Code    68  gw_analogue.o(.text.normalize_gray_weight)
-    pid_reset_state                          0x0800b051   Thumb Code    30  pid.o(.text.pid_reset_state)
-    road_decision                            0x0800b071   Thumb Code    40  gw_analogue.o(.text.road_decision)
-    road_new_from_bit                        0x0800b099   Thumb Code    14  gw_analogue.o(.text.road_new_from_bit)
-    select_channel                           0x0800b105   Thumb Code    76  gw_analogue.o(.text.select_channel)
-    serve_road                               0x0800b151   Thumb Code   102  gw_analogue.o(.text.serve_road)
-    server_button                            0x0800b1b9   Thumb Code   150  button.o(.text.server_button)
-    set_wheel_dir                            0x0800b251   Thumb Code   278  wheel.o(.text.set_wheel_dir)
-    stepper_publish_absolute                 0x0800b369   Thumb Code    94  uart_it.o(.text.stepper_publish_absolute)
-    stepper_service                          0x0800b3c9   Thumb Code   166  uart_it.o(.text.stepper_service)
-    stepper_target_disable                   0x0800b471   Thumb Code    54  uart_it.o(.text.stepper_target_disable)
-    task4_debug_flush                        0x0800b4a9   Thumb Code   218  defect.o(.text.task4_debug_flush)
-    task7_flush                              0x0800b585   Thumb Code   116  defect.o(.text.task7_flush)
-    task_finish                              0x0800b751   Thumb Code     4  defect.o(.text.task_finish)
-    task_select                              0x0800b755   Thumb Code    18  defect.o(.text.task_select)
-    task_start                               0x0800b769   Thumb Code   164  defect.o(.text.task_start)
-    task_stop                                0x0800b80d   Thumb Code   102  defect.o(.text.task_stop)
-    uart_gyr_ensure_receive                  0x0800b885   Thumb Code    92  uart_gyro.o(.text.uart_gyr_ensure_receive)
-    uart_gyr_init                            0x0800b8e1   Thumb Code    24  uart_gyro.o(.text.uart_gyr_init)
-    uart_gyr_rx_feed                         0x0800b8f9   Thumb Code   164  uart_gyro.o(.text.uart_gyr_rx_feed)
-    uart_gyr_start_receive                   0x0800b99d   Thumb Code    92  uart_gyro.o(.text.uart_gyr_start_receive)
-    update_status                            0x0800b9f9   Thumb Code   508  status.o(.text.update_status)
-    update_task                              0x0800bbf5   Thumb Code   170  defect.o(.text.update_task)
-    update_task_led                          0x0800bca1   Thumb Code    30  defect.o(.text.update_task_led)
-    __0snprintf                              0x0800bcd5   Thumb Code    44  printfa.o(i.__0snprintf)
-    __1snprintf                              0x0800bcd5   Thumb Code     0  printfa.o(i.__0snprintf)
-    __2snprintf                              0x0800bcd5   Thumb Code     0  printfa.o(i.__0snprintf)
-    __c89snprintf                            0x0800bcd5   Thumb Code     0  printfa.o(i.__0snprintf)
-    snprintf                                 0x0800bcd5   Thumb Code     0  printfa.o(i.__0snprintf)
-    __0sprintf                               0x0800bd05   Thumb Code    34  printfa.o(i.__0sprintf)
-    __1sprintf                               0x0800bd05   Thumb Code     0  printfa.o(i.__0sprintf)
-    __2sprintf                               0x0800bd05   Thumb Code     0  printfa.o(i.__0sprintf)
-    __c89sprintf                             0x0800bd05   Thumb Code     0  printfa.o(i.__0sprintf)
-    sprintf                                  0x0800bd05   Thumb Code     0  printfa.o(i.__0sprintf)
-    __hardfp__fabsf                          0x0800bd2d   Thumb Code    14  fabsf.o(i.__hardfp__fabsf)
-    __hardfp_atof                            0x0800bd41   Thumb Code    44  atof.o(i.__hardfp_atof)
-    __hardfp_fabsf                           0x0800bd79   Thumb Code    14  fabsfc99.o(i.__hardfp_fabsf)
-    __hardfp_sqrtf                           0x0800bd87   Thumb Code    58  sqrtf.o(i.__hardfp_sqrtf)
-    __read_errno                             0x0800bdc1   Thumb Code     6  errno.o(i.__read_errno)
-    __scatterload_copy                       0x0800bdcd   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_null                       0x0800bddb   Thumb Code     2  handlers.o(i.__scatterload_null)
-    __scatterload_zeroinit                   0x0800bddd   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    __set_errno                              0x0800bded   Thumb Code     6  errno.o(i.__set_errno)
-    _is_digit                                0x0800bf7d   Thumb Code    14  scanf_fp.o(i._is_digit)
-    __ctype_table                            0x0800c6da   Data         129  ctype_o.o(.constdata)
-    AHBPrescTable                            0x0800c760   Data          16  system_stm32g4xx.o(.rodata.AHBPrescTable)
-    APBPrescTable                            0x0800c770   Data           8  system_stm32g4xx.o(.rodata.APBPrescTable)
-    UARTPrescTable                           0x0800c778   Data          24  stm32g4xx_hal_uart.o(.rodata.UARTPrescTable)
-    g_ball_mechanism_lut                     0x0800c790   Data       37636  ball_mechanism_lut.o(.rodata.g_ball_mechanism_lut)
-    Region$$Table$$Base                      0x08015a94   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08015ab4   Number         0  anon$$obj.o(Region$$Table)
+    ball_control_service                     0x080085e5   Thumb Code  1024  ball_control.o(.text.ball_control_service)
+    car_speed_profile_init                   0x08008bc9   Thumb Code    44  car_speed_profile.o(.text.car_speed_profile_init)
+    car_speed_profile_reset                  0x08008bf5   Thumb Code    18  car_speed_profile.o(.text.car_speed_profile_reset)
+    car_speed_profile_start                  0x08008c09   Thumb Code   132  car_speed_profile.o(.text.car_speed_profile_start)
+    car_speed_profile_step                   0x08008c8d   Thumb Code   224  car_speed_profile.o(.text.car_speed_profile_step)
+    car_speed_profile_update_measurement     0x08008d6d   Thumb Code   158  car_speed_profile.o(.text.car_speed_profile_update_measurement)
+    compute_pid                              0x08008e0d   Thumb Code   224  pid.o(.text.compute_pid)
+    correct_gw_analogue                      0x08008ef1   Thumb Code   448  gw_analogue.o(.text.correct_gw_analogue)
+    driver_BUZZER                            0x080090b1   Thumb Code    44  buzzer.o(.text.driver_BUZZER)
+    driver_LED                               0x080090dd   Thumb Code   128  led.o(.text.driver_LED)
+    driver_button                            0x0800915d   Thumb Code   188  button.o(.text.driver_button)
+    driver_gw_analogue                       0x08009219   Thumb Code    36  gw_analogue.o(.text.driver_gw_analogue)
+    driver_wheel                             0x08009901   Thumb Code   544  wheel.o(.text.driver_wheel)
+    follow_line                              0x08009b29   Thumb Code    74  status.o(.text.follow_line)
+    follow_line_task4                        0x08009b75   Thumb Code   118  status.o(.text.follow_line_task4)
+    gan_init                                 0x08009bed   Thumb Code    72  main.o(.text.gan_init)
+    get_gw_analoge_digital_data              0x08009c35   Thumb Code    76  gw_analogue.o(.text.get_gw_analoge_digital_data)
+    get_gw_analogue_analogue_diff            0x08009c81   Thumb Code   144  gw_analogue.o(.text.get_gw_analogue_analogue_diff)
+    get_gw_raw_data                          0x08009d11   Thumb Code    92  gw_analogue.o(.text.get_gw_raw_data)
+    get_road_type                            0x08009d6d   Thumb Code   166  gw_analogue.o(.text.get_road_type)
+    get_wheel_speed                          0x08009e15   Thumb Code    78  wheel.o(.text.get_wheel_speed)
+    iic_gyr_get_value                        0x08009f39   Thumb Code   136  gy901.o(.text.iic_gyr_get_value)
+    iic_gyr_init                             0x08009fc1   Thumb Code   172  gy901.o(.text.iic_gyr_init)
+    iic_gyr_read_dma                         0x0800a06d   Thumb Code    74  gy901.o(.text.iic_gyr_read_dma)
+    init_BUZZER                              0x0800a0b9   Thumb Code    12  buzzer.o(.text.init_BUZZER)
+    init_LED                                 0x0800a0c5   Thumb Code    10  led.o(.text.init_LED)
+    init_button                              0x0800a0d1   Thumb Code    24  button.o(.text.init_button)
+    init_device                              0x0800a0e9   Thumb Code    86  status.o(.text.init_device)
+    init_gw_analogue                         0x0800a141   Thumb Code   142  gw_analogue.o(.text.init_gw_analogue)
+    init_maixcam_uart                        0x0800a1d1   Thumb Code    56  uart_it.o(.text.init_maixcam_uart)
+    init_motor                               0x0800a209   Thumb Code   100  status.o(.text.init_motor)
+    init_pid                                 0x0800a26d   Thumb Code    32  pid.o(.text.init_pid)
+    init_road_cnt                            0x0800a28d   Thumb Code    12  gw_analogue.o(.text.init_road_cnt)
+    init_road_determine                      0x0800a299   Thumb Code    14  gw_analogue.o(.text.init_road_determine)
+    init_sensor                              0x0800a2a9   Thumb Code    24  status.o(.text.init_sensor)
+    init_servo                               0x0800a2c1   Thumb Code   224  servo.o(.text.init_servo)
+    init_state                               0x0800a3a1   Thumb Code    28  status.o(.text.init_state)
+    init_status                              0x0800a3bd   Thumb Code    84  status.o(.text.init_status)
+    init_status_pid                          0x0800a411   Thumb Code   384  status.o(.text.init_status_pid)
+    init_stepper_uart                        0x0800a591   Thumb Code    72  uart_it.o(.text.init_stepper_uart)
+    init_task                                0x0800a5d9   Thumb Code    34  defect.o(.text.init_task)
+    init_uart_gyr                            0x0800a5fd   Thumb Code    30  uart_it.o(.text.init_uart_gyr)
+    init_uart_pid_tune                       0x0800a61d   Thumb Code    22  uart_it.o(.text.init_uart_pid_tune)
+    init_wheel                               0x0800a635   Thumb Code   572  wheel.o(.text.init_wheel)
+    keep_angle                               0x0800a871   Thumb Code   164  status.o(.text.keep_angle)
+    keep_balance                             0x0800a915   Thumb Code    76  status.o(.text.keep_balance)
+    main                                     0x0800a961   Thumb Code   340  main.o(.text.main)
+    maixcam_cmd_CDA                          0x0800aab5   Thumb Code    20  maixcam.o(.text.maixcam_cmd_CDA)
+    maixcam_cmd_D                            0x0800aac9   Thumb Code    52  maixcam.o(.text.maixcam_cmd_D)
+    maixcam_cmd_M                            0x0800aafd   Thumb Code    44  maixcam.o(.text.maixcam_cmd_M)
+    maixcam_cmd_T                            0x0800ab29   Thumb Code    52  maixcam.o(.text.maixcam_cmd_T)
+    maixcam_cmd_done                         0x0800ab5d   Thumb Code    32  maixcam.o(.text.maixcam_cmd_done)
+    maixcam_init                             0x0800ab7d   Thumb Code   120  maixcam.o(.text.maixcam_init)
+    maixcam_poll                             0x0800abf5   Thumb Code    74  maixcam.o(.text.maixcam_poll)
+    maixcam_rx_feed                          0x0800ac41   Thumb Code    48  maixcam.o(.text.maixcam_rx_feed)
+    maixcam_uart_tx_complete                 0x0800adbd   Thumb Code    48  maixcam.o(.text.maixcam_uart_tx_complete)
+    maixcam_uart_tx_enqueue                  0x0800aded   Thumb Code   164  maixcam.o(.text.maixcam_uart_tx_enqueue)
+    normalize_gray_data                      0x0800af95   Thumb Code    40  gw_analogue.o(.text.normalize_gray_data)
+    normalize_gray_weight                    0x0800afbd   Thumb Code    68  gw_analogue.o(.text.normalize_gray_weight)
+    pid_reset_state                          0x0800b295   Thumb Code    30  pid.o(.text.pid_reset_state)
+    road_decision                            0x0800b2b5   Thumb Code    40  gw_analogue.o(.text.road_decision)
+    road_new_from_bit                        0x0800b2dd   Thumb Code    14  gw_analogue.o(.text.road_new_from_bit)
+    select_channel                           0x0800b349   Thumb Code    76  gw_analogue.o(.text.select_channel)
+    serve_road                               0x0800b395   Thumb Code   102  gw_analogue.o(.text.serve_road)
+    server_button                            0x0800b3fd   Thumb Code   150  button.o(.text.server_button)
+    set_wheel_dir                            0x0800b495   Thumb Code   278  wheel.o(.text.set_wheel_dir)
+    stepper_publish_absolute                 0x0800b5ad   Thumb Code    94  uart_it.o(.text.stepper_publish_absolute)
+    stepper_service                          0x0800b60d   Thumb Code   166  uart_it.o(.text.stepper_service)
+    stepper_target_disable                   0x0800b6b5   Thumb Code    54  uart_it.o(.text.stepper_target_disable)
+    task3_debug_flush                        0x0800b6ed   Thumb Code   234  defect.o(.text.task3_debug_flush)
+    task4_debug_flush                        0x0800b7d9   Thumb Code   218  defect.o(.text.task4_debug_flush)
+    task7_flush                              0x0800b8b5   Thumb Code   116  defect.o(.text.task7_flush)
+    task_finish                              0x0800ba81   Thumb Code     4  defect.o(.text.task_finish)
+    task_select                              0x0800ba85   Thumb Code    18  defect.o(.text.task_select)
+    task_start                               0x0800ba99   Thumb Code   164  defect.o(.text.task_start)
+    task_stop                                0x0800bb3d   Thumb Code   102  defect.o(.text.task_stop)
+    uart_gyr_ensure_receive                  0x0800bbb5   Thumb Code    92  uart_gyro.o(.text.uart_gyr_ensure_receive)
+    uart_gyr_init                            0x0800bc11   Thumb Code    24  uart_gyro.o(.text.uart_gyr_init)
+    uart_gyr_rx_feed                         0x0800bc29   Thumb Code   164  uart_gyro.o(.text.uart_gyr_rx_feed)
+    uart_gyr_start_receive                   0x0800bccd   Thumb Code    92  uart_gyro.o(.text.uart_gyr_start_receive)
+    update_status                            0x0800bd29   Thumb Code   508  status.o(.text.update_status)
+    update_task                              0x0800bf25   Thumb Code   170  defect.o(.text.update_task)
+    update_task_led                          0x0800bfd1   Thumb Code    30  defect.o(.text.update_task_led)
+    __0snprintf                              0x0800c005   Thumb Code    44  printfa.o(i.__0snprintf)
+    __1snprintf                              0x0800c005   Thumb Code     0  printfa.o(i.__0snprintf)
+    __2snprintf                              0x0800c005   Thumb Code     0  printfa.o(i.__0snprintf)
+    __c89snprintf                            0x0800c005   Thumb Code     0  printfa.o(i.__0snprintf)
+    snprintf                                 0x0800c005   Thumb Code     0  printfa.o(i.__0snprintf)
+    __0sprintf                               0x0800c035   Thumb Code    34  printfa.o(i.__0sprintf)
+    __1sprintf                               0x0800c035   Thumb Code     0  printfa.o(i.__0sprintf)
+    __2sprintf                               0x0800c035   Thumb Code     0  printfa.o(i.__0sprintf)
+    __c89sprintf                             0x0800c035   Thumb Code     0  printfa.o(i.__0sprintf)
+    sprintf                                  0x0800c035   Thumb Code     0  printfa.o(i.__0sprintf)
+    __hardfp__fabsf                          0x0800c05d   Thumb Code    14  fabsf.o(i.__hardfp__fabsf)
+    __hardfp_atof                            0x0800c071   Thumb Code    44  atof.o(i.__hardfp_atof)
+    __hardfp_fabsf                           0x0800c0a9   Thumb Code    14  fabsfc99.o(i.__hardfp_fabsf)
+    __hardfp_sqrtf                           0x0800c0b7   Thumb Code    58  sqrtf.o(i.__hardfp_sqrtf)
+    __read_errno                             0x0800c0f1   Thumb Code     6  errno.o(i.__read_errno)
+    __scatterload_copy                       0x0800c0fd   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x0800c10b   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x0800c10d   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    __set_errno                              0x0800c11d   Thumb Code     6  errno.o(i.__set_errno)
+    _is_digit                                0x0800c2ad   Thumb Code    14  scanf_fp.o(i._is_digit)
+    __ctype_table                            0x0800ca0a   Data         129  ctype_o.o(.constdata)
+    AHBPrescTable                            0x0800ca90   Data          16  system_stm32g4xx.o(.rodata.AHBPrescTable)
+    APBPrescTable                            0x0800caa0   Data           8  system_stm32g4xx.o(.rodata.APBPrescTable)
+    UARTPrescTable                           0x0800caa8   Data          24  stm32g4xx_hal_uart.o(.rodata.UARTPrescTable)
+    g_ball_mechanism_lut                     0x0800cac0   Data       37636  ball_mechanism_lut.o(.rodata.g_ball_mechanism_lut)
+    Region$$Table$$Base                      0x08015dc4   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08015de4   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x20000004   Data           4  system_stm32g4xx.o(.data.SystemCoreClock)
     cmd_speed                                0x20000008   Data           2  main.o(.data.cmd_speed)
     distance                                 0x2000000c   Data          32  gw_analogue.o(.data.distance)
     uwTickFreq                               0x2000002c   Data           4  stm32g4xx_hal.o(.data.uwTickFreq)
     uwTickPrio                               0x20000030   Data           4  stm32g4xx_hal.o(.data.uwTickPrio)
     cross_cnt                                0x20000048   Data           1  gw_analogue.o(.bss.cross_cnt)
-    esp8266_ready                            0x20000068   Data           1  lora.o(.bss.esp8266_ready)
-    gyro_dma_busy                            0x2000008a   Data           1  gy901.o(.bss.gyro_dma_busy)
-    gyro_dma_ready                           0x2000008b   Data           1  gy901.o(.bss.gyro_dma_ready)
-    hadc3                                    0x2000008c   Data         108  adc.o(.bss.hadc3)
-    hadc5                                    0x200000f8   Data         108  adc.o(.bss.hadc5)
-    hdma_i2c1_rx                             0x20000164   Data          96  i2c.o(.bss.hdma_i2c1_rx)
-    hdma_uart4_rx                            0x200001c4   Data          96  usart.o(.bss.hdma_uart4_rx)
-    hdma_uart4_tx                            0x20000224   Data          96  usart.o(.bss.hdma_uart4_tx)
-    hdma_usart3_tx                           0x20000284   Data          96  usart.o(.bss.hdma_usart3_tx)
-    hi2c1                                    0x200002e4   Data          76  i2c.o(.bss.hi2c1)
-    hspi1                                    0x20000330   Data         100  spi.o(.bss.hspi1)
-    htim1                                    0x20000394   Data          76  tim.o(.bss.htim1)
-    htim15                                   0x200003e0   Data          76  tim.o(.bss.htim15)
-    htim2                                    0x2000042c   Data          76  tim.o(.bss.htim2)
-    htim3                                    0x20000478   Data          76  tim.o(.bss.htim3)
-    htim4                                    0x200004c4   Data          76  tim.o(.bss.htim4)
-    htim5                                    0x20000510   Data          76  tim.o(.bss.htim5)
-    htim6                                    0x2000055c   Data          76  tim.o(.bss.htim6)
-    htim8                                    0x200005a8   Data          76  tim.o(.bss.htim8)
-    huart1                                   0x200005f4   Data         144  usart.o(.bss.huart1)
-    huart2                                   0x20000684   Data         144  usart.o(.bss.huart2)
-    huart3                                   0x20000714   Data         144  usart.o(.bss.huart3)
-    huart4                                   0x200007a4   Data         144  usart.o(.bss.huart4)
-    iic_gyr_dma_complete_tick                0x20000834   Data           4  gy901.o(.bss.iic_gyr_dma_complete_tick)
-    iic_gyr_dma_error_count                  0x20000838   Data           4  gy901.o(.bss.iic_gyr_dma_error_count)
-    iic_gyr_initial_ready                    0x2000083c   Data           1  gy901.o(.bss.iic_gyr_initial_ready)
-    maixcam_cmd                              0x20000848   Data          21  maixcam.o(.bss.maixcam_cmd)
-    maixcam_det                              0x20000860   Data          24  maixcam.o(.bss.maixcam_det)
-    maixcam_det_new                          0x20000878   Data           1  maixcam.o(.bss.maixcam_det_new)
-    maixcam_loc                              0x200008fc   Data          16  maixcam.o(.bss.maixcam_loc)
-    maixcam_loc_new                          0x2000090c   Data           1  maixcam.o(.bss.maixcam_loc_new)
-    maixcam_rx                               0x2000090e   Data         134  maixcam.o(.bss.maixcam_rx)
-    maixcam_rx_raw_buf                       0x20000994   Data          64  maixcam.o(.bss.maixcam_rx_raw_buf)
-    maixcam_rx_raw_ready                     0x200009d4   Data           1  maixcam.o(.bss.maixcam_rx_raw_ready)
+    esp8266_ready                            0x2000006c   Data           1  lora.o(.bss.esp8266_ready)
+    gyro_dma_busy                            0x2000008e   Data           1  gy901.o(.bss.gyro_dma_busy)
+    gyro_dma_ready                           0x2000008f   Data           1  gy901.o(.bss.gyro_dma_ready)
+    hadc3                                    0x20000090   Data         108  adc.o(.bss.hadc3)
+    hadc5                                    0x200000fc   Data         108  adc.o(.bss.hadc5)
+    hdma_i2c1_rx                             0x20000168   Data          96  i2c.o(.bss.hdma_i2c1_rx)
+    hdma_uart4_rx                            0x200001c8   Data          96  usart.o(.bss.hdma_uart4_rx)
+    hdma_uart4_tx                            0x20000228   Data          96  usart.o(.bss.hdma_uart4_tx)
+    hdma_usart3_tx                           0x20000288   Data          96  usart.o(.bss.hdma_usart3_tx)
+    hi2c1                                    0x200002e8   Data          76  i2c.o(.bss.hi2c1)
+    hspi1                                    0x20000334   Data         100  spi.o(.bss.hspi1)
+    htim1                                    0x20000398   Data          76  tim.o(.bss.htim1)
+    htim15                                   0x200003e4   Data          76  tim.o(.bss.htim15)
+    htim2                                    0x20000430   Data          76  tim.o(.bss.htim2)
+    htim3                                    0x2000047c   Data          76  tim.o(.bss.htim3)
+    htim4                                    0x200004c8   Data          76  tim.o(.bss.htim4)
+    htim5                                    0x20000514   Data          76  tim.o(.bss.htim5)
+    htim6                                    0x20000560   Data          76  tim.o(.bss.htim6)
+    htim8                                    0x200005ac   Data          76  tim.o(.bss.htim8)
+    huart1                                   0x200005f8   Data         144  usart.o(.bss.huart1)
+    huart2                                   0x20000688   Data         144  usart.o(.bss.huart2)
+    huart3                                   0x20000718   Data         144  usart.o(.bss.huart3)
+    huart4                                   0x200007a8   Data         144  usart.o(.bss.huart4)
+    iic_gyr_dma_complete_tick                0x20000838   Data           4  gy901.o(.bss.iic_gyr_dma_complete_tick)
+    iic_gyr_dma_error_count                  0x2000083c   Data           4  gy901.o(.bss.iic_gyr_dma_error_count)
+    iic_gyr_initial_ready                    0x20000840   Data           1  gy901.o(.bss.iic_gyr_initial_ready)
+    maixcam_cmd                              0x2000084c   Data          21  maixcam.o(.bss.maixcam_cmd)
+    maixcam_det                              0x20000864   Data          24  maixcam.o(.bss.maixcam_det)
+    maixcam_det_new                          0x2000087c   Data           1  maixcam.o(.bss.maixcam_det_new)
+    maixcam_loc                              0x20000900   Data          16  maixcam.o(.bss.maixcam_loc)
+    maixcam_loc_new                          0x20000910   Data           1  maixcam.o(.bss.maixcam_loc_new)
+    maixcam_rx                               0x20000912   Data         134  maixcam.o(.bss.maixcam_rx)
+    maixcam_rx_raw_buf                       0x20000998   Data          64  maixcam.o(.bss.maixcam_rx_raw_buf)
+    maixcam_rx_raw_ready                     0x200009d8   Data           1  maixcam.o(.bss.maixcam_rx_raw_ready)
     status                                   0x20000e30   Data        1024  status.o(.bss.status)
-    uwTick                                   0x200012bc   Data           4  stm32g4xx_hal.o(.bss.uwTick)
-    __initial_sp                             0x200016c0   Data           0  startup_stm32g474xx.o(STACK)
+    uwTick                                   0x200012e0   Data           4  stm32g4xx_hal.o(.bss.uwTick)
+    __initial_sp                             0x200016e8   Data           0  startup_stm32g474xx.o(STACK)
 
 
 
@@ -6317,61 +6347,61 @@ Memory Map of the image
 
   Image Entry point : 0x080001d9
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00015af0, Max: 0x00020000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00015e20, Max: 0x00020000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00015ab4, Max: 0x00020000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00015de4, Max: 0x00020000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x08000000   0x000001d8   Data   RO            3    RESET               startup_stm32g474xx.o
-    0x080001d8   0x080001d8   0x00000000   Code   RO         2975  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x080001d8   0x080001d8   0x00000004   Code   RO         3281    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x080001dc   0x080001dc   0x00000004   Code   RO         3284    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x080001e0   0x080001e0   0x00000000   Code   RO         3286    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x080001e0   0x080001e0   0x00000000   Code   RO         3288    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
-    0x080001e0   0x080001e0   0x00000008   Code   RO         3289    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
-    0x080001e8   0x080001e8   0x00000000   Code   RO         3291    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
-    0x080001e8   0x080001e8   0x00000000   Code   RO         3293    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
-    0x080001e8   0x080001e8   0x00000004   Code   RO         3282    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x080001d8   0x080001d8   0x00000000   Code   RO         2984  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
+    0x080001d8   0x080001d8   0x00000004   Code   RO         3290    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x080001dc   0x080001dc   0x00000004   Code   RO         3293    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x080001e0   0x080001e0   0x00000000   Code   RO         3295    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x080001e0   0x080001e0   0x00000000   Code   RO         3297    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
+    0x080001e0   0x080001e0   0x00000008   Code   RO         3298    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
+    0x080001e8   0x080001e8   0x00000000   Code   RO         3300    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
+    0x080001e8   0x080001e8   0x00000000   Code   RO         3302    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
+    0x080001e8   0x080001e8   0x00000004   Code   RO         3291    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
     0x080001ec   0x080001ec   0x00000024   Code   RO            4    .text               startup_stm32g474xx.o
-    0x08000210   0x08000210   0x00000062   Code   RO         2978    .text               mc_w.l(uldiv.o)
-    0x08000272   0x08000272   0x00000024   Code   RO         2980    .text               mc_w.l(memseta.o)
-    0x08000296   0x08000296   0x0000000e   Code   RO         2982    .text               mc_w.l(strlen.o)
-    0x080002a4   0x080002a4   0x0000014e   Code   RO         3247    .text               mf_w.l(dadd.o)
-    0x080003f2   0x080003f2   0x000000e4   Code   RO         3249    .text               mf_w.l(dmul.o)
-    0x080004d6   0x080004d6   0x000000de   Code   RO         3251    .text               mf_w.l(ddiv.o)
-    0x080005b4   0x080005b4   0x0000002c   Code   RO         3253    .text               mf_w.l(ffltl.o)
-    0x080005e0   0x080005e0   0x00000022   Code   RO         3255    .text               mf_w.l(dflti.o)
-    0x08000602   0x08000602   0x0000001a   Code   RO         3257    .text               mf_w.l(dfltui.o)
-    0x0800061c   0x0800061c   0x0000003e   Code   RO         3259    .text               mf_w.l(dfixi.o)
-    0x0800065a   0x0800065a   0x00000026   Code   RO         3261    .text               mf_w.l(f2d.o)
-    0x08000680   0x08000680   0x00000038   Code   RO         3263    .text               mf_w.l(d2f.o)
-    0x080006b8   0x080006b8   0x0000002c   Code   RO         3296    .text               mc_w.l(uidiv.o)
-    0x080006e4   0x080006e4   0x0000001e   Code   RO         3298    .text               mc_w.l(llshl.o)
-    0x08000702   0x08000702   0x00000020   Code   RO         3300    .text               mc_w.l(llushr.o)
-    0x08000722   0x08000722   0x00000024   Code   RO         3302    .text               mc_w.l(llsshr.o)
+    0x08000210   0x08000210   0x00000062   Code   RO         2987    .text               mc_w.l(uldiv.o)
+    0x08000272   0x08000272   0x00000024   Code   RO         2989    .text               mc_w.l(memseta.o)
+    0x08000296   0x08000296   0x0000000e   Code   RO         2991    .text               mc_w.l(strlen.o)
+    0x080002a4   0x080002a4   0x0000014e   Code   RO         3256    .text               mf_w.l(dadd.o)
+    0x080003f2   0x080003f2   0x000000e4   Code   RO         3258    .text               mf_w.l(dmul.o)
+    0x080004d6   0x080004d6   0x000000de   Code   RO         3260    .text               mf_w.l(ddiv.o)
+    0x080005b4   0x080005b4   0x0000002c   Code   RO         3262    .text               mf_w.l(ffltl.o)
+    0x080005e0   0x080005e0   0x00000022   Code   RO         3264    .text               mf_w.l(dflti.o)
+    0x08000602   0x08000602   0x0000001a   Code   RO         3266    .text               mf_w.l(dfltui.o)
+    0x0800061c   0x0800061c   0x0000003e   Code   RO         3268    .text               mf_w.l(dfixi.o)
+    0x0800065a   0x0800065a   0x00000026   Code   RO         3270    .text               mf_w.l(f2d.o)
+    0x08000680   0x08000680   0x00000038   Code   RO         3272    .text               mf_w.l(d2f.o)
+    0x080006b8   0x080006b8   0x0000002c   Code   RO         3305    .text               mc_w.l(uidiv.o)
+    0x080006e4   0x080006e4   0x0000001e   Code   RO         3307    .text               mc_w.l(llshl.o)
+    0x08000702   0x08000702   0x00000020   Code   RO         3309    .text               mc_w.l(llushr.o)
+    0x08000722   0x08000722   0x00000024   Code   RO         3311    .text               mc_w.l(llsshr.o)
     0x08000746   0x08000746   0x00000002   PAD
-    0x08000748   0x08000748   0x0000009c   Code   RO         3311    .text               mc_w.l(strtod.o)
-    0x080007e4   0x080007e4   0x00000000   Code   RO         3315    .text               mc_w.l(iusefp.o)
-    0x080007e4   0x080007e4   0x0000006e   Code   RO         3316    .text               mf_w.l(fepilogue.o)
-    0x08000852   0x08000852   0x000000ba   Code   RO         3318    .text               mf_w.l(depilogue.o)
-    0x0800090c   0x0800090c   0x00000030   Code   RO         3320    .text               mf_w.l(dfixul.o)
-    0x0800093c   0x0800093c   0x00000030   Code   RO         3322    .text               mf_w.l(cdrcmple.o)
-    0x0800096c   0x0800096c   0x00000024   Code   RO         3324    .text               mc_w.l(init.o)
-    0x08000990   0x08000990   0x00000008   Code   RO         3328    .text               mc_w.l(ctype_o.o)
-    0x08000998   0x08000998   0x00000012   Code   RO         3350    .text               mc_w.l(isspace_o.o)
+    0x08000748   0x08000748   0x0000009c   Code   RO         3320    .text               mc_w.l(strtod.o)
+    0x080007e4   0x080007e4   0x00000000   Code   RO         3324    .text               mc_w.l(iusefp.o)
+    0x080007e4   0x080007e4   0x0000006e   Code   RO         3325    .text               mf_w.l(fepilogue.o)
+    0x08000852   0x08000852   0x000000ba   Code   RO         3327    .text               mf_w.l(depilogue.o)
+    0x0800090c   0x0800090c   0x00000030   Code   RO         3329    .text               mf_w.l(dfixul.o)
+    0x0800093c   0x0800093c   0x00000030   Code   RO         3331    .text               mf_w.l(cdrcmple.o)
+    0x0800096c   0x0800096c   0x00000024   Code   RO         3333    .text               mc_w.l(init.o)
+    0x08000990   0x08000990   0x00000008   Code   RO         3337    .text               mc_w.l(ctype_o.o)
+    0x08000998   0x08000998   0x00000012   Code   RO         3359    .text               mc_w.l(isspace_o.o)
     0x080009aa   0x080009aa   0x00000002   PAD
-    0x080009ac   0x080009ac   0x00000360   Code   RO         3356    .text               mc_w.l(scanf_fp.o)
-    0x08000d0c   0x08000d0c   0x00000040   Code   RO         3360    .text               mc_w.l(_sgetc.o)
-    0x08000d4c   0x08000d4c   0x00000018   Code   RO         3369    .text               mf_w.l(dfltul.o)
+    0x080009ac   0x080009ac   0x00000360   Code   RO         3365    .text               mc_w.l(scanf_fp.o)
+    0x08000d0c   0x08000d0c   0x00000040   Code   RO         3369    .text               mc_w.l(_sgetc.o)
+    0x08000d4c   0x08000d4c   0x00000018   Code   RO         3378    .text               mf_w.l(dfltul.o)
     0x08000d64   0x08000d64   0x000000de   Code   RO          305    .text.ADC_ConversionStop  stm32g4xx_hal_adc.o
     0x08000e42   0x08000e42   0x00000002   PAD
     0x08000e44   0x08000e44   0x00000096   Code   RO          307    .text.ADC_Disable   stm32g4xx_hal_adc.o
     0x08000eda   0x08000eda   0x00000002   PAD
     0x08000edc   0x08000edc   0x00000078   Code   RO          315    .text.ADC_Enable    stm32g4xx_hal_adc.o
-    0x08000f54   0x08000f54   0x00000006   Code   RO         2387    .text.BallMechanismLut_IndexFromRelative  ball_control.o
+    0x08000f54   0x08000f54   0x00000006   Code   RO         2396    .text.BallMechanismLut_IndexFromRelative  ball_control.o
     0x08000f5a   0x08000f5a   0x00000002   PAD
-    0x08000f5c   0x08000f5c   0x00000006   Code   RO         2391    .text.BallMechanismLut_RelativeFromIndex  ball_control.o
+    0x08000f5c   0x08000f5c   0x00000006   Code   RO         2400    .text.BallMechanismLut_RelativeFromIndex  ball_control.o
     0x08000f62   0x08000f62   0x00000002   PAD
     0x08000f64   0x08000f64   0x00000002   Code   RO          222    .text.BusFault_Handler  stm32g4xx_it.o
     0x08000f66   0x08000f66   0x00000002   PAD
@@ -6385,11 +6415,11 @@ Memory Map of the image
     0x0800105c   0x0800105c   0x00000002   Code   RO          228    .text.DebugMon_Handler  stm32g4xx_it.o
     0x0800105e   0x0800105e   0x00000002   PAD
     0x08001060   0x08001060   0x0000011c   Code   RO           11    .text.ESP8266_Init  lora.o
-    0x0800117c   0x0800117c   0x00000030   Code   RO         2691    .text.Emm_V5_En_Control  emm_v5.o
-    0x080011ac   0x080011ac   0x0000009e   Code   RO         2697    .text.Emm_V5_Pos_Absolute_Try  emm_v5.o
+    0x0800117c   0x0800117c   0x00000030   Code   RO         2700    .text.Emm_V5_En_Control  emm_v5.o
+    0x080011ac   0x080011ac   0x0000009e   Code   RO         2706    .text.Emm_V5_Pos_Absolute_Try  emm_v5.o
     0x0800124a   0x0800124a   0x00000002   PAD
-    0x0800124c   0x0800124c   0x00000058   Code   RO         2695    .text.Emm_V5_Pos_Control  emm_v5.o
-    0x080012a4   0x080012a4   0x00000026   Code   RO         2681    .text.Emm_V5_Reset_CurPos_To_Zero  emm_v5.o
+    0x0800124c   0x0800124c   0x00000058   Code   RO         2704    .text.Emm_V5_Pos_Control  emm_v5.o
+    0x080012a4   0x080012a4   0x00000026   Code   RO         2690    .text.Emm_V5_Reset_CurPos_To_Zero  emm_v5.o
     0x080012ca   0x080012ca   0x00000002   PAD
     0x080012cc   0x080012cc   0x0000000a   Code   RO           35    .text.Error_Handler  main.o
     0x080012d6   0x080012d6   0x00000002   PAD
@@ -6432,7 +6462,7 @@ Memory Map of the image
     0x080023d8   0x080023d8   0x00000066   Code   RO         1280    .text.HAL_I2C_ER_IRQHandler  stm32g4xx_hal_i2c.o
     0x0800243e   0x0800243e   0x00000002   PAD
     0x08002440   0x08002440   0x00000018   Code   RO         1278    .text.HAL_I2C_EV_IRQHandler  stm32g4xx_hal_i2c.o
-    0x08002458   0x08002458   0x0000002e   Code   RO         2438    .text.HAL_I2C_ErrorCallback  gy901.o
+    0x08002458   0x08002458   0x0000002e   Code   RO         2447    .text.HAL_I2C_ErrorCallback  gy901.o
     0x08002486   0x08002486   0x00000002   PAD
     0x08002488   0x08002488   0x000000bc   Code   RO         1168    .text.HAL_I2C_Init  stm32g4xx_hal_i2c.o
     0x08002544   0x08002544   0x00000002   Code   RO         1294    .text.HAL_I2C_ListenCpltCallback  stm32g4xx_hal_i2c.o
@@ -6441,7 +6471,7 @@ Memory Map of the image
     0x0800254a   0x0800254a   0x00000002   PAD
     0x0800254c   0x0800254c   0x00000002   Code   RO         1284    .text.HAL_I2C_MasterTxCpltCallback  stm32g4xx_hal_i2c.o
     0x0800254e   0x0800254e   0x00000002   PAD
-    0x08002550   0x08002550   0x00000040   Code   RO         2436    .text.HAL_I2C_MemRxCpltCallback  gy901.o
+    0x08002550   0x08002550   0x00000040   Code   RO         2445    .text.HAL_I2C_MemRxCpltCallback  gy901.o
     0x08002590   0x08002590   0x00000002   Code   RO         1296    .text.HAL_I2C_MemTxCpltCallback  stm32g4xx_hal_i2c.o
     0x08002592   0x08002592   0x00000002   PAD
     0x08002594   0x08002594   0x0000015a   Code   RO         1246    .text.HAL_I2C_Mem_Read_DMA  stm32g4xx_hal_i2c.o
@@ -6743,8 +6773,8 @@ Memory Map of the image
     0x08008140   0x08008140   0x0000013c   Code   RO         1936    .text.UART_Start_Receive_IT  stm32g4xx_hal_uart.o
     0x0800827c   0x0800827c   0x000000ee   Code   RO         1920    .text.UART_WaitOnFlagUntilTimeout  stm32g4xx_hal_uart.o
     0x0800836a   0x0800836a   0x00000002   PAD
-    0x0800836c   0x0800836c   0x00000058   Code   RO         2870    .text.UART_send_bytes  log.o
-    0x080083c4   0x080083c4   0x00000068   Code   RO         2874    .text.UART_send_justfloat  log.o
+    0x0800836c   0x0800836c   0x00000058   Code   RO         2879    .text.UART_send_bytes  log.o
+    0x080083c4   0x080083c4   0x00000068   Code   RO         2883    .text.UART_send_justfloat  log.o
     0x0800842c   0x0800842c   0x0000000c   Code   RO          248    .text.USART1_IRQHandler  stm32g4xx_it.o
     0x08008438   0x08008438   0x0000000c   Code   RO          250    .text.USART2_IRQHandler  stm32g4xx_it.o
     0x08008444   0x08008444   0x0000000c   Code   RO          252    .text.USART3_IRQHandler  stm32g4xx_it.o
@@ -6755,288 +6785,297 @@ Memory Map of the image
     0x08008488   0x08008488   0x00000022   Code   RO         1101    .text.__NVIC_SetPriority  stm32g4xx_hal_cortex.o
     0x080084aa   0x080084aa   0x00000002   PAD
     0x080084ac   0x080084ac   0x00000020   Code   RO         1095    .text.__NVIC_SetPriorityGrouping  stm32g4xx_hal_cortex.o
-    0x080084cc   0x080084cc   0x00000032   Code   RO         2379    .text.ball_control_disable  ball_control.o
+    0x080084cc   0x080084cc   0x00000032   Code   RO         2384    .text.ball_control_disable  ball_control.o
     0x080084fe   0x080084fe   0x00000002   PAD
-    0x08008500   0x08008500   0x0000007c   Code   RO         2375    .text.ball_control_init  ball_control.o
-    0x0800857c   0x0800857c   0x00000068   Code   RO         2377    .text.ball_control_request  ball_control.o
-    0x080085e4   0x080085e4   0x000002ac   Code   RO         2381    .text.ball_control_service  ball_control.o
-    0x08008890   0x08008890   0x000000e0   Code   RO         2385    .text.ball_find_relative_pulse  ball_control.o
-    0x08008970   0x08008970   0x00000090   Code   RO         2389    .text.ball_model_accel  ball_control.o
-    0x08008a00   0x08008a00   0x00000044   Code   RO         2383    .text.ball_request_snapshot  ball_control.o
-    0x08008a44   0x08008a44   0x0000002c   Code   RO         2909    .text.car_speed_profile_init  car_speed_profile.o
-    0x08008a70   0x08008a70   0x00000012   Code   RO         2911    .text.car_speed_profile_reset  car_speed_profile.o
-    0x08008a82   0x08008a82   0x00000002   PAD
-    0x08008a84   0x08008a84   0x00000084   Code   RO         2913    .text.car_speed_profile_start  car_speed_profile.o
-    0x08008b08   0x08008b08   0x000000e0   Code   RO         2917    .text.car_speed_profile_step  car_speed_profile.o
-    0x08008be8   0x08008be8   0x0000009e   Code   RO         2915    .text.car_speed_profile_update_measurement  car_speed_profile.o
-    0x08008c86   0x08008c86   0x00000002   PAD
-    0x08008c88   0x08008c88   0x000000e0   Code   RO         2892    .text.compute_pid   pid.o
-    0x08008d68   0x08008d68   0x000001c0   Code   RO         2626    .text.correct_gw_analogue  gw_analogue.o
-    0x08008f28   0x08008f28   0x0000002c   Code   RO         2146    .text.driver_BUZZER  buzzer.o
-    0x08008f54   0x08008f54   0x00000080   Code   RO         2131    .text.driver_LED    led.o
-    0x08008fd4   0x08008fd4   0x000000bc   Code   RO         2115    .text.driver_button  button.o
-    0x08009090   0x08009090   0x00000024   Code   RO         2644    .text.driver_gw_analogue  gw_analogue.o
-    0x080090b4   0x080090b4   0x00000004   PAD
-    0x080090b8   0x080090b8   0x00000100   Code   RO         2333    .text.driver_task1  defect.o
-    0x080091b8   0x080091b8   0x000001c8   Code   RO         2335    .text.driver_task2  defect.o
-    0x08009380   0x08009380   0x000000d4   Code   RO         2337    .text.driver_task3  defect.o
-    0x08009454   0x08009454   0x000000b8   Code   RO         2339    .text.driver_task4  defect.o
-    0x0800950c   0x0800950c   0x00000102   Code   RO         2341    .text.driver_task5  defect.o
-    0x0800960e   0x0800960e   0x00000002   PAD
-    0x08009610   0x08009610   0x00000040   Code   RO         2343    .text.driver_task6  defect.o
-    0x08009650   0x08009650   0x00000074   Code   RO         2345    .text.driver_task7  defect.o
-    0x080096c4   0x080096c4   0x00000220   Code   RO         2791    .text.driver_wheel  wheel.o
-    0x080098e4   0x080098e4   0x00000004   Code   RO         2349    .text.fabsf         defect.o
-    0x080098e8   0x080098e8   0x0000004a   Code   RO         2282    .text.follow_line   status.o
-    0x08009932   0x08009932   0x00000002   PAD
-    0x08009934   0x08009934   0x00000076   Code   RO         2284    .text.follow_line_task4  status.o
-    0x080099aa   0x080099aa   0x00000002   PAD
-    0x080099ac   0x080099ac   0x00000048   Code   RO           33    .text.gan_init      main.o
-    0x080099f4   0x080099f4   0x0000004c   Code   RO         2628    .text.get_gw_analoge_digital_data  gw_analogue.o
-    0x08009a40   0x08009a40   0x00000090   Code   RO         2634    .text.get_gw_analogue_analogue_diff  gw_analogue.o
-    0x08009ad0   0x08009ad0   0x0000005c   Code   RO         2624    .text.get_gw_raw_data  gw_analogue.o
-    0x08009b2c   0x08009b2c   0x000000a6   Code   RO         2642    .text.get_road_type  gw_analogue.o
-    0x08009bd2   0x08009bd2   0x00000002   PAD
-    0x08009bd4   0x08009bd4   0x0000004e   Code   RO         2787    .text.get_wheel_speed  wheel.o
-    0x08009c22   0x08009c22   0x00000002   PAD
-    0x08009c24   0x08009c24   0x000000d4   Code   RO         2683    .text.gimbal_send   emm_v5.o
-    0x08009cf8   0x08009cf8   0x00000088   Code   RO         2442    .text.iic_gyr_get_value  gy901.o
-    0x08009d80   0x08009d80   0x000000ac   Code   RO         2434    .text.iic_gyr_init  gy901.o
-    0x08009e2c   0x08009e2c   0x0000004a   Code   RO         2440    .text.iic_gyr_read_dma  gy901.o
-    0x08009e76   0x08009e76   0x00000002   PAD
-    0x08009e78   0x08009e78   0x0000000c   Code   RO         2148    .text.init_BUZZER   buzzer.o
-    0x08009e84   0x08009e84   0x0000000a   Code   RO         2133    .text.init_LED      led.o
-    0x08009e8e   0x08009e8e   0x00000002   PAD
-    0x08009e90   0x08009e90   0x00000018   Code   RO         2117    .text.init_button   button.o
-    0x08009ea8   0x08009ea8   0x00000056   Code   RO         2264    .text.init_device   status.o
-    0x08009efe   0x08009efe   0x00000002   PAD
-    0x08009f00   0x08009f00   0x0000008e   Code   RO         2620    .text.init_gw_analogue  gw_analogue.o
-    0x08009f8e   0x08009f8e   0x00000002   PAD
-    0x08009f90   0x08009f90   0x00000038   Code   RO         2230    .text.init_maixcam_uart  uart_it.o
-    0x08009fc8   0x08009fc8   0x00000064   Code   RO         2262    .text.init_motor    status.o
-    0x0800a02c   0x0800a02c   0x00000020   Code   RO         2890    .text.init_pid      pid.o
-    0x0800a04c   0x0800a04c   0x0000000c   Code   RO         2618    .text.init_road_cnt  gw_analogue.o
-    0x0800a058   0x0800a058   0x0000000e   Code   RO         2616    .text.init_road_determine  gw_analogue.o
-    0x0800a066   0x0800a066   0x00000002   PAD
-    0x0800a068   0x0800a068   0x00000018   Code   RO         2266    .text.init_sensor   status.o
-    0x0800a080   0x0800a080   0x000000e0   Code   RO         2774    .text.init_servo    servo.o
-    0x0800a160   0x0800a160   0x0000001c   Code   RO         2268    .text.init_state    status.o
-    0x0800a17c   0x0800a17c   0x00000054   Code   RO         2278    .text.init_status   status.o
-    0x0800a1d0   0x0800a1d0   0x00000180   Code   RO         2270    .text.init_status_pid  status.o
-    0x0800a350   0x0800a350   0x00000048   Code   RO         2226    .text.init_stepper_uart  uart_it.o
-    0x0800a398   0x0800a398   0x00000022   Code   RO         2319    .text.init_task     defect.o
-    0x0800a3ba   0x0800a3ba   0x00000002   PAD
-    0x0800a3bc   0x0800a3bc   0x0000001e   Code   RO         2228    .text.init_uart_gyr  uart_it.o
-    0x0800a3da   0x0800a3da   0x00000002   PAD
-    0x0800a3dc   0x0800a3dc   0x00000016   Code   RO         2216    .text.init_uart_pid_tune  uart_it.o
-    0x0800a3f2   0x0800a3f2   0x00000002   PAD
-    0x0800a3f4   0x0800a3f4   0x0000023c   Code   RO         2795    .text.init_wheel    wheel.o
-    0x0800a630   0x0800a630   0x000000a4   Code   RO         2286    .text.keep_angle    status.o
-    0x0800a6d4   0x0800a6d4   0x0000004c   Code   RO         2288    .text.keep_balance  status.o
-    0x0800a720   0x0800a720   0x00000150   Code   RO           29    .text.main          main.o
-    0x0800a870   0x0800a870   0x00000014   Code   RO         2507    .text.maixcam_cmd_CDA  maixcam.o
-    0x0800a884   0x0800a884   0x00000034   Code   RO         2505    .text.maixcam_cmd_D  maixcam.o
-    0x0800a8b8   0x0800a8b8   0x0000002c   Code   RO         2509    .text.maixcam_cmd_M  maixcam.o
-    0x0800a8e4   0x0800a8e4   0x00000034   Code   RO         2501    .text.maixcam_cmd_T  maixcam.o
-    0x0800a918   0x0800a918   0x00000020   Code   RO         2513    .text.maixcam_cmd_done  maixcam.o
-    0x0800a938   0x0800a938   0x00000078   Code   RO         2491    .text.maixcam_init  maixcam.o
-    0x0800a9b0   0x0800a9b0   0x0000004a   Code   RO         2515    .text.maixcam_poll  maixcam.o
-    0x0800a9fa   0x0800a9fa   0x00000002   PAD
-    0x0800a9fc   0x0800a9fc   0x00000030   Code   RO         2493    .text.maixcam_rx_feed  maixcam.o
-    0x0800aa2c   0x0800aa2c   0x00000036   Code   RO         2517    .text.maixcam_rx_read  maixcam.o
-    0x0800aa62   0x0800aa62   0x00000002   PAD
-    0x0800aa64   0x0800aa64   0x0000001e   Code   RO         2523    .text.maixcam_send_frame  maixcam.o
-    0x0800aa82   0x0800aa82   0x00000002   PAD
-    0x0800aa84   0x0800aa84   0x0000004a   Code   RO         2503    .text.maixcam_start_cmd  maixcam.o
-    0x0800aace   0x0800aace   0x00000002   PAD
-    0x0800aad0   0x0800aad0   0x00000044   Code   RO         2521    .text.maixcam_tick_inner  maixcam.o
-    0x0800ab14   0x0800ab14   0x00000064   Code   RO         2497    .text.maixcam_tx_start_next  maixcam.o
-    0x0800ab78   0x0800ab78   0x00000030   Code   RO         2499    .text.maixcam_uart_tx_complete  maixcam.o
-    0x0800aba8   0x0800aba8   0x000000a4   Code   RO         2495    .text.maixcam_uart_tx_enqueue  maixcam.o
-    0x0800ac4c   0x0800ac4c   0x0000008a   Code   RO         2519    .text.mc_feed_byte  maixcam.o
-    0x0800acd6   0x0800acd6   0x00000002   PAD
-    0x0800acd8   0x0800acd8   0x00000078   Code   RO         2525    .text.mc_frame_ready  maixcam.o
-    0x0800ad50   0x0800ad50   0x00000028   Code   RO         2630    .text.normalize_gray_data  gw_analogue.o
-    0x0800ad78   0x0800ad78   0x00000044   Code   RO         2632    .text.normalize_gray_weight  gw_analogue.o
-    0x0800adbc   0x0800adbc   0x0000002c   Code   RO         2531    .text.parse_ack_frame  maixcam.o
-    0x0800ade8   0x0800ade8   0x00000086   Code   RO         2533    .text.parse_fixed1  maixcam.o
-    0x0800ae6e   0x0800ae6e   0x00000002   PAD
-    0x0800ae70   0x0800ae70   0x00000080   Code   RO         2236    .text.parse_uart_pid_byte  uart_it.o
-    0x0800aef0   0x0800aef0   0x000000a6   Code   RO         2527    .text.parse_vd_frame  maixcam.o
-    0x0800af96   0x0800af96   0x00000002   PAD
-    0x0800af98   0x0800af98   0x000000b6   Code   RO         2529    .text.parse_vl_frame  maixcam.o
-    0x0800b04e   0x0800b04e   0x00000002   PAD
-    0x0800b050   0x0800b050   0x0000001e   Code   RO         2894    .text.pid_reset_state  pid.o
-    0x0800b06e   0x0800b06e   0x00000002   PAD
-    0x0800b070   0x0800b070   0x00000028   Code   RO         2638    .text.road_decision  gw_analogue.o
-    0x0800b098   0x0800b098   0x0000000e   Code   RO         2636    .text.road_new_from_bit  gw_analogue.o
-    0x0800b0a6   0x0800b0a6   0x00000002   PAD
-    0x0800b0a8   0x0800b0a8   0x0000002c   Code   RO         2921    .text.scurve_dq     car_speed_profile.o
-    0x0800b0d4   0x0800b0d4   0x0000002e   Code   RO         2919    .text.scurve_q      car_speed_profile.o
-    0x0800b102   0x0800b102   0x00000002   PAD
-    0x0800b104   0x0800b104   0x0000004c   Code   RO         2622    .text.select_channel  gw_analogue.o
-    0x0800b150   0x0800b150   0x00000066   Code   RO         2640    .text.serve_road    gw_analogue.o
-    0x0800b1b6   0x0800b1b6   0x00000002   PAD
-    0x0800b1b8   0x0800b1b8   0x00000096   Code   RO         2113    .text.server_button  button.o
-    0x0800b24e   0x0800b24e   0x00000002   PAD
-    0x0800b250   0x0800b250   0x00000116   Code   RO         2789    .text.set_wheel_dir  wheel.o
-    0x0800b366   0x0800b366   0x00000002   PAD
-    0x0800b368   0x0800b368   0x0000005e   Code   RO         2220    .text.stepper_publish_absolute  uart_it.o
-    0x0800b3c6   0x0800b3c6   0x00000002   PAD
-    0x0800b3c8   0x0800b3c8   0x000000a6   Code   RO         2224    .text.stepper_service  uart_it.o
-    0x0800b46e   0x0800b46e   0x00000002   PAD
-    0x0800b470   0x0800b470   0x00000036   Code   RO         2222    .text.stepper_target_disable  uart_it.o
-    0x0800b4a6   0x0800b4a6   0x00000002   PAD
-    0x0800b4a8   0x0800b4a8   0x000000da   Code   RO         2313    .text.task4_debug_flush  defect.o
-    0x0800b582   0x0800b582   0x00000002   PAD
-    0x0800b584   0x0800b584   0x00000074   Code   RO         2315    .text.task7_flush   defect.o
-    0x0800b5f8   0x0800b5f8   0x00000154   Code   RO         2317    .text.task7_flush_one  defect.o
-    0x0800b74c   0x0800b74c   0x00000004   Code   RO         2347    .text.task7_tx      defect.o
-    0x0800b750   0x0800b750   0x00000004   Code   RO         2329    .text.task_finish   defect.o
-    0x0800b754   0x0800b754   0x00000012   Code   RO         2323    .text.task_select   defect.o
-    0x0800b766   0x0800b766   0x00000002   PAD
-    0x0800b768   0x0800b768   0x000000a4   Code   RO         2325    .text.task_start    defect.o
-    0x0800b80c   0x0800b80c   0x00000066   Code   RO         2327    .text.task_stop     defect.o
-    0x0800b872   0x0800b872   0x00000002   PAD
-    0x0800b874   0x0800b874   0x00000010   Code   RO           13    .text.uart1_tx      lora.o
-    0x0800b884   0x0800b884   0x0000005c   Code   RO         2470    .text.uart_gyr_ensure_receive  uart_gyro.o
-    0x0800b8e0   0x0800b8e0   0x00000018   Code   RO         2460    .text.uart_gyr_init  uart_gyro.o
-    0x0800b8f8   0x0800b8f8   0x000000a4   Code   RO         2466    .text.uart_gyr_rx_feed  uart_gyro.o
-    0x0800b99c   0x0800b99c   0x0000005c   Code   RO         2468    .text.uart_gyr_start_receive  uart_gyro.o
-    0x0800b9f8   0x0800b9f8   0x000001fc   Code   RO         2290    .text.update_status  status.o
-    0x0800bbf4   0x0800bbf4   0x000000aa   Code   RO         2331    .text.update_task   defect.o
-    0x0800bc9e   0x0800bc9e   0x00000002   PAD
-    0x0800bca0   0x0800bca0   0x0000001e   Code   RO         2321    .text.update_task_led  defect.o
-    0x0800bcbe   0x0800bcbe   0x00000002   PAD
-    0x0800bcc0   0x0800bcc0   0x00000012   Code   RO         2793    .text.wheel_ff_index  wheel.o
-    0x0800bcd2   0x0800bcd2   0x00000002   PAD
-    0x0800bcd4   0x0800bcd4   0x00000030   Code   RO         3218    i.__0snprintf       mc_w.l(printfa.o)
-    0x0800bd04   0x0800bd04   0x00000028   Code   RO         3219    i.__0sprintf        mc_w.l(printfa.o)
-    0x0800bd2c   0x0800bd2c   0x0000000e   Code   RO         2951    i.__hardfp__fabsf   m_wm.l(fabsf.o)
-    0x0800bd3a   0x0800bd3a   0x00000006   PAD
-    0x0800bd40   0x0800bd40   0x00000038   Code   RO         2945    i.__hardfp_atof     m_wm.l(atof.o)
-    0x0800bd78   0x0800bd78   0x0000000e   Code   RO         2969    i.__hardfp_fabsf    m_wm.l(fabsfc99.o)
-    0x0800bd86   0x0800bd86   0x0000003a   Code   RO         2957    i.__hardfp_sqrtf    m_wm.l(sqrtf.o)
-    0x0800bdc0   0x0800bdc0   0x0000000c   Code   RO         3305    i.__read_errno      mc_w.l(errno.o)
-    0x0800bdcc   0x0800bdcc   0x0000000e   Code   RO         3373    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x0800bdda   0x0800bdda   0x00000002   Code   RO         3374    i.__scatterload_null  mc_w.l(handlers.o)
-    0x0800bddc   0x0800bddc   0x0000000e   Code   RO         3375    i.__scatterload_zeroinit  mc_w.l(handlers.o)
-    0x0800bdea   0x0800bdea   0x00000002   PAD
-    0x0800bdec   0x0800bdec   0x0000000c   Code   RO         3306    i.__set_errno       mc_w.l(errno.o)
-    0x0800bdf8   0x0800bdf8   0x00000184   Code   RO         3224    i._fp_digits        mc_w.l(printfa.o)
-    0x0800bf7c   0x0800bf7c   0x0000000e   Code   RO         3358    i._is_digit         mc_w.l(scanf_fp.o)
-    0x0800bf8a   0x0800bf8a   0x00000002   PAD
-    0x0800bf8c   0x0800bf8c   0x000006dc   Code   RO         3225    i._printf_core      mc_w.l(printfa.o)
-    0x0800c668   0x0800c668   0x00000024   Code   RO         3226    i._printf_post_padding  mc_w.l(printfa.o)
-    0x0800c68c   0x0800c68c   0x0000002e   Code   RO         3227    i._printf_pre_padding  mc_w.l(printfa.o)
-    0x0800c6ba   0x0800c6ba   0x00000016   Code   RO         3228    i._snputc           mc_w.l(printfa.o)
-    0x0800c6d0   0x0800c6d0   0x0000000a   Code   RO         3229    i._sputc            mc_w.l(printfa.o)
-    0x0800c6da   0x0800c6da   0x00000081   Data   RO         3329    .constdata          mc_w.l(ctype_o.o)
-    0x0800c75b   0x0800c75b   0x00000001   PAD
-    0x0800c75c   0x0800c75c   0x00000004   Data   RO         3330    .constdata          mc_w.l(ctype_o.o)
-    0x0800c760   0x0800c760   0x00000010   Data   RO         2100    .rodata.AHBPrescTable  system_stm32g4xx.o
-    0x0800c770   0x0800c770   0x00000008   Data   RO         2101    .rodata.APBPrescTable  system_stm32g4xx.o
-    0x0800c778   0x0800c778   0x00000018   Data   RO         2038    .rodata.UARTPrescTable  stm32g4xx_hal_uart.o
-    0x0800c790   0x0800c790   0x00009304   Data   RO         2808    .rodata.g_ball_mechanism_lut  ball_mechanism_lut.o
-    0x08015a94   0x08015a94   0x00000020   Data   RO         3371    Region$$Table       anon$$obj.o
+    0x08008500   0x08008500   0x0000007c   Code   RO         2380    .text.ball_control_init  ball_control.o
+    0x0800857c   0x0800857c   0x00000068   Code   RO         2382    .text.ball_control_request  ball_control.o
+    0x080085e4   0x080085e4   0x00000400   Code   RO         2386    .text.ball_control_service  ball_control.o
+    0x080089e4   0x080089e4   0x00000030   Code   RO         2392    .text.ball_fall_ratio  ball_control.o
+    0x08008a14   0x08008a14   0x000000e0   Code   RO         2394    .text.ball_find_relative_pulse  ball_control.o
+    0x08008af4   0x08008af4   0x00000090   Code   RO         2398    .text.ball_model_accel  ball_control.o
+    0x08008b84   0x08008b84   0x00000044   Code   RO         2388    .text.ball_request_snapshot  ball_control.o
+    0x08008bc8   0x08008bc8   0x0000002c   Code   RO         2918    .text.car_speed_profile_init  car_speed_profile.o
+    0x08008bf4   0x08008bf4   0x00000012   Code   RO         2920    .text.car_speed_profile_reset  car_speed_profile.o
+    0x08008c06   0x08008c06   0x00000002   PAD
+    0x08008c08   0x08008c08   0x00000084   Code   RO         2922    .text.car_speed_profile_start  car_speed_profile.o
+    0x08008c8c   0x08008c8c   0x000000e0   Code   RO         2926    .text.car_speed_profile_step  car_speed_profile.o
+    0x08008d6c   0x08008d6c   0x0000009e   Code   RO         2924    .text.car_speed_profile_update_measurement  car_speed_profile.o
+    0x08008e0a   0x08008e0a   0x00000002   PAD
+    0x08008e0c   0x08008e0c   0x000000e0   Code   RO         2901    .text.compute_pid   pid.o
+    0x08008eec   0x08008eec   0x00000004   PAD
+    0x08008ef0   0x08008ef0   0x000001c0   Code   RO         2635    .text.correct_gw_analogue  gw_analogue.o
+    0x080090b0   0x080090b0   0x0000002c   Code   RO         2146    .text.driver_BUZZER  buzzer.o
+    0x080090dc   0x080090dc   0x00000080   Code   RO         2131    .text.driver_LED    led.o
+    0x0800915c   0x0800915c   0x000000bc   Code   RO         2115    .text.driver_button  button.o
+    0x08009218   0x08009218   0x00000024   Code   RO         2653    .text.driver_gw_analogue  gw_analogue.o
+    0x0800923c   0x0800923c   0x00000004   PAD
+    0x08009240   0x08009240   0x00000100   Code   RO         2335    .text.driver_task1  defect.o
+    0x08009340   0x08009340   0x000001c8   Code   RO         2337    .text.driver_task2  defect.o
+    0x08009508   0x08009508   0x0000017c   Code   RO         2339    .text.driver_task3  defect.o
+    0x08009684   0x08009684   0x000000c4   Code   RO         2341    .text.driver_task4  defect.o
+    0x08009748   0x08009748   0x00000102   Code   RO         2343    .text.driver_task5  defect.o
+    0x0800984a   0x0800984a   0x00000002   PAD
+    0x0800984c   0x0800984c   0x00000040   Code   RO         2345    .text.driver_task6  defect.o
+    0x0800988c   0x0800988c   0x00000074   Code   RO         2347    .text.driver_task7  defect.o
+    0x08009900   0x08009900   0x00000220   Code   RO         2800    .text.driver_wheel  wheel.o
+    0x08009b20   0x08009b20   0x00000004   Code   RO         2351    .text.fabsf         defect.o
+    0x08009b24   0x08009b24   0x00000004   Code   RO         2390    .text.fabsf         ball_control.o
+    0x08009b28   0x08009b28   0x0000004a   Code   RO         2282    .text.follow_line   status.o
+    0x08009b72   0x08009b72   0x00000002   PAD
+    0x08009b74   0x08009b74   0x00000076   Code   RO         2284    .text.follow_line_task4  status.o
+    0x08009bea   0x08009bea   0x00000002   PAD
+    0x08009bec   0x08009bec   0x00000048   Code   RO           33    .text.gan_init      main.o
+    0x08009c34   0x08009c34   0x0000004c   Code   RO         2637    .text.get_gw_analoge_digital_data  gw_analogue.o
+    0x08009c80   0x08009c80   0x00000090   Code   RO         2643    .text.get_gw_analogue_analogue_diff  gw_analogue.o
+    0x08009d10   0x08009d10   0x0000005c   Code   RO         2633    .text.get_gw_raw_data  gw_analogue.o
+    0x08009d6c   0x08009d6c   0x000000a6   Code   RO         2651    .text.get_road_type  gw_analogue.o
+    0x08009e12   0x08009e12   0x00000002   PAD
+    0x08009e14   0x08009e14   0x0000004e   Code   RO         2796    .text.get_wheel_speed  wheel.o
+    0x08009e62   0x08009e62   0x00000002   PAD
+    0x08009e64   0x08009e64   0x000000d4   Code   RO         2692    .text.gimbal_send   emm_v5.o
+    0x08009f38   0x08009f38   0x00000088   Code   RO         2451    .text.iic_gyr_get_value  gy901.o
+    0x08009fc0   0x08009fc0   0x000000ac   Code   RO         2443    .text.iic_gyr_init  gy901.o
+    0x0800a06c   0x0800a06c   0x0000004a   Code   RO         2449    .text.iic_gyr_read_dma  gy901.o
+    0x0800a0b6   0x0800a0b6   0x00000002   PAD
+    0x0800a0b8   0x0800a0b8   0x0000000c   Code   RO         2148    .text.init_BUZZER   buzzer.o
+    0x0800a0c4   0x0800a0c4   0x0000000a   Code   RO         2133    .text.init_LED      led.o
+    0x0800a0ce   0x0800a0ce   0x00000002   PAD
+    0x0800a0d0   0x0800a0d0   0x00000018   Code   RO         2117    .text.init_button   button.o
+    0x0800a0e8   0x0800a0e8   0x00000056   Code   RO         2264    .text.init_device   status.o
+    0x0800a13e   0x0800a13e   0x00000002   PAD
+    0x0800a140   0x0800a140   0x0000008e   Code   RO         2629    .text.init_gw_analogue  gw_analogue.o
+    0x0800a1ce   0x0800a1ce   0x00000002   PAD
+    0x0800a1d0   0x0800a1d0   0x00000038   Code   RO         2230    .text.init_maixcam_uart  uart_it.o
+    0x0800a208   0x0800a208   0x00000064   Code   RO         2262    .text.init_motor    status.o
+    0x0800a26c   0x0800a26c   0x00000020   Code   RO         2899    .text.init_pid      pid.o
+    0x0800a28c   0x0800a28c   0x0000000c   Code   RO         2627    .text.init_road_cnt  gw_analogue.o
+    0x0800a298   0x0800a298   0x0000000e   Code   RO         2625    .text.init_road_determine  gw_analogue.o
+    0x0800a2a6   0x0800a2a6   0x00000002   PAD
+    0x0800a2a8   0x0800a2a8   0x00000018   Code   RO         2266    .text.init_sensor   status.o
+    0x0800a2c0   0x0800a2c0   0x000000e0   Code   RO         2783    .text.init_servo    servo.o
+    0x0800a3a0   0x0800a3a0   0x0000001c   Code   RO         2268    .text.init_state    status.o
+    0x0800a3bc   0x0800a3bc   0x00000054   Code   RO         2278    .text.init_status   status.o
+    0x0800a410   0x0800a410   0x00000180   Code   RO         2270    .text.init_status_pid  status.o
+    0x0800a590   0x0800a590   0x00000048   Code   RO         2226    .text.init_stepper_uart  uart_it.o
+    0x0800a5d8   0x0800a5d8   0x00000022   Code   RO         2321    .text.init_task     defect.o
+    0x0800a5fa   0x0800a5fa   0x00000002   PAD
+    0x0800a5fc   0x0800a5fc   0x0000001e   Code   RO         2228    .text.init_uart_gyr  uart_it.o
+    0x0800a61a   0x0800a61a   0x00000002   PAD
+    0x0800a61c   0x0800a61c   0x00000016   Code   RO         2216    .text.init_uart_pid_tune  uart_it.o
+    0x0800a632   0x0800a632   0x00000002   PAD
+    0x0800a634   0x0800a634   0x0000023c   Code   RO         2804    .text.init_wheel    wheel.o
+    0x0800a870   0x0800a870   0x000000a4   Code   RO         2286    .text.keep_angle    status.o
+    0x0800a914   0x0800a914   0x0000004c   Code   RO         2288    .text.keep_balance  status.o
+    0x0800a960   0x0800a960   0x00000154   Code   RO           29    .text.main          main.o
+    0x0800aab4   0x0800aab4   0x00000014   Code   RO         2516    .text.maixcam_cmd_CDA  maixcam.o
+    0x0800aac8   0x0800aac8   0x00000034   Code   RO         2514    .text.maixcam_cmd_D  maixcam.o
+    0x0800aafc   0x0800aafc   0x0000002c   Code   RO         2518    .text.maixcam_cmd_M  maixcam.o
+    0x0800ab28   0x0800ab28   0x00000034   Code   RO         2510    .text.maixcam_cmd_T  maixcam.o
+    0x0800ab5c   0x0800ab5c   0x00000020   Code   RO         2522    .text.maixcam_cmd_done  maixcam.o
+    0x0800ab7c   0x0800ab7c   0x00000078   Code   RO         2500    .text.maixcam_init  maixcam.o
+    0x0800abf4   0x0800abf4   0x0000004a   Code   RO         2524    .text.maixcam_poll  maixcam.o
+    0x0800ac3e   0x0800ac3e   0x00000002   PAD
+    0x0800ac40   0x0800ac40   0x00000030   Code   RO         2502    .text.maixcam_rx_feed  maixcam.o
+    0x0800ac70   0x0800ac70   0x00000036   Code   RO         2526    .text.maixcam_rx_read  maixcam.o
+    0x0800aca6   0x0800aca6   0x00000002   PAD
+    0x0800aca8   0x0800aca8   0x0000001e   Code   RO         2532    .text.maixcam_send_frame  maixcam.o
+    0x0800acc6   0x0800acc6   0x00000002   PAD
+    0x0800acc8   0x0800acc8   0x0000004a   Code   RO         2512    .text.maixcam_start_cmd  maixcam.o
+    0x0800ad12   0x0800ad12   0x00000002   PAD
+    0x0800ad14   0x0800ad14   0x00000044   Code   RO         2530    .text.maixcam_tick_inner  maixcam.o
+    0x0800ad58   0x0800ad58   0x00000064   Code   RO         2506    .text.maixcam_tx_start_next  maixcam.o
+    0x0800adbc   0x0800adbc   0x00000030   Code   RO         2508    .text.maixcam_uart_tx_complete  maixcam.o
+    0x0800adec   0x0800adec   0x000000a4   Code   RO         2504    .text.maixcam_uart_tx_enqueue  maixcam.o
+    0x0800ae90   0x0800ae90   0x0000008a   Code   RO         2528    .text.mc_feed_byte  maixcam.o
+    0x0800af1a   0x0800af1a   0x00000002   PAD
+    0x0800af1c   0x0800af1c   0x00000078   Code   RO         2534    .text.mc_frame_ready  maixcam.o
+    0x0800af94   0x0800af94   0x00000028   Code   RO         2639    .text.normalize_gray_data  gw_analogue.o
+    0x0800afbc   0x0800afbc   0x00000044   Code   RO         2641    .text.normalize_gray_weight  gw_analogue.o
+    0x0800b000   0x0800b000   0x0000002c   Code   RO         2540    .text.parse_ack_frame  maixcam.o
+    0x0800b02c   0x0800b02c   0x00000086   Code   RO         2542    .text.parse_fixed1  maixcam.o
+    0x0800b0b2   0x0800b0b2   0x00000002   PAD
+    0x0800b0b4   0x0800b0b4   0x00000080   Code   RO         2236    .text.parse_uart_pid_byte  uart_it.o
+    0x0800b134   0x0800b134   0x000000a6   Code   RO         2536    .text.parse_vd_frame  maixcam.o
+    0x0800b1da   0x0800b1da   0x00000002   PAD
+    0x0800b1dc   0x0800b1dc   0x000000b6   Code   RO         2538    .text.parse_vl_frame  maixcam.o
+    0x0800b292   0x0800b292   0x00000002   PAD
+    0x0800b294   0x0800b294   0x0000001e   Code   RO         2903    .text.pid_reset_state  pid.o
+    0x0800b2b2   0x0800b2b2   0x00000002   PAD
+    0x0800b2b4   0x0800b2b4   0x00000028   Code   RO         2647    .text.road_decision  gw_analogue.o
+    0x0800b2dc   0x0800b2dc   0x0000000e   Code   RO         2645    .text.road_new_from_bit  gw_analogue.o
+    0x0800b2ea   0x0800b2ea   0x00000002   PAD
+    0x0800b2ec   0x0800b2ec   0x0000002c   Code   RO         2930    .text.scurve_dq     car_speed_profile.o
+    0x0800b318   0x0800b318   0x0000002e   Code   RO         2928    .text.scurve_q      car_speed_profile.o
+    0x0800b346   0x0800b346   0x00000002   PAD
+    0x0800b348   0x0800b348   0x0000004c   Code   RO         2631    .text.select_channel  gw_analogue.o
+    0x0800b394   0x0800b394   0x00000066   Code   RO         2649    .text.serve_road    gw_analogue.o
+    0x0800b3fa   0x0800b3fa   0x00000002   PAD
+    0x0800b3fc   0x0800b3fc   0x00000096   Code   RO         2113    .text.server_button  button.o
+    0x0800b492   0x0800b492   0x00000002   PAD
+    0x0800b494   0x0800b494   0x00000116   Code   RO         2798    .text.set_wheel_dir  wheel.o
+    0x0800b5aa   0x0800b5aa   0x00000002   PAD
+    0x0800b5ac   0x0800b5ac   0x0000005e   Code   RO         2220    .text.stepper_publish_absolute  uart_it.o
+    0x0800b60a   0x0800b60a   0x00000002   PAD
+    0x0800b60c   0x0800b60c   0x000000a6   Code   RO         2224    .text.stepper_service  uart_it.o
+    0x0800b6b2   0x0800b6b2   0x00000002   PAD
+    0x0800b6b4   0x0800b6b4   0x00000036   Code   RO         2222    .text.stepper_target_disable  uart_it.o
+    0x0800b6ea   0x0800b6ea   0x00000002   PAD
+    0x0800b6ec   0x0800b6ec   0x000000ea   Code   RO         2313    .text.task3_debug_flush  defect.o
+    0x0800b7d6   0x0800b7d6   0x00000002   PAD
+    0x0800b7d8   0x0800b7d8   0x000000da   Code   RO         2315    .text.task4_debug_flush  defect.o
+    0x0800b8b2   0x0800b8b2   0x00000002   PAD
+    0x0800b8b4   0x0800b8b4   0x00000074   Code   RO         2317    .text.task7_flush   defect.o
+    0x0800b928   0x0800b928   0x00000154   Code   RO         2319    .text.task7_flush_one  defect.o
+    0x0800ba7c   0x0800ba7c   0x00000004   Code   RO         2349    .text.task7_tx      defect.o
+    0x0800ba80   0x0800ba80   0x00000004   Code   RO         2331    .text.task_finish   defect.o
+    0x0800ba84   0x0800ba84   0x00000012   Code   RO         2325    .text.task_select   defect.o
+    0x0800ba96   0x0800ba96   0x00000002   PAD
+    0x0800ba98   0x0800ba98   0x000000a4   Code   RO         2327    .text.task_start    defect.o
+    0x0800bb3c   0x0800bb3c   0x00000066   Code   RO         2329    .text.task_stop     defect.o
+    0x0800bba2   0x0800bba2   0x00000002   PAD
+    0x0800bba4   0x0800bba4   0x00000010   Code   RO           13    .text.uart1_tx      lora.o
+    0x0800bbb4   0x0800bbb4   0x0000005c   Code   RO         2479    .text.uart_gyr_ensure_receive  uart_gyro.o
+    0x0800bc10   0x0800bc10   0x00000018   Code   RO         2469    .text.uart_gyr_init  uart_gyro.o
+    0x0800bc28   0x0800bc28   0x000000a4   Code   RO         2475    .text.uart_gyr_rx_feed  uart_gyro.o
+    0x0800bccc   0x0800bccc   0x0000005c   Code   RO         2477    .text.uart_gyr_start_receive  uart_gyro.o
+    0x0800bd28   0x0800bd28   0x000001fc   Code   RO         2290    .text.update_status  status.o
+    0x0800bf24   0x0800bf24   0x000000aa   Code   RO         2333    .text.update_task   defect.o
+    0x0800bfce   0x0800bfce   0x00000002   PAD
+    0x0800bfd0   0x0800bfd0   0x0000001e   Code   RO         2323    .text.update_task_led  defect.o
+    0x0800bfee   0x0800bfee   0x00000002   PAD
+    0x0800bff0   0x0800bff0   0x00000012   Code   RO         2802    .text.wheel_ff_index  wheel.o
+    0x0800c002   0x0800c002   0x00000002   PAD
+    0x0800c004   0x0800c004   0x00000030   Code   RO         3227    i.__0snprintf       mc_w.l(printfa.o)
+    0x0800c034   0x0800c034   0x00000028   Code   RO         3228    i.__0sprintf        mc_w.l(printfa.o)
+    0x0800c05c   0x0800c05c   0x0000000e   Code   RO         2960    i.__hardfp__fabsf   m_wm.l(fabsf.o)
+    0x0800c06a   0x0800c06a   0x00000006   PAD
+    0x0800c070   0x0800c070   0x00000038   Code   RO         2954    i.__hardfp_atof     m_wm.l(atof.o)
+    0x0800c0a8   0x0800c0a8   0x0000000e   Code   RO         2978    i.__hardfp_fabsf    m_wm.l(fabsfc99.o)
+    0x0800c0b6   0x0800c0b6   0x0000003a   Code   RO         2966    i.__hardfp_sqrtf    m_wm.l(sqrtf.o)
+    0x0800c0f0   0x0800c0f0   0x0000000c   Code   RO         3314    i.__read_errno      mc_w.l(errno.o)
+    0x0800c0fc   0x0800c0fc   0x0000000e   Code   RO         3382    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x0800c10a   0x0800c10a   0x00000002   Code   RO         3383    i.__scatterload_null  mc_w.l(handlers.o)
+    0x0800c10c   0x0800c10c   0x0000000e   Code   RO         3384    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x0800c11a   0x0800c11a   0x00000002   PAD
+    0x0800c11c   0x0800c11c   0x0000000c   Code   RO         3315    i.__set_errno       mc_w.l(errno.o)
+    0x0800c128   0x0800c128   0x00000184   Code   RO         3233    i._fp_digits        mc_w.l(printfa.o)
+    0x0800c2ac   0x0800c2ac   0x0000000e   Code   RO         3367    i._is_digit         mc_w.l(scanf_fp.o)
+    0x0800c2ba   0x0800c2ba   0x00000002   PAD
+    0x0800c2bc   0x0800c2bc   0x000006dc   Code   RO         3234    i._printf_core      mc_w.l(printfa.o)
+    0x0800c998   0x0800c998   0x00000024   Code   RO         3235    i._printf_post_padding  mc_w.l(printfa.o)
+    0x0800c9bc   0x0800c9bc   0x0000002e   Code   RO         3236    i._printf_pre_padding  mc_w.l(printfa.o)
+    0x0800c9ea   0x0800c9ea   0x00000016   Code   RO         3237    i._snputc           mc_w.l(printfa.o)
+    0x0800ca00   0x0800ca00   0x0000000a   Code   RO         3238    i._sputc            mc_w.l(printfa.o)
+    0x0800ca0a   0x0800ca0a   0x00000081   Data   RO         3338    .constdata          mc_w.l(ctype_o.o)
+    0x0800ca8b   0x0800ca8b   0x00000001   PAD
+    0x0800ca8c   0x0800ca8c   0x00000004   Data   RO         3339    .constdata          mc_w.l(ctype_o.o)
+    0x0800ca90   0x0800ca90   0x00000010   Data   RO         2100    .rodata.AHBPrescTable  system_stm32g4xx.o
+    0x0800caa0   0x0800caa0   0x00000008   Data   RO         2101    .rodata.APBPrescTable  system_stm32g4xx.o
+    0x0800caa8   0x0800caa8   0x00000018   Data   RO         2038    .rodata.UARTPrescTable  stm32g4xx_hal_uart.o
+    0x0800cac0   0x0800cac0   0x00009304   Data   RO         2817    .rodata.g_ball_mechanism_lut  ball_mechanism_lut.o
+    0x08015dc4   0x08015dc4   0x00000020   Data   RO         3380    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08015ab8, Size: 0x000016c0, Max: 0x00020000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08015de8, Size: 0x000016e8, Max: 0x00020000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   0x08015ab8   0x00000004   Data   RW         3307    .data               mc_w.l(errno.o)
-    0x20000004   0x08015abc   0x00000004   Data   RW         2099    .data.SystemCoreClock  system_stm32g4xx.o
-    0x20000008   0x08015ac0   0x00000002   Data   RW           37    .data.cmd_speed     main.o
-    0x2000000a   0x08015ac2   0x00000002   PAD
-    0x2000000c   0x08015ac4   0x00000020   Data   RW         2646    .data.distance      gw_analogue.o
-    0x2000002c   0x08015ae4   0x00000004   Data   RW          630    .data.uwTickFreq    stm32g4xx_hal.o
-    0x20000030   0x08015ae8   0x00000004   Data   RW          629    .data.uwTickPrio    stm32g4xx_hal.o
-    0x20000034   0x08015aec   0x00000004   PAD
+    0x20000000   0x08015de8   0x00000004   Data   RW         3316    .data               mc_w.l(errno.o)
+    0x20000004   0x08015dec   0x00000004   Data   RW         2099    .data.SystemCoreClock  system_stm32g4xx.o
+    0x20000008   0x08015df0   0x00000002   Data   RW           37    .data.cmd_speed     main.o
+    0x2000000a   0x08015df2   0x00000002   PAD
+    0x2000000c   0x08015df4   0x00000020   Data   RW         2655    .data.distance      gw_analogue.o
+    0x2000002c   0x08015e14   0x00000004   Data   RW          630    .data.uwTickFreq    stm32g4xx_hal.o
+    0x20000030   0x08015e18   0x00000004   Data   RW          629    .data.uwTickPrio    stm32g4xx_hal.o
+    0x20000034   0x08015e1c   0x00000004   PAD
     0x20000038        -       0x00000004   Zero   RW           75    .bss.HAL_RCC_ADC345_CLK_ENABLED  adc.o
     0x2000003c        -       0x00000004   Zero   RW         2249    .bss.HAL_UART_RxCpltCallback.buf  uart_it.o
     0x20000040        -       0x00000001   Zero   RW         2250    .bss.HAL_UART_RxCpltCallback.idx  uart_it.o
-    0x20000041   0x08015aec   0x00000003   PAD
-    0x20000044        -       0x00000004   Zero   RW         2476    .bss.active_gyro    uart_gyro.o
-    0x20000048        -       0x00000001   Zero   RW         2647    .bss.cross_cnt      gw_analogue.o
-    0x20000049   0x08015aec   0x00000003   PAD
-    0x2000004c        -       0x00000004   Zero   RW         2357    .bss.driver_task1.last_pos_mm  defect.o
-    0x20000050        -       0x00000004   Zero   RW         2359    .bss.driver_task1.last_print  defect.o
-    0x20000054        -       0x00000004   Zero   RW         2358    .bss.driver_task1.last_ts_ms  defect.o
-    0x20000058        -       0x00000001   Zero   RW         2360    .bss.driver_task3.q3_state  defect.o
-    0x20000059   0x08015aec   0x00000003   PAD
-    0x2000005c        -       0x00000004   Zero   RW         2361    .bss.driver_task4.last  defect.o
-    0x20000060        -       0x00000001   Zero   RW         2362    .bss.driver_task5.q5_state  defect.o
-    0x20000061   0x08015aec   0x00000003   PAD
-    0x20000064        -       0x00000004   Zero   RW         2363    .bss.driver_task5.q5_t0  defect.o
-    0x20000068        -       0x00000001   Zero   RW           15    .bss.esp8266_ready  lora.o
-    0x20000069        -       0x0000000d   Zero   RW         2711    .bss.gimbal_abs_tx_buf  emm_v5.o
-    0x20000076        -       0x00000014   Zero   RW         2712    .bss.gimbal_tx_buf  emm_v5.o
-    0x2000008a        -       0x00000001   Zero   RW         2445    .bss.gyro_dma_busy  gy901.o
-    0x2000008b        -       0x00000001   Zero   RW         2444    .bss.gyro_dma_ready  gy901.o
-    0x2000008c        -       0x0000006c   Zero   RW           73    .bss.hadc3          adc.o
-    0x200000f8        -       0x0000006c   Zero   RW           74    .bss.hadc5          adc.o
-    0x20000164        -       0x00000060   Zero   RW          107    .bss.hdma_i2c1_rx   i2c.o
-    0x200001c4        -       0x00000060   Zero   RW          202    .bss.hdma_uart4_rx  usart.o
-    0x20000224        -       0x00000060   Zero   RW          203    .bss.hdma_uart4_tx  usart.o
-    0x20000284        -       0x00000060   Zero   RW          204    .bss.hdma_usart3_tx  usart.o
-    0x200002e4        -       0x0000004c   Zero   RW          106    .bss.hi2c1          i2c.o
-    0x20000330        -       0x00000064   Zero   RW          125    .bss.hspi1          spi.o
-    0x20000394        -       0x0000004c   Zero   RW          167    .bss.htim1          tim.o
-    0x200003e0        -       0x0000004c   Zero   RW          174    .bss.htim15         tim.o
-    0x2000042c        -       0x0000004c   Zero   RW          168    .bss.htim2          tim.o
-    0x20000478        -       0x0000004c   Zero   RW          169    .bss.htim3          tim.o
-    0x200004c4        -       0x0000004c   Zero   RW          170    .bss.htim4          tim.o
-    0x20000510        -       0x0000004c   Zero   RW          171    .bss.htim5          tim.o
-    0x2000055c        -       0x0000004c   Zero   RW          172    .bss.htim6          tim.o
-    0x200005a8        -       0x0000004c   Zero   RW          173    .bss.htim8          tim.o
-    0x200005f4        -       0x00000090   Zero   RW          199    .bss.huart1         usart.o
-    0x20000684        -       0x00000090   Zero   RW          200    .bss.huart2         usart.o
-    0x20000714        -       0x00000090   Zero   RW          201    .bss.huart3         usart.o
-    0x200007a4        -       0x00000090   Zero   RW          198    .bss.huart4         usart.o
-    0x20000834        -       0x00000004   Zero   RW         2447    .bss.iic_gyr_dma_complete_tick  gy901.o
-    0x20000838        -       0x00000004   Zero   RW         2448    .bss.iic_gyr_dma_error_count  gy901.o
-    0x2000083c        -       0x00000001   Zero   RW         2446    .bss.iic_gyr_initial_ready  gy901.o
-    0x2000083d   0x08015aec   0x00000003   PAD
-    0x20000840        -       0x00000004   Zero   RW           39    .bss.main.Gray_ADC_Update_nxt  main.o
-    0x20000844        -       0x00000004   Zero   RW           38    .bss.main.maixcam_poll_next  main.o
-    0x20000848        -       0x00000015   Zero   RW         2539    .bss.maixcam_cmd    maixcam.o
-    0x2000085d   0x08015aec   0x00000003   PAD
-    0x20000860        -       0x00000018   Zero   RW         2536    .bss.maixcam_det    maixcam.o
-    0x20000878        -       0x00000001   Zero   RW         2546    .bss.maixcam_det_new  maixcam.o
-    0x20000879        -       0x00000080   Zero   RW         2247    .bss.maixcam_dma_buf  uart_it.o
-    0x200008f9   0x08015aec   0x00000001   PAD
-    0x200008fa        -       0x00000002   Zero   RW         2246    .bss.maixcam_dma_pos  uart_it.o
-    0x200008fc        -       0x00000010   Zero   RW         2537    .bss.maixcam_loc    maixcam.o
-    0x2000090c        -       0x00000001   Zero   RW         2538    .bss.maixcam_loc_new  maixcam.o
-    0x2000090d   0x08015aec   0x00000001   PAD
-    0x2000090e        -       0x00000086   Zero   RW         2535    .bss.maixcam_rx     maixcam.o
-    0x20000994        -       0x00000040   Zero   RW         2547    .bss.maixcam_rx_raw_buf  maixcam.o
-    0x200009d4        -       0x00000001   Zero   RW         2548    .bss.maixcam_rx_raw_ready  maixcam.o
-    0x200009d5        -       0x00000001   Zero   RW         2542    .bss.maixcam_tx_busy  maixcam.o
-    0x200009d6        -       0x00000001   Zero   RW         2540    .bss.maixcam_tx_head  maixcam.o
-    0x200009d7   0x08015aec   0x00000001   PAD
-    0x200009d8        -       0x00000410   Zero   RW         2543    .bss.maixcam_tx_queue  maixcam.o
-    0x20000de8        -       0x00000001   Zero   RW         2541    .bss.maixcam_tx_tail  maixcam.o
-    0x20000de9        -       0x00000040   Zero   RW         2550    .bss.mc_buf         maixcam.o
-    0x20000e29        -       0x00000001   Zero   RW         2551    .bss.mc_idx         maixcam.o
-    0x20000e2a        -       0x00000001   Zero   RW         2545    .bss.mc_new_detection  maixcam.o
-    0x20000e2b        -       0x00000001   Zero   RW         2549    .bss.mc_ps          maixcam.o
-    0x20000e2c   0x08015aec   0x00000004   PAD
+    0x20000041   0x08015e1c   0x00000003   PAD
+    0x20000044        -       0x00000004   Zero   RW         2485    .bss.active_gyro    uart_gyro.o
+    0x20000048        -       0x00000001   Zero   RW         2656    .bss.cross_cnt      gw_analogue.o
+    0x20000049   0x08015e1c   0x00000003   PAD
+    0x2000004c        -       0x00000004   Zero   RW         2361    .bss.driver_task1.last_pos_mm  defect.o
+    0x20000050        -       0x00000004   Zero   RW         2363    .bss.driver_task1.last_print  defect.o
+    0x20000054        -       0x00000004   Zero   RW         2362    .bss.driver_task1.last_ts_ms  defect.o
+    0x20000058        -       0x00000004   Zero   RW         2365    .bss.driver_task3.last_dbg_seq  defect.o
+    0x2000005c        -       0x00000001   Zero   RW         2364    .bss.driver_task3.q3_state  defect.o
+    0x2000005d   0x08015e1c   0x00000003   PAD
+    0x20000060        -       0x00000004   Zero   RW         2366    .bss.driver_task4.last  defect.o
+    0x20000064        -       0x00000001   Zero   RW         2367    .bss.driver_task5.q5_state  defect.o
+    0x20000065   0x08015e1c   0x00000003   PAD
+    0x20000068        -       0x00000004   Zero   RW         2368    .bss.driver_task5.q5_t0  defect.o
+    0x2000006c        -       0x00000001   Zero   RW           15    .bss.esp8266_ready  lora.o
+    0x2000006d        -       0x0000000d   Zero   RW         2720    .bss.gimbal_abs_tx_buf  emm_v5.o
+    0x2000007a        -       0x00000014   Zero   RW         2721    .bss.gimbal_tx_buf  emm_v5.o
+    0x2000008e        -       0x00000001   Zero   RW         2454    .bss.gyro_dma_busy  gy901.o
+    0x2000008f        -       0x00000001   Zero   RW         2453    .bss.gyro_dma_ready  gy901.o
+    0x20000090        -       0x0000006c   Zero   RW           73    .bss.hadc3          adc.o
+    0x200000fc        -       0x0000006c   Zero   RW           74    .bss.hadc5          adc.o
+    0x20000168        -       0x00000060   Zero   RW          107    .bss.hdma_i2c1_rx   i2c.o
+    0x200001c8        -       0x00000060   Zero   RW          202    .bss.hdma_uart4_rx  usart.o
+    0x20000228        -       0x00000060   Zero   RW          203    .bss.hdma_uart4_tx  usart.o
+    0x20000288        -       0x00000060   Zero   RW          204    .bss.hdma_usart3_tx  usart.o
+    0x200002e8        -       0x0000004c   Zero   RW          106    .bss.hi2c1          i2c.o
+    0x20000334        -       0x00000064   Zero   RW          125    .bss.hspi1          spi.o
+    0x20000398        -       0x0000004c   Zero   RW          167    .bss.htim1          tim.o
+    0x200003e4        -       0x0000004c   Zero   RW          174    .bss.htim15         tim.o
+    0x20000430        -       0x0000004c   Zero   RW          168    .bss.htim2          tim.o
+    0x2000047c        -       0x0000004c   Zero   RW          169    .bss.htim3          tim.o
+    0x200004c8        -       0x0000004c   Zero   RW          170    .bss.htim4          tim.o
+    0x20000514        -       0x0000004c   Zero   RW          171    .bss.htim5          tim.o
+    0x20000560        -       0x0000004c   Zero   RW          172    .bss.htim6          tim.o
+    0x200005ac        -       0x0000004c   Zero   RW          173    .bss.htim8          tim.o
+    0x200005f8        -       0x00000090   Zero   RW          199    .bss.huart1         usart.o
+    0x20000688        -       0x00000090   Zero   RW          200    .bss.huart2         usart.o
+    0x20000718        -       0x00000090   Zero   RW          201    .bss.huart3         usart.o
+    0x200007a8        -       0x00000090   Zero   RW          198    .bss.huart4         usart.o
+    0x20000838        -       0x00000004   Zero   RW         2456    .bss.iic_gyr_dma_complete_tick  gy901.o
+    0x2000083c        -       0x00000004   Zero   RW         2457    .bss.iic_gyr_dma_error_count  gy901.o
+    0x20000840        -       0x00000001   Zero   RW         2455    .bss.iic_gyr_initial_ready  gy901.o
+    0x20000841   0x08015e1c   0x00000003   PAD
+    0x20000844        -       0x00000004   Zero   RW           39    .bss.main.Gray_ADC_Update_nxt  main.o
+    0x20000848        -       0x00000004   Zero   RW           38    .bss.main.maixcam_poll_next  main.o
+    0x2000084c        -       0x00000015   Zero   RW         2548    .bss.maixcam_cmd    maixcam.o
+    0x20000861   0x08015e1c   0x00000003   PAD
+    0x20000864        -       0x00000018   Zero   RW         2545    .bss.maixcam_det    maixcam.o
+    0x2000087c        -       0x00000001   Zero   RW         2555    .bss.maixcam_det_new  maixcam.o
+    0x2000087d        -       0x00000080   Zero   RW         2247    .bss.maixcam_dma_buf  uart_it.o
+    0x200008fd   0x08015e1c   0x00000001   PAD
+    0x200008fe        -       0x00000002   Zero   RW         2246    .bss.maixcam_dma_pos  uart_it.o
+    0x20000900        -       0x00000010   Zero   RW         2546    .bss.maixcam_loc    maixcam.o
+    0x20000910        -       0x00000001   Zero   RW         2547    .bss.maixcam_loc_new  maixcam.o
+    0x20000911   0x08015e1c   0x00000001   PAD
+    0x20000912        -       0x00000086   Zero   RW         2544    .bss.maixcam_rx     maixcam.o
+    0x20000998        -       0x00000040   Zero   RW         2556    .bss.maixcam_rx_raw_buf  maixcam.o
+    0x200009d8        -       0x00000001   Zero   RW         2557    .bss.maixcam_rx_raw_ready  maixcam.o
+    0x200009d9        -       0x00000001   Zero   RW         2551    .bss.maixcam_tx_busy  maixcam.o
+    0x200009da        -       0x00000001   Zero   RW         2549    .bss.maixcam_tx_head  maixcam.o
+    0x200009db   0x08015e1c   0x00000001   PAD
+    0x200009dc        -       0x00000410   Zero   RW         2552    .bss.maixcam_tx_queue  maixcam.o
+    0x20000dec        -       0x00000001   Zero   RW         2550    .bss.maixcam_tx_tail  maixcam.o
+    0x20000ded        -       0x00000040   Zero   RW         2559    .bss.mc_buf         maixcam.o
+    0x20000e2d        -       0x00000001   Zero   RW         2560    .bss.mc_idx         maixcam.o
+    0x20000e2e        -       0x00000001   Zero   RW         2554    .bss.mc_new_detection  maixcam.o
+    0x20000e2f        -       0x00000001   Zero   RW         2558    .bss.mc_ps          maixcam.o
     0x20000e30        -       0x00000400   Zero   RW         2300    .bss.status         status.o
     0x20001230        -       0x00000001   Zero   RW         2245    .bss.stepper_rx_byte  uart_it.o
-    0x20001231   0x08015aec   0x00000003   PAD
-    0x20001234        -       0x00000018   Zero   RW         2352    .bss.task4_dbg_buf  defect.o
-    0x2000124c        -       0x00000001   Zero   RW         2351    .bss.task4_dbg_ready  defect.o
-    0x2000124d   0x08015aec   0x00000003   PAD
-    0x20001250        -       0x00000050   Zero   RW         2356    .bss.task7_cap      defect.o
-    0x200012a0        -       0x00000001   Zero   RW         2353    .bss.task7_cmd_type  defect.o
-    0x200012a1        -       0x00000001   Zero   RW         2355    .bss.task7_dbg_msg_type  defect.o
-    0x200012a2        -       0x00000001   Zero   RW         2354    .bss.task7_rx_msg_type  defect.o
-    0x200012a3        -       0x00000001   Zero   RW         2244    .bss.uart1_pid_byte  uart_it.o
-    0x200012a4        -       0x00000018   Zero   RW         2248    .bss.uart1_pid_rx   uart_it.o
-    0x200012bc        -       0x00000004   Zero   RW          631    .bss.uwTick         stm32g4xx_hal.o
-    0x200012c0        -       0x00000400   Zero   RW            1    STACK               startup_stm32g474xx.o
+    0x20001231   0x08015e1c   0x00000003   PAD
+    0x20001234        -       0x00000020   Zero   RW         2354    .bss.task3_dbg_buf  defect.o
+    0x20001254        -       0x00000001   Zero   RW         2353    .bss.task3_dbg_ready  defect.o
+    0x20001255   0x08015e1c   0x00000003   PAD
+    0x20001258        -       0x00000018   Zero   RW         2356    .bss.task4_dbg_buf  defect.o
+    0x20001270        -       0x00000001   Zero   RW         2355    .bss.task4_dbg_ready  defect.o
+    0x20001271   0x08015e1c   0x00000003   PAD
+    0x20001274        -       0x00000050   Zero   RW         2360    .bss.task7_cap      defect.o
+    0x200012c4        -       0x00000001   Zero   RW         2357    .bss.task7_cmd_type  defect.o
+    0x200012c5        -       0x00000001   Zero   RW         2359    .bss.task7_dbg_msg_type  defect.o
+    0x200012c6        -       0x00000001   Zero   RW         2358    .bss.task7_rx_msg_type  defect.o
+    0x200012c7        -       0x00000001   Zero   RW         2244    .bss.uart1_pid_byte  uart_it.o
+    0x200012c8        -       0x00000018   Zero   RW         2248    .bss.uart1_pid_rx   uart_it.o
+    0x200012e0        -       0x00000004   Zero   RW          631    .bss.uwTick         stm32g4xx_hal.o
+    0x200012e4   0x08015e1c   0x00000004   PAD
+    0x200012e8        -       0x00000400   Zero   RW            1    STACK               startup_stm32g474xx.o
 
 
 ==============================================================================
@@ -7047,12 +7086,12 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
        618          0          0          0        220       8491   adc.o
-      1410         44          0          0          0      11978   ball_control.o
+      1802         52          0          0          0      12957   ball_control.o
          0          0      37636          0          0        794   ball_mechanism_lut.o
        362          0          0          0          0       2374   button.o
         56          0          0          0          0       1554   buzzer.o
        666         16          0          0          0       4310   car_speed_profile.o
-      2750        166          0          0        130      14720   defect.o
+      3164        166          0          0        167      15528   defect.o
        136          0          0          0          0       4027   dma.o
        544          0          0          0         33       6260   emm_v5.o
        378          0          0          0          0       2714   gpio.o
@@ -7062,7 +7101,7 @@ Image component sizes
        138          0          0          0          0       1579   led.o
        192          0          0          0          0       5909   log.o
        300        128          0          0          1       1321   lora.o
-       526         48          0          2          8       3420   main.o
+       530         48          0          2          8       3421   main.o
       1764         32          0          0       1372       9331   maixcam.o
        286          8          0          0          0       1957   pid.o
        224         24          0          0          0       1148   servo.o
@@ -7096,9 +7135,9 @@ Image component sizes
       1490        116          0          0          0       4617   wheel.o
 
     ----------------------------------------------------------------------
-     44948        960      38188         48       5772     467614   Object Totals
+     45764        972      38188         48       5812     469402   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-       356          0          0          2         35          0   (incl. Padding)
+       362          4          0          2         38          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -7170,15 +7209,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     50434       1120      38322         52       5772     468902   Grand Totals
-     50434       1120      38322         52       5772     468902   ELF Image Totals
-     50434       1120      38322         52          0          0   ROM Totals
+     51250       1132      38322         52       5812     470690   Grand Totals
+     51250       1132      38322         52       5812     470690   ELF Image Totals
+     51250       1132      38322         52          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                88756 (  86.68kB)
-    Total RW  Size (RW Data + ZI Data)              5824 (   5.69kB)
-    Total ROM Size (Code + RO Data + RW Data)      88808 (  86.73kB)
+    Total RO  Size (Code + RO Data)                89572 (  87.47kB)
+    Total RW  Size (RW Data + ZI Data)              5864 (   5.73kB)
+    Total ROM Size (Code + RO Data + RW Data)      89624 (  87.52kB)
 
 ==============================================================================
 

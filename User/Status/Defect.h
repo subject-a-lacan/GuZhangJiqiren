@@ -56,4 +56,5 @@ void update_task(STATUS *status);
 void update_task_led(STATUS *status);
 void task7_flush(void);
 void task4_debug_flush(void);
+void task3_debug_flush(void);
 #endif

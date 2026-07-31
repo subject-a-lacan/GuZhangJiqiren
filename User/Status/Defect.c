@@ -49,6 +49,23 @@ static struct {
   char rx_raw[64];
 } task7_cap;
 
+/* task3 debug: ISR writes floats on new vision frame, main loop sends */
+static volatile uint8_t  task3_dbg_ready;
+static volatile float    task3_dbg_buf[8];
+
+void task3_debug_flush(void) {
+  if (!task3_dbg_ready) return;
+  float local[8];
+  uint32_t primask = __get_PRIMASK();
+  __disable_irq();
+  for (uint8_t i = 0; i < 8; i++) local[i] = task3_dbg_buf[i];
+  task3_dbg_ready = 0;
+  if (!primask) __enable_irq();
+  UART_send_justfloat(&huart1, 8,
+    local[0], local[1], local[2], local[3],
+    local[4], local[5], local[6], local[7]);
+}
+
 /* task4 debug: ISR writes floats, main loop sends */
 static volatile uint8_t  task4_dbg_ready;
 static volatile float    task4_dbg_buf[6];
@@ -348,9 +365,12 @@ static void driver_task3(STATUS *status) {
 
   case Q3_WAIT_POS5: {
     float pos = status->control.ball.estimator.position_mm;
+    float vel = status->control.ball.estimator.velocity_mm_s;
     float err = pos - 50.0f;
     if (err < 0.0f) err = -err;
-    if (status->control.ball.estimator.control_ready && err <= 5.0f)
+    if (vel < 0.0f) vel = -vel;
+    if (status->control.ball.estimator.control_ready &&
+        err <= 5.0f && vel <= 12.0f)
       q3_state = Q3_GO_NEG5;
     break;
   }
@@ -362,15 +382,38 @@ static void driver_task3(STATUS *status) {
 
   case Q3_WAIT_NEG5: {
     float pos = status->control.ball.estimator.position_mm;
+    float vel = status->control.ball.estimator.velocity_mm_s;
     float err = pos - (-50.0f);
     if (err < 0.0f) err = -err;
-    if (status->control.ball.estimator.control_ready && err <= 5.0f)
+    if (vel < 0.0f) vel = -vel;
+    if (status->control.ball.estimator.control_ready &&
+        err <= 5.0f && vel <= 12.0f)
       q3_state = Q3_DONE;
     break;
   }
 
   case Q3_DONE:
     break;  /* hold at -5 cm */
+  }
+
+  /* ── debug: per new vision frame, write once ── */
+  {
+    BALL_CONTROL *ball = &status->control.ball;
+    static uint32_t last_dbg_seq;
+    if (ball->estimator.control_ready &&
+        ball->estimator.consumed_sample_seq != last_dbg_seq) {
+      last_dbg_seq = ball->estimator.consumed_sample_seq;
+      /* [0]误差mm [1]P项 [2]D项 [3]I项 [4]总加速度mm/s² [5]脉冲 [6]积分计时s [7]hold_active */
+      task3_dbg_buf[0]  = ball->position_error_mm;
+      task3_dbg_buf[1]  = ball->kp * ball->position_error_mm;
+      task3_dbg_buf[2]  = -ball->kd * ball->estimator.velocity_mm_s;
+      task3_dbg_buf[3]  = ball->integral_accel_mm_s2;
+      task3_dbg_buf[4]  = ball->requested_accel_mm_s2;
+      task3_dbg_buf[5]  = (float)ball->relative_target_pulse;
+      task3_dbg_buf[6]  = ball->stuck_timer_s;
+      task3_dbg_buf[7]  = (float)ball->hold_active;
+      task3_dbg_ready = 1;
+    }
   }
 }
 static void driver_task4(STATUS *status) {
@@ -394,7 +437,9 @@ static void driver_task4(STATUS *status) {
       task4_dbg_buf[2] = status->control.ball.integral_accel_mm_s2;
       task4_dbg_buf[3] = status->control.ball.requested_accel_mm_s2;
       task4_dbg_buf[4] = (float)status->control.ball.relative_target_pulse;
-      task4_dbg_buf[5] = (status->control.ball.stuck_timer_s >= BALL_STUCK_CONFIRM_S) ? 1.0f : 0.0f;
+      /* 0=PD only  1=integral active  2=deadband */
+      task4_dbg_buf[5] = status->control.ball.hold_active ? 2.0f
+        : ((status->control.ball.stuck_timer_s >= BALL_I_CONFIRM_S) ? 1.0f : 0.0f);
       task4_dbg_ready = 1;
     }
   }
