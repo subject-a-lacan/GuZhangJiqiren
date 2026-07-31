@@ -172,6 +172,7 @@ void ball_control_service(STATUS *status) {
   BALL_REQUEST_SNAPSHOT request = ball_request_snapshot(status);
   uint8_t request_changed = request.publish_seq != ball->consumed_request_seq;
   uint8_t vision_changed = vision->sample_seq != ball->estimator.consumed_sample_seq;
+  float dt_s = 0.0f;
 
   if (!request.enabled) {
     ball->estimator.ready = 0;
@@ -219,7 +220,7 @@ void ball_control_service(STATUS *status) {
         ball->consumed_request_seq = request.publish_seq;
         return;
       } else {
-        float dt_s = (float)dt_ms * 0.001f;
+        dt_s = (float)dt_ms * 0.001f;
         float predicted_position = ball->estimator.position_mm +
                                    ball->estimator.velocity_mm_s * dt_s;
         float residual = measured_position_mm - predicted_position;
@@ -238,6 +239,51 @@ void ball_control_service(STATUS *status) {
   ball->position_error_mm = request.target_mm - ball->estimator.position_mm;
   ball->requested_accel_mm_s2 = ball->kp * ball->position_error_mm -
                                 ball->kd * ball->estimator.velocity_mm_s;
+
+  /* Stuck integral: only when ball is stuck away from target */
+  {
+    float e_abs = ball->position_error_mm;
+    if (e_abs < 0.0f) e_abs = -e_abs;
+    float v_abs = ball->estimator.velocity_mm_s;
+    if (v_abs < 0.0f) v_abs = -v_abs;
+
+    if (!ball->hold_active &&
+        e_abs > BALL_STUCK_ERROR_MM &&
+        v_abs < BALL_STUCK_SPEED_MM_S) {
+      ball->stuck_timer_s += dt_s;
+    } else {
+      ball->stuck_timer_s = 0.0f;
+    }
+
+    if (ball->stuck_timer_s >= BALL_STUCK_CONFIRM_S) {
+      ball->integral_accel_mm_s2 += ball->ki * ball->position_error_mm * dt_s;
+      if (ball->integral_accel_mm_s2 > BALL_I_MAX_MM_S2)
+        ball->integral_accel_mm_s2 = BALL_I_MAX_MM_S2;
+      else if (ball->integral_accel_mm_s2 < -BALL_I_MAX_MM_S2)
+        ball->integral_accel_mm_s2 = -BALL_I_MAX_MM_S2;
+    }
+
+    ball->requested_accel_mm_s2 += ball->integral_accel_mm_s2;
+  }
+
+  /* Center hold: freeze stepper when ball is settled */
+  {
+    float e_abs = ball->position_error_mm;
+    if (e_abs < 0.0f) e_abs = -e_abs;
+    float v_abs = ball->estimator.velocity_mm_s;
+    if (v_abs < 0.0f) v_abs = -v_abs;
+
+    if (e_abs <= BALL_HOLD_ERROR_MM && v_abs <= BALL_HOLD_SPEED_MM_S) {
+      ball->hold_timer_s += dt_s;
+    } else {
+      ball->hold_timer_s = 0.0f;
+      ball->hold_active = 0;
+    }
+    if (ball->hold_timer_s >= BALL_HOLD_CONFIRM_S) {
+      ball->hold_active = 1;
+    }
+  }
+
   ball->relative_target_pulse =
       ball_find_relative_pulse(ball->requested_accel_mm_s2,
                                request.car_accel_mm_s2);
@@ -248,7 +294,8 @@ void ball_control_service(STATUS *status) {
   {
     uint32_t primask = __get_PRIMASK();
     __disable_irq();
-    if (status->control.ball.request.enabled &&
+    if (!ball->hold_active &&
+        status->control.ball.request.enabled &&
         status->control.ball.request.publish_seq == request.publish_seq &&
         status->control.ball.request.session_seq == request.session_seq) {
       stepper_publish_absolute(ball->absolute_target_pulse,

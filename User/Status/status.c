@@ -332,6 +332,14 @@ void update_status(STATUS *status) {
     status->task.stop_cmd = 0;
     follow_line_task4(status);
   }
+  if (status->state.motion == TASK_FOUR_STRAIGHT) {
+    status->task.stop_cmd = 0;
+    float base = status->control.car_speed.target_speed_unit;
+    status->motor.wheel[0].tar_speed = base;
+    status->motor.wheel[1].tar_speed = base;
+    status->motor.wheel[2].tar_speed = base;
+    status->motor.wheel[3].tar_speed = base;
+  }
   if (status->state.motion == MOTOR_TEST) {
     status->task.stop_cmd = 0;
     status->state.base_speed = cmd_speed;

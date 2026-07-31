@@ -41,6 +41,7 @@ typedef enum MOTION_STATION {
   BALANCE,
   STRAIGHT,
   FOLLOW_LINE_TASK4,
+  TASK_FOUR_STRAIGHT,
 } MOTION_STATION;
 /*
  * @brief 传感器结构体

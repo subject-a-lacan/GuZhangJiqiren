@@ -1,46 +1,79 @@
-当前二分查表有个危险特性：
+结论：先不要加大 K
+i
+	​
 
-如果加入积分后 requested_accel_mm_s2 变成 NaN 或正无穷，查表同样会直接返回 -2500。
+。先测“启动阈值”，同时观察积分和脉冲有没有饱和。
+K
+i
+	​
 
-而且浮点数中：
+ 只决定积分增长多快；积分限幅才决定最终能不能顶过卡滞。
 
-0×NaN=NaN
+你当前卡住时：
 
-所以即使 Ki=0，只要积分变量或 dt_s已经异常，也不能保证输出恢复正常。
+a
+cmd
+	​
 
-立即在查表前增加：
+=K
+p
+	​
 
-if (!isfinite(ball->requested_accel_mm_s2)) {
-    ball->integral_accel_mm_s2 = 0.0f;
-    return;   /* 不发送新的异常目标，保持上一次命令 */
-}
+e+I
 
-并且注意：如果运行过程中把 Ki改成0，已有积分不会自动消失，只会停止继续积累。必须显式清零：
+其中：
 
-ball->integral_accel_mm_s2 = 0.0f;
+a
+cmd
+	​
 
-至少应在以下位置清零：
+：送入查表的目标加速度；
+e：位置误差；
+I：积分补偿；
+K
+p
+	​
 
-ball_control_init()；
-ball_control_disable()；
-Task4每次重新启动；
-新的 session_seq开始时。
-你现在的VOFA输出根本不足以判断
+：比例系数。
 
-把没有意义的恒定目标值换掉，至少输出：
+设 a
+break
+	​
 
-task4_dbg_buf[0] = ball->estimator.position_mm;
-task4_dbg_buf[1] = ball->estimator.velocity_mm_s;
-task4_dbg_buf[2] = ball->position_error_mm;
-task4_dbg_buf[3] = ball->requested_accel_mm_s2;
-task4_dbg_buf[4] = (float)ball->relative_target_pulse;
+ 是球从静止开始运动所需的最小目标加速度，则必须满足：
 
-如果有积分变量，再加：
+K
+p
+	​
 
-task4_dbg_buf[5] = ball->integral_accel_mm_s2;
+∣e∣+∣I∣≥a
+break
+	​
 
-判断规则非常明确：
+卡住时看这几个量
+position_error_mm
+velocity_mm_s
+integral_accel_mm_s2
+requested_accel_mm_s2
+relative_target_pulse
+integral_enable
+卡住时现象	根因	应该怎么改
+积分停住，但没到限幅	积分条件没有满足	检查积分使能逻辑
+积分已经达到限幅，脉冲还没到边界	积分最大作用不够	增大积分限幅
+积分还在增长，最后能推动，但等待太久	积分增长太慢	小幅增大 K
+i
+	​
 
-requested_accel ≥ 465.3且脉冲为-2500：正常饱和，主要是P+D太大；
-requested_accel = NaN/Inf且脉冲为-2500：积分或时间间隔计算出错；
-requested_accel有限且小于465.3，却仍为-2500：执行一次 CCS 的 Clean Project + Rebuild，检查修改 status.h 后是否存在旧目标文件。
+
+脉冲已经等于 -2500 或 6908	执行器/查表输出饱和	增大 K
+i
+	​
+
+、积分限幅都没用
+总在相同物理位置卡住	导轨局部缺陷、凹坑或摩擦不均	优先处理机械问题
+
+尤其检查你有没有保留类似条件：
+
+error_abs < BALL_CONTROL_I_ERROR_MAX_MM
+
+如果上限还是 30 mm，那么球在误差超过30 mm的位置卡住时，积分会直接停止，这就会表现为“有些地方I项救不回来”。

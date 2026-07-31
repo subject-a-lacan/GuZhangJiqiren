@@ -27,6 +27,56 @@ Project File Date:  08/01/2026
 <h2>Output:</h2>
 *** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'car_control_stm32_project'
+../User/Status/Defect.c(2): warning: In file included from...
+../User/Status/status.h(17): warning: In file included from...
+../User/Tool\car_speed_profile.h(7): warning: 'ENCODER_PPR' macro redefined [-Wmacro-redefined]
+#define ENCODER_PPR         (13)
+        ^
+../User/Tool\pid.h(31): note: previous definition is here
+#define ENCODER_PPR 13                    // <U+7F16><U+7801><U+5668><U+7EBF><U+6570>
+        ^
+../User/Status/Defect.c(2): warning: In file included from...
+../User/Status/status.h(17): warning: In file included from...
+../User/Tool\car_speed_profile.h(9): warning: 'GEAR_RATIO' macro redefined [-Wmacro-redefined]
+#define GEAR_RATIO          (28.0f)
+        ^
+../User/Tool\pid.h(32): note: previous definition is here
+#define GEAR_RATIO 28.0f                  // <U+51CF><U+901F><U+6BD4> 1:28<U+FF08><U+7535><U+673A>:<U+8F66><U+8F6E><U+FF09>
+        ^
+../User/Status/Defect.c(2): warning: In file included from...
+../User/Status/status.h(208): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+3 warnings generated.
+compiling Defect.c...
+../Core/Src/main.c(32): warning: In file included from...
+../User/Status\status.h(17): warning: In file included from...
+../User/Tool\car_speed_profile.h(7): warning: 'ENCODER_PPR' macro redefined [-Wmacro-redefined]
+#define ENCODER_PPR         (13)
+        ^
+../User/Tool\pid.h(31): note: previous definition is here
+#define ENCODER_PPR 13                    // <U+7F16><U+7801><U+5668><U+7EBF><U+6570>
+        ^
+../Core/Src/main.c(32): warning: In file included from...
+../User/Status\status.h(17): warning: In file included from...
+../User/Tool\car_speed_profile.h(9): warning: 'GEAR_RATIO' macro redefined [-Wmacro-redefined]
+#define GEAR_RATIO          (28.0f)
+        ^
+../User/Tool\pid.h(32): note: previous definition is here
+#define GEAR_RATIO 28.0f                  // <U+51CF><U+901F><U+6BD4> 1:28<U+FF08><U+7535><U+673A>:<U+8F66><U+8F6E><U+FF09>
+        ^
+../Core/Src/main.c(32): warning: In file included from...
+../User/Status\status.h(208): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+3 warnings generated.
+compiling main.c...
 ../User/Status/ball_control.c(3): warning: In file included from...
 ../User/Status/status.h(17): warning: In file included from...
 ../User/Tool\car_speed_profile.h(7): warning: 'ENCODER_PPR' macro redefined [-Wmacro-redefined]
@@ -44,7 +94,7 @@ Build target 'car_control_stm32_project'
 #define GEAR_RATIO 28.0f                  // <U+51CF><U+901F><U+6BD4> 1:28<U+FF08><U+7535><U+673A>:<U+8F66><U+8F6E><U+FF09>
         ^
 ../User/Status/ball_control.c(3): warning: In file included from...
-../User/Status/status.h(207): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+../User/Status/status.h(208): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
   ^
 ../User/Status/Defect.h(6): note: previous definition is here
@@ -52,10 +102,38 @@ typedef struct STATUS STATUS;
                       ^
 3 warnings generated.
 compiling ball_control.c...
+../User/Status/status.c(1): warning: In file included from...
+../User/Status/status.h(17): warning: In file included from...
+../User/Tool\car_speed_profile.h(7): warning: 'ENCODER_PPR' macro redefined [-Wmacro-redefined]
+#define ENCODER_PPR         (13)
+        ^
+../User/Tool\pid.h(31): note: previous definition is here
+#define ENCODER_PPR 13                    // <U+7F16><U+7801><U+5668><U+7EBF><U+6570>
+        ^
+../User/Status/status.c(1): warning: In file included from...
+../User/Status/status.h(17): warning: In file included from...
+../User/Tool\car_speed_profile.h(9): warning: 'GEAR_RATIO' macro redefined [-Wmacro-redefined]
+#define GEAR_RATIO          (28.0f)
+        ^
+../User/Tool\pid.h(32): note: previous definition is here
+#define GEAR_RATIO 28.0f                  // <U+51CF><U+901F><U+6BD4> 1:28<U+FF08><U+7535><U+673A>:<U+8F66><U+8F6E><U+FF09>
+        ^
+../User/Status/status.c(1): warning: In file included from...
+../User/Status/status.h(208): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+../User/Status/status.c(240): warning: implicit declaration of function 'fabsf' is invalid in C99 [-Wimplicit-function-declaration]
+  float diff_limit = fabsf(base);
+                     ^
+4 warnings generated.
+compiling status.c...
 linking...
-Program Size: Code=49962 RO-data=38322 RW-data=52 ZI-data=5764  
+Program Size: Code=50426 RO-data=38322 RW-data=52 ZI-data=5772  
 FromELF: creating hex file...
-"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 3 Warning(s).
+"car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 13 Warning(s).
 
 <h2>Software Packages used:</h2>
 

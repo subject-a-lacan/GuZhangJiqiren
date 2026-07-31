@@ -51,19 +51,22 @@ static struct {
 
 /* task4 debug: ISR writes floats, main loop sends */
 static volatile uint8_t  task4_dbg_ready;
-static volatile float    task4_dbg_buf[3];
+static volatile float    task4_dbg_buf[6];
 
 void task4_debug_flush(void) {
   if (!task4_dbg_ready) return;
-  float local[3];
+  float local[6];
   uint32_t primask = __get_PRIMASK();
   __disable_irq();
   local[0] = task4_dbg_buf[0];
   local[1] = task4_dbg_buf[1];
   local[2] = task4_dbg_buf[2];
+  local[3] = task4_dbg_buf[3];
+  local[4] = task4_dbg_buf[4];
+  local[5] = task4_dbg_buf[5];
   task4_dbg_ready = 0;
   if (!primask) __enable_irq();
-  UART_send_justfloat(&huart1, 3, local[0], local[1], local[2]);
+  UART_send_justfloat(&huart1, 6, local[0], local[1], local[2], local[3], local[4], local[5]);
 }
 
 static uint8_t task7_tx(const char *s, uint16_t len) {
@@ -385,10 +388,14 @@ static void driver_task4(STATUS *status) {
     static uint32_t last;
     if (status->state.time - last >= 80) {
       last = status->state.time;
-      task4_dbg_buf[0] = status->control.ball.estimator.position_mm;
-      task4_dbg_buf[1] = status->control.ball.request.target_mm;
-      task4_dbg_buf[2] = (float)status->control.ball.relative_target_pulse;
-      task4_dbg_ready = 1;  /* DMB not needed — single-byte flag is atomic on M4 */
+      /* [0]位置误差mm [1]速度mm/s [2]积分mm/s² [3]期望加速度mm/s² [4]相对脉冲 [5]积分使能 */
+      task4_dbg_buf[0] = status->control.ball.position_error_mm;
+      task4_dbg_buf[1] = status->control.ball.estimator.velocity_mm_s;
+      task4_dbg_buf[2] = status->control.ball.integral_accel_mm_s2;
+      task4_dbg_buf[3] = status->control.ball.requested_accel_mm_s2;
+      task4_dbg_buf[4] = (float)status->control.ball.relative_target_pulse;
+      task4_dbg_buf[5] = (status->control.ball.stuck_timer_s >= BALL_STUCK_CONFIRM_S) ? 1.0f : 0.0f;
+      task4_dbg_ready = 1;
     }
   }
 }
@@ -456,7 +463,13 @@ static void driver_task7(STATUS *status) {
 
   car_speed_profile_step(profile, (uint32_t)status->state.time);
 
-  status->state.motion = FOLLOW_LINE_TASK4;
+  /* auto-stop after 1.5 m */
+  if (profile->mileage_mm >= 1500.0f) {
+    task_stop(status);
+    return;
+  }
+
+  status->state.motion = TASK_FOUR_STRAIGHT;
   status->task.stop_cmd = 0;
   status->state.base_speed = (int16_t)profile->target_speed_unit;
   status->task.phase_mileage = profile->mileage_mm;
