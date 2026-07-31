@@ -27,17 +27,17 @@ Project File Date:  07/31/2026
 <h2>Output:</h2>
 *** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'car_control_stm32_project'
-../Core/Src/main.c(32): warning: In file included from...
-../User/Status\status.h(135): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+../User/Status/ball_control.c(3): warning: In file included from...
+../User/Status/status.h(199): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
   ^
 ../User/Status/Defect.h(6): note: previous definition is here
 typedef struct STATUS STATUS;
                       ^
 1 warning generated.
-compiling main.c...
+compiling ball_control.c...
 linking...
-Program Size: Code=47122 RO-data=686 RW-data=52 ZI-data=5508  
+Program Size: Code=48642 RO-data=38322 RW-data=52 ZI-data=5636  
 FromELF: creating hex file...
 "car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 1 Warning(s).
 
@@ -62,7 +62,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.0.1
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

@@ -710,6 +710,16 @@
               <FileType>1</FileType>
               <FilePath>..\User\Status\Defect.c</FilePath>
             </File>
+            <File>
+              <FileName>ball_control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Status\ball_control.c</FilePath>
+            </File>
+            <File>
+              <FileName>ball_control.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\User\Status\ball_control.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -849,6 +859,11 @@
               <FileName>wheel.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\Motor\wheel.c</FilePath>
+            </File>
+            <File>
+              <FileName>ball_mechanism_lut.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Motor\ball_mechanism_lut.c</FilePath>
             </File>
           </Files>
         </Group>

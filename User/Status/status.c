@@ -10,6 +10,7 @@
 #include "servo.h"
 #include "wheel.h"
 #include "uart_it.h"
+#include "ball_control.h"
 
 STATUS status;
 
@@ -180,6 +181,8 @@ void init_status(STATUS *status, uint8_t T) {
   init_status_pid(status);
 
   init_sensor(status);
+
+  ball_control_init(status);
 
   init_motor();
 

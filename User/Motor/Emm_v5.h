@@ -17,6 +17,8 @@ void Emm_V5_Modify_Ctrl_Mode(uint8_t addr, bool svF, uint8_t ctrl_mode);
 void Emm_V5_En_Control(uint8_t addr, bool state, bool snF);
 void Emm_V5_Vel_Control(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, bool snF);
 uint8_t Emm_V5_Pos_Control(uint8_t addr, uint8_t dir, uint16_t vel, uint8_t acc, uint32_t clk, bool raF, bool snF);
+uint8_t Emm_V5_Pos_Absolute_Try(uint8_t addr, int32_t absolute_pulse,
+                                uint16_t vel, uint8_t acc, bool snF);
 void Emm_V5_Stop_Now(uint8_t addr, bool snF);
 void Emm_V5_Synchronous_motion(uint8_t addr);
 void Emm_V5_Origin_Set_O(uint8_t addr, bool svF);

@@ -5,6 +5,7 @@
 #include "maixcam.h"
 #include "Emm_v5.h"
 #include "uart_it.h"
+#include "ball_control.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -15,6 +16,8 @@
 #define TASK2_V_CURVE_MIN 1.0f
 #define TASK2_CURVE_SPEED_K 1.0f
 #define TASK2_STOP_ROAD_TYPE 1u
+#define TASK7_BALL_TARGET_MM 0.0f
+#define TASK7_CAR_ACCEL_MM_S2 0.0f
 
 enum {
   TASK2_STRAIGHT = 0,
@@ -23,7 +26,7 @@ enum {
 };
 
 enum { T7_MSG_NONE, T7_MSG_RX, T7_MSG_CT1, T7_MSG_CM1, T7_MSG_CD1, T7_MSG_FOUND };
-enum { T7_CMD_NONE, T7_CMD_T, T7_CMD_M, T7_CMD_D };
+enum { T7_CMD_NONE, T7_CMD_T, T7_CMD_M, T7_CMD_D, T7_CMD_CDA };
 
 static volatile uint8_t task7_rx_msg_type;
 static volatile uint8_t task7_dbg_msg_type;
@@ -75,6 +78,7 @@ void task7_flush(void) {
       case T7_CMD_T: maixcam_cmd_T(1); break;
       case T7_CMD_M: maixcam_cmd_M(1); break;
       case T7_CMD_D: maixcam_cmd_D(1); break;
+      case T7_CMD_CDA: maixcam_cmd_CDA(); break;
     }
   }
   {
@@ -144,6 +148,8 @@ void task_start(STATUS *status) {
 void task_finish(STATUS *status) { task_stop(status); }
 
 void task_stop(STATUS *status) {
+  task7_cmd_type = T7_CMD_NONE;
+  ball_control_disable(status);
   status->task.task_running = 0;
   status->task.armed = 0;
   status->task.stop_cmd = 1;
@@ -283,12 +289,46 @@ static void driver_task4(STATUS *status) {
   }
 }
 static void driver_task5(STATUS *status) {
-  static uint32_t last;
-  if (status->state.time - last >= 200) {
-    last = status->state.time;
-    UART_send_justfloat(&huart1, 2,
-      status->sensor.uart_gyr.gyro_z,
-      status->sensor.uart_gyr.yaw);
+  typedef enum { Q5_GO_5, Q5_OVERRIDE, Q5_WAIT_55, Q5_COOLDOWN } Q5_STATE;
+  static Q5_STATE q5_state = Q5_GO_5;
+  static uint32_t q5_t0;
+
+  status->state.motion = STOP;
+  status->state.base_speed = 0;
+
+  switch (q5_state) {
+  case Q5_GO_5:
+    /* 5 deg absolute, slow so it takes time */
+    status->stepper.reached = 0;
+    status->stepper.busy = 1;
+    Emm_V5_Pos_Control(1, 0, 5, 5, 356, true, false);
+    q5_t0 = status->state.time;
+    q5_state = Q5_OVERRIDE;
+    break;
+
+  case Q5_OVERRIDE:
+    /* after 500ms, override to 55 deg regardless of reached */
+    if (status->state.time - q5_t0 >= 500) {
+      status->stepper.reached = 0;
+      status->stepper.busy = 1;
+      Emm_V5_Pos_Control(1, 0, 50, 0, 3911, true, false);
+      q5_t0 = status->state.time;
+      q5_state = Q5_WAIT_55;
+    }
+    break;
+
+  case Q5_WAIT_55:
+    if (status->stepper.reached || status->state.time - q5_t0 >= 3000) {
+      q5_t0 = status->state.time;
+      q5_state = Q5_COOLDOWN;
+    }
+    break;
+
+  case Q5_COOLDOWN:
+    if (status->state.time - q5_t0 >= 5000) {
+      q5_state = Q5_GO_5;
+    }
+    break;
   }
 }
 static void driver_task6(STATUS *status) {
@@ -303,45 +343,16 @@ static void driver_task6(STATUS *status) {
   }
 }
 static void driver_task7(STATUS *status) {
-  typedef enum { Q7_START, Q7_STREAM } Q7_STATE;
-  static Q7_STATE q7_state = Q7_START;
-  static uint16_t q7_timer;
-
   status->task.task_running = 1;
   status->state.motion = STOP;
   status->state.base_speed = 0;
 
   if (status->task.phase_mileage == 0) {
-    q7_state = Q7_START;
-    q7_timer = 0;
+    task7_cmd_type = T7_CMD_CDA;
     status->task.phase_mileage = 1;
   }
 
-  if (maixcam_loc_new) {
-    maixcam_loc_new = 0;
-    q7_state = Q7_STREAM;
-  }
-
-  q7_timer += (uint16_t)status->state.T;
-
-  switch (q7_state) {
-
-  case Q7_START:
-    if (q7_timer == 0) { maixcam_cmd_D(1); }
-    if (q7_timer >= 2000) { q7_timer = 0; maixcam_cmd_D(1); }
-    break;
-
-  case Q7_STREAM: {
-    static uint32_t last;
-    if (status->state.time - last >= 100) {
-      last = status->state.time;
-      UART_send_justfloat(&huart1, 2,
-        (float)(maixcam_loc.x10 / 10.0f),
-        (float)maixcam_loc.timestamp_ms);
-    }
-    break;
-  }
-  }
+  ball_control_request(status, TASK7_BALL_TARGET_MM, TASK7_CAR_ACCEL_MM_S2);
 }
 
 void update_task(STATUS *status) {

@@ -1,6 +1,7 @@
 #include "maixcam.h"
 #include "usart.h"
 #include "log.h"
+#include "status.h"
 #include <stdio.h>
 #include <stddef.h>
 
@@ -310,6 +311,12 @@ static void parse_vl_frame(const char *body) {
   maixcam_loc.timestamp_ms = ts;
   maixcam_loc.valid        = 1;
   maixcam_loc_new          = 1;
+
+  status.sensor.vision.ball.x10 = x10;
+  status.sensor.vision.ball.timestamp_ms = ts;
+  status.sensor.vision.ball.valid = 1;
+  __DMB();
+  status.sensor.vision.ball.sample_seq++;
 }
 
 /* ── 解析命令应答帧：V<type>A<result># ── */

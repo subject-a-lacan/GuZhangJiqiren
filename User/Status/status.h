@@ -75,10 +75,22 @@ typedef struct GW_8BIT {
 
 } GW_ANALOGUE;
  */
+typedef struct {
+  int32_t x10;
+  uint32_t timestamp_ms;
+  uint32_t sample_seq;
+  uint8_t valid;
+} VISION_BALL;
+
+typedef struct {
+  VISION_BALL ball;
+} VISION;
+
 typedef struct SENSOR {
   GYR gy901;
   UART_GYRO uart_gyr;
   GW_ANALOGUE gw_analogue;
+  VISION vision;
 } SENSOR;
 /*
 LED:which LED编号 High_level_is_on 用于设置该led是高电平亮还是低电平亮 on 设置LED亮灭
@@ -120,9 +132,60 @@ typedef struct STATE {
 } STATE;
 
 typedef struct {
+  volatile uint8_t enabled;
+  volatile float target_mm;
+  volatile float car_accel_mm_s2;
+  volatile uint32_t publish_seq;
+  volatile uint32_t session_seq;
+} BALL_CONTROL_REQUEST;
+
+typedef struct {
+  uint8_t ready;
+  uint8_t control_ready;
+  uint32_t consumed_sample_seq;
+  uint32_t last_timestamp_ms;
+  float position_mm;
+  float velocity_mm_s;
+  float alpha;
+  float beta;
+} BALL_ESTIMATOR;
+
+typedef struct {
+  BALL_CONTROL_REQUEST request;
+  BALL_ESTIMATOR estimator;
+  uint32_t consumed_request_seq;
+  uint32_t consumed_session_seq;
+  float kp;
+  float kd;
+  float position_error_mm;
+  float requested_accel_mm_s2;
+  int32_t relative_target_pulse;
+  int32_t absolute_target_pulse;
+} BALL_CONTROL;
+
+typedef struct {
+  BALL_CONTROL ball;
+} CONTROL;
+
+typedef struct {
+  volatile uint8_t enabled;
+  volatile int32_t absolute_pulse;
+  volatile uint16_t velocity;
+  volatile uint8_t accel_param;
+  volatile uint32_t publish_seq;
+} STEPPER_TARGET;
+
+typedef struct {
+  volatile uint8_t dma_busy;
+  uint32_t last_started_seq;
+} STEPPER_TX;
+
+typedef struct {
   volatile uint8_t reached;   // set by RX ISR when 01 FD 9F 6B received
   volatile uint8_t busy;      // 1 = motion in progress
   uint32_t clk;               // last-requested pulse count
+  STEPPER_TARGET target;
+  STEPPER_TX tx;
 } STEPPER;
 
 typedef struct STATUS {
@@ -131,6 +194,7 @@ typedef struct STATUS {
   MOTOR motor;
   DEVICE device;
   TASK task;
+  CONTROL control;
   STEPPER stepper;
 } STATUS;
 

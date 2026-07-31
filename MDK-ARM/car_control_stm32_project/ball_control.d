@@ -1,4 +1,8 @@
-car_control_stm32_project/main.o: ../Core/Src/main.c ../Core/Inc\main.h \
+car_control_stm32_project/ball_control.o: ../User/Status/ball_control.c \
+  ../User/Status/ball_control.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
+  ../User/Motor\ball_mechanism_lut.h ../User/Status/status.h \
+  ../User/Device\button.h ../Core/Inc\main.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal.h \
   ../Core/Inc\stm32g4xx_hal_conf.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_rcc.h \
@@ -6,7 +10,6 @@ car_control_stm32_project/main.o: ../Core/Src/main.c ../Core/Inc\main.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include\stm32g4xx.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g474xx.h \
   ../Drivers/CMSIS/Include\core_cm4.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
   ../Drivers/CMSIS/Include/cmsis_version.h \
   ../Drivers/CMSIS/Include/cmsis_compiler.h \
   ../Drivers/CMSIS/Include/cmsis_armclang_ltm.h \
@@ -38,16 +41,7 @@ car_control_stm32_project/main.o: ../Core/Src/main.c ../Core/Inc\main.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_uart.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
-  ../Core/Inc\adc.h ../Core/Inc\dma.h ../Core/Inc\i2c.h \
-  ../Core/Inc\spi.h ../Core/Inc\tim.h ../Core/Inc\usart.h \
-  ../Core/Inc\gpio.h ../User/Tool\log.h ../User/Status\status.h \
-  ../User/Device\button.h ../User/Device\buzzer.h \
-  ../User/Status/Defect.h ../User/Sensor\gw_anagloge.h \
-  ../User/Sensor\gy901.h ../User/Tool\pid.h ../User/Sensor\uart_gyro.h \
-  ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h \
-  ../User/It\uart_it.h ../User/Tool\math_tool.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h ../User/Tool\task.h \
-  ../Core/Inc\lora.h ../User/Sensor\maixcam.h ../User/Motor\Emm_v5.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h \
-  ../User/Status\ball_control.h
+  ../User/Device\buzzer.h ../User/Status/Defect.h \
+  ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h ../User/Tool\pid.h \
+  ../User/Sensor\uart_gyro.h ../User/Device\led.h ../User/Motor\servo.h \
+  ../User/Motor\wheel.h ../User/It\uart_it.h

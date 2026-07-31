@@ -118,7 +118,7 @@ void driver_wheel(WHEEL *wheel) {
   }
 
   if (ABS(wheel->cur_speed) < 4 && status.state.motion != KEEP_ANGLE) {
-    wheel->trust = CONFINE(wheel->trust, -4000, 4000);
+    wheel->trust = CONFINE(wheel->trust, -8500, 8500);
   }
 
   set_wheel_dir(wheel, wheel->trust);

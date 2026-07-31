@@ -69,6 +69,14 @@ void init_uart_pid_tune(void) {
 
 static uint8_t stepper_rx_byte;
 
+typedef struct {
+  uint8_t enabled;
+  int32_t absolute_pulse;
+  uint16_t velocity;
+  uint8_t accel_param;
+  uint32_t publish_seq;
+} STEPPER_TARGET_SNAPSHOT;
+
 void stepper_request_move(uint32_t clk, uint16_t vel, uint8_t acc) {
   status.stepper.reached = 0;
   status.stepper.clk = clk;
@@ -77,7 +85,85 @@ void stepper_request_move(uint32_t clk, uint16_t vel, uint8_t acc) {
     status.stepper.busy = 0;
 }
 
+void stepper_publish_absolute(int32_t absolute_pulse, uint16_t vel, uint8_t acc) {
+  STEPPER_TARGET *target = &status.stepper.target;
+  uint32_t primask = __get_PRIMASK();
+
+  __disable_irq();
+  if (!target->enabled || target->absolute_pulse != absolute_pulse ||
+      target->velocity != vel || target->accel_param != acc) {
+    target->enabled = 1;
+    target->absolute_pulse = absolute_pulse;
+    target->velocity = vel;
+    target->accel_param = acc;
+    __DMB();
+    target->publish_seq++;
+  }
+  if (!primask) __enable_irq();
+}
+
+void stepper_target_disable(void) {
+  uint32_t primask = __get_PRIMASK();
+
+  __disable_irq();
+  if (status.stepper.target.enabled) {
+    status.stepper.target.enabled = 0;
+    __DMB();
+    status.stepper.target.publish_seq++;
+  }
+  if (!primask) __enable_irq();
+}
+
+void stepper_service(void) {
+  STEPPER_TARGET_SNAPSHOT target;
+  uint32_t primask = __get_PRIMASK();
+
+  __disable_irq();
+  target.enabled = status.stepper.target.enabled;
+  target.absolute_pulse = status.stepper.target.absolute_pulse;
+  target.velocity = status.stepper.target.velocity;
+  target.accel_param = status.stepper.target.accel_param;
+  target.publish_seq = status.stepper.target.publish_seq;
+
+  if (target.publish_seq == status.stepper.tx.last_started_seq) {
+    if (!primask) __enable_irq();
+    return;
+  }
+  if (!target.enabled) {
+    status.stepper.tx.last_started_seq = target.publish_seq;
+    if (!primask) __enable_irq();
+    return;
+  }
+  if (status.stepper.tx.dma_busy) {
+    if (!primask) __enable_irq();
+    return;
+  }
+  status.stepper.tx.dma_busy = 1;
+  if (Emm_V5_Pos_Absolute_Try(1, target.absolute_pulse, target.velocity,
+                              target.accel_param, false)) {
+    status.stepper.tx.last_started_seq = target.publish_seq;
+    status.stepper.reached = 0;
+    status.stepper.busy = 1;
+    status.stepper.clk = target.absolute_pulse < 0
+                             ? (uint32_t)(-(int64_t)target.absolute_pulse)
+                             : (uint32_t)target.absolute_pulse;
+  } else {
+    status.stepper.tx.dma_busy = 0;
+  }
+  if (!primask) __enable_irq();
+}
+
 void init_stepper_uart(void) {
+  status.stepper.reached = 0;
+  status.stepper.busy = 0;
+  status.stepper.clk = 0;
+  status.stepper.target.enabled = 0;
+  status.stepper.target.absolute_pulse = 0;
+  status.stepper.target.velocity = 0;
+  status.stepper.target.accel_param = 0;
+  status.stepper.target.publish_seq = 0;
+  status.stepper.tx.dma_busy = 0;
+  status.stepper.tx.last_started_seq = 0;
   HAL_UART_Receive_IT(&huart3, &stepper_rx_byte, 1);
 }
 
@@ -181,6 +267,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart == &huart3) status.stepper.tx.dma_busy = 0;
   if (huart == &huart4) maixcam_uart_tx_complete();
 }
 
@@ -200,6 +287,11 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     HAL_UART_AbortReceive(huart);
     __HAL_UART_CLEAR_OREFLAG(huart);
     __HAL_UART_CLEAR_FEFLAG(huart);
+    if ((huart->ErrorCode & HAL_UART_ERROR_DMA) != 0U &&
+        huart->gState == HAL_UART_STATE_READY && status.stepper.tx.dma_busy) {
+      status.stepper.tx.dma_busy = 0;
+      status.stepper.tx.last_started_seq--;
+    }
     HAL_UART_Receive_IT(&huart3, &stepper_rx_byte, 1);
   }
   if (huart == &huart4) {

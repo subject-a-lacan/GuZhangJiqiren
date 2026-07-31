@@ -43,6 +43,7 @@
 #include "lora.h"
 #include "maixcam.h"
 #include "Emm_v5.h"
+#include "ball_control.h"
 
 /* USER CODE END Includes */
 
@@ -168,6 +169,8 @@ int main(void)
         maixcam_poll_next = status.state.time + 8;
       }
     }
+    ball_control_service(&status);
+    stepper_service();
     task7_flush();
     PERIODIC_START(Gray_ADC_Update, 5)
       driver_gw_analogue(&status.sensor.gw_analogue);
@@ -229,11 +232,11 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 void gan_init(void) {
-  /* 50 deg at 128 microsteps: 25600 * 50 / 360 ≈ 3556 pulses */
+  /* 55 deg at 128 microsteps: 25600 * 55 / 360 ≈ 3911 pulses */
   Emm_V5_En_Control(1, true, false);
   Emm_V5_Reset_CurPos_To_Zero(1);
   HAL_Delay(50);
-  Emm_V5_Pos_Control(1, 0, 50, 0, 3556, true, false);
+  Emm_V5_Pos_Control(1, 0, 50, 0, BALL_STEPPER_ZERO_PULSE, true, false);
   while (huart3.gState != HAL_UART_STATE_READY) {}
 }
 /* USER CODE END 4 */
