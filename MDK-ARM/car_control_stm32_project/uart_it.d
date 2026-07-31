@@ -45,4 +45,5 @@ car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
   ../User/Status/Defect.h ../User/Sensor\gw_anagloge.h \
   ../User/Sensor\gy901.h ../User/Tool\pid.h ../User/Device\led.h \
   ../User/Motor\servo.h ../User/Motor\wheel.h ../User/Sensor\maixcam.h \
-  ../Core/Inc\lora.h
+  ../Core/Inc\lora.h ../User/Motor\Emm_v5.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h

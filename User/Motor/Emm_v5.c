@@ -1,16 +1,26 @@
 #include "Emm_v5.h"
-static void gimbal_send(const uint8_t *cmd, uint16_t len) {
-  uint32_t timeout = HAL_GetTick() + 100;
-  while (huart3.gState != HAL_UART_STATE_READY) {
-    if (HAL_GetTick() >= timeout) {
-      HAL_UART_AbortTransmit(GIMBAL_UART);
-      break;
+static uint8_t gimbal_tx_buf[20];
+
+static uint8_t gimbal_send(const uint8_t *cmd, uint16_t len) {
+  if (len > sizeof(gimbal_tx_buf)) return 0;
+  if (__get_IPSR() != 0U) {
+    if (huart3.gState != HAL_UART_STATE_READY) return 0;
+  } else {
+    uint32_t timeout = HAL_GetTick() + 100;
+    while (huart3.gState != HAL_UART_STATE_READY) {
+      if (HAL_GetTick() >= timeout) {
+        HAL_UART_AbortTransmit(GIMBAL_UART);
+        break;
+      }
     }
   }
-  if (HAL_UART_Transmit_DMA(GIMBAL_UART, (uint8_t *)cmd, len) != HAL_OK) {
+  for (uint16_t i = 0; i < len; i++) gimbal_tx_buf[i] = cmd[i];
+  if (HAL_UART_Transmit_DMA(GIMBAL_UART, gimbal_tx_buf, len) != HAL_OK) {
     HAL_UART_AbortTransmit(GIMBAL_UART);
-    HAL_UART_Transmit_DMA(GIMBAL_UART, (uint8_t *)cmd, len);
+    for (uint16_t i = 0; i < len; i++) gimbal_tx_buf[i] = cmd[i];
+    return HAL_UART_Transmit_DMA(GIMBAL_UART, gimbal_tx_buf, len) == HAL_OK;
   }
+  return 1;
 }
 #define SEND(a) gimbal_send((a), sizeof(a))
 void Emm_V5_Reset_CurPos_To_Zero(uint8_t a){uint8_t c[]={a,0x0A,0x6D,0x6B};SEND(c);}
@@ -19,7 +29,7 @@ void Emm_V5_Read_Sys_Params(uint8_t a,SysParams_t s){uint8_t c[4]={a,0,0x6B,0};s
 void Emm_V5_Modify_Ctrl_Mode(uint8_t a,bool sv,uint8_t m){uint8_t c[]={a,0x46,0x69,sv,m,0x6B};SEND(c);}
 void Emm_V5_En_Control(uint8_t a,bool st,bool sn){uint8_t c[]={a,0xF3,0xAB,st,sn,0x6B};SEND(c);}
 void Emm_V5_Vel_Control(uint8_t a,uint8_t d,uint16_t v,uint8_t ac,bool sn){uint8_t c[]={a,0xF6,d,v>>8,v,ac,sn,0x6B};SEND(c);}
-void Emm_V5_Pos_Control(uint8_t a,uint8_t d,uint16_t v,uint8_t ac,uint32_t k,bool ra,bool sn){uint8_t c[]={a,0xFD,d,v>>8,v,ac,k>>24,k>>16,k>>8,k,ra,sn,0x6B};SEND(c);}
+uint8_t Emm_V5_Pos_Control(uint8_t a,uint8_t d,uint16_t v,uint8_t ac,uint32_t k,bool ra,bool sn){uint8_t c[]={a,0xFD,d,v>>8,v,ac,k>>24,k>>16,k>>8,k,ra,sn,0x6B};return SEND(c);}
 void Emm_V5_Stop_Now(uint8_t a,bool sn){uint8_t c[]={a,0xFE,0x98,sn,0x6B};SEND(c);}
 void Emm_V5_Synchronous_motion(uint8_t a){uint8_t c[]={a,0xFF,0x66,0x6B};SEND(c);}
 void Emm_V5_Origin_Set_O(uint8_t a,bool sv){uint8_t c[]={a,0x93,0x88,sv,0x6B};SEND(c);}

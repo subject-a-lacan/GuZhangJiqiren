@@ -4,6 +4,7 @@
 #include "uart_gyro.h"
 #include "maixcam.h"
 #include "Emm_v5.h"
+#include "uart_it.h"
 #include <stdio.h>
 
 enum { T7_MSG_NONE, T7_MSG_RX, T7_MSG_CT1, T7_MSG_CM1, T7_MSG_CD1, T7_MSG_FOUND };
@@ -153,7 +154,12 @@ static void driver_task2(STATUS *status) {
   static uint32_t last;
   if (status->state.time - last >= 80) {
     last = status->state.time;
-    UART_send_justfloat(&huart1, 1, status->sensor.gw_analogue.diff);
+    uint8_t d = status->sensor.gw_analogue.digital_8bit;
+    UART_send_justfloat(&huart1, 8,
+      (float)((d >> 7) & 1), (float)((d >> 6) & 1),
+      (float)((d >> 5) & 1), (float)((d >> 4) & 1),
+      (float)((d >> 3) & 1), (float)((d >> 2) & 1),
+      (float)((d >> 1) & 1), (float)((d >> 0) & 1));
   }
 }
 static void driver_task3(STATUS *status) {

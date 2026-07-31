@@ -6,6 +6,7 @@
 #include "status.h"
 #include "maixcam.h"
 #include "lora.h"
+#include "Emm_v5.h"
 
 #define MAIXCAM_DMA_SIZE 128
 static uint8_t maixcam_dma_buf[MAIXCAM_DMA_SIZE];
@@ -70,14 +71,13 @@ static uint8_t stepper_rx_byte;
 
 void stepper_request_move(uint32_t clk, uint16_t vel, uint8_t acc) {
   status.stepper.reached = 0;
-  status.stepper.busy = 1;
   status.stepper.clk = clk;
-  Emm_V5_Pos_Control(1, 0, vel, acc, clk, false, false);
+  status.stepper.busy = 1;
+  if (!Emm_V5_Pos_Control(1, 0, vel, acc, clk, false, false))
+    status.stepper.busy = 0;
 }
 
 void init_stepper_uart(void) {
-  HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(USART3_IRQn);
   HAL_UART_Receive_IT(&huart3, &stepper_rx_byte, 1);
 }
 
