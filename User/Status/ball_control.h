@@ -25,10 +25,10 @@ struct STATUS;
 #define BALL_STEPPER_REVERSE_ACCEL_RPM_S (180.0f) /* 换向保护：加速度                         */
 
 /* ── PD 参数 ── */
-#define BALL_CONTROL_KP (4.0f)               /* 位置增益 (s⁻²)                           */
-#define BALL_CONTROL_KD (5.0f)               /* 速度阻尼 (s⁻¹)                           */
-#define BALL_CONTROL_KI (30.0f)              /* 积分增益 (s⁻³)                           */
-#define BALL_I_MAX_MM_S2  (250.0f)           /* 积分限幅 (mm/s²)                         */
+#define BALL_CONTROL_KP (3.0f)               /* 位置增益 (s⁻²)                           */
+#define BALL_CONTROL_KD (3.0f)               /* 速度阻尼 (s⁻¹)                           */
+#define BALL_CONTROL_KI (20.0f)              /* 积分增益 (s⁻³)                           */
+#define BALL_I_MAX_MM_S2  (200.0f)           /* 积分限幅 (mm/s²)                         */
 
 /* ── α-β 估计器 ── */
 #define BALL_ESTIMATOR_ALPHA (0.6f)          /* 位置滤波系数                             */
@@ -37,7 +37,7 @@ struct STATUS;
 
 /* ── 变速积分：误差权重 ── */
 #define BALL_I_FULL_ERROR_MM   (20.0f)       /* |e|≤20mm 全速积分                        */
-#define BALL_I_OFF_ERROR_MM    (45.0f)       /* |e|≥45mm 关闭积分                        */
+#define BALL_I_OFF_ERROR_MM    (35.0f)       /* |e|≥35mm 关闭积分                        */
 /* ── 变速积分：速度权重 ── */
 #define BALL_I_FULL_SPEED_MM_S   (3.0f)      /* |v|≤3mm/s 全速积分                       */
 #define BALL_I_OFF_SPEED_MM_S   (12.0f)      /* |v|≥12mm/s 关闭积分                      */

@@ -172,7 +172,6 @@ int main(void)
     ball_control_service(&status);
     stepper_service();
     task7_flush();
-    task3_debug_flush();
     task4_debug_flush();
     PERIODIC_START(Gray_ADC_Update, 5)
       driver_gw_analogue(&status.sensor.gw_analogue);
