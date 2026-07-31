@@ -26,6 +26,7 @@ typedef struct {
 /* ── 位置数据 (VL 帧) ── */
 typedef struct {
   int32_t x10;           /* x 坐标，单位 0.1mm */
+  uint32_t timestamp_ms; /* 视觉模块时间戳，单位 ms */
   uint8_t valid;
   uint32_t update_tick;
 } VisionLocationData;
@@ -68,6 +69,7 @@ void maixcam_init(void);
 /* ── 命令发送 ── */
 void maixcam_cmd_T(uint8_t on_off);            /* CT0# / CT1# */
 void maixcam_cmd_D(uint8_t on_off);            /* CD0# / CD1# */
+void maixcam_cmd_CDA(void);                    /* CDA# — start continuous VL stream */
 void maixcam_cmd_M(uint8_t mode);              /* CM<mode># */
 void maixcam_cmd_send_val(char type, float v); /* C<type><1位小数># 通用 */
 uint8_t maixcam_uart_tx_enqueue(const uint8_t *data, uint16_t len);

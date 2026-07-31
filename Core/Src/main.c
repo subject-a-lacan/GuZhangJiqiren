@@ -148,7 +148,7 @@ int main(void)
   init_uart_gyr();
   init_stepper_uart();
   init_maixcam_uart();
-  // ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
+  ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
   esp8266_ready = 1;
   gan_init();
   status.device.buzzer.on = 1;
@@ -229,11 +229,11 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 void gan_init(void) {
-  /* 39 deg at 128 microsteps: 25600 * 39 / 360 = 2773 pulses */
+  /* 50 deg at 128 microsteps: 25600 * 50 / 360 ≈ 3556 pulses */
   Emm_V5_En_Control(1, true, false);
   Emm_V5_Reset_CurPos_To_Zero(1);
   HAL_Delay(50);
-  Emm_V5_Pos_Control(1, 0, 50, 0, 2773, false, false);
+  Emm_V5_Pos_Control(1, 0, 50, 0, 3556, true, false);
   while (huart3.gState != HAL_UART_STATE_READY) {}
 }
 /* USER CODE END 4 */

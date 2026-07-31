@@ -46,4 +46,5 @@ car_control_stm32_project/defect.o: ../User/Status/Defect.c \
   ../User/Tool\log.h ../Core/Inc\usart.h ../User/Sensor\maixcam.h \
   ../User/Motor\Emm_v5.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h ../User/It\uart_it.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h

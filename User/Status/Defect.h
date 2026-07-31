@@ -41,6 +41,10 @@ typedef struct TASK {
 
   uint32_t phase_start_time;
   float phase_mileage;
+  uint8_t curve_cnt;
+  uint8_t phase_confirm_cnt;
+  float last_curve_ratio;
+  float curve_entry_yaw;
 } TASK;
 
 void init_task(TASK *task);

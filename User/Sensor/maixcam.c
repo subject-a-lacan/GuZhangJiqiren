@@ -152,6 +152,10 @@ void maixcam_cmd_D(uint8_t on_off) {
   if (len > 0 && len < (int)sizeof(buf)) maixcam_start_cmd('D', buf, (uint8_t)len);
 }
 
+void maixcam_cmd_CDA(void) {
+  maixcam_start_cmd('D', "CDA#", 4);
+}
+
 void maixcam_cmd_M(uint8_t mode) {
   char buf[8];
   int len = snprintf(buf, sizeof(buf), "CM%u#", mode);
@@ -278,9 +282,8 @@ static void parse_vd_frame(const char *body) {
   maixcam_det_new         = 1;
 }
 
-/* ── 解析 VL 位置数据帧：VL,<x>,#   x 固定1位小数，单位mm ── */
+/* ── 解析 VL 位置数据帧：VL,<x>,<ts>,#   x 固定1位小数(mm)，ts 毫秒时间戳 ── */
 static void parse_vl_frame(const char *body) {
-  /* body = ",3.3,#" — 已经跳过了 "VL" */
   const char *p = body;
 
   if (*p != ',') return;
@@ -292,11 +295,21 @@ static void parse_vl_frame(const char *body) {
   if (*p != ',') return;
   p++;
 
+  uint32_t ts = 0;
+  while (*p >= '0' && *p <= '9') {
+    ts = ts * 10 + (uint32_t)(*p - '0');
+    p++;
+  }
+
+  if (*p != ',') return;
+  p++;
+
   if (*p != '#') return;
 
-  maixcam_loc.x10   = x10;
-  maixcam_loc.valid = 1;
-  maixcam_loc_new   = 1;
+  maixcam_loc.x10          = x10;
+  maixcam_loc.timestamp_ms = ts;
+  maixcam_loc.valid        = 1;
+  maixcam_loc_new          = 1;
 }
 
 /* ── 解析命令应答帧：V<type>A<result># ── */

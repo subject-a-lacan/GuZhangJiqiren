@@ -204,6 +204,10 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   }
   if (huart == &huart4) {
     HAL_UART_AbortReceive(huart);
+    __HAL_UART_CLEAR_OREFLAG(huart);
+    __HAL_UART_CLEAR_FEFLAG(huart);
+    __HAL_UART_CLEAR_NEFLAG(huart);
+    __HAL_UART_CLEAR_PEFLAG(huart);
     maixcam_dma_pos = 0;
     HAL_UARTEx_ReceiveToIdle_DMA(&huart4, maixcam_dma_buf, MAIXCAM_DMA_SIZE);
     __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);

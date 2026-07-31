@@ -5,7 +5,22 @@
 #include "maixcam.h"
 #include "Emm_v5.h"
 #include "uart_it.h"
+#include <math.h>
 #include <stdio.h>
+
+#define TASK2_CURVE_RATIO_THRESHOLD 1.0f
+#define TASK2_STRAIGHT_RATIO_THRESHOLD 1.0f
+#define TASK2_CONFIRM_FRAMES 1u
+#define TASK2_MIN_SPEED 1.0f
+#define TASK2_V_CURVE_MIN 1.0f
+#define TASK2_CURVE_SPEED_K 1.0f
+#define TASK2_STOP_ROAD_TYPE 1u
+
+enum {
+  TASK2_STRAIGHT = 0,
+  TASK2_CURVE,
+  TASK2_FINAL_CURVE,
+};
 
 enum { T7_MSG_NONE, T7_MSG_RX, T7_MSG_CT1, T7_MSG_CM1, T7_MSG_CD1, T7_MSG_FOUND };
 enum { T7_CMD_NONE, T7_CMD_T, T7_CMD_M, T7_CMD_D };
@@ -90,6 +105,10 @@ void init_task(TASK *task) {
   task->stop_cmd = 1;
   task->phase_start_time = 0;
   task->phase_mileage = 0.0f;
+  task->curve_cnt = 0;
+  task->phase_confirm_cnt = 0;
+  task->last_curve_ratio = 0.0f;
+  task->curve_entry_yaw = 0.0f;
 }
 
 void update_task_led(STATUS *status) {
@@ -112,6 +131,13 @@ void task_start(STATUS *status) {
   status->task.stop_cmd = 0;
   status->task.phase_start_time = status->state.time;
   status->task.phase_mileage = 0.0f;
+  if (status->task.task_id == TASK_BASIC_2) {
+    status->task.race_phase = TASK2_STRAIGHT;
+    status->task.curve_cnt = 0;
+    status->task.phase_confirm_cnt = 0;
+    status->task.last_curve_ratio = 0.0f;
+    status->task.curve_entry_yaw = 0.0f;
+  }
   task_last_report = status->state.time;
 }
 
@@ -151,6 +177,85 @@ static void driver_task1(STATUS *status) {
   }
 }
 static void driver_task2(STATUS *status) {
+  float average_speed;
+  float ratio;
+
+  status->state.motion = FIND_LINE;
+  status->task.stop_cmd = 0;
+
+  if (status->task.race_phase == TASK2_FINAL_CURVE) {
+    float theta;
+    float curve_speed;
+
+    if ((uint8_t)status->sensor.gw_analogue.cross.cross == TASK2_STOP_ROAD_TYPE) {
+      task_finish(status);
+      return;
+    }
+
+    theta = fabsf(status->sensor.uart_gyr.yaw - status->task.curve_entry_yaw);
+    if (theta > 180.0f) theta = 360.0f - theta;
+
+    curve_speed = TASK2_V_CURVE_MIN + TASK2_CURVE_SPEED_K * (170.0f - theta);
+    if (curve_speed < TASK2_V_CURVE_MIN) curve_speed = TASK2_V_CURVE_MIN;
+    if (curve_speed > 15.0f) curve_speed = 15.0f;
+    status->state.base_speed = (int16_t)curve_speed;
+    return;
+  }
+
+  status->state.base_speed = 15;
+  average_speed =
+      ((float)status->motor.wheel[0].cur_speed +
+       (float)status->motor.wheel[1].cur_speed +
+       (float)status->motor.wheel[2].cur_speed +
+       (float)status->motor.wheel[3].cur_speed) / 4.0f;
+  average_speed = fabsf(average_speed);
+
+  if (!status->sensor.uart_gyr.valid || average_speed < TASK2_MIN_SPEED) {
+    status->task.phase_confirm_cnt = 0;
+    status->task.last_curve_ratio = 0.0f;
+    return;
+  }
+
+  ratio = fabsf(status->sensor.uart_gyr.gyro_z) / average_speed;
+
+  if (status->task.race_phase == TASK2_STRAIGHT) {
+    if (ratio > TASK2_CURVE_RATIO_THRESHOLD &&
+        ratio > status->task.last_curve_ratio) {
+      if (status->task.phase_confirm_cnt < 0xFFu) {
+        status->task.phase_confirm_cnt++;
+      }
+    } else {
+      status->task.phase_confirm_cnt = 0;
+    }
+
+    if (status->task.phase_confirm_cnt > TASK2_CONFIRM_FRAMES) {
+      status->task.curve_cnt++;
+      status->task.phase_confirm_cnt = 0;
+      if (status->task.curve_cnt >= 2u) {
+        status->task.race_phase = TASK2_FINAL_CURVE;
+        status->task.curve_entry_yaw = status->sensor.uart_gyr.yaw;
+      } else {
+        status->task.race_phase = TASK2_CURVE;
+      }
+    }
+  } else if (status->task.race_phase == TASK2_CURVE) {
+    if (ratio < TASK2_STRAIGHT_RATIO_THRESHOLD) {
+      if (status->task.phase_confirm_cnt < 0xFFu) {
+        status->task.phase_confirm_cnt++;
+      }
+    } else {
+      status->task.phase_confirm_cnt = 0;
+    }
+
+    if (status->task.phase_confirm_cnt > TASK2_CONFIRM_FRAMES) {
+      status->task.race_phase = TASK2_STRAIGHT;
+      status->task.phase_confirm_cnt = 0;
+    }
+  }
+
+  status->task.last_curve_ratio = ratio;
+}
+static void driver_task3(STATUS *status) {
   static uint32_t last;
   if (status->state.time - last >= 80) {
     last = status->state.time;
@@ -162,21 +267,21 @@ static void driver_task2(STATUS *status) {
       (float)((d >> 1) & 1), (float)((d >> 0) & 1));
   }
 }
-static void driver_task3(STATUS *status) {
-  static uint8_t inited;
+static void driver_task4(STATUS *status) {
   static uint32_t last;
-  if (!inited) { status->state.base_speed = 8; inited = 1; }
   status->state.motion = FIND_LINE;
+  status->state.base_speed = 10;
   status->task.stop_cmd = 0;
-  if (status->state.time - last >= 100) {
+  if (status->state.time - last >= 50) {
     last = status->state.time;
-    UART_send_justfloat(&huart1, 3,
-      status->sensor.gw_analogue.diff,
-      status->state.status_pid.follow_line_pid.error,
-      status->state.status_pid.follow_line_pid.out);
+    UART_send_justfloat(&huart1, 5,
+      status->sensor.uart_gyr.gyro_z,
+      (float)status->motor.wheel[0].cur_speed,
+      (float)status->motor.wheel[1].cur_speed,
+      (float)status->motor.wheel[2].cur_speed,
+      (float)status->motor.wheel[3].cur_speed);
   }
 }
-static void driver_task4(STATUS *status) { status->state.motion = FIND_LINE; status->state.base_speed = 3; }
 static void driver_task5(STATUS *status) {
   static uint32_t last;
   if (status->state.time - last >= 200) {
@@ -187,48 +292,55 @@ static void driver_task5(STATUS *status) {
   }
 }
 static void driver_task6(STATUS *status) {
-  if (every_100ms(status))
-    UART_send_justfloat(&huart1, 1,
-      iic_gyr_get_value(&status->sensor.gy901, gyr_a_y));
+  static uint32_t last;
+  status->state.motion = FIND_LINE;
+  status->task.stop_cmd = 0;
+  if (status->state.time - last >= 80) {
+    last = status->state.time;
+    UART_send_justfloat(&huart1, 2,
+      (float)status->state.base_speed,
+      status->sensor.gw_analogue.diff);
+  }
 }
 static void driver_task7(STATUS *status) {
-  typedef enum { Q7_SEND = 0, Q7_WAIT, Q7_DONE } Q7_STATE;
-  static Q7_STATE q7_state = Q7_SEND;
-  static uint8_t q7_dir;
-  static uint32_t q7_timeout;
-  const uint32_t q7_clk = 6400u;
+  typedef enum { Q7_START, Q7_STREAM } Q7_STATE;
+  static Q7_STATE q7_state = Q7_START;
+  static uint16_t q7_timer;
 
   status->task.task_running = 1;
   status->state.motion = STOP;
   status->state.base_speed = 0;
 
   if (status->task.phase_mileage == 0) {
-    q7_state = Q7_SEND;
-    q7_dir = 0;
+    q7_state = Q7_START;
+    q7_timer = 0;
     status->task.phase_mileage = 1;
   }
 
+  if (maixcam_loc_new) {
+    maixcam_loc_new = 0;
+    q7_state = Q7_STREAM;
+  }
+
+  q7_timer += (uint16_t)status->state.T;
+
   switch (q7_state) {
 
-  case Q7_SEND:
-    stepper_request_move(q7_clk, 20, 0);
-    q7_timeout = status->state.time + 3000;
-    q7_state = Q7_WAIT;
+  case Q7_START:
+    if (q7_timer == 0) { maixcam_cmd_D(1); }
+    if (q7_timer >= 2000) { q7_timer = 0; maixcam_cmd_D(1); }
     break;
 
-  case Q7_WAIT:
-    if (status->stepper.reached) {
-      status->stepper.reached = 0;
-      q7_dir = (uint8_t)(q7_dir ^ 1u);
-      q7_state = Q7_DONE;
-    } else if (status->state.time >= q7_timeout) {
-      q7_state = Q7_DONE;
+  case Q7_STREAM: {
+    static uint32_t last;
+    if (status->state.time - last >= 100) {
+      last = status->state.time;
+      UART_send_justfloat(&huart1, 2,
+        (float)(maixcam_loc.x10 / 10.0f),
+        (float)maixcam_loc.timestamp_ms);
     }
     break;
-
-  case Q7_DONE:
-    /* single shot — stop to re-arm */
-    break;
+  }
   }
 }
 
