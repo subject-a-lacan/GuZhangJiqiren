@@ -131,22 +131,83 @@ static uint8_t every_100ms(STATUS *status) {
   task_last_report = status->state.time;
   return 1;
 }
+/* ================================================================
+ *  Task1: UART4 与 MaixCam2 通信测试 Demo
+ *
+ *  协议:
+ *    MCU → MaixCam2:  C + 命令 + 数值 + #    例: CD1#
+ *    MaixCam2 → MCU:  V + 类型 + 数据 + #    例: VDA1#  VL,3.3,#
+ *
+ *  流程:
+ *    1. 发送 CD1# (启动检测)
+ *    2. 等待 VDA1# 应答帧，超时重发直到收到
+ *    3. 收到应答后，打印接收到的 VL 位置数据帧
+ *
+ *  串口助手测试方法:
+ *    - UART4 (PC10/PC11): 接 USB-TTL 模块
+ *    - USART1 (PC4/PC5):  接 ST-Link VCP，查看调试输出
+ *    - 用串口助手发送 VDA1# 模拟应答
+ *    - 用串口助手发送 VL,3.3,#  模拟位置数据
+ * ================================================================ */
+
+enum {
+  COMM_IDLE = 0,
+  COMM_SEND_CD1,
+  COMM_WAIT_ACK,
+  COMM_RUNNING,
+};
+
+static uint8_t  comm_state       = COMM_IDLE;
+static uint32_t comm_last_tx     = 0;
+static uint8_t  comm_retry_cnt   = 0;
+static uint32_t comm_last_report = 0;
+
 static void driver_task1(STATUS *status) {
-  int16_t base = status->state.base_speed;
-  status->state.motion = STRAIGHT;
+  status->state.motion = STOP;
   status->task.stop_cmd = 0;
-  status->motor.wheel[0].tar_speed = (float)base;
-  status->motor.wheel[1].tar_speed = (float)base;
-  status->motor.wheel[2].tar_speed = (float)base;
-  status->motor.wheel[3].tar_speed = (float)base;
-  static uint32_t last_print;
-  if (status->state.time - last_print >= 80) {
-    last_print = status->state.time;
-    UART_send_justfloat(&huart1, 12,
-      (float)status->motor.wheel[0].cur_speed, status->motor.wheel[0].tar_speed, (float)status->motor.wheel[0].trust,
-      (float)status->motor.wheel[1].cur_speed, status->motor.wheel[1].tar_speed, (float)status->motor.wheel[1].trust,
-      (float)status->motor.wheel[2].cur_speed, status->motor.wheel[2].tar_speed, (float)status->motor.wheel[2].trust,
-      (float)status->motor.wheel[3].cur_speed, status->motor.wheel[3].tar_speed, (float)status->motor.wheel[3].trust);
+
+  switch (comm_state) {
+
+  /* ── 状态0: 初始化，进入发送 ── */
+  case COMM_IDLE:
+    comm_state     = COMM_SEND_CD1;
+    comm_retry_cnt = 0;
+    break;
+
+  /* ── 状态1: 通过 DMA 发送 CD1# ── */
+  case COMM_SEND_CD1:
+    maixcam_cmd_D(1);                    /* 内部使用 HAL_UART_Transmit_DMA */
+    comm_last_tx = (uint32_t)status->state.time;
+    comm_retry_cnt++;
+    comm_state = COMM_WAIT_ACK;
+    PRINTF("[TEST] TX: CD1# (attempt %u)\r\n", comm_retry_cnt);
+    break;
+
+  /* ── 状态2: 等待 VDA1# 应答，超时重发 ── */
+  case COMM_WAIT_ACK:
+    if (maixcam_cmd.state == MAIXCAM_CMD_OK) {
+      /* 收到 VDA1# 应答 */
+      PRINTF("[TEST] RX: VDA1# ACK OK! Ready for position data.\r\n");
+      maixcam_cmd.state = MAIXCAM_CMD_IDLE;
+      comm_state       = COMM_RUNNING;
+      comm_last_report = 0;
+    } else if (status->state.time - comm_last_tx > 300) {
+      /* 300ms 超时，重发 CD1# */
+      comm_state = COMM_SEND_CD1;
+    }
+    break;
+
+  /* ── 状态3: 已握手，持续解析并打印位置数据 ── */
+  case COMM_RUNNING:
+    if (maixcam_loc_new) {
+      maixcam_loc_new = 0;
+      float x_mm = (float)maixcam_loc.x10 / 10.0f;
+      if (status->state.time - comm_last_report >= 100) {
+        PRINTF("[TEST] POS: X=%.1f mm\r\n", (double)x_mm);
+        comm_last_report = (uint32_t)status->state.time;
+      }
+    }
+    break;
   }
 }
 static void driver_task2(STATUS *status) {

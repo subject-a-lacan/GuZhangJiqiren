@@ -146,7 +146,7 @@ int main(void)
   init_uart_gyr();
   init_maixcam_uart();
   ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
-  esp8266_ready = 1;
+  esp8266_ready = 1;  // 不用8266，关掉PID解析防止USART1噪声误触发蜂鸣器
   status.device.buzzer.on = 1;
   status.device.buzzer.off_time = 400;
   HAL_TIM_Base_Start_IT(&htim5);

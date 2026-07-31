@@ -1,0 +1,225 @@
+# 校赛项目报告结构框架
+
+## 摘要
+- 需要完成的任务概述：
+  1. 基本要求（1）：循迹1圈停车（≤15s，停车偏差≤3cm）
+  2. 基本要求（2）：带干扰A4纸，3/4圈掉头返回（≤25s，停车偏差≤3cm）
+  3. 发挥部分（1）：负重330ml水，CD边测量l1/l2，无线传至手机（≤15s，误差≤20%）
+  4. 发挥部分（2）：负重330ml水，识别CD边图形类型，导航至对角线三等分点停车（≤30s）
+- 项目大概实现：
+  - 主控：STM32G431KBU6
+  - 循迹：8路模拟灰度传感器 + 加权偏差 + PID差速控制
+  - 姿态：GY901陀螺仪（I2C，yaw角） + 角度环PID
+  - 电机驱动：TB6612驱动两轮差速 + 编码器速度闭环 + 前馈+PID
+  - 视觉：MaixCam（K230）用于图形识别与测量辅助
+  - 无线：USART3接蓝牙/ESP8266 → 手机显示l1/l2
+  - 调度：20ms定时器中断周期性更新
+
+## 一、题目要求与指标
+（按timu.md逐条列出四道题的参数要求，包括时间、精度、负重、尺寸约束等）
+
+### 1.1 基本要求（1）
+### 1.2 基本要求（2）
+### 1.3 发挥部分（1）
+### 1.4 发挥部分（2）
+
+## 二、系统方案
+
+### 2.1 总体设计
+- 系统总体框图（文字描述，后面你画图）：
+  ```
+  [灰度传感器×8] ──ADC──┐
+  [GY901陀螺仪]  ──I2C──┤
+  [编码器×2]     ──TIM──┤
+  [MaixCam K230] ──UART─┤
+  [蓝牙/ESP8266] ──UART─┤
+                        ├── STM32G431KBU6 ──┬── TIM8 PWM ── TB6612 ── 直流电机×2
+                        │                    ├── GPIO ── LED×3 + 蜂鸣器 + 按键×2
+                        │                    └── GPIO ── 舵机×2
+  ```
+
+- 工作流程概述：
+  上电 → 初始化 → 按键选任务/切换AB-AD → 按键发车 → 20ms循环（读传感器→任务状态机→运动控制→写硬件）→ 声光提示停车
+
+### 2.2 关键方案的比较与选择
+#### 2.2.1 主控选型
+- 方案A：STM32F103C8T6
+- 方案B：STM32G431KBU6（选择）
+- 理由：G4系列主频170MHz、内置CORDIC加速、丰富定时器资源、充足UART/I2C外设
+
+#### 2.2.2 循迹方案
+- 方案A：红外对管（数字灰度）
+- 方案B：模拟灰度传感器（选择）
+- 理由：模拟量可做加权插值计算连续偏差，分辨率远高于数字二值；支持白/黑校准适应不同场地
+
+#### 2.2.3 姿态控制
+- 方案A：开环延时转弯
+- 方案B：MPU6050
+- 方案C：GY901（JY901S，选择）
+- 理由：I2C直接输出欧拉角yaw，无需姿态解算，±0.05°精度，满足90°/180°转弯需求
+
+#### 2.2.4 视觉测量
+- 方案A：OpenMV
+- 方案B：MaixCam（K230，选择）
+- 理由：K230算力更强，支持MicroPython开发，板载摄像头，UART通信简单可靠
+
+#### 2.2.5 手机显示
+- 方案A：蓝牙HC-05透传
+- 方案B：ESP8266 WiFi + UDP/TCP
+- 选择与理由（你来填实际用的）
+
+## 三、硬件与机械安装
+【你来写】
+
+建议包含：
+3.1 整车尺寸与布局
+3.2 传感器安装位置（灰度排布间距、陀螺仪安装、摄像头安装）
+3.3 电机与驱动板选型
+3.4 电池选型
+3.5 电路连接框图
+
+## 四、控制方法与理论
+
+### 4.1 灰度循迹
+- 8路模拟灰度通过CD4051模拟开关轮询 → ADC3读取12bit值（0-4095）
+- 迟滞比较器二值化：channel[i] > 高阈值 → 白（bit清零）；< 低阈值 → 黑（bit置1）；中间→保持
+- 中间4路（通道2-5）做加权偏差计算：
+  - 每路取反归一化：buff[i] = 100 - normalize(now, min, max)
+  - 4路权重归一化（权重和=1）
+  - diff = Σ(buff[i] × distance[i])，distance = {-15, -10, 10, 15}
+- PID差速输出：左轮=base_speed-diff，右轮=base_speed+diff
+
+### 4.2 前馈控制（Feedforward）
+- 理论：电机稳态PWM与速度近似线性关系：PWM = offset + k × speed
+- 标定方法：实测不同PWM下的稳态速度 → 线性回归拟合
+- 参数（空载）：offset=157 CCR，k=18.3，启动死区下限=254 CCR
+- 公式：ff_abs = offset + k × |tar_speed|；若<min则=min
+- 最终输出：trust = ff + pid_out（前馈负责"大概需要多少PWM"，PID只补微小偏差）
+- 空载/负重两套参数通过apply_basic_control_param()和apply_adv_control_param()切换
+
+### 4.3 角度环转向与停车策略
+- 角度环：target = tar_angle + initial_angle；diff = target - cur_angle（归一化到±180°）
+- PID计算角度环差速：左轮 = base_speed + diff，右轮 = base_speed - diff
+- 转弯流程：检测路口 → 记录initial_angle → KEEP_ANGLE转90° → angle_error < 阈值 → 转弯完成 → FIND_LINE找线
+- 停车策略：
+  - 主力：编码器里程累计测距触发（编码器脉冲×CM_PER_PULSE）
+  - 兜底：灰度检测到对应路口 + 最低距离门槛
+
+### 4.4 干扰A4纸处理（第二问BC边）
+- BC边A4纸上有横向黑条，灰度可能误判为左/右路口
+- 方案：BC边使用里程门控（Q2_BC_ROAD_ENABLE_CM=79cm），前79cm内不消费路口
+- 过A4纸期间降低速度，削弱循迹PID修正
+- T路口（TLRoad/TRRoad）统一映射为Left/RightRoad
+
+### 4.5 纯编码器测距（第三问CD边l1/l2）
+- 待测A4纸在CD边，纸张上有三条横向黑线
+- l1 = 第一条线到第二条线的距离；l2 = 第二条线到第三条线距离
+- 测量方式：利用编码器累计脉冲数换算距离
+  - CM_PER_PULSE = π×D / (PPR×4×减速比) = π×6.723 / (13×4×28) ≈ 0.0145 cm/pulse
+- CD边速度控制：30→20→30，在14-68cm段降速到20给视觉数据更多帧
+- 75cm前屏蔽A4纸产生的横线干扰（Q3_CD_IGNORE_END_CM）
+- MaixCam辅助检测横线 → UART发l1/l2值 → STM32通过USART2 printf发至手机
+
+### 4.6 视觉方法（MaixCam K230）
+- 第三问：K230拍摄CD边A4纸 → 检测三条横线 → 计算l1/l2 → UART发回STM32
+- 第四问：K230拍摄CD边A4纸 → 识别形状类型（圆形/正方形/三角形/椭圆形）→ UART回传
+- 通信协议：UART 115200bps，命令格式C<cmd><val>\r\n
+- K230只负责视觉识别，不参与电机控制（与stm32分工明确）
+
+## 五、软件设计
+
+### 5.1 整体调度
+- 主循环：main() → 初始化硬件 → 启动TIM5 → while(1)轮询发送状态
+- 控制核心：TIM5每1ms中断 → time+=1 → 每20ms调用update_status()
+- update_status()调用链：
+  ```
+  driver_gw_analogue()          → 读灰度ADC + 二值化 + 算diff + 路口检测
+  get_wheel_speed()             → 读编码器
+  get_gyr_raw_data() + get_gyr_value() → 读陀螺仪yaw角
+  driver_button() + server_button()    → 按键事件→置task request
+  update_task()                 → 消费request + 题目状态机
+  follow_line()/keep_angle()/STOP  → 根据motion算tar_speed
+  driver_LED/driver_BUZZER      → 声光
+  driver_wheel()                → 前馈+PID → PWM输出
+  ```
+
+### 5.2 状态机设计
+- 三层架构：
+  - 选题层 (task_id)：当前跑第几问
+  - 题内流程层 (race_phase)：当前题目内部阶段
+  - 运动控制层 (motion)：FIND_LINE / KEEP_ANGLE / STOP / MOTOR_TEST
+
+- 按键→任务链路：
+  - PB11短按 → task_select_request → update_task() → task_select()
+  - PD2短按 → start_request → update_task() → armed=1 → task_start()
+  - task_start()初始化后，具体task_xxx_update()在确认开始后置task_running=1
+
+- TASK1状态机（AB发车，逆时针一圈）：
+  START_TO_A → TURN_A → FIND_AD → SIDE_AD → TURN_D → FIND_DC → SIDE_DC → TURN_C → FIND_CB → SIDE_CB → TURN_B → FIND_BA → BA_FINAL → STOP
+
+- TASK2状态机（AB发车，3/4圈掉头返回）：
+  去程：TURN_A → FIND_AD → SIDE_AD → TURN_D → FIND_DC → SIDE_DC → TURN_C → FIND_CB → SIDE_CB → STOP → UTURN_B →
+  回程：FIND_BC_RETURN → SIDE_BC → TURN_C_RETURN → FIND_CD → SIDE_CD → TURN_D_RETURN → FIND_DA → SIDE_DA → FINISH
+
+- TASK3状态机（AB/AD发车，一圈+CD边测距）：
+  与TASK1路线相同，CD边(SIDE_DC)特殊处理降速+视觉测距+屏蔽A4横线干扰
+
+- TASK4状态机（框架，待实现）：
+  START → ... → SIDE_DC(拍照识别) → ... → SIDE_BA → EXIT_PREPARE → EXIT_TURN → EXIT_DRIVE → EXIT_STOP → FINISH
+
+- 各阶段统一使用task_enter_phase()切换：清零phase_mileage + phase_start_time + 稳定计数
+
+### 5.3 主要源码文件与功能附录
+```
+Core/
+  Src/main.c                 主入口，硬件初始化，while(1)轮询，UART调参
+  Src/stm32g4xx_it.c         中断服务
+  Src/tim.c                  定时器配置（TIM5:1ms，TIM8:PWM，TIM1/2:编码器）
+  Src/usart.c                4路UART配置（115200，8N1）
+  Src/gpio.c                 GPIO配置
+  Src/adc.c                  ADC3配置
+  Src/i2c.c                  I2C1/I2C2配置（GY901）
+
+Drivers/
+  STM32G4xx_HAL_Driver/      HAL库（不常改）
+
+User/
+  Status/
+    status.h                 全局STATUS树定义（STATE/SENSOR/MOTOR/DEVICE/TASK）
+    status.c                 init_status(), update_status(), follow_line(), keep_angle()
+    Defect.h                 TASK结构体、TASK_ID枚举、RACE_PHASE枚举
+    Defect.c                 init_task(), task_start/finish/stop/select, update_task(),
+                             driver_task1(), driver_task2(), driver_task3(), update_task_led()
+
+  Sensor/
+    gw_anagloge.h            GW_ANALOGUE结构体、Road枚举、Cross结构体
+    gw_analogue.c            灰度ADC读取、二值化、加权diff、路口检测状态机
+    gy901.h                  GYR结构体、gyroscope枚举
+    gy901.c                  I2C读原始数据、解析yaw角
+
+  Motor/
+    wheel.h                  WHEEL结构体
+    wheel.c                  get_wheel_speed(), driver_wheel()前馈+PID+PWM, set_wheel_ff_param()
+    servo.h/servo.c          舵机驱动
+
+  Device/
+    button.h/button.c        按键驱动（边沿检测+长按）+ server_button()业务逻辑
+    led.h/led.c              LED驱动
+    buzzer.h/buzzer.c        蜂鸣器驱动
+
+  It/
+    timer_it.c               TIM5中断回调：每1ms time++，每20ms调update_status()
+    uart_it.c                UART中断接收PID调参/蓝牙命令/视觉数据
+
+  Tool/
+    pid.h                    PID结构体、encoder_pulse_to_cm()、编码器参数宏
+    pid.c                    init_pid(), compute_pid()（含变速积分）
+    math_tool.h              数学宏（ABS/CONFINE等）
+    log.h/log.c              UART日志打印
+```
+
+## 六、测试方案与结果
+【你来写】
+
+## 七、设计报告补充
+【你来写】

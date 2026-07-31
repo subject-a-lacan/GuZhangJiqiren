@@ -1,5 +1,5 @@
 car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
-  ../User/It/uart_it.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
+  ../User/It/uart_it.h D:\keil5\ARM\ARMCLANG\Bin\..\include\stdint.h \
   ../Core/Inc\usart.h ../Core/Inc/main.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal.h \
   ../Core/Inc\stm32g4xx_hal_conf.h \
@@ -11,11 +11,11 @@ car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
   ../Drivers/CMSIS/Include/cmsis_version.h \
   ../Drivers/CMSIS/Include/cmsis_compiler.h \
   ../Drivers/CMSIS/Include/cmsis_armclang_ltm.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
   ../Drivers/CMSIS/Include/mpu_armv7.h \
   ../Drivers/CMSIS/Device/ST/STM32G4xx/Include/system_stm32g4xx.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stddef.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\stddef.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_gpio.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_gpio_ex.h \
@@ -39,7 +39,7 @@ car_control_stm32_project/uart_it.o: ../User/It/uart_it.c \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_uart.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
+  D:\keil5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
   ../User/Sensor\uart_gyro.h ../User/Status\status.h \
   ../User/Device\button.h ../User/Device\buzzer.h \
   ../User/Status/Defect.h ../User/Sensor\gw_anagloge.h \
