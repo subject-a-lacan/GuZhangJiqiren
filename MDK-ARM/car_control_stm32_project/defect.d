@@ -43,8 +43,8 @@ car_control_stm32_project/defect.o: ../User/Status/Defect.c \
   ../User/Device\buzzer.h ../User/Sensor\gw_anagloge.h \
   ../User/Sensor\gy901.h ../User/Tool\pid.h ../User/Sensor\uart_gyro.h \
   ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h \
-  ../User/Tool\log.h ../Core/Inc\usart.h ../User/Sensor\maixcam.h \
-  ../User/Motor\Emm_v5.h \
+  ../User/Tool\car_speed_profile.h ../User/Tool\log.h \
+  ../Core/Inc\usart.h ../User/Sensor\maixcam.h ../User/Motor\Emm_v5.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h ../User/It\uart_it.h \
   ../User/Status/ball_control.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h \

@@ -16,9 +16,20 @@ struct STATUS;
 
 #define BALL_CONTROL_KP (4.0f)
 #define BALL_CONTROL_KD (4.0f)
+#define BALL_CONTROL_KI (0.0f)
+#define BALL_I_MAX_MM_S2  (100.0f)
 #define BALL_ESTIMATOR_ALPHA (0.6f)
 #define BALL_ESTIMATOR_BETA (0.1f)
 #define BALL_ESTIMATOR_MAX_DT_MS (200u)
+
+/* Stuck integral: activates when |error| > threshold & |v| < threshold for confirm time */
+#define BALL_STUCK_ERROR_MM    (5.0f)
+#define BALL_STUCK_SPEED_MM_S  (5.0f)
+#define BALL_STUCK_CONFIRM_S   (0.20f)
+/* Center hold: freeze stepper when centered & slow for confirm time */
+#define BALL_HOLD_ERROR_MM     (2.0f)
+#define BALL_HOLD_SPEED_MM_S   (5.0f)
+#define BALL_HOLD_CONFIRM_S    (0.10f)
 
 void ball_control_init(struct STATUS *status);
 void ball_control_request(struct STATUS *status, float target_mm,

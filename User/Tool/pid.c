@@ -56,6 +56,16 @@ float compute_pid(PID *pid, float error) {
   return pid->out;
 }
 
+void pid_reset_state(PID *pid) {
+  if (pid == NULL) return;
+  pid->error = 0.0f;
+  pid->last_error = 0.0f;
+  pid->integral = 0.0f;
+  pid->derivative = 0.0f;
+  pid->out = 0.0f;
+  pid->is_first = 1;
+}
+
 /*
  * 将编码器累计脉冲数转换为实际行驶距离(cm)。
  * 调用方需自行维护脉冲累加器（如 phase_mileage），

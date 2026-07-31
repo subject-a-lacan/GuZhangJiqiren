@@ -16,8 +16,19 @@
 #define TASK2_V_CURVE_MIN 1.0f
 #define TASK2_CURVE_SPEED_K 1.0f
 #define TASK2_STOP_ROAD_TYPE 1u
-#define TASK7_BALL_TARGET_MM 0.0f
-#define TASK7_CAR_ACCEL_MM_S2 0.0f
+/* ── TASK7 (Q4) speed-profile parameters ── */
+/* TASK7_CRUISE_SPEED_UNIT : cruise target speed, unit = encoder count / 5 ms.
+   V_mm_s = U * MM_PER_COUNT / 0.005,  e.g. 10 → ~285 mm/s                */
+#define TASK7_CRUISE_SPEED_UNIT  10.0f
+/* TASK7_RAMP_DISTANCE_MM : planned ramp-up distance, mm.
+   400 mm gives Tr ≈ 2.8 s, peak accel ≈ 0.02 g — gentle enough for the ball. */
+#define TASK7_RAMP_DISTANCE_MM   400.0f
+/* TASK7_DIFF_LIMIT_RATIO : |diff| ≤ ratio * |base_speed| during ramp.
+   1.0 = no single wheel reverses even at low speed.                        */
+#define TASK7_DIFF_LIMIT_RATIO    1.0f
+
+#define TASK7_BALL_TARGET_MM      0.0f
+#define TASK7_CAR_ACCEL_MM_S2     0.0f
 
 enum {
   TASK2_STRAIGHT = 0,
@@ -37,6 +48,23 @@ static struct {
   uint8_t found; int32_t x10, y10, d10;
   char rx_raw[64];
 } task7_cap;
+
+/* task4 debug: ISR writes floats, main loop sends */
+static volatile uint8_t  task4_dbg_ready;
+static volatile float    task4_dbg_buf[3];
+
+void task4_debug_flush(void) {
+  if (!task4_dbg_ready) return;
+  float local[3];
+  uint32_t primask = __get_PRIMASK();
+  __disable_irq();
+  local[0] = task4_dbg_buf[0];
+  local[1] = task4_dbg_buf[1];
+  local[2] = task4_dbg_buf[2];
+  task4_dbg_ready = 0;
+  if (!primask) __enable_irq();
+  UART_send_justfloat(&huart1, 3, local[0], local[1], local[2]);
+}
 
 static uint8_t task7_tx(const char *s, uint16_t len) {
   return maixcam_uart_tx_enqueue((const uint8_t *)s, len);
@@ -142,6 +170,21 @@ void task_start(STATUS *status) {
     status->task.last_curve_ratio = 0.0f;
     status->task.curve_entry_yaw = 0.0f;
   }
+  if (status->task.task_id == TASK_ADV_4) {
+    pid_reset_state(&status->state.status_pid.follow_line_pid);
+    for (uint8_t i = 0; i < 4; i++) {
+      pid_reset_state(&status->motor.wheel[i].wheel_pid);
+      status->motor.wheel[i].tar_speed = 0.0f;
+    }
+    if (!car_speed_profile_start(&status->control.car_speed,
+            (uint32_t)status->state.time,
+            TASK7_CRUISE_SPEED_UNIT,
+            TASK7_RAMP_DISTANCE_MM)) {
+      task_stop(status);
+      return;
+    }
+    task7_cmd_type = T7_CMD_CDA;
+  }
   task_last_report = status->state.time;
 }
 
@@ -150,6 +193,14 @@ void task_finish(STATUS *status) { task_stop(status); }
 void task_stop(STATUS *status) {
   task7_cmd_type = T7_CMD_NONE;
   ball_control_disable(status);
+
+  car_speed_profile_reset(&status->control.car_speed);
+  pid_reset_state(&status->state.status_pid.follow_line_pid);
+  for (uint8_t i = 0; i < 4; i++) {
+    pid_reset_state(&status->motor.wheel[i].wheel_pid);
+    status->motor.wheel[i].tar_speed = 0.0f;
+  }
+
   status->task.task_running = 0;
   status->task.armed = 0;
   status->task.stop_cmd = 1;
@@ -157,6 +208,7 @@ void task_stop(STATUS *status) {
   status->task.stop_request = 0;
   status->state.motion = STOP;
   status->state.base_speed = 0;
+  status->task.phase_mileage = 0.0f;
 }
 
 static uint8_t every_100ms(STATUS *status) {
@@ -165,21 +217,31 @@ static uint8_t every_100ms(STATUS *status) {
   return 1;
 }
 static void driver_task1(STATUS *status) {
-  int16_t base = status->state.base_speed;
-  status->state.motion = STRAIGHT;
-  status->task.stop_cmd = 0;
-  status->motor.wheel[0].tar_speed = (float)base;
-  status->motor.wheel[1].tar_speed = (float)base;
-  status->motor.wheel[2].tar_speed = (float)base;
-  status->motor.wheel[3].tar_speed = (float)base;
+  static float last_pos_mm;
+  static uint32_t last_ts_ms;
   static uint32_t last_print;
+
+  status->state.motion = STOP;
+  status->state.base_speed = 0;
+
+  if (status->task.phase_mileage == 0.0f) {
+    status->task.phase_mileage = 1.0f;
+    maixcam_cmd_D(1);
+    last_pos_mm = 0.0f;
+    last_ts_ms = 0;
+  }
+
   if (status->state.time - last_print >= 80) {
     last_print = status->state.time;
-    UART_send_justfloat(&huart1, 12,
-      (float)status->motor.wheel[0].cur_speed, status->motor.wheel[0].tar_speed, (float)status->motor.wheel[0].trust,
-      (float)status->motor.wheel[1].cur_speed, status->motor.wheel[1].tar_speed, (float)status->motor.wheel[1].trust,
-      (float)status->motor.wheel[2].cur_speed, status->motor.wheel[2].tar_speed, (float)status->motor.wheel[2].trust,
-      (float)status->motor.wheel[3].cur_speed, status->motor.wheel[3].tar_speed, (float)status->motor.wheel[3].trust);
+    float pos_mm = (float)status->sensor.vision.ball.x10 * 0.1f;
+    float vel_mm_s = 0.0f;
+    uint32_t ts = status->sensor.vision.ball.timestamp_ms;
+    if (last_ts_ms != 0 && ts != last_ts_ms) {
+      vel_mm_s = (pos_mm - last_pos_mm) / ((float)(ts - last_ts_ms) * 0.001f);
+    }
+    last_pos_mm = pos_mm;
+    last_ts_ms = ts;
+    UART_send_justfloat(&huart1, 2, pos_mm, vel_mm_s);
   }
 }
 static void driver_task2(STATUS *status) {
@@ -262,30 +324,72 @@ static void driver_task2(STATUS *status) {
   status->task.last_curve_ratio = ratio;
 }
 static void driver_task3(STATUS *status) {
-  static uint32_t last;
-  if (status->state.time - last >= 80) {
-    last = status->state.time;
-    uint8_t d = status->sensor.gw_analogue.digital_8bit;
-    UART_send_justfloat(&huart1, 8,
-      (float)((d >> 7) & 1), (float)((d >> 6) & 1),
-      (float)((d >> 5) & 1), (float)((d >> 4) & 1),
-      (float)((d >> 3) & 1), (float)((d >> 2) & 1),
-      (float)((d >> 1) & 1), (float)((d >> 0) & 1));
+  typedef enum { Q3_GO_POS5, Q3_WAIT_POS5, Q3_GO_NEG5, Q3_WAIT_NEG5, Q3_DONE } Q3_STATE;
+  static Q3_STATE q3_state;
+
+  status->state.motion = STOP;
+  status->state.base_speed = 0;
+
+  /* phase_mileage reset to 0 by task_stop — reliable fresh-start flag */
+  if (status->task.phase_mileage == 0.0f) {
+    status->task.phase_mileage = 1.0f;
+    q3_state = Q3_GO_POS5;
+    maixcam_cmd_D(1);
+  }
+
+  switch (q3_state) {
+  case Q3_GO_POS5:
+    ball_control_request(status, 50.0f, 0.0f);  /* +5 cm */
+    q3_state = Q3_WAIT_POS5;
+    break;
+
+  case Q3_WAIT_POS5: {
+    float pos = status->control.ball.estimator.position_mm;
+    float err = pos - 50.0f;
+    if (err < 0.0f) err = -err;
+    if (status->control.ball.estimator.control_ready && err <= 5.0f)
+      q3_state = Q3_GO_NEG5;
+    break;
+  }
+
+  case Q3_GO_NEG5:
+    ball_control_request(status, -50.0f, 0.0f);  /* -5 cm */
+    q3_state = Q3_WAIT_NEG5;
+    break;
+
+  case Q3_WAIT_NEG5: {
+    float pos = status->control.ball.estimator.position_mm;
+    float err = pos - (-50.0f);
+    if (err < 0.0f) err = -err;
+    if (status->control.ball.estimator.control_ready && err <= 5.0f)
+      q3_state = Q3_DONE;
+    break;
+  }
+
+  case Q3_DONE:
+    break;  /* hold at -5 cm */
   }
 }
 static void driver_task4(STATUS *status) {
-  static uint32_t last;
-  status->state.motion = FIND_LINE;
-  status->state.base_speed = 10;
-  status->task.stop_cmd = 0;
-  if (status->state.time - last >= 50) {
-    last = status->state.time;
-    UART_send_justfloat(&huart1, 5,
-      status->sensor.uart_gyr.gyro_z,
-      (float)status->motor.wheel[0].cur_speed,
-      (float)status->motor.wheel[1].cur_speed,
-      (float)status->motor.wheel[2].cur_speed,
-      (float)status->motor.wheel[3].cur_speed);
+  status->state.motion = STOP;
+  status->state.base_speed = 0;
+
+  if (status->task.phase_mileage == 0.0f) {
+    status->task.phase_mileage = 1.0f;
+    maixcam_cmd_D(1);
+    ball_control_request(status, 0.0f, 0.0f);
+  }
+
+  /* ISR-safe: write floats to buffer, main loop sends */
+  {
+    static uint32_t last;
+    if (status->state.time - last >= 80) {
+      last = status->state.time;
+      task4_dbg_buf[0] = status->control.ball.estimator.position_mm;
+      task4_dbg_buf[1] = status->control.ball.request.target_mm;
+      task4_dbg_buf[2] = (float)status->control.ball.relative_target_pulse;
+      task4_dbg_ready = 1;  /* DMB not needed — single-byte flag is atomic on M4 */
+    }
   }
 }
 static void driver_task5(STATUS *status) {
@@ -342,16 +446,22 @@ static void driver_task6(STATUS *status) {
   }
 }
 static void driver_task7(STATUS *status) {
-  status->task.task_running = 1;
-  status->state.motion = STOP;
-  status->state.base_speed = 0;
+  CAR_SPEED_PROFILE *profile = &status->control.car_speed;
 
-  if (status->task.phase_mileage == 0) {
-    task7_cmd_type = T7_CMD_CDA;
-    status->task.phase_mileage = 1;
+  if (!profile->enabled) {
+    status->state.motion = STOP;
+    status->state.base_speed = 0;
+    return;
   }
 
-  ball_control_request(status, TASK7_BALL_TARGET_MM, TASK7_CAR_ACCEL_MM_S2);
+  car_speed_profile_step(profile, (uint32_t)status->state.time);
+
+  status->state.motion = FOLLOW_LINE_TASK4;
+  status->task.stop_cmd = 0;
+  status->state.base_speed = (int16_t)profile->target_speed_unit;
+  status->task.phase_mileage = profile->mileage_mm;
+
+  ball_control_request(status, TASK7_BALL_TARGET_MM, profile->accel_mm_s2);
 }
 
 void update_task(STATUS *status) {

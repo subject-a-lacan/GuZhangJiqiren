@@ -42,6 +42,7 @@ car_control_stm32_project/status.o: ../User/Status/status.c \
   ../User/Device\buzzer.h ../User/Status/Defect.h \
   ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h ../User/Tool\pid.h \
   ../User/Sensor\uart_gyro.h ../User/Device\led.h ../User/Motor\servo.h \
-  ../User/Motor\wheel.h ../Core/Inc\i2c.h ../User/Tool\log.h \
-  ../Core/Inc\usart.h ../User/Tool\math_tool.h ../User/It\uart_it.h \
+  ../User/Motor\wheel.h ../User/Tool\car_speed_profile.h \
+  ../Core/Inc\i2c.h ../User/Tool\log.h ../Core/Inc\usart.h \
+  ../User/Tool\math_tool.h ../User/It\uart_it.h \
   ../User/Status/ball_control.h

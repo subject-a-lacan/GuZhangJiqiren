@@ -43,4 +43,5 @@ car_control_stm32_project/maixcam.o: ../User/Sensor/maixcam.c \
   ../User/Device\buzzer.h ../User/Status/Defect.h \
   ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h ../User/Tool\pid.h \
   ../User/Sensor\uart_gyro.h ../User/Device\led.h ../User/Motor\servo.h \
-  ../User/Motor\wheel.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h
+  ../User/Motor\wheel.h ../User/Tool\car_speed_profile.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h

@@ -14,6 +14,7 @@
 #include "pid.h"
 #include "servo.h"
 #include "wheel.h"
+#include "car_speed_profile.h"
 
 #define MOTION_BASE_SPEED 2000
 
@@ -39,6 +40,7 @@ typedef enum MOTION_STATION {
   MOTOR_TEST,
   BALANCE,
   STRAIGHT,
+  FOLLOW_LINE_TASK4,
 } MOTION_STATION;
 /*
  * @brief 传感器结构体
@@ -157,14 +159,20 @@ typedef struct {
   uint32_t consumed_session_seq;
   float kp;
   float kd;
+  float ki;
   float position_error_mm;
   float requested_accel_mm_s2;
   int32_t relative_target_pulse;
   int32_t absolute_target_pulse;
+  float stuck_timer_s;
+  float integral_accel_mm_s2;
+  float hold_timer_s;
+  uint8_t hold_active;
 } BALL_CONTROL;
 
 typedef struct {
   BALL_CONTROL ball;
+  CAR_SPEED_PROFILE car_speed;
 } CONTROL;
 
 typedef struct {
@@ -206,5 +214,6 @@ void update_status(STATUS *status);
 void driver_status(STATUS *status);
 void apply_basic_control_param(STATUS *status);
 void apply_adv_control_param(STATUS *status);
+void follow_line_task4(STATUS *status);
 
 #endif

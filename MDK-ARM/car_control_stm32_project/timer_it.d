@@ -44,4 +44,5 @@ car_control_stm32_project/timer_it.o: ../User/It/timer_it.c \
   ../User/Motor\servo.h ../User/Status\status.h ../User/Device\button.h \
   ../User/Status/Defect.h ../User/Sensor\gw_anagloge.h \
   ../User/Sensor\gy901.h ../User/Tool\pid.h ../User/Sensor\uart_gyro.h \
-  ../User/Motor\wheel.h ../Core/Inc\tim.h
+  ../User/Motor\wheel.h ../User/Tool\car_speed_profile.h \
+  ../Core/Inc\tim.h

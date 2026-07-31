@@ -19,12 +19,11 @@ uint8_t is_init = 0;
 uint8_t find_voice[3] = {0xAA, 0x01, 0xBB};
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-  status.state.time += 1;  // 硬件时基为1ms，T仅表示控制采样周期
-  if (htim == &htim5)  // 周期 1ms
-  {
-    if (status.state.time % 5 == 0) {  // 周期 5ms
-      update_status(&status);           // 状态更新中断 用于读取传感器原始数据
-    }
+  if (htim != &htim5) return;
 
+  status.state.time += 1;
+
+  if (status.state.time % 5u == 0u) {
+    update_status(&status);
   }
 }

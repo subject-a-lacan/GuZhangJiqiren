@@ -184,6 +184,9 @@ void init_status(STATUS *status, uint8_t T) {
 
   ball_control_init(status);
 
+  car_speed_profile_init(&status->control.car_speed,
+                         (float)T * 0.001f, MM_PER_COUNT);
+
   init_motor();
 
   init_device();
@@ -228,6 +231,18 @@ void follow_line(STATUS *status) {
   status->motor.wheel[1].tar_speed = (float)status->state.base_speed + diff;
   status->motor.wheel[2].tar_speed = (float)status->state.base_speed - diff;
   status->motor.wheel[3].tar_speed = (float)status->state.base_speed + diff;
+}
+
+void follow_line_task4(STATUS *status) {
+  float base = status->control.car_speed.target_speed_unit;
+  float diff = compute_pid(&status->state.status_pid.follow_line_pid,
+                           status->sensor.gw_analogue.diff);
+  float diff_limit = fabsf(base);
+  diff = CONFINE(diff, -diff_limit, diff_limit);
+  status->motor.wheel[0].tar_speed = base - diff;
+  status->motor.wheel[1].tar_speed = base + diff;
+  status->motor.wheel[2].tar_speed = base - diff;
+  status->motor.wheel[3].tar_speed = base + diff;
 }
 
 void keep_angle(STATUS *status) {
@@ -276,7 +291,11 @@ void update_status(STATUS *status) {
   status->motor.wheel[2].cur_speed = get_wheel_speed(&status->motor.wheel[2]);
   status->motor.wheel[3].cur_speed = get_wheel_speed(&status->motor.wheel[3]);
 
-  
+  car_speed_profile_update_measurement(&status->control.car_speed,
+    status->motor.wheel[0].cur_speed, status->motor.wheel[1].cur_speed,
+    status->motor.wheel[2].cur_speed, status->motor.wheel[3].cur_speed);
+
+
 
   // log_uprintf(&huart1, "%d %d %d %d\r\n", cross_cnt, cross_delay, Turn_or_Straight(), status->state.road_determine.cross);
 
@@ -308,6 +327,10 @@ void update_status(STATUS *status) {
     status->task.stop_cmd = 1;
     status->motor.wheel[0].tar_speed = 0;
     status->motor.wheel[1].tar_speed = 0;
+  }
+  if (status->state.motion == FOLLOW_LINE_TASK4) {
+    status->task.stop_cmd = 0;
+    follow_line_task4(status);
   }
   if (status->state.motion == MOTOR_TEST) {
     status->task.stop_cmd = 0;

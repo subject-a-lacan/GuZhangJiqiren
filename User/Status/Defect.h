@@ -55,4 +55,5 @@ void task_select(STATUS *status, uint8_t id);
 void update_task(STATUS *status);
 void update_task_led(STATUS *status);
 void task7_flush(void);
+void task4_debug_flush(void);
 #endif

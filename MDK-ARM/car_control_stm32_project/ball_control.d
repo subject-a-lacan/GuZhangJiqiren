@@ -44,5 +44,5 @@ car_control_stm32_project/ball_control.o: ../User/Status/ball_control.c \
   ../User/Device\buzzer.h ../User/Status/Defect.h \
   ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h ../User/Tool\pid.h \
   ../User/Sensor\uart_gyro.h ../User/Device\led.h ../User/Motor\servo.h \
-  ../User/Motor\wheel.h ../User/It\uart_it.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h
+  ../User/Motor\wheel.h ../User/Tool\car_speed_profile.h \
+  ../User/It\uart_it.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h

@@ -920,6 +920,11 @@
               <FileType>5</FileType>
               <FilePath>..\User\Tool\task.h</FilePath>
             </File>
+            <File>
+              <FileName>car_speed_profile.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Tool\car_speed_profile.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

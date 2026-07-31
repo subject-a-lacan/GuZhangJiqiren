@@ -219,6 +219,9 @@ void UART_PID_Tune(uint8_t cmd, float val, uint8_t has_val) {
               status.motor.wheel[3].wheel_pid.ki = val; break;
     case 'h': status.state.base_speed = (int16_t)val; break;
     case 't': task_select(&status, (uint8_t)val); break;
+    case 'A': status.control.ball.kp = val; break;  /* ball PD: position gain */
+    case 'D': status.control.ball.kd = val; break;  /* ball PD: velocity gain */
+    case 'I': status.control.ball.ki = val; break;  /* ball  I: stuck integral */
     default: handled = 0; break;
   }
   if (handled) {

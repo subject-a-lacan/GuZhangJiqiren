@@ -24,6 +24,8 @@ typedef struct PID {
 PID init_pid(float kp, float ki, float kd, float T, float integral_max, float InteralCoef);
 // PID 计算函数 参数 error: 误差
 float compute_pid(PID *pid, float error);
+// PID 状态复位：清零 error/integral/derivative/out，保留参数
+void pid_reset_state(PID *pid);
 
 /* 编码器脉冲 → 距离(cm) 转换参数 */
 #define ENCODER_PPR 13                    // 编码器线数
