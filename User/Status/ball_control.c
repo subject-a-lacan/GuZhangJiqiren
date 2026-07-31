@@ -105,6 +105,87 @@ static float ball_fall_ratio(float value, float full, float off) {
   return (off - value) / (off - full);
 }
 
+static float ball_clampf(float value, float min, float max) {
+  if (value < min) return min;
+  if (value > max) return max;
+  return value;
+}
+
+static uint8_t ball_stepper_accel_to_param(float accel_rpm_s) {
+  if (accel_rpm_s < 79.0f) accel_rpm_s = 79.0f;
+  float param = 256.0f - 20000.0f / accel_rpm_s;
+  param = ball_clampf(param, 1.0f, 255.0f);
+  return (uint8_t)(param + 0.5f);
+}
+
+typedef struct {
+  uint8_t valid;
+  int32_t target_pulse;
+  uint16_t velocity_rpm;
+  uint8_t accel_param;
+  int8_t direction;
+  uint8_t reverse_guard_after;
+  float move_ratio;
+} BALL_STEPPER_COMMAND;
+
+static BALL_STEPPER_COMMAND ball_stepper_prepare_command(
+    const BALL_CONTROL *ball, int32_t raw_target_pulse, uint32_t now_ms) {
+  BALL_STEPPER_COMMAND cmd = {0};
+  const BALL_STEPPER_PROFILE *profile = &ball->stepper_profile;
+
+  int64_t delta64 = (int64_t)raw_target_pulse - (int64_t)profile->last_target_pulse;
+  uint32_t distance = delta64 < 0 ? (uint32_t)(-delta64) : (uint32_t)delta64;
+  int8_t direction = delta64 > 0 ? 1 : -1;
+  uint8_t reversing = profile->last_direction != 0 &&
+                      direction != profile->last_direction &&
+                      distance >= BALL_STEPPER_REVERSE_MIN_PULSE;
+  uint32_t elapsed_ms = now_ms - profile->last_publish_ms;
+
+  if (distance <= BALL_STEPPER_DEADBAND_PULSE) return cmd;
+  if (elapsed_ms < BALL_STEPPER_MIN_PUBLISH_MS &&
+      distance < BALL_STEPPER_URGENT_PULSE && !reversing)
+    return cmd;
+
+  float ratio = ((float)distance - (float)BALL_STEPPER_DEADBAND_PULSE) /
+                ((float)BALL_STEPPER_FULL_SPEED_PULSE - (float)BALL_STEPPER_DEADBAND_PULSE);
+  ratio = ball_clampf(ratio, 0.0f, 1.0f);
+  float smooth_ratio = ratio * ratio * (3.0f - 2.0f * ratio);
+
+  float velocity_rpm = BALL_STEPPER_VEL_MIN_RPM +
+                       (BALL_STEPPER_VEL_MAX_RPM - BALL_STEPPER_VEL_MIN_RPM) * smooth_ratio;
+  float accel_rpm_s = BALL_STEPPER_ACCEL_MIN_RPM_S +
+                      (BALL_STEPPER_ACCEL_MAX_RPM_S - BALL_STEPPER_ACCEL_MIN_RPM_S) * smooth_ratio;
+
+  uint8_t guard = profile->reverse_guard;
+  if (reversing) guard = BALL_STEPPER_REVERSE_GUARD_COUNT;
+  if (guard > 0u) {
+    if (velocity_rpm > BALL_STEPPER_REVERSE_MAX_RPM) velocity_rpm = BALL_STEPPER_REVERSE_MAX_RPM;
+    if (accel_rpm_s > BALL_STEPPER_REVERSE_ACCEL_RPM_S) accel_rpm_s = BALL_STEPPER_REVERSE_ACCEL_RPM_S;
+    guard--;
+  }
+
+  cmd.valid = 1;
+  cmd.target_pulse = raw_target_pulse;
+  cmd.velocity_rpm = (uint16_t)(velocity_rpm + 0.5f);
+  cmd.accel_param = ball_stepper_accel_to_param(accel_rpm_s);
+  cmd.direction = direction;
+  cmd.reverse_guard_after = guard;
+  cmd.move_ratio = smooth_ratio;
+  return cmd;
+}
+
+static void ball_stepper_commit_command(BALL_CONTROL *ball,
+    const BALL_STEPPER_COMMAND *cmd, uint32_t now_ms) {
+  BALL_STEPPER_PROFILE *profile = &ball->stepper_profile;
+  profile->last_target_pulse = cmd->target_pulse;
+  profile->last_publish_ms = now_ms;
+  profile->velocity_rpm = cmd->velocity_rpm;
+  profile->accel_param = cmd->accel_param;
+  profile->last_direction = cmd->direction;
+  profile->reverse_guard = cmd->reverse_guard_after;
+  profile->move_ratio = cmd->move_ratio;
+}
+
 void ball_control_init(STATUS *status) {
   status->sensor.vision.ball.x10 = 0;
   status->sensor.vision.ball.timestamp_ms = 0;
@@ -137,6 +218,16 @@ void ball_control_init(STATUS *status) {
   status->control.ball.integral_accel_mm_s2 = 0.0f;
   status->control.ball.hold_timer_s = 0.0f;
   status->control.ball.hold_active = 0;
+
+  status->control.ball.consumed_target_mm = 0.0f;
+  status->control.ball.stepper_profile.last_target_pulse = BALL_STEPPER_ZERO_PULSE;
+  status->control.ball.stepper_profile.last_publish_ms = 0u;
+  status->control.ball.stepper_profile.velocity_rpm = 0u;
+  status->control.ball.stepper_profile.accel_param =
+      ball_stepper_accel_to_param(BALL_STEPPER_ACCEL_MIN_RPM_S);
+  status->control.ball.stepper_profile.last_direction = 0;
+  status->control.ball.stepper_profile.reverse_guard = 0u;
+  status->control.ball.stepper_profile.move_ratio = 0.0f;
 }
 
 void ball_control_request(STATUS *status, float target_mm,
@@ -201,7 +292,20 @@ void ball_control_service(STATUS *status) {
     ball->integral_accel_mm_s2 = 0.0f;
     ball->hold_timer_s = 0.0f;
     ball->hold_active = 0;
+    ball->consumed_target_mm = request.target_mm;
+    ball->stepper_profile.last_publish_ms =
+        (uint32_t)status->state.time - BALL_STEPPER_MIN_PUBLISH_MS;
+    ball->stepper_profile.last_direction = 0;
+    ball->stepper_profile.reverse_guard = 0u;
     ball->consumed_session_seq = request.session_seq;
+  }
+
+  if (request.target_mm != ball->consumed_target_mm) {
+    ball->stuck_timer_s = 0.0f;
+    ball->integral_accel_mm_s2 = 0.0f;
+    ball->hold_timer_s = 0.0f;
+    ball->hold_active = 0;
+    ball->consumed_target_mm = request.target_mm;
   }
 
   if (vision_changed && vision->valid) {
@@ -336,15 +440,21 @@ void ball_control_service(STATUS *status) {
   ball->consumed_request_seq = request.publish_seq;
 
   {
-    uint32_t primask = __get_PRIMASK();
-    __disable_irq();
-    if (status->control.ball.request.enabled &&
-        status->control.ball.request.publish_seq == request.publish_seq &&
-        status->control.ball.request.session_seq == request.session_seq) {
-      stepper_publish_absolute(ball->absolute_target_pulse,
-                               BALL_STEPPER_VELOCITY,
-                               BALL_STEPPER_ACCEL_PARAM);
+    uint32_t now_ms = (uint32_t)status->state.time;
+    BALL_STEPPER_COMMAND cmd = ball_stepper_prepare_command(
+        ball, ball->absolute_target_pulse, now_ms);
+
+    if (cmd.valid) {
+      uint32_t primask = __get_PRIMASK();
+      __disable_irq();
+      if (status->control.ball.request.enabled &&
+          status->control.ball.request.publish_seq == request.publish_seq &&
+          status->control.ball.request.session_seq == request.session_seq) {
+        stepper_publish_absolute(cmd.target_pulse, cmd.velocity_rpm,
+                                 cmd.accel_param);
+        ball_stepper_commit_command(ball, &cmd, now_ms);
+      }
+      if (!primask) __enable_irq();
     }
-    if (!primask) __enable_irq();
   }
 }

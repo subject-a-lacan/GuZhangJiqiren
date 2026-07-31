@@ -92,6 +92,7 @@ void stepper_publish_absolute(int32_t absolute_pulse, uint16_t vel, uint8_t acc)
   __disable_irq();
   if (!target->enabled || target->absolute_pulse != absolute_pulse ||
       target->velocity != vel || target->accel_param != acc) {
+    status.stepper.reached = 0;
     target->enabled = 1;
     target->absolute_pulse = absolute_pulse;
     target->velocity = vel;

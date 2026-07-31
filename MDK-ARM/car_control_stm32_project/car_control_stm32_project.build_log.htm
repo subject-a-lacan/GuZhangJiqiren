@@ -44,7 +44,7 @@ Build target 'car_control_stm32_project'
 #define GEAR_RATIO 28.0f                  // <U+51CF><U+901F><U+6BD4> 1:28<U+FF08><U+7535><U+673A>:<U+8F66><U+8F6E><U+FF09>
         ^
 ../Core/Src/main.c(32): warning: In file included from...
-../User/Status\status.h(208): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+../User/Status\status.h(220): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
   ^
 ../User/Status/Defect.h(6): note: previous definition is here
@@ -69,7 +69,7 @@ compiling main.c...
 #define GEAR_RATIO 28.0f                  // <U+51CF><U+901F><U+6BD4> 1:28<U+FF08><U+7535><U+673A>:<U+8F66><U+8F6E><U+FF09>
         ^
 ../User/Status/status.c(1): warning: In file included from...
-../User/Status/status.h(208): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+../User/Status/status.h(220): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
   ^
 ../User/Status/Defect.h(6): note: previous definition is here
@@ -97,7 +97,7 @@ compiling status.c...
 #define GEAR_RATIO 28.0f                  // <U+51CF><U+901F><U+6BD4> 1:28<U+FF08><U+7535><U+673A>:<U+8F66><U+8F6E><U+FF09>
         ^
 ../User/Status/ball_control.c(3): warning: In file included from...
-../User/Status/status.h(208): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+../User/Status/status.h(220): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
   ^
 ../User/Status/Defect.h(6): note: previous definition is here
@@ -122,7 +122,7 @@ compiling ball_control.c...
 #define GEAR_RATIO 28.0f                  // <U+51CF><U+901F><U+6BD4> 1:28<U+FF08><U+7535><U+673A>:<U+8F66><U+8F6E><U+FF09>
         ^
 ../User/Status/Defect.c(2): warning: In file included from...
-../User/Status/status.h(208): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+../User/Status/status.h(220): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
 } STATUS;
   ^
 ../User/Status/Defect.h(6): note: previous definition is here
@@ -131,7 +131,7 @@ typedef struct STATUS STATUS;
 3 warnings generated.
 compiling Defect.c...
 linking...
-Program Size: Code=51250 RO-data=38322 RW-data=52 ZI-data=5812  
+Program Size: Code=52010 RO-data=38322 RW-data=52 ZI-data=5836  
 FromELF: creating hex file...
 "car_control_stm32_project\car_control_stm32_project.axf" - 0 Error(s), 13 Warning(s).
 

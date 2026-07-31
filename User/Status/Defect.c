@@ -365,12 +365,9 @@ static void driver_task3(STATUS *status) {
 
   case Q3_WAIT_POS5: {
     float pos = status->control.ball.estimator.position_mm;
-    float vel = status->control.ball.estimator.velocity_mm_s;
     float err = pos - 50.0f;
     if (err < 0.0f) err = -err;
-    if (vel < 0.0f) vel = -vel;
-    if (status->control.ball.estimator.control_ready &&
-        err <= 5.0f && vel <= 12.0f)
+    if (status->control.ball.estimator.control_ready && err <= 5.0f)
       q3_state = Q3_GO_NEG5;
     break;
   }
@@ -382,12 +379,9 @@ static void driver_task3(STATUS *status) {
 
   case Q3_WAIT_NEG5: {
     float pos = status->control.ball.estimator.position_mm;
-    float vel = status->control.ball.estimator.velocity_mm_s;
     float err = pos - (-50.0f);
     if (err < 0.0f) err = -err;
-    if (vel < 0.0f) vel = -vel;
-    if (status->control.ball.estimator.control_ready &&
-        err <= 5.0f && vel <= 12.0f)
+    if (status->control.ball.estimator.control_ready && err <= 5.0f)
       q3_state = Q3_DONE;
     break;
   }

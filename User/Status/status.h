@@ -154,6 +154,16 @@ typedef struct {
 } BALL_ESTIMATOR;
 
 typedef struct {
+  int32_t last_target_pulse;
+  uint32_t last_publish_ms;
+  uint16_t velocity_rpm;
+  uint8_t accel_param;
+  int8_t last_direction;
+  uint8_t reverse_guard;
+  float move_ratio;
+} BALL_STEPPER_PROFILE;
+
+typedef struct {
   BALL_CONTROL_REQUEST request;
   BALL_ESTIMATOR estimator;
   uint32_t consumed_request_seq;
@@ -169,6 +179,8 @@ typedef struct {
   float integral_accel_mm_s2;
   float hold_timer_s;
   uint8_t hold_active;
+  float consumed_target_mm;
+  BALL_STEPPER_PROFILE stepper_profile;
 } BALL_CONTROL;
 
 typedef struct {
