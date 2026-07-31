@@ -146,8 +146,9 @@ int main(void)
   status.state.motion = STOP;
   init_uart_pid_tune();
   init_uart_gyr();
+  init_stepper_uart();
   init_maixcam_uart();
-  ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
+  // ESP8266_Init("F521F520","f521f520","192.168.112.154","8080");
   esp8266_ready = 1;
   gan_init();
   status.device.buzzer.on = 1;
@@ -233,6 +234,7 @@ void gan_init(void) {
   Emm_V5_Reset_CurPos_To_Zero(1);
   HAL_Delay(50);
   Emm_V5_Pos_Control(1, 0, 50, 0, 2773, false, false);
+  while (huart3.gState != HAL_UART_STATE_READY) {}
 }
 /* USER CODE END 4 */
 

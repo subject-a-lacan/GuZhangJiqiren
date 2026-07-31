@@ -66,6 +66,21 @@ void init_uart_pid_tune(void) {
   HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
 }
 
+static uint8_t stepper_rx_byte;
+
+void stepper_request_move(uint32_t clk, uint16_t vel, uint8_t acc) {
+  status.stepper.reached = 0;
+  status.stepper.busy = 1;
+  status.stepper.clk = clk;
+  Emm_V5_Pos_Control(1, 0, vel, acc, clk, false, false);
+}
+
+void init_stepper_uart(void) {
+  HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(USART3_IRQn);
+  HAL_UART_Receive_IT(&huart3, &stepper_rx_byte, 1);
+}
+
 void init_uart_gyr(void) {
   uart_gyr_init(&status.sensor.uart_gyr);
   uart_gyr_start_receive(&status.sensor.uart_gyr);
@@ -138,6 +153,19 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (esp8266_ready) parse_uart_pid_byte(&uart1_pid_rx);
     HAL_UART_Receive_IT(&huart1, &uart1_pid_byte, 1);
   }
+  if (huart == &huart3) {
+    static uint8_t buf[4], idx;
+    static const uint8_t reached_frame[4] = {0x01, 0xFD, 0x9F, 0x6B};
+    buf[idx] = stepper_rx_byte;
+    if (buf[idx] == reached_frame[idx]) {
+      idx++;
+      if (idx == 4) { status.stepper.reached = 1; status.stepper.busy = 0; idx = 0; }
+    } else {
+      idx = (stepper_rx_byte == 0x01) ? 1 : 0;
+      if (idx) buf[0] = 0x01;
+    }
+    HAL_UART_Receive_IT(&huart3, &stepper_rx_byte, 1);
+  }
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
@@ -167,6 +195,12 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     status.sensor.uart_gyr.count = 0;
     huart->ErrorCode = HAL_UART_ERROR_NONE;
     uart_gyr_start_receive(&status.sensor.uart_gyr);
+  }
+  if (huart == &huart3) {
+    HAL_UART_AbortReceive(huart);
+    __HAL_UART_CLEAR_OREFLAG(huart);
+    __HAL_UART_CLEAR_FEFLAG(huart);
+    HAL_UART_Receive_IT(&huart3, &stepper_rx_byte, 1);
   }
   if (huart == &huart4) {
     HAL_UART_AbortReceive(huart);

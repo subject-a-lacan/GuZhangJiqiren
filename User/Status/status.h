@@ -119,12 +119,19 @@ typedef struct STATE {
   STATUS_PID status_pid;  // PID结构体
 } STATE;
 
+typedef struct {
+  volatile uint8_t reached;   // set by RX ISR when 01 FD 9F 6B received
+  volatile uint8_t busy;      // 1 = motion in progress
+  uint32_t clk;               // last-requested pulse count
+} STEPPER;
+
 typedef struct STATUS {
   STATE state;
-  SENSOR sensor;  // 传感器数据
-  MOTOR motor;    // 电机数据
+  SENSOR sensor;
+  MOTOR motor;
   DEVICE device;
   TASK task;
+  STEPPER stepper;
 } STATUS;
 
 extern STATUS status;

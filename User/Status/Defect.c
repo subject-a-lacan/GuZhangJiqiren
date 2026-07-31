@@ -186,29 +186,43 @@ static void driver_task6(STATUS *status) {
       iic_gyr_get_value(&status->sensor.gy901, gyr_a_y));
 }
 static void driver_task7(STATUS *status) {
+  typedef enum { Q7_SEND = 0, Q7_WAIT, Q7_DONE } Q7_STATE;
+  static Q7_STATE q7_state = Q7_SEND;
   static uint8_t q7_dir;
-  static uint16_t q7_timer;
-  const uint32_t q7_angle_clk = 6400u; /* 90 degrees at 25600 pulses/rev (128-step) */
+  static uint32_t q7_timeout;
+  const uint32_t q7_clk = 6400u;
 
   status->task.task_running = 1;
   status->state.motion = STOP;
   status->state.base_speed = 0;
 
   if (status->task.phase_mileage == 0) {
+    q7_state = Q7_SEND;
     q7_dir = 0;
-    q7_timer = 0;
     status->task.phase_mileage = 1;
-    Emm_V5_En_Control(1, true, false);
-    Emm_V5_Reset_CurPos_To_Zero(1);
-    Emm_V5_Pos_Control(1, q7_dir, 20, 0, q7_angle_clk, false, false);
   }
 
-  q7_timer += (uint16_t)status->state.T;
+  switch (q7_state) {
 
-  if (q7_timer >= 5000) {
-    q7_timer = 0;
-    q7_dir = (uint8_t)(q7_dir ^ 1u);
-    Emm_V5_Pos_Control(1, q7_dir, 20, 0, q7_angle_clk, false, false);
+  case Q7_SEND:
+    stepper_request_move(q7_clk, 20, 0);
+    q7_timeout = status->state.time + 3000;
+    q7_state = Q7_WAIT;
+    break;
+
+  case Q7_WAIT:
+    if (status->stepper.reached) {
+      status->stepper.reached = 0;
+      q7_dir = (uint8_t)(q7_dir ^ 1u);
+      q7_state = Q7_DONE;
+    } else if (status->state.time >= q7_timeout) {
+      q7_state = Q7_DONE;
+    }
+    break;
+
+  case Q7_DONE:
+    /* single shot — stop to re-arm */
+    break;
   }
 }
 
