@@ -44,6 +44,7 @@
 #include "maixcam.h"
 #include "Emm_v5.h"
 #include "ball_control.h"
+#include "ball_id.h"
 
 /* USER CODE END Includes */
 
@@ -169,9 +170,25 @@ int main(void)
         maixcam_poll_next = status.state.time + 8;
       }
     }
-    ball_control_service(&status);
+    /* KEY1 (B11, active-low) advances to next identification run */
+    {
+      static uint8_t last_b11 = 1;
+      uint8_t now_b11 = status.device.button_B11.now;
+      if (last_b11 == 1 && now_b11 == 0 && !ball_id.active) {
+        ball_id_try_next(&status);
+      }
+      last_b11 = now_b11;
+    }
+
+    if (ball_id.active) {
+      ball_id_service(&status);
+      ball_id_log_service(&status);
+    } else {
+      ball_control_service(&status);
+    }
     stepper_service();
     task7_flush();
+    ball_id_log_flush();
     task4_debug_flush();
     PERIODIC_START(Gray_ADC_Update, 5)
       driver_gw_analogue(&status.sensor.gw_analogue);

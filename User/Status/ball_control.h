@@ -57,5 +57,8 @@ void ball_control_request(struct STATUS *status, float target_mm,
                           float car_accel_mm_s2);
 void ball_control_disable(struct STATUS *status);
 void ball_control_service(struct STATUS *status);
+uint8_t ball_stepper_shaped_request(struct STATUS *status,
+    int32_t raw_absolute_pulse, uint32_t now_ms);
+int32_t ball_accel_to_absolute_pulse(float accel_mm_s2);
 
 #endif

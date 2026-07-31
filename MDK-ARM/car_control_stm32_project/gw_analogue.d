@@ -44,5 +44,6 @@ car_control_stm32_project/gw_analogue.o: ../User/Sensor/gw_analogue.c \
   ../User/Device\buzzer.h ../User/Status/Defect.h ../User/Sensor\gy901.h \
   ../User/Tool\pid.h ../User/Sensor\uart_gyro.h ../User/Device\led.h \
   ../User/Motor\servo.h ../User/Motor\wheel.h \
-  ../User/Tool\car_speed_profile.h ../User/Tool\math_tool.h \
+  ../User/Tool\car_speed_profile.h ../User/Status/ball_id.h \
+  ../User/Tool\math_tool.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h

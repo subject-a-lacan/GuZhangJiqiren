@@ -11,6 +11,7 @@
 #include "wheel.h"
 #include "uart_it.h"
 #include "ball_control.h"
+#include "ball_id.h"
 
 STATUS status;
 
@@ -183,6 +184,7 @@ void init_status(STATUS *status, uint8_t T) {
   init_sensor(status);
 
   ball_control_init(status);
+  ball_id_init(status);
 
   car_speed_profile_init(&status->control.car_speed,
                          (float)T * 0.001f, MM_PER_COUNT);

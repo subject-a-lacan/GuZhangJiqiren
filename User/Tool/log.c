@@ -42,10 +42,10 @@ void log_uprintf(UART_HandleTypeDef *huart, const char *format, ...) {
 }
 
 void UART_send_justfloat(UART_HandleTypeDef *huart, unsigned int count, ...) {
-  float data[16];
+  float data[24];
   uint8_t tail[4] = {0x00, 0x00, 0x80, 0x7f};
   va_list args;
-  if (count > 16) count = 16;
+  if (count > 24) count = 24;
   va_start(args, count);
   for (unsigned int i = 0; i < count; ++i) data[i] = (float)va_arg(args, double);
   va_end(args);

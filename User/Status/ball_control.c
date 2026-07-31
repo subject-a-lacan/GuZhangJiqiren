@@ -458,3 +458,24 @@ void ball_control_service(STATUS *status) {
     }
   }
 }
+
+uint8_t ball_stepper_shaped_request(STATUS *status,
+    int32_t raw_absolute_pulse, uint32_t now_ms) {
+  BALL_CONTROL *ball = &status->control.ball;
+  BALL_STEPPER_COMMAND cmd = ball_stepper_prepare_command(
+      ball, raw_absolute_pulse, now_ms);
+  if (!cmd.valid) return 0;
+
+  uint32_t primask = __get_PRIMASK();
+  __disable_irq();
+  stepper_publish_absolute(cmd.target_pulse, cmd.velocity_rpm,
+                           cmd.accel_param);
+  ball_stepper_commit_command(ball, &cmd, now_ms);
+  if (!primask) __enable_irq();
+  return 1;
+}
+
+int32_t ball_accel_to_absolute_pulse(float accel_mm_s2) {
+  int32_t relative = ball_find_relative_pulse(accel_mm_s2, 0.0f);
+  return BALL_STEPPER_ZERO_PULSE + relative;
+}

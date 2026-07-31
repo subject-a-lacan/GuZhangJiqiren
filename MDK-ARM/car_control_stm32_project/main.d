@@ -45,8 +45,8 @@ car_control_stm32_project/main.o: ../Core/Src/main.c ../Core/Inc\main.h \
   ../User/Status/Defect.h ../User/Sensor\gw_anagloge.h \
   ../User/Sensor\gy901.h ../User/Tool\pid.h ../User/Sensor\uart_gyro.h \
   ../User/Device\led.h ../User/Motor\servo.h ../User/Motor\wheel.h \
-  ../User/Tool\car_speed_profile.h ../User/It\uart_it.h \
-  ../User/Tool\math_tool.h \
+  ../User/Tool\car_speed_profile.h ../User/Status/ball_id.h \
+  ../User/It\uart_it.h ../User/Tool\math_tool.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h ../User/Tool\task.h \
   ../Core/Inc\lora.h ../User/Sensor\maixcam.h ../User/Motor\Emm_v5.h \

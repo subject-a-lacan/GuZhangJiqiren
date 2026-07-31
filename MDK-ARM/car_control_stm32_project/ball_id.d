@@ -1,8 +1,8 @@
-car_control_stm32_project/ball_control.o: ../User/Status/ball_control.c \
-  ../User/Status/ball_control.h \
+car_control_stm32_project/ball_id.o: ../User/Status/ball_id.c \
+  ../User/Status/ball_id.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
-  ../User/Motor\ball_mechanism_lut.h ../User/Status/status.h \
-  ../User/Device\button.h ../Core/Inc\main.h \
+  ../User/Status/ball_control.h ../User/Motor\ball_mechanism_lut.h \
+  ../User/Status/status.h ../User/Device\button.h ../Core/Inc\main.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal.h \
   ../Core/Inc\stm32g4xx_hal_conf.h \
   ../Drivers/STM32G4xx_HAL_Driver/Inc\stm32g4xx_hal_rcc.h \
@@ -45,5 +45,5 @@ car_control_stm32_project/ball_control.o: ../User/Status/ball_control.c \
   ../User/Sensor\gw_anagloge.h ../User/Sensor\gy901.h ../User/Tool\pid.h \
   ../User/Sensor\uart_gyro.h ../User/Device\led.h ../User/Motor\servo.h \
   ../User/Motor\wheel.h ../User/Tool\car_speed_profile.h \
-  ../User/Status/ball_id.h ../User/It\uart_it.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h
+  ../User/It\uart_it.h ../User/Sensor\maixcam.h ../User/Tool\log.h \
+  ../Core/Inc\usart.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h

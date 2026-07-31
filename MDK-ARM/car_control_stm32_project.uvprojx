@@ -720,6 +720,11 @@
               <FileType>5</FileType>
               <FilePath>..\User\Status\ball_control.h</FilePath>
             </File>
+            <File>
+              <FileName>ball_id.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Status\ball_id.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

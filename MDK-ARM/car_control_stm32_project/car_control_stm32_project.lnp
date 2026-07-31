@@ -45,6 +45,7 @@
 "car_control_stm32_project\status.o"
 "car_control_stm32_project\defect.o"
 "car_control_stm32_project\ball_control.o"
+"car_control_stm32_project\ball_id.o"
 "car_control_stm32_project\abslute_angle_sensor.o"
 "car_control_stm32_project\gy901.o"
 "car_control_stm32_project\uart_gyro.o"

@@ -143,6 +143,10 @@ void stepper_service(void) {
   if (Emm_V5_Pos_Absolute_Try(1, target.absolute_pulse, target.velocity,
                               target.accel_param, false)) {
     status.stepper.tx.last_started_seq = target.publish_seq;
+    status.stepper.tx.last_started_pulse = target.absolute_pulse;
+    status.stepper.tx.last_started_velocity = target.velocity;
+    status.stepper.tx.last_started_accel = target.accel_param;
+    status.stepper.tx.last_started_ms = status.state.time;
     status.stepper.reached = 0;
     status.stepper.busy = 1;
     status.stepper.clk = target.absolute_pulse < 0

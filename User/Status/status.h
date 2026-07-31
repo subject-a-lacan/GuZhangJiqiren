@@ -15,6 +15,7 @@
 #include "servo.h"
 #include "wheel.h"
 #include "car_speed_profile.h"
+#include "ball_id.h"
 
 #define MOTION_BASE_SPEED 2000
 
@@ -199,6 +200,10 @@ typedef struct {
 typedef struct {
   volatile uint8_t dma_busy;
   uint32_t last_started_seq;
+  int32_t  last_started_pulse;
+  uint16_t last_started_velocity;
+  uint8_t  last_started_accel;
+  uint32_t last_started_ms;
 } STEPPER_TX;
 
 typedef struct {

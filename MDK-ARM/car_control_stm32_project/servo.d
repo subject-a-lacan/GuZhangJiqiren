@@ -44,4 +44,5 @@ car_control_stm32_project/servo.o: ../User/Motor/servo.c \
   ../User/Status/Defect.h ../User/Sensor\gw_anagloge.h \
   ../User/Sensor\gy901.h ../User/Tool\pid.h ../User/Sensor\uart_gyro.h \
   ../User/Device\led.h ../User/Motor\wheel.h \
-  ../User/Tool\car_speed_profile.h ../Core/Inc\tim.h
+  ../User/Tool\car_speed_profile.h ../User/Status/ball_id.h \
+  ../Core/Inc\tim.h
