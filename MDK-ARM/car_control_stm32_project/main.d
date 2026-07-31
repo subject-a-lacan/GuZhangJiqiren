@@ -48,4 +48,5 @@ car_control_stm32_project/main.o: ../Core/Src/main.c ../Core/Inc\main.h \
   ../User/It\uart_it.h ../User/Tool\math_tool.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h ../User/Tool\task.h \
-  ../Core/Inc\lora.h ../User/Sensor\maixcam.h
+  ../Core/Inc\lora.h ../User/Sensor\maixcam.h ../User/Motor\Emm_v5.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h

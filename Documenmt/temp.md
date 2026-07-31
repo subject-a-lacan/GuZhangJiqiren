@@ -1,215 +1,177 @@
-算完了。按照 qiankui.md 的形式，固定采用你实测的公共死区：
-
-D
-+
-=680,D
-−
-=730
-
-其中：
-
-D
-+
-：正转死区PWM；
-D
-−
-：反转死区PWM的绝对值；
-v：目标速度，单位与记录数据中的速度变量完全相同；
-u
-ff
-	​
-
-：前馈PWM。
-最终四轮前馈参数
-电机	正转斜率 k
-+
-	反转斜率 k
-−
-
-MOTOR0	247.0	212.2
-MOTOR1	247.7	214.0
-MOTOR2	243.0	211.0
-MOTOR3	247.5	213.2
-
-所以最终公式为：
-
-u
-ff,i
-	​
-
-=
-⎩
-⎨
-⎧
-	​
-
-0,
-680+k
-i
-+
-	​
-
-∣v∣,
-−(730+k
-i
-−
-	​
-
-∣v∣),
-	​
-
-v=0
-v>0
-v<0
-	​
-
-
-分别展开就是：
-
-MOTOR0: {
-680+247.0∣v∣,
-−(730+212.2∣v∣),
-	​
-
-v>0
-v<0
-	​
-
-	​
-
-MOTOR1: {
-680+247.7∣v∣,
-−(730+214.0∣v∣),
-	​
-
-v>0
-v<0
-	​
-
-	​
-
-MOTOR2: {
-680+243.0∣v∣,
-−(730+211.0∣v∣),
-	​
-
-v>0
-v<0
-	​
-
-	​
-
-MOTOR3: {
-680+247.5∣v∣,
-−(730+213.2∣v∣),
-	​
-
-v>0
-v<0
-	​
-
-	​
-
-数据清洗情况
-
-实际拟合前做了这些剔除：
-
-4000 PWM：剔除末尾2帧明显降速数据；
-6400 PWM：剔除末尾8帧减速及重新加速数据；
-8500 PWM：MOTOR3全部剔除，MOTOR0～2保留；
-不完整的JustFloat首帧直接丢弃；
-1600 PWM与800 PWM的数据逐字节完全相同，因此剔除错误的1600 PWM；
--3200 PWM与-2400 PWM也逐字节完全相同，因此剔除错误的-3200 PWM。
-
-拟合采用每档PWM的稳态平均速度，并固定死区，计算：
-
-k
-i
-+
-	​
-
-=
-∑
-j
-	​
-
-v
-ˉ
-ij
-2
-	​
-
-∑
-j
-	​
-
-v
-ˉ
-ij
-	​
-
-(P
-j
-	​
-
-−680)
-	​
-
-
-反转时使用速度和PWM的绝对值：
-
-k
-i
-−
-	​
-
-=
-∑
-j
-	​
-
-∣
-v
-ˉ
-ij
-	​
-
-∣
-2
-∑
-j
-	​
-
-∣
-v
-ˉ
-ij
-	​
-
-∣(∣P
-j
-	​
-
-∣−730)
-	​
-
-
-其中：
-
-i：MOTOR0～MOTOR3；
-j：不同PWM档位；
-v
-ˉ
-ij
-	​
-
-：第 i 个轮子在第 j 档PWM下的稳态平均速度；
-P
-j
-	​
-
-：该档PWM。
-
-四个电机的正转斜率最大只相差约 1.9%，反转斜率最大只相差约 1.4%，整体一致性很好。反转因为真正的 -3200 PWM 数据缺失，目前参数可用，但可信度低于正转；以后补测这一档再重新拟合会更稳。
-
-全程没有修改任何代码。
+*** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
+Rebuild target 'car_control_stm32_project'
+assembling startup_stm32g474xx.s...
+compiling gpio.c...
+compiling adc.c...
+compiling stm32g4xx_hal_adc.c...
+../Core/Src/lora.c(31): warning: implicitly declaring library function 'strlen' with type 'unsigned int (const char *)' [-Wimplicit-function-declaration]
+    uart1_tx((uint8_t*)buf, strlen(buf));
+                            ^
+../Core/Src/lora.c(31): note: include the header <string.h> or explicitly provide a declaration for 'strlen'
+1 warning generated.
+compiling lora.c...
+compiling spi.c...
+compiling i2c.c...
+compiling stm32g4xx_hal_msp.c...
+compiling dma.c...
+compiling stm32g4xx_hal.c...
+compiling usart.c...
+compiling tim.c...
+compiling stm32g4xx_it.c...
+compiling stm32g4xx_hal_adc_ex.c...
+compiling stm32g4xx_hal_flash.c...
+compiling stm32g4xx_hal_flash_ramfunc.c...
+compiling stm32g4xx_hal_pwr.c...
+compiling stm32g4xx_hal_rcc.c...
+compiling stm32g4xx_hal_rcc_ex.c...
+../Core/Src/main.c(32): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+../Core/Src/main.c(151): warning: implicit declaration of function 'gan_init' is invalid in C99 [-Wimplicit-function-declaration]
+  gan_init();
+  ^
+../Core/Src/main.c(229): error: conflicting types for 'gan_init'
+void gan_init(void) {
+     ^
+../Core/Src/main.c(151): note: previous implicit declaration is here
+  gan_init();
+  ^
+2 warnings and 1 error generated.
+compiling main.c...
+compiling stm32g4xx_hal_i2c_ex.c...
+compiling stm32g4xx_hal_exti.c...
+compiling stm32g4xx_ll_adc.c...
+compiling stm32g4xx_hal_cortex.c...
+compiling stm32g4xx_hal_dma_ex.c...
+compiling stm32g4xx_hal_dma.c...
+compiling stm32g4xx_hal_gpio.c...
+compiling stm32g4xx_hal_pwr_ex.c...
+compiling stm32g4xx_hal_spi_ex.c...
+compiling stm32g4xx_hal_flash_ex.c...
+compiling stm32g4xx_hal_i2c.c...
+compiling system_stm32g4xx.c...
+../User/Device/led.c(5): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling led.c...
+../User/Device/button.c(5): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling button.c...
+../User/It/timer_it.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling timer_it.c...
+compiling buzzer.c...
+../User/Device/device_test.c(4): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling device_test.c...
+../User/It/uart_it.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling uart_it.c...
+compiling stm32g4xx_hal_uart_ex.c...
+../User/Status/status.c(1): warning: In file included from...
+../User/Status/status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling status.c...
+compiling stm32g4xx_hal_tim.c...
+compiling stm32g4xx_hal_tim_ex.c...
+compiling stm32g4xx_hal_spi.c...
+compiling ms_find_line.c...
+compiling abslute_angle_sensor.c...
+compiling gy901.c...
+compiling stm32g4xx_hal_uart.c...
+compiling uart_gyro.c...
+../User/Status/Defect.c(2): warning: In file included from...
+../User/Status/status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling Defect.c...
+compiling maixcam.c...
+compiling radar.c...
+compiling lq_step.c...
+../User/Sensor/gw_analogue.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling gw_analogue.c...
+compiling Emm_v5.c...
+../User/Motor/servo.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling servo.c...
+compiling datou.c...
+../User/Motor/wheel.c(6): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling wheel.c...
+compiling yuntai.c...
+compiling eeprom.c...
+compiling log.c...
+../User/Tool/pid.c(7): warning: In file included from...
+../User/Status\status.h(128): warning: redefinition of typedef 'STATUS' is a C11 feature [-Wtypedef-redefinition]
+} STATUS;
+  ^
+../User/Status/Defect.h(6): note: previous definition is here
+typedef struct STATUS STATUS;
+                      ^
+1 warning generated.
+compiling pid.c...
+compiling array.c...
+"car_control_stm32_project\car_control_stm32_project.axf" - 1 Error(s), 14 Warning(s).
+Target not created.
+Build Time Elapsed:  00:00:04
