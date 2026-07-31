@@ -6,7 +6,7 @@
 struct STATUS;
 
 /* Mechanical/tuning parameters. Keep zero separate from the relative LUT. */
-#define BALL_STEPPER_ZERO_PULSE (3911)
+#define BALL_STEPPER_ZERO_PULSE (3399)  /* 47.8 deg */
 /* Full generated LUT range, one entry per pulse. */
 #define BALL_CONTROL_REL_PULSE_MIN (-2500)
 #define BALL_CONTROL_REL_PULSE_MAX (6908)
