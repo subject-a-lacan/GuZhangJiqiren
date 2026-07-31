@@ -7,9 +7,10 @@ struct STATUS;
 
 /* Mechanical/tuning parameters. Keep zero separate from the relative LUT. */
 #define BALL_STEPPER_ZERO_PULSE (3911)
-/* Active control range; it may be narrowed or widened within the LUT bounds. */
-#define BALL_CONTROL_REL_PULSE_MIN (-1000)
-#define BALL_CONTROL_REL_PULSE_MAX (1000)
+/* Full generated LUT range, one entry per pulse. */
+#define BALL_CONTROL_REL_PULSE_MIN (-2500)
+#define BALL_CONTROL_REL_PULSE_MAX (6908)
+#define BALL_CONTROL_CAR_ACCEL_LIMIT_MM_S2 (9810.0f)
 #define BALL_STEPPER_VELOCITY (50u)
 #define BALL_STEPPER_ACCEL_PARAM (0u)
 

@@ -2,6 +2,7 @@
 #include "ball_mechanism_lut.h"
 #include "status.h"
 #include "uart_it.h"
+#include <math.h>
 
 #if BALL_CONTROL_REL_PULSE_MIN < BALL_LUT_REL_PULSE_MIN || \
     BALL_CONTROL_REL_PULSE_MAX > BALL_LUT_REL_PULSE_MAX || \
@@ -10,6 +11,9 @@
 #endif
 
 #define BALL_ROLLING_FACTOR (5.0f / 7.0f)
+#define BALL_GRAVITY_MM_S2 (9810.0f)
+#define BALL_ROLLING_GRAVITY_MM_S2 \
+  (BALL_ROLLING_FACTOR * BALL_GRAVITY_MM_S2)
 
 typedef struct {
   uint8_t enabled;
@@ -32,32 +36,66 @@ static BALL_REQUEST_SNAPSHOT ball_request_snapshot(STATUS *status) {
   return snapshot;
 }
 
+static float ball_model_accel(uint32_t index, float car_accel_mm_s2) {
+  float gravity_accel =
+      (float)g_ball_mechanism_lut[index].gravity_accel_x10 /
+      BALL_LUT_A0_SCALE;
+
+  if (car_accel_mm_s2 == 0.0f) return gravity_accel;
+
+  /* Reconstruct cos(theta) from the same quantized gravity term.  Using the
+     separately quantized Q15 column can introduce tiny local reversals in the
+     otherwise descending full-range search key. */
+  {
+    float sin_theta = -gravity_accel / BALL_ROLLING_GRAVITY_MM_S2;
+    float cos_squared = 1.0f - sin_theta * sin_theta;
+    float cos_theta = sqrtf(cos_squared > 0.0f ? cos_squared : 0.0f);
+    return gravity_accel -
+           BALL_ROLLING_FACTOR * car_accel_mm_s2 * cos_theta;
+  }
+}
+
 static int32_t ball_find_relative_pulse(float requested_accel_mm_s2,
                                         float car_accel_mm_s2) {
-  float best_error = 3.402823466e+38f;
-  int32_t first_pulse = BALL_CONTROL_REL_PULSE_MIN;
-  int32_t last_pulse = BALL_CONTROL_REL_PULSE_MAX;
-  int32_t best_pulse = first_pulse;
+  uint32_t first_index = BallMechanismLut_IndexFromRelative(
+      BALL_CONTROL_REL_PULSE_MIN);
+  uint32_t end_index = BallMechanismLut_IndexFromRelative(
+                           BALL_CONTROL_REL_PULSE_MAX) +
+                       1u;
+  uint32_t lo = first_index;
+  uint32_t hi = end_index;
 
-  for (int32_t relative_pulse = first_pulse;
-       relative_pulse <= last_pulse; relative_pulse++) {
-    const BallMechanismLutEntry *entry =
-        &g_ball_mechanism_lut[BallMechanismLut_IndexFromRelative(relative_pulse)];
-    float model_accel;
-    float error;
+  if (car_accel_mm_s2 > BALL_CONTROL_CAR_ACCEL_LIMIT_MM_S2) {
+    car_accel_mm_s2 = BALL_CONTROL_CAR_ACCEL_LIMIT_MM_S2;
+  } else if (car_accel_mm_s2 < -BALL_CONTROL_CAR_ACCEL_LIMIT_MM_S2) {
+    car_accel_mm_s2 = -BALL_CONTROL_CAR_ACCEL_LIMIT_MM_S2;
+  }
 
-    model_accel = (float)entry->gravity_accel_x10 / BALL_LUT_A0_SCALE -
-                  BALL_ROLLING_FACTOR * car_accel_mm_s2 *
-                      ((float)entry->cos_theta_q15 / BALL_LUT_COS_Q15_SCALE);
-    error = model_accel - requested_accel_mm_s2;
-    if (error < 0.0f) error = -error;
-    if (error < best_error) {
-      best_error = error;
-      best_pulse = relative_pulse;
+  /* The model is descending with pulse. Find the first entry whose
+     acceleration is no greater than the requested acceleration. */
+  while (lo < hi) {
+    uint32_t mid = lo + (hi - lo) / 2u;
+    if (ball_model_accel(mid, car_accel_mm_s2) > requested_accel_mm_s2) {
+      lo = mid + 1u;
+    } else {
+      hi = mid;
     }
   }
 
-  return best_pulse;
+  if (lo == first_index) return BALL_CONTROL_REL_PULSE_MIN;
+  if (lo == end_index) return BALL_CONTROL_REL_PULSE_MAX;
+
+  {
+    float previous_error =
+        ball_model_accel(lo - 1u, car_accel_mm_s2) - requested_accel_mm_s2;
+    float current_error =
+        ball_model_accel(lo, car_accel_mm_s2) - requested_accel_mm_s2;
+    if (previous_error < 0.0f) previous_error = -previous_error;
+    if (current_error < 0.0f) current_error = -current_error;
+    if (previous_error <= current_error) lo--;
+  }
+
+  return BallMechanismLut_RelativeFromIndex(lo);
 }
 
 void ball_control_init(STATUS *status) {

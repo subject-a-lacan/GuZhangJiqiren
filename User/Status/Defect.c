@@ -332,14 +332,13 @@ static void driver_task5(STATUS *status) {
   }
 }
 static void driver_task6(STATUS *status) {
-  static uint32_t last;
-  status->state.motion = FIND_LINE;
-  status->task.stop_cmd = 0;
-  if (status->state.time - last >= 80) {
-    last = status->state.time;
-    UART_send_justfloat(&huart1, 2,
-      (float)status->state.base_speed,
-      status->sensor.gw_analogue.diff);
+  status->state.motion = STOP;
+  status->state.base_speed = 0;
+
+  if (status->task.phase_mileage == 0) {
+    status->task.phase_mileage = 1;
+    maixcam_cmd_D(1);
+    ball_control_request(status, 0.0f, 0.0f);
   }
 }
 static void driver_task7(STATUS *status) {
