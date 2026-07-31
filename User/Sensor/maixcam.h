@@ -23,6 +23,13 @@ typedef struct {
   uint8_t valid;
 } VisionDetectionData;
 
+/* ── 位置数据 (VL 帧) ── */
+typedef struct {
+  int32_t x10;           /* x 坐标，单位 0.1mm */
+  uint8_t valid;
+  uint32_t update_tick;
+} VisionLocationData;
+
 /* ── 命令等待/重发状态 ── */
 #define MAIXCAM_CMD_FRAME_MAX  16
 #define MAIXCAM_RETRY_MAX       3
@@ -48,8 +55,10 @@ typedef struct {
 /* ── 模块全局 ── */
 extern MaixcamRxRing        maixcam_rx;
 extern VisionDetectionData  maixcam_det;
+extern VisionLocationData   maixcam_loc;
 extern MaixcamCmdReq        maixcam_cmd;
 extern uint8_t              maixcam_det_new;
+extern uint8_t              maixcam_loc_new;
 extern char                 maixcam_rx_raw_buf[64];
 extern uint8_t              maixcam_rx_raw_ready;
 

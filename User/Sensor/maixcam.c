@@ -1,4 +1,4 @@
-﻿#include "maixcam.h"
+#include "maixcam.h"
 #include "usart.h"
 #include "log.h"
 #include <stdio.h>
@@ -17,17 +17,17 @@ static volatile uint8_t maixcam_tx_head;
 static volatile uint8_t maixcam_tx_tail;
 static volatile uint8_t maixcam_tx_busy;
 
-/* 鈹€鈹€ 妯″潡鍏ㄥ眬鍙橀噺 鈹€鈹€ */
+/* 模块全局变量 */
 MaixcamRxRing        maixcam_rx;
 VisionDetectionData  maixcam_det;
+VisionLocationData   maixcam_loc;
 MaixcamCmdReq        maixcam_cmd;
 uint8_t              maixcam_det_new;
+uint8_t              maixcam_loc_new;
 char                 maixcam_rx_raw_buf[64];
 uint8_t              maixcam_rx_raw_ready;
 
-/* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?
- *  鐜舰缂撳啿
- * 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
+/* ── 环形缓冲 ── */
 
 void maixcam_init(void) {
   maixcam_rx.head     = 0;
@@ -40,6 +40,11 @@ void maixcam_init(void) {
   maixcam_det.distance10 = -10;
   maixcam_det.update_tick = 0;
   maixcam_det.valid   = 0;
+
+  maixcam_loc.x10     = 0;
+  maixcam_loc.valid   = 0;
+  maixcam_loc.update_tick = 0;
+  maixcam_loc_new     = 0;
 
   maixcam_cmd.state         = MAIXCAM_CMD_IDLE;
   maixcam_cmd.cmd_type      = 0;
@@ -68,9 +73,7 @@ static uint8_t maixcam_rx_read(uint8_t *out) {
   return 1;
 }
 
-/* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?
- *  鍛戒护鍙戦€?
- * 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
+/* ── 命令发送 (DMA TX) ── */
 
 static void maixcam_tx_start_next(void) {
   if (maixcam_tx_busy || maixcam_tx_head == maixcam_tx_tail) return;
@@ -170,9 +173,7 @@ void maixcam_cmd_send_val(char type, float v) {
   if (len > 0 && len < (int)sizeof(buf)) maixcam_start_cmd(type, buf, (uint8_t)len);
 }
 
-/* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?
- *  瓒呮椂/閲嶅彂鐘舵€佹満
- * 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
+/* ── 超时/重发状态机 ── */
 
 void maixcam_cmd_done(char cmd_type, uint8_t result) {
   if (maixcam_cmd.state != MAIXCAM_CMD_WAITING) return;
@@ -198,9 +199,7 @@ static void maixcam_tick_inner(void) {
   }
 }
 
-/* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?
- *  V 甯цВ鏋愬櫒 鈥?鐘舵€佹満閫愬瓧鑺傜粍甯э紝鍦ㄤ富寰幆/8ms tick 涓皟鐢?
- * 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
+/* ── V 帧解析器 —— 状态机逐字节组帧，在主循环/8ms tick 中调用 ── */
 
 #define MAIXCAM_FRAME_MAX  64
 
@@ -214,7 +213,7 @@ static char  mc_buf[MAIXCAM_FRAME_MAX];
 static uint8_t mc_idx;
 static uint8_t mc_new_detection;
 
-/* 鈹€鈹€ 鍥哄畾涓€浣嶅皬鏁拌В鏋愶細璇诲叆绗﹀彿鍙€夈€佹暣鏁般€佸皬鏁扮偣銆佷竴浣嶅皬鏁?鈹€鈹€ */
+/* ── 固定一位小数解析：读入符号可选、整数、小数点、一位小数 ── */
 static uint8_t parse_fixed1(const char **p, int32_t *out) {
   const char *s = *p;
   int8_t sign = 1;
@@ -241,7 +240,7 @@ static uint8_t parse_fixed1(const char **p, int32_t *out) {
   return 1;
 }
 
-/* 鈹€鈹€ 瑙ｆ瀽 VD 妫€娴嬫暟鎹抚锛歏D,<found>,<x>,<y>,<distance># 鈹€鈹€ */
+/* ── 解析 VD 检测数据帧：VD,<found>,<x>,<y>,<distance># ── */
 static void parse_vd_frame(const char *body) {
   const char *p = body;
 
@@ -279,7 +278,28 @@ static void parse_vd_frame(const char *body) {
   maixcam_det_new         = 1;
 }
 
-/* 鈹€鈹€ 瑙ｆ瀽鍛戒护搴旂瓟甯э細V<type>A<result># 鈹€鈹€ */
+/* ── 解析 VL 位置数据帧：VL,<x>,#   x 固定1位小数，单位mm ── */
+static void parse_vl_frame(const char *body) {
+  /* body = ",3.3,#" — 已经跳过了 "VL" */
+  const char *p = body;
+
+  if (*p != ',') return;
+  p++;
+
+  int32_t x10;
+  if (!parse_fixed1(&p, &x10)) return;
+
+  if (*p != ',') return;
+  p++;
+
+  if (*p != '#') return;
+
+  maixcam_loc.x10   = x10;
+  maixcam_loc.valid = 1;
+  maixcam_loc_new   = 1;
+}
+
+/* ── 解析命令应答帧：V<type>A<result># ── */
 static void parse_ack_frame(const char *body) {
   if (body[1] != 'A') return;
   char cmd_type = body[0];
@@ -290,11 +310,11 @@ static void parse_ack_frame(const char *body) {
   maixcam_cmd_done(cmd_type, result);
 }
 
-/* 鈹€鈹€ 鏀跺抚骞跺垎绫?鈹€鈹€ */
+/* ── 收帧并分类 ── */
 static void mc_frame_ready(const char *frame) {
   if (frame[0] != 'V') return;
 
-  /* 淇濆瓨鍘熷甯?*/
+  /* 保存原始帧 */
   {
     uint8_t i = 0;
     while (frame[i] && i < MAIXCAM_FRAME_MAX - 1) {
@@ -305,20 +325,26 @@ static void mc_frame_ready(const char *frame) {
     maixcam_rx_raw_ready = 1;
   }
 
-  /* VD,...# 鈥?妫€娴嬫暟鎹抚 */
+  /* VD,...# —— 检测数据帧 */
   if (frame[1] == 'D' && frame[2] == ',') {
     parse_vd_frame(frame + 2);
     return;
   }
 
-  /* V<type>A<result># 鈥?鍛戒护搴旂瓟甯?*/
+  /* VL,...# —— 位置数据帧 */
+  if (frame[1] == 'L' && frame[2] == ',') {
+    parse_vl_frame(frame + 2);
+    return;
+  }
+
+  /* V<type>A<result># —— 命令应答帧 */
   if (frame[2] == 'A' && frame[3] != '\0') {
     parse_ack_frame(frame + 1);
     return;
   }
 }
 
-/* 鈹€鈹€ 閫愬瓧鑺傛秷璐圭幆褰㈢紦鍐诧紝杩愯缁勫抚鐘舵€佹満 鈹€鈹€ */
+/* ── 逐字节消费环形缓冲，运行组帧状态机 ── */
 static void mc_feed_byte(uint8_t byte) {
   switch (mc_ps) {
 
@@ -355,9 +381,7 @@ static void mc_feed_byte(uint8_t byte) {
   }
 }
 
-/* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?
- *  姣?8ms 璋冪敤涓€娆★細娑堣垂鐜舰缂撳啿 + 瓒呮椂閲嶅彂
- * 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
+/* ── 每 8ms 调用一次：消费环形缓冲 + 超时重发 ── */
 
 void maixcam_poll(uint32_t time_ms) {
   uint8_t byte;
@@ -373,5 +397,3 @@ void maixcam_poll(uint32_t time_ms) {
 
   maixcam_tick_inner();
 }
-
-
