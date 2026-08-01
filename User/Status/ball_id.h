@@ -18,8 +18,13 @@ struct STATUS;
 #define BALL_ID_MOVE_SPEED_MM_S  15.0f
 #define BALL_ID_POST_RECORD_MS   600u
 #define BALL_ID_SAFETY_MM        65.0f
-#define BALL_ID_VISION_TIMEOUT   200u
-#define BALL_ID_MAX_RUN_MS       12000u
+/* ── 超时参数 (放宽以适应 MaixCAM WiFi 掉帧) ── */
+#define BALL_ID_VISION_TIMEOUT       8000u   /* 视觉帧最大间隔 ms (原200→8000)   */
+#define BALL_ID_MAX_RUN_MS           60000u  /* 单次实验总超时 ms (原12000→60000) */
+#define BALL_ID_BASELINE_TIMEOUT_MS  15000u  /* BASELINE 阶段超时 ms (原3000→15000) */
+#define BALL_ID_EXCITE_TIMEOUT_MS    5000u   /* EXCITE 阶段最大等待 ms (原1500→5000)   */
+#define BALL_ID_RETURN_ZERO_TIMEOUT_MS 5000u /* RETURN_ZERO 超时 ms (原2000→5000)    */
+#define BALL_ID_DONE_TIMEOUT_MS      8000u   /* DONE 阶段超时 ms (原3000→8000)         */
 
 /* Scan: 7 ratios for threshold detection */
 #define BALL_ID_SCAN_RATIOS 7u
@@ -35,7 +40,7 @@ struct STATUS;
 /* ── State ── */
 typedef struct {
     uint8_t  active;
-    uint8_t  run_id;        /* 0..11 */
+    uint8_t  run_id;        /* 0..25 (14 scan + 12 formal) */
     uint8_t  phase_id;      /* BASELINE/EXCITE/RETURN/POST/DONE */
     uint8_t  abort_code;
     uint8_t  command_sent;

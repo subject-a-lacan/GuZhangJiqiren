@@ -13,8 +13,7 @@ static const float scan_ratios[BALL_ID_SCAN_RATIOS] = {
     0.35f, 0.45f, 0.55f, 0.65f, 0.75f, 0.85f, 0.95f
 };
 
-static void id_abort(struct STATUS *status);
-float ball_control_get_velocity(struct STATUS *status);
+static void id_abort(struct STATUS *status, uint8_t code);
 
 static float id_absf(float x) { return x < 0.0f ? -x : x; }
 
@@ -59,9 +58,9 @@ static void id_buzzer_beep(STATUS *status, uint32_t dur) {
     status->device.buzzer.off_time = status->state.time + dur;
 }
 
-static void id_abort(STATUS *status) {
+static void id_abort(STATUS *status, uint8_t code) {
     if (ball_id.phase_id == BALL_ID_PHASE_DONE) return; /* already aborting */
-    ball_id.abort_code = (ball_id.abort_code == 0) ? 4 : ball_id.abort_code;
+    ball_id.abort_code = code;
     id_try_publish(BALL_STEPPER_ZERO_PULSE, (uint32_t)status->state.time);
     ball_id.phase_id = BALL_ID_PHASE_DONE;
     ball_id.phase_start_ms = (uint32_t)status->state.time;
@@ -134,17 +133,33 @@ void ball_id_service(STATUS *status) {
     float raw_mm = (float)status->sensor.vision.ball.x10 * 0.1f;
     if (ball_id.phase_id != BALL_ID_PHASE_DONE) {
         if (id_absf(raw_mm) >= BALL_ID_SAFETY_MM) {
-            ball_id.abort_code = 1; id_abort(status);
+            id_abort(status, 1);
         } else if (now_ms - ball_id.vision_last_ms > BALL_ID_VISION_TIMEOUT) {
-            ball_id.abort_code = 2; id_abort(status);
+            id_abort(status, 2);
         } else if (now_ms - ball_id.run_start_ms > BALL_ID_MAX_RUN_MS) {
-            ball_id.abort_code = 2; id_abort(status);
+            id_abort(status, 2);
         } else if (status->task.stop_request) {
-            ball_id.abort_code = 3; id_abort(status);
+            id_abort(status, 3);
         }
     }
     if (status->sensor.vision.ball.valid)
         ball_id.vision_last_ms = now_ms;
+
+    /* ── 基于视觉帧差分计算球速 (ball_control_service 在 ID 期间不运行) ── */
+    static uint32_t last_vel_seq;
+    static float    last_vel_x_mm;
+    static uint32_t last_vel_ts_ms;
+    float vision_vel_mm_s = 0.0f;
+    if (status->sensor.vision.ball.valid &&
+        status->sensor.vision.ball.sample_seq != last_vel_seq) {
+        uint32_t dt = status->sensor.vision.ball.timestamp_ms - last_vel_ts_ms;
+        if (dt > 0u && dt <= 1000u && last_vel_ts_ms > 0u) {
+            vision_vel_mm_s = (raw_mm - last_vel_x_mm) / ((float)dt * 0.001f);
+        }
+        last_vel_x_mm  = raw_mm;
+        last_vel_ts_ms = status->sensor.vision.ball.timestamp_ms;
+        last_vel_seq   = status->sensor.vision.ball.sample_seq;
+    }
 
     int32_t zero_pulse = BALL_STEPPER_ZERO_PULSE;
 
@@ -168,12 +183,12 @@ void ball_id_service(STATUS *status) {
             ball_id.command_sent = 0;
 
             float limit = (ball_id.side > 0) ? BALL_ACCEL_MAX : BALL_ACCEL_MIN;
-            ball_id.test_accel = (float)ball_id.side * ball_id.test_ratio * limit;
+            ball_id.test_accel = ball_id.test_ratio * limit;
             ball_id.target_pulse = id_clamp_pulse(ball_accel_to_absolute_pulse(ball_id.test_accel));
         }
-        /* Timeout: 3 s without 8 new frames → vision problem, abort */
-        if (now_ms - ball_id.run_start_ms > 3000u) {
-            ball_id.abort_code = 2; id_abort(status);
+        /* BASELINE 超时: 等不到足够视觉帧 → abort */
+        if (now_ms - ball_id.run_start_ms > BALL_ID_BASELINE_TIMEOUT_MS) {
+            id_abort(status, 2);
         }
         break;
     }
@@ -185,14 +200,14 @@ void ball_id_service(STATUS *status) {
             break;
         }
         float dx_mm = id_absf(raw_mm - ball_id.run_x0_mm);
-        float vel = ball_control_get_velocity(status);
         if (dx_mm >= BALL_ID_EXCITE_MM ||
-            id_absf(vel) >= BALL_ID_MOVE_SPEED_MM_S ||
+            id_absf(vision_vel_mm_s) >= BALL_ID_MOVE_SPEED_MM_S ||
             (status->stepper.reached && now_ms - ball_id.phase_start_ms >= 300u) ||
-            now_ms - ball_id.phase_start_ms >= 1500u) {
+            now_ms - ball_id.phase_start_ms >= BALL_ID_EXCITE_TIMEOUT_MS) {
 
             uint8_t is_scan = (ball_id.run_id < BALL_ID_SCAN_RATIOS * 2u);
-            if (is_scan && dx_mm >= BALL_ID_EXCITE_MM) {
+            if (is_scan && (dx_mm >= BALL_ID_EXCITE_MM ||
+                            id_absf(vision_vel_mm_s) >= BALL_ID_MOVE_SPEED_MM_S)) {
                 if (ball_id.side < 0 && ball_id.low_move_ratio <= 0.0f)
                     ball_id.low_move_ratio = ball_id.test_ratio;
                 if (ball_id.side > 0 && ball_id.high_move_ratio <= 0.0f)
@@ -210,7 +225,7 @@ void ball_id_service(STATUS *status) {
             if (id_try_publish(zero_pulse, now_ms))
                 ball_id.command_sent = 1;
         }
-        if (status->stepper.reached || now_ms - ball_id.phase_start_ms >= 2000u) {
+        if (status->stepper.reached || now_ms - ball_id.phase_start_ms >= BALL_ID_RETURN_ZERO_TIMEOUT_MS) {
             ball_id.phase_id = BALL_ID_PHASE_POST_RECORD;
             ball_id.phase_start_ms = now_ms;
         }
@@ -228,7 +243,7 @@ void ball_id_service(STATUS *status) {
 
     case BALL_ID_PHASE_DONE: {
         id_try_publish(zero_pulse, now_ms);
-        if (status->stepper.reached || now_ms - ball_id.phase_start_ms >= 3000u) {
+        if (status->stepper.reached || now_ms - ball_id.phase_start_ms >= BALL_ID_DONE_TIMEOUT_MS) {
             ball_id.active = 0;
             if (ball_id.abort_code == 0) {
                 ball_id.run_id++;  /* only advance on clean completion */
@@ -239,10 +254,6 @@ void ball_id_service(STATUS *status) {
     }
 
     }
-}
-
-float ball_control_get_velocity(STATUS *status) {
-    return status->control.ball.estimator.velocity_mm_s;
 }
 
 /* ── Log ── */
@@ -258,8 +269,13 @@ void ball_id_log_service(STATUS *status) {
     float rmm = (float)status->sensor.vision.ball.x10 * 0.1f;
     BALL_CONTROL *ball = &status->control.ball;
     static uint32_t cam_t0;
-    if (ball_id.phase_id == BALL_ID_PHASE_BASELINE && ball_id.baseline_frames == 0)
+    static uint32_t cam_t0_run_start;
+    /* ball_id_service 先于 log_service 递增 baseline_frames, 因此用 run_start_ms 判断新 run */
+    if (ball_id.phase_id == BALL_ID_PHASE_BASELINE &&
+        ball_id.run_start_ms != cam_t0_run_start) {
         cam_t0 = status->sensor.vision.ball.timestamp_ms;
+        cam_t0_run_start = ball_id.run_start_ms;
+    }
 
     id_log_buf[0]  = (float)ball_id.run_id;
     id_log_buf[1]  = (float)ball_id.phase_id;
@@ -286,7 +302,6 @@ void ball_id_log_service(STATUS *status) {
 
 void ball_id_log_flush(void) {
     if (!id_log_ready) return;
-    if (!ball_id.active) { id_log_ready = 0; return; }
     float local[20];
     uint32_t primask = __get_PRIMASK();
     __disable_irq();
